@@ -7,7 +7,7 @@ export default function BucketView({ step, language }: { step: Step; language: L
   const cumulative = step.type === 'prefix';
   const offset = ['offset', 'place'].includes(step.type);
   return <div className="bucket-view">
-    <p>{ko ? offset ? '버킷 · 다음 출력 위치' : cumulative ? '버킷 · 누적 빈도' : '버킷 · 빈도' : offset ? 'Buckets · next output position' : cumulative ? 'Buckets · cumulative frequency' : 'Buckets · frequency'}</p>
+    <p>{'digit' in step.variables ? ko ? `버킷 · 오른쪽 ${step.variables.digit}번째 자릿수` : `Buckets · digit ${step.variables.digit} from the right` : ko ? offset ? '버킷 · 다음 출력 위치' : cumulative ? '버킷 · 누적 빈도' : '버킷 · 빈도' : offset ? 'Buckets · next output position' : cumulative ? 'Buckets · cumulative frequency' : 'Buckets · frequency'}</p>
     <div className="bucket-grid" role="list" aria-label={ko ? '현재 버킷' : 'Current buckets'}>
       {buckets.map((bucket, index) => <div key={index} role="listitem" className={`bucket-cell ${step.variables.bucket === index ? 'active-bucket' : ''}`}>
         <span>{index + Number(step.variables.minimum ?? 0)}</span><strong>{Array.isArray(bucket) ? bucket.join(', ') || '∅' : bucket}</strong>

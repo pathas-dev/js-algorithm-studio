@@ -1,5 +1,6 @@
+import radixSource from '../src/algorithms/sorting/radix-sort/RadixSort.js?raw';
 import countingSource from '../src/algorithms/sorting/counting-sort/CountingSort.js?raw';
-import { traceCounting } from '../src/visualization/numeric';
+import { traceCounting, traceRadix } from '../src/visualization/numeric';
 import HeapSort from '../src/algorithms/sorting/heap-sort/HeapSort';
 import heapSource from '../src/algorithms/sorting/heap-sort/HeapSort.js?raw';
 import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
@@ -417,4 +418,28 @@ export const counting: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, linear, binary, bfs, dfs];
+export const radix: Algorithm = {
+  id: 'radix-sort', category: 'sort',
+  name: { ko: '기수 정렬', en: 'Radix sort' },
+  summary: { ko: '일의 자리부터 각 자릿수로 버킷에 나누고 순서대로 모읍니다. 이전 자릿수의 순서를 유지합니다.', en: 'Distribute by digits from right to left, then gather buckets in order while preserving previous digit order.' },
+  source: algorithmCode(radixSource), example: [170, 45, 75, 90, 802, 24, 2, 66], time: 'O(d(n + 10))', randomMax: 999,
+  inputHint: { ko: '0부터 999까지 정수 · d는 최댓값의 자릿수', en: 'Integers from 0 to 999 · d is the maximum digit count' },
+  run: (values) => numericSteps(traceRadix(values)),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['자릿수 정렬 준비', '입력을 복사하고 최댓값의 자릿수만큼 반복합니다. 빈 배열과 모두 0인 배열은 이미 정렬됐으므로 바로 완료합니다.']
+        : ['Prepare digit sorting', 'Copy the input and iterate over the maximum digit count. Empty and all-zero arrays are already sorted.'];
+      case 'bucket': return ko ? ['현재 자릿수로 분류', `오른쪽에서 ${v.digit}번째 자릿수로 버킷 ${v.bucket}에 넣었습니다. 해당 자릿수가 없으면 0으로 처리합니다. 같은 버킷 안에서는 입력 순서를 유지합니다.`]
+        : ['Distribute by this digit', `Use digit ${v.digit} from the right to place the value in bucket ${v.bucket}. Missing digits count as zero; preserve order within each bucket.`];
+      case 'gather': return ko ? ['버킷 순서대로 모으기', '버킷 0부터 9까지 차례대로 이어 붙입니다. 각 버킷 내부의 순서가 유지되어 이전에 정렬한 낮은 자릿수의 순서도 보존됩니다.']
+        : ['Gather buckets in order', 'Concatenate buckets 0 through 9. Preserving order within each bucket retains the order of previously processed lower digits.'];
+      case 'pass': return ko ? ['한 자릿수 완료', `오른쪽 ${v.digit}개 자릿수를 기준으로 정렬됐습니다. 더 높은 자릿수가 남았다면 다음 반복에서 처리합니다.`]
+        : ['Digit pass complete', `Sorted by the rightmost ${v.digit} digits. Process the next higher digit if one remains.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, bfs, dfs];

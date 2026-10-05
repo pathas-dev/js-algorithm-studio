@@ -15,6 +15,7 @@ export default class RadixSort extends Sort {
     const isArrayOfNumbers = this.isArrayOfNumbers(originalArray);
 
     let sortedArray = [...originalArray];
+    this.recordStep('start', sortedArray, [], {}, 'let sortedArray = [...originalArray];');
     const numPasses = this.determineNumPasses(sortedArray);
 
     for (let currentIndex = 0; currentIndex < numPasses; currentIndex += 1) {
@@ -22,12 +23,27 @@ export default class RadixSort extends Sort {
         ? this.placeElementsInNumberBuckets(sortedArray, currentIndex)
         : this.placeElementsInCharacterBuckets(sortedArray, currentIndex, numPasses);
 
+      this.recordStep(
+        'gather',
+        sortedArray,
+        [],
+        () => ({ digit: currentIndex + 1, buckets: JSON.stringify(buckets) }),
+        'sortedArray = buckets.reduce((acc, val) => {',
+      );
       // Flatten buckets into sortedArray, and repeat at next index
       sortedArray = buckets.reduce((acc, val) => {
         return [...acc, ...val];
       }, []);
+      this.recordStep('pass', sortedArray, [], { digit: currentIndex + 1 }, '}, []);');
     }
 
+    this.recordStep(
+      'done',
+      sortedArray,
+      [],
+      { sortedCount: sortedArray.length },
+      'return sortedArray;',
+    );
     return sortedArray;
   }
 
@@ -42,10 +58,17 @@ export default class RadixSort extends Sort {
     const divided = 10 ** index;
     const buckets = this.createBuckets(NUMBER_OF_POSSIBLE_DIGITS);
 
-    array.forEach((element) => {
+    array.forEach((element, elementIndex) => {
       this.callbacks.visitingCallback(element);
       if (element < divided) {
         buckets[0].push(element);
+        this.recordStep(
+          'bucket',
+          array,
+          [elementIndex],
+          () => ({ digit: index + 1, bucket: 0, buckets: JSON.stringify(buckets) }),
+          'buckets[0].push(element);',
+        );
       } else {
         /**
          * Say we have element of 1,052 and are currently on index 1 (starting from 0). This means
@@ -54,6 +77,13 @@ export default class RadixSort extends Sort {
          */
         const currentDigit = Math.floor((element % modded) / divided);
         buckets[currentDigit].push(element);
+        this.recordStep(
+          'bucket',
+          array,
+          [elementIndex],
+          () => ({ digit: index + 1, bucket: currentDigit, buckets: JSON.stringify(buckets) }),
+          'buckets[currentDigit].push(element);',
+        );
       }
     });
 

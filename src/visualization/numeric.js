@@ -1,3 +1,4 @@
+import RadixSort from '../algorithms/sorting/radix-sort/RadixSort';
 import CountingSort from '../algorithms/sorting/counting-sort/CountingSort';
 
 export function requireIntegers(values) {
@@ -12,5 +13,13 @@ export function traceCounting(values) {
   if (maximum - minimum >= 64) throw new Error('buckets');
   const steps = [];
   new CountingSort({ stepCallback: (step) => steps.push(step) }).sort(values, minimum, maximum);
+  return steps;
+}
+
+export function traceRadix(values) {
+  requireIntegers(values);
+  if (values.some((value) => value < 0)) throw new Error('nonnegative');
+  const steps = [];
+  new RadixSort({ stepCallback: (step) => steps.push(step) }).sort(values);
   return steps;
 }
