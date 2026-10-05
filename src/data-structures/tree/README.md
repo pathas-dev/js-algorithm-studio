@@ -1,8 +1,7 @@
 # Tree
 
-_Read this in other languages:_
-[_简体中文_](README.zh-CN.md),
-[_Português_](README.pt-BR.md)
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 * [Binary Search Tree](binary-search-tree)
 * [AVL Tree](avl-tree)

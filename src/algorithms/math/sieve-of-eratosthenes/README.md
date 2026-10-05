@@ -1,5 +1,7 @@
 # Sieve of Eratosthenes
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 The Sieve of Eratosthenes is an algorithm for finding all prime numbers up to some limit `n`.
 
 It is attributed to Eratosthenes of Cyrene, an ancient Greek mathematician.

@@ -1,5 +1,7 @@
 # Maximum subarray problem
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 The maximum subarray problem is the task of finding the contiguous
 subarray within a one-dimensional array, `a[1...n]`, of numbers
 which has the largest sum, where,

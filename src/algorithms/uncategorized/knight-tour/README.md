@@ -1,5 +1,7 @@
 # Knight's Tour
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 A **knight's tour** is a sequence of moves of a knight on a chessboard 
 such that the knight visits every square only once. If the knight 
 ends on a square that is one knight's move from the beginning 

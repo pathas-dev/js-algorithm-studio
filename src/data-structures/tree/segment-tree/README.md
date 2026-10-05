@@ -1,7 +1,7 @@
 # Segment Tree
 
-_Read this in other languages:_
-[_Português_](README.pt-BR.md) 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 In computer science, a **segment tree** also known as a statistic tree 
 is a tree data structure used for storing information about intervals, 

@@ -1,16 +1,7 @@
 # 다익스트라 알고리즘 (Dijkstra's Algorithm)
 
-_다른 언어로 읽기:_
-[_English_](README.md),
-[_한국어_](README.ko-KR.md),
-[_日本語_](README.ja-JP.md),
-[_简体中文_](README.zh-CN.md),
-[_繁體中文_](README.zh-TW.md),
-[_Українська_](README.uk-UA.md),
-[_Español_](README.es-ES.md),
-[_Français_](README.fr-FR.md),
-[_Deutsch_](README.de-DE.md),
-[_עברית_](README.he-IL.md)
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 다익스트라 알고리즘은 그래프의 노드 간 최단 경로를 찾는 알고리즘으로, 예를 들어 도로망을 표현할 수 있습니다.
 
@@ -38,7 +29,7 @@ _다른 언어로 읽기:_
 
 가중치가 있는 그래프가 있다고 가정합시다. 각 간선에는 노드 간의 거리 값이 있습니다. 예를 들어, 노드 `A`와 `B` 사이의 거리가 `7m`라고 하겠습니다.
 
-이 알고리즘은 항상 출발 노드로부터 가장 짧은 거리를 가진 방문하지 않은 노드를 꺼내기 위해 [우선순위 큐](../../../data-structures/priority-queue/)를 사용합니다.
+이 알고리즘은 항상 출발 노드로부터 가장 짧은 거리를 가진 방문하지 않은 노드를 꺼내기 위해 [우선순위 큐](../../../data-structures/priority-queue/README.ko-KR.md)를 사용합니다.
 
 출발 노드는 자기 자신으로부터의 거리가 `0m`이므로, 우선순위 큐에는 처음에 이 노드만 포함되어 있습니다.
 

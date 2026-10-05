@@ -1,7 +1,7 @@
 # Radix Sort
 
-_Read this in other languages:_
-[_Português_](README.pt-BR.md),
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 In computer science, **radix sort** is a non-comparative integer sorting
 algorithm that sorts data with integer keys by grouping keys by the individual

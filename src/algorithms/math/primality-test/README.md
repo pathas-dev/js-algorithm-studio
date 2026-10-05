@@ -1,5 +1,7 @@
 # Primality Test
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 A **prime number** (or a **prime**) is a natural number greater than `1` that 
 cannot be formed by multiplying two smaller natural numbers. A natural number 
 greater than `1` that is not prime is called a composite number. For 

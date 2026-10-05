@@ -1,7 +1,7 @@
 # Insertion Sort
 
-_Read this in other languages:_
-[_Português_](README.pt-BR.md)
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 Insertion sort is a simple sorting algorithm that builds 
 the final sorted array (or list) one item at a time. 

@@ -1,7 +1,7 @@
 # Least Recently Used (LRU) Cache
 
-_Read this in other languages:_
-[한국어](README.ko-KR.md),
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 A **Least Recently Used (LRU) Cache** organizes items in order of use, allowing you to quickly identify which item hasn't been used for the longest amount of time.
 

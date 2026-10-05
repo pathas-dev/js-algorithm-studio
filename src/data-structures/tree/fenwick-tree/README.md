@@ -1,7 +1,7 @@
 # Fenwick Tree / Binary Indexed Tree
 
-_Read this in other languages:_
-[_Português_](README.pt-BR.md) 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 A **Fenwick tree** or **binary indexed tree** is a data 
 structure that can efficiently update elements and 

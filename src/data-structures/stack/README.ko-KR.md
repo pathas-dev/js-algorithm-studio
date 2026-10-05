@@ -1,11 +1,7 @@
 # 스택
 
-_Read this in other languages:_
-[_简体中文_](README.zh-CN.md),
-[_Русский_](README.ru-RU.md),
-[_日本語_](README.ja-JP.md),
-[_Français_](README.fr-FR.md),
-[_Português_](README.pt-BR.md)
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 컴퓨터 과학에서, **스택**은 아래의 두가지 연산을 가진 요소들의 집합인 추상 자료형입니다.
 

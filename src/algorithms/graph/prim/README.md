@@ -1,5 +1,7 @@
 # Prim's Algorithm
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 In computer science, **Prim's algorithm** is a greedy algorithm that 
 finds a minimum spanning tree for a weighted undirected graph. 
 

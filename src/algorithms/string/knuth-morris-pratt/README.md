@@ -1,5 +1,7 @@
 # Knuth–Morris–Pratt Algorithm
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 The Knuth–Morris–Pratt string searching algorithm (or 
 KMP algorithm) searches for occurrences of a "word" `W` 
 within a main "text string" `T` by employing the 

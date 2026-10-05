@@ -1,5 +1,7 @@
 # Articulation Points (or Cut Vertices)
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 A vertex in an undirected connected graph is an articulation point
 (or cut vertex) if removing it (and edges through it) disconnects 
 the graph. Articulation points represent vulnerabilities in a 

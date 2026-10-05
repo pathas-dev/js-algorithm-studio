@@ -1,5 +1,7 @@
 # Hamming Distance
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 the Hamming distance between two strings of equal length is the 
 number of positions at which the corresponding symbols are 
 different. In other words, it measures the minimum number of

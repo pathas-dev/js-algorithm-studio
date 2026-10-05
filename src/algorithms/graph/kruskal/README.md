@@ -1,7 +1,7 @@
 # Kruskal's Algorithm
 
-_Read this in other languages:_
-[_한국어_](README.ko-KR.md)
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 Kruskal's algorithm is a minimum-spanning-tree algorithm which 
 finds an edge of the least possible weight that connects any two 

@@ -1,5 +1,7 @@
 # Levenshtein Distance
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 The Levenshtein distance is a string metric for measuring the 
 difference between two sequences. Informally, the Levenshtein 
 distance between two words is the minimum number of 

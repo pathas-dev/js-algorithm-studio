@@ -1,7 +1,7 @@
 # Complex Number
 
-_Read this in other languages:_
-[français](README.fr-FR.md).
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 A **complex number** is a number that can be expressed in the
 form `a + b * i`, where `a` and `b` are real numbers, and `i` is a solution of
@@ -114,7 +114,7 @@ To multiply complex numbers each part of the first complex number gets multiplie
 by each part of the second complex number:
 
 Just use "FOIL", which stands for "**F**irsts, **O**uters, **I**nners, **L**asts" (
-see [Binomial Multiplication](ttps://www.mathsisfun.com/algebra/polynomials-multiplying.html) for
+see [Binomial Multiplication](https://www.mathsisfun.com/algebra/polynomials-multiplying.html) for
 more details):
 
 ![Complex Multiplication](https://www.mathsisfun.com/algebra/images/foil-complex.svg)

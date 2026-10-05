@@ -1,5 +1,7 @@
 # Deque (Double-Ended Queue)
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 A **deque** (pronounced "deck", short for **double-ended queue**) is a linear data
 structure that generalizes both a stack and a queue. Elements can be added or
 removed from **either end** — the front (head) or the back (tail) — in **O(1)** time.

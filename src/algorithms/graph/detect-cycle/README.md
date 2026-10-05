@@ -1,5 +1,7 @@
 # Detect Cycle in Graphs
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 In graph theory, a **cycle** is a path of edges and vertices 
 wherein a vertex is reachable from itself. There are several 
 different types of cycles, principally a **closed walk** and 

@@ -1,5 +1,7 @@
 # Z Algorithm
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 The Z-algorithm finds occurrences of a "word" `W` 
 within a main "text string" `T` in linear time `O(|W| + |T|)`.
 

@@ -1,5 +1,7 @@
 # Longest Common Substring Problem
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 The longest common substring problem is to find the longest string 
 (or strings) that is a substring (or are substrings) of two or more 
 strings.

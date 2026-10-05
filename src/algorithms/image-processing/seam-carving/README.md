@@ -1,5 +1,7 @@
 # Content-aware image resizing in JavaScript
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 ![Content-aware image resizing in JavaScript](https://raw.githubusercontent.com/trekhleb/trekhleb.github.io/master/src/posts/2021/content-aware-image-resizing-in-javascript/assets/01-cover-02.png)
 
 > There is an [interactive version of this post](https://trekhleb.dev/blog/2021/content-aware-image-resizing-in-javascript/) available where you can upload and resize your custom images.

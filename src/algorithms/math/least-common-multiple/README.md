@@ -1,5 +1,7 @@
 # Least common multiple
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 In arithmetic and number theory, the least common multiple, 
 lowest common multiple, or smallest common multiple of 
 two integers `a` and `b`, usually denoted by `LCM(a, b)`, is 

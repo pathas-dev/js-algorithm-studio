@@ -1,5 +1,7 @@
 # Shortest Common Supersequence
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 The shortest common supersequence (SCS) of two sequences `X` and `Y` 
 is the shortest sequence which has `X` and `Y` as subsequences.
 

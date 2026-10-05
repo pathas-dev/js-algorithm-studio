@@ -1,7 +1,7 @@
 # Euclidean algorithm
 
-_Read this in other languages:_
-[français](README.fr-FR.md).
+[English](README.md) | [한국어](README.ko-KR.md)
+
 
 In mathematics, the Euclidean algorithm, or Euclid's algorithm,
 is an efficient method for computing the greatest common divisor

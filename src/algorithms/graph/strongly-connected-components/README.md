@@ -1,5 +1,7 @@
 # Strongly Connected Component
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 A directed graph is called **strongly connected** if there is a path 
 in each direction between each pair of vertices of the graph. 
 In a directed graph G that may not itself be strongly connected, 

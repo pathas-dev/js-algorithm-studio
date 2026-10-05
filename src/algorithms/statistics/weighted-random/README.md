@@ -1,5 +1,7 @@
 # Weighted Random
 
+[English](README.md) | [한국어](README.ko-KR.md)
+
 ![Weighted Random](images/cover.png)
 
 ## What is "Weighted Random"
