@@ -7,6 +7,13 @@ export default class CountingSort extends Sort {
    * @param {number} [biggestElement]
    */
   sort(originalArray, smallestElement = undefined, biggestElement = undefined) {
+    this.recordStep(
+      'start',
+      originalArray,
+      [],
+      {},
+      'let detectedSmallestElement = smallestElement || 0;',
+    );
     // Init biggest and smallest elements in array in order to build number bucket array later.
     let detectedSmallestElement = smallestElement || 0;
     let detectedBiggestElement = biggestElement || 0;
@@ -32,11 +39,29 @@ export default class CountingSort extends Sort {
     // This array will hold frequency of each number from originalArray.
     const buckets = Array(detectedBiggestElement - detectedSmallestElement + 1).fill(0);
 
-    originalArray.forEach((element) => {
+    this.recordStep(
+      'buckets',
+      originalArray,
+      [],
+      () => ({ minimum: detectedSmallestElement, buckets: JSON.stringify(buckets) }),
+      'const buckets = Array(',
+    );
+    originalArray.forEach((element, index) => {
       // Visit element.
       this.callbacks.visitingCallback(element);
 
       buckets[element - detectedSmallestElement] += 1;
+      this.recordStep(
+        'count',
+        originalArray,
+        [index],
+        () => ({
+          minimum: detectedSmallestElement,
+          bucket: element - detectedSmallestElement,
+          buckets: JSON.stringify(buckets),
+        }),
+        'buckets[element - detectedSmallestElement] += 1;',
+      );
     });
 
     // Add previous frequencies to the current one for each number in bucket
@@ -44,6 +69,17 @@ export default class CountingSort extends Sort {
     // the left of current one.
     for (let bucketIndex = 1; bucketIndex < buckets.length; bucketIndex += 1) {
       buckets[bucketIndex] += buckets[bucketIndex - 1];
+      this.recordStep(
+        'prefix',
+        originalArray,
+        [],
+        () => ({
+          minimum: detectedSmallestElement,
+          bucket: bucketIndex,
+          buckets: JSON.stringify(buckets),
+        }),
+        'buckets[bucketIndex] += buckets[bucketIndex - 1];',
+      );
     }
 
     // Now let's shift frequencies to the right so that they show correct numbers.
@@ -55,6 +91,17 @@ export default class CountingSort extends Sort {
 
     // Now let's assemble sorted array.
     const sortedArray = Array(originalArray.length).fill(null);
+    this.recordStep(
+      'offset',
+      originalArray,
+      [],
+      () => ({
+        minimum: detectedSmallestElement,
+        buckets: JSON.stringify(buckets),
+        output: JSON.stringify(sortedArray),
+      }),
+      'buckets.unshift(0);',
+    );
     for (let elementIndex = 0; elementIndex < originalArray.length; elementIndex += 1) {
       // Get the element that we want to put into correct sorted position.
       const element = originalArray[elementIndex];
@@ -67,12 +114,32 @@ export default class CountingSort extends Sort {
 
       // Put element into correct position in sorted array.
       sortedArray[elementSortedPosition] = element;
+      this.recordStep(
+        'place',
+        originalArray,
+        [elementIndex],
+        () => ({
+          minimum: detectedSmallestElement,
+          bucket: element - detectedSmallestElement,
+          position: elementSortedPosition,
+          buckets: JSON.stringify(buckets),
+          output: JSON.stringify(sortedArray),
+        }),
+        'sortedArray[elementSortedPosition] = element;',
+      );
 
       // Increase position of current element in the bucket for future correct placements.
       buckets[element - detectedSmallestElement] += 1;
     }
 
     // Return sorted array.
+    this.recordStep(
+      'done',
+      sortedArray,
+      [],
+      { sortedCount: sortedArray.length },
+      'return sortedArray;',
+    );
     return sortedArray;
   }
 }

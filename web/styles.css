@@ -95,3 +95,10 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .heap-view { border-bottom: 1px solid #e4ece6; padding-bottom: 12px; color: #687b6e; font-size: 12px; }
 .heap-view svg { display: block; width: 100%; }
 .heap-view output { display: block; font-family: monospace; }
+
+.bucket-view { padding: 10px 0; color: #617469; font-size: 12px; }
+.bucket-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.bucket-cell { min-width: 40px; flex: 1 0 40px; max-width: 76px; border: 1px solid #dce5dd; border-radius: 6px; padding: 5px; text-align: center; overflow-wrap: anywhere; }
+.bucket-cell span { display: block; color: #617469; font-size: 10px; }
+.bucket-cell strong { color: #305645; font-size: 12px; }
+.active-bucket { background: #fff0d8; border-color: #d8964a; }

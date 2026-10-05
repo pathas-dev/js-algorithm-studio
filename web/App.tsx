@@ -5,6 +5,7 @@ import { MAX_VALUES, parseTarget, parseValues, playbackReducer } from '../src/vi
 import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
 import { parseEdges } from '../src/visualization/graph';
 import GraphView from './GraphView';
+import BucketView from './BucketView';
 import HeapView from './HeapView';
 import ArrayView from './ArrayView';
 import CodePanel from './CodePanel';
@@ -76,12 +77,14 @@ export default function App() {
   }
 
   function randomize() {
-    const values = Array.from({ length: 8 }, () => Math.floor(Math.random() * 90) + 1);
+    const values = Array.from({ length: 8 }, () => Math.floor(Math.random() * (algorithm.randomMax ?? 90)) + 1);
     if (algorithm.requiresSorted) values.sort((a, b) => a - b);
     apply(values.join(', '));
   }
 
   const errors: Record<string, string> = {
+    integers: t('이 알고리즘에는 정수만 입력할 수 있습니다.', 'This algorithm requires integers.'),
+    buckets: t('최댓값과 최솟값의 차이는 63 이하여야 합니다. 최대 64개 버킷을 표시합니다.', 'The maximum minus minimum must be at most 63, giving at most 64 buckets.'),
     nodes: t('정점은 1부터 12 사이의 서로 다른 정수여야 합니다. 최대 12개, 최소 1개를 입력하세요.', 'Use 1–12 distinct integer vertices, labeled between 1 and 12.'),
     edges: t('간선은 1-2, 2-3 형식으로 입력하세요. 존재하는 정점끼리 연결하며 중복·자기 연결 없이 최대 24개까지 허용합니다.', 'Use edges such as 1-2, 2-3 between existing vertices. At most 24 edges; no duplicates or self-loops.'),
     start: t('시작 정점은 입력한 정점 중 하나여야 합니다.', 'The start vertex must be one of the input vertices.'),
@@ -133,6 +136,7 @@ export default function App() {
                   <Paper withBorder className="canvas-card">
                     <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
                     {algorithm.category === 'sort' && 'depth' in step.variables && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
+                    {'buckets' in step.variables && <BucketView step={step} language={language} />}
                     {'heapSize' in step.variables && <HeapView step={step} language={language} />}
                     {algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : <ArrayView step={step} language={language} />}
                     <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
@@ -146,7 +150,7 @@ export default function App() {
                       {error && <span role="alert" className="sr-only">{errors[error]}</span>}
                     </form>
                     {algorithm.requiresSorted && <Text size="xs" c="teal" mt="xs">{t('오름차순 배열이 필요합니다. 인덱스는 입력 배열 기준입니다.', 'Requires an ascending array. Indices refer to the input array.')}</Text>}
-                    <Group justify="space-between" mt="sm"><Text size="xs" c="dimmed">{algorithm.category === 'graph' ? t('무방향 그래프 · 1–12 정점 · 최대 24개 간선', 'Undirected graph · 1–12 vertices · up to 24 edges') : t(`최대 ${MAX_VALUES}개 · 음수·중복·소수 지원`, `Up to ${MAX_VALUES} values · negatives, duplicates, decimals`)}</Text>{algorithm.category !== 'graph' && <Button variant="subtle" size="compact-xs" onClick={randomize}>{t('무작위', 'Randomize')}</Button>}</Group>
+                    <Group justify="space-between" mt="sm"><Text size="xs" c="dimmed">{algorithm.category === 'graph' ? t('무방향 그래프 · 1–12 정점 · 최대 24개 간선', 'Undirected graph · 1–12 vertices · up to 24 edges') : algorithm.inputHint?.[language] ?? t(`최대 ${MAX_VALUES}개 · 음수·중복·소수 지원`, `Up to ${MAX_VALUES} values · negatives, duplicates, decimals`)}</Text>{algorithm.category !== 'graph' && <Button variant="subtle" size="compact-xs" onClick={randomize}>{t('무작위', 'Randomize')}</Button>}</Group>
                   </Paper>
                 </div>
                 <div className="detail-column">
@@ -154,7 +158,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>

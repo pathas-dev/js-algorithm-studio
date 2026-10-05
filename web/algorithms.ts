@@ -1,3 +1,5 @@
+import countingSource from '../src/algorithms/sorting/counting-sort/CountingSort.js?raw';
+import { traceCounting } from '../src/visualization/numeric';
 import HeapSort from '../src/algorithms/sorting/heap-sort/HeapSort';
 import heapSource from '../src/algorithms/sorting/heap-sort/HeapSort.js?raw';
 import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
@@ -43,6 +45,8 @@ export type Algorithm = {
   category: 'sort' | 'search' | 'graph';
   target?: number;
   requiresSorted?: boolean;
+  inputHint?: Record<Language, string>;
+  randomMax?: number;
   graphEdges?: number[][];
   run(values: number[], target?: number, edges?: number[][]): Step[];
   explain(step: Step, language: Language): [string, string];
@@ -381,4 +385,36 @@ export const heap: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, linear, binary, bfs, dfs];
+function numericSteps(steps: (Omit<Step, 'array'> & { array: number[] })[]): Step[] {
+  return steps.map((step) => ({ ...step, array: step.array.map((value, id) => ({ value, id })) }));
+}
+
+export const counting: Algorithm = {
+  id: 'counting-sort', category: 'sort',
+  name: { ko: '계수 정렬', en: 'Counting sort' },
+  summary: { ko: '정수의 빈도를 세고 누적합으로 출력 위치를 계산합니다. 음수와 중복을 지원합니다.', en: 'Count integer frequencies, then use cumulative counts to place values. Supports negatives and duplicates.' },
+  source: algorithmCode(countingSource), example: [4, 2, -1, 4, 0, 2], time: 'O(n + k)', randomMax: 30,
+  inputHint: { ko: '정수만 허용 · 최댓값 − 최솟값 ≤ 63 · k는 버킷 수', en: 'Integers only · max − min ≤ 63 · k is the bucket count' },
+  run: (values) => numericSteps(traceCounting(values)),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['값 범위 준비', '입력에서 최솟값과 최댓값을 미리 계산해 전달했습니다. 두 값 사이의 각 정수에 버킷 하나를 할당합니다.']
+        : ['Prepare the range', 'Pass the precomputed input minimum and maximum. Allocate one bucket for each integer in this range.'];
+      case 'buckets': return ko ? ['빈도 버킷 생성', `최솟값 ${v.minimum}부터 시작하는 빈도 버킷을 0으로 채웁니다. 값에서 최솟값을 빼면 버킷 인덱스가 됩니다.`]
+        : ['Create frequency buckets', `Create zeroed buckets starting at minimum ${v.minimum}. Subtract the minimum to obtain a bucket index.`];
+      case 'count': return ko ? ['빈도 증가', '현재 입력 값에 해당하는 버킷의 빈도를 1 늘렸습니다. 막대 배열은 원본 입력이며 버킷이 빈도를 저장합니다.']
+        : ['Count a value', 'Increment the bucket for the current input value. Bars show the original input; buckets store frequencies.'];
+      case 'prefix': return ko ? ['누적 빈도 계산', '앞 버킷의 누적 빈도를 더합니다. 이 버킷에는 해당 값 이하인 입력 값의 개수가 저장됩니다.']
+        : ['Accumulate counts', 'Add the previous cumulative count. This bucket now counts all input values less than or equal to its value.'];
+      case 'offset': return ko ? ['출력 시작 위치 계산', '누적 빈도를 한 칸 오른쪽으로 옮기고 처음에 0을 넣었습니다. 각 버킷은 해당 값이 들어갈 첫 출력 위치를 가리킵니다.']
+        : ['Compute starting positions', 'Shift cumulative counts right and insert zero. Each bucket points to the first output position for its value.'];
+      case 'place': return ko ? ['출력 위치에 배치', `출력 인덱스 ${v.position}에 현재 값을 넣었습니다. 다음 같은 값은 버킷의 위치를 1 늘려 그다음 칸에 넣습니다.`]
+        : ['Place in the output', `Place the value at output index ${v.position}. Increment the bucket position for the next equal value.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, linear, binary, bfs, dfs];
