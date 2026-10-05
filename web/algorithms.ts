@@ -1,7 +1,9 @@
+import heapClassSource from '../src/data-structures/heap/Heap.js?raw';
+import minHeapSource from '../src/data-structures/heap/MinHeap.js?raw';
 import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList, traceHeap } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -758,4 +760,38 @@ export const linkedList: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList];
+export const minHeap: Algorithm = {
+  id: 'min-heap', category: 'structure', usesStart: false,
+  name: { ko: '최소 힙', en: 'Min heap' },
+  summary: { ko: '루트에서 최솟값을 꺼냅니다. 삽입 후 위로, 추출 후 아래로 교환하며 힙 순서를 복원합니다.', en: 'Extract the minimum at the root. Restore heap order upward after insertion and downward after extraction.' },
+  source: algorithmCode(heapClassSource + '\n' + minHeapSource), example: [8, 3, 6, 1, 5, 2],
+  operations: 'peek, add 0, poll, poll, peek', operationHint: 'add 0, poll, peek',
+  time: { ko: 'add · poll O(log n) · peek O(1)', en: 'add · poll O(log n) · peek O(1)' },
+  run: (values, _target, _edges, _directed, operations = minHeap.operations) => traceHeap(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 최소 힙 준비', '기존 MinHeap을 실행합니다. 배열 인덱스 i의 자식은 2i+1, 2i+2이며 부모는 floor((i-1)/2)입니다.']
+        : ['Create an empty min heap', 'Run the existing MinHeap. Children of index i are 2i+1 and 2i+2; its parent is floor((i-1)/2).'];
+      case 'add': return ko ? ['마지막 위치에 추가', `값 ${v.value}을 배열 끝에 추가했습니다. 아직 부모보다 작을 수 있어 위로 올리며 확인합니다.`]
+        : ['Append at the last position', `Append ${v.value}. It may be smaller than its parent, so check upward.`];
+      case 'compare-up': return ko ? ['부모와 비교', step.indices.length > 1 ? '부모 ≤ 자식인지 확인합니다. 자식이 더 작으면 두 위치를 교환하고 새 부모를 확인합니다.' : '루트에 도달해 부모가 없습니다. 위로 올리기를 끝냅니다.']
+        : ['Compare with the parent', step.indices.length > 1 ? 'Check parent ≤ child. Swap if the child is smaller, then inspect its new parent.' : 'The root has no parent. Stop moving upward.'];
+      case 'swap': return ko ? ['힙 위치 교환', '순서가 어긋난 부모와 자식을 교환했습니다. 새 위치에서 힙 조건을 다시 확인합니다. 주황색 노드가 교환한 위치입니다.']
+        : ['Swap heap positions', 'Swap the out-of-order parent and child. Check heap order again at the new position. Orange marks the exchanged positions.'];
+      case 'replace-root': return ko ? ['마지막 값을 루트로 이동', '기존 최솟값을 빼고 배열 마지막 값을 루트로 옮겼습니다. 더 작은 자식과 비교하며 아래로 내려 힙 순서를 복원합니다.']
+        : ['Move the last value to the root', 'Remove the old minimum and move the last value to the root. Compare with the smaller child and move downward to restore order.'];
+      case 'compare-down': return ko ? ['더 작은 자식과 비교', '왼쪽·오른쪽 자식 중 작은 쪽을 골랐습니다. 부모가 그 자식 이하이면 멈추고, 그렇지 않으면 교환합니다.']
+        : ['Compare with the smaller child', 'Choose the smaller child. Stop if the parent is no greater; otherwise swap.'];
+      case 'settled': return ko ? ['힙 순서 복원', '삽입을 마쳤습니다. 모든 부모가 자식 이하이며 루트가 최솟값입니다. 배열 전체가 정렬된 것은 아닙니다.']
+        : ['Heap order restored', 'Insertion is complete. Every parent is no greater than its children; the root is minimum. The full array is not sorted.'];
+      case 'peek': case 'poll': return ko ? [step.type === 'peek' ? '최솟값 조회' : '최솟값 추출', v.result === 'null' ? '빈 힙이므로 null을 반환합니다.' : `${v.operation}()의 반환 값은 ${v.result}입니다.${step.type === 'peek' ? ' 구조는 바뀌지 않습니다.' : ' 남은 힙의 순서를 복원했습니다.'}`]
+        : [step.type === 'peek' ? 'Peek at the minimum' : 'Extract the minimum', v.result === 'null' ? 'The heap is empty; return null.' : `${v.operation}() returns ${v.result}.${step.type === 'peek' ? ' Leave the heap unchanged.' : ' Restore order in the remaining heap.'}`];
+      default: return ko ? ['연산 완료', '남은 최소 힙입니다. 타임라인에서 교환 전후와 최솟값 추출을 비교해 보세요.']
+        : ['Operations complete', 'The remaining min heap is shown. Rewind to compare swaps and minimum extraction.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap];

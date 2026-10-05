@@ -1,3 +1,4 @@
+import MinHeap from '../data-structures/heap/MinHeap';
 import LinkedList from '../data-structures/linked-list/LinkedList';
 import Queue from '../data-structures/queue/Queue';
 import Stack from '../data-structures/stack/Stack';
@@ -145,5 +146,57 @@ export function traceLinkedList(values, operations = '') {
   commands.forEach((command) => run(command, 'commands'));
   list.toArray();
   snapshot('done', 'toArray() {');
+  return steps;
+}
+
+export function traceHeap(values, operations = '') {
+  const commands = parseOperations(operations, { add: 1, poll: 0, peek: 0 });
+  if (values.length > MAX_VALUES) throw new Error('limit');
+  const steps = [];
+  let context = {};
+  let nextId = 0;
+  const heap = new MinHeap((a, b) => a.value - b.value, (step) => {
+    steps.push({
+      ...step,
+      variables: {
+        ...context, structure: 'heap', sortedCount: 0, heapSize: step.array.length, adjusting: true,
+      },
+    });
+  });
+  const snapshot = (type, code, variables = {}, indices = []) => {
+    steps.push({
+      type,
+      code,
+      array: [...heap.heapContainer],
+      indices,
+      variables: {
+        ...context,
+        structure: 'heap',
+        sortedCount: 0,
+        heapSize: heap.heapContainer.length,
+        adjusting: false,
+        ...variables,
+      },
+    });
+  };
+  snapshot('start', 'this.heapContainer = [];');
+  const run = ({ name, value }, phase) => {
+    context = { operation: name, phase };
+    if (name === 'add') {
+      if (heap.heapContainer.length >= MAX_VALUES) throw new Error('capacity');
+      context.value = value;
+      heap.add({ value, id: nextId });
+      nextId += 1;
+      snapshot('settled', 'return this;');
+    } else {
+      const result = heap[name]();
+      snapshot(name, `${name}() {`, { result: result ? result.value : 'null' }, name === 'peek' && result ? [0] : []);
+    }
+  };
+  values.forEach((value) => run({ name: 'add', value }, 'input'));
+  commands.forEach((command) => run(command, 'commands'));
+  context = {};
+  heap.toString();
+  snapshot('done', 'return this.heapContainer.toString();');
   return steps;
 }

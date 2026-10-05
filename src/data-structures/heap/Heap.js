@@ -1,4 +1,5 @@
 import Comparator from '../../utils/comparator/Comparator';
+import recordStep from '../../utils/trace/recordStep';
 
 /**
  * Parent class for Min and Max Heaps.
@@ -8,13 +9,14 @@ export default class Heap {
    * @constructs Heap
    * @param {Function} [comparatorFunction]
    */
-  constructor(comparatorFunction) {
+  constructor(comparatorFunction, stepCallback) {
     if (new.target === Heap) {
       throw new TypeError('Cannot construct Heap instance directly');
     }
 
     // Array representation of the heap.
     this.heapContainer = [];
+    this.stepCallback = stepCallback;
     this.compare = new Comparator(comparatorFunction);
   }
 
@@ -98,6 +100,7 @@ export default class Heap {
     const tmp = this.heapContainer[indexTwo];
     this.heapContainer[indexTwo] = this.heapContainer[indexOne];
     this.heapContainer[indexOne] = tmp;
+    recordStep(this.stepCallback, 'swap', this.heapContainer, [indexOne, indexTwo], {}, 'this.heapContainer[indexOne] = tmp;');
   }
 
   /**
@@ -127,6 +130,7 @@ export default class Heap {
 
     // Move the last element from the end to the head.
     this.heapContainer[0] = this.heapContainer.pop();
+    recordStep(this.stepCallback, 'replace-root', this.heapContainer, [0], {}, 'this.heapContainer[0] = this.heapContainer.pop();');
     this.heapifyDown();
 
     return item;
@@ -138,6 +142,7 @@ export default class Heap {
    */
   add(item) {
     this.heapContainer.push(item);
+    recordStep(this.stepCallback, 'add', this.heapContainer, [this.heapContainer.length - 1], {}, 'this.heapContainer.push(item);');
     this.heapifyUp();
     return this;
   }
@@ -225,6 +230,7 @@ export default class Heap {
     // in the heap container and lift it up until it is in the correct
     // order with respect to its parent element.
     let currentIndex = customStartIndex || this.heapContainer.length - 1;
+    recordStep(this.stepCallback, 'compare-up', this.heapContainer, [currentIndex, this.getParentIndex(currentIndex)].filter((index) => index >= 0), {}, 'this.hasParent(currentIndex)');
 
     while (
       this.hasParent(currentIndex)
@@ -232,6 +238,7 @@ export default class Heap {
     ) {
       this.swap(currentIndex, this.getParentIndex(currentIndex));
       currentIndex = this.getParentIndex(currentIndex);
+      recordStep(this.stepCallback, 'compare-up', this.heapContainer, [currentIndex, this.getParentIndex(currentIndex)].filter((index) => index >= 0), {}, 'this.hasParent(currentIndex)');
     }
   }
 
@@ -255,6 +262,7 @@ export default class Heap {
         nextIndex = this.getLeftChildIndex(currentIndex);
       }
 
+      recordStep(this.stepCallback, 'compare-down', this.heapContainer, [currentIndex, nextIndex], {}, 'if (this.pairIsInCorrectOrder(');
       if (this.pairIsInCorrectOrder(
         this.heapContainer[currentIndex],
         this.heapContainer[nextIndex],

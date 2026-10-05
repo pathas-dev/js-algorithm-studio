@@ -4,7 +4,7 @@ import LinkedList from '../../data-structures/linked-list/LinkedList';
 import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
 import {
-  parseOperations, traceStack, traceQueue, traceLinkedList,
+  parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap,
 } from '../structures';
 
 describe('structure lessons', () => {
@@ -87,5 +87,32 @@ describe('structure lessons', () => {
     expect(trace.at(-1).array.map((item) => item.value))
       .toEqual(real.toArray().map((node) => node.value));
     expect(traceLinkedList([1], 'reverse').filter((step) => step.type === 'reverse-link')).toHaveLength(1);
+  });
+  it('records real heap swaps and extracts minima in sorted order', () => {
+    [[], [0], [-2.5, 3, -2.5, 0], [8, 3, 6, 1, 5, 2], [1, 2, 3], [3, 2, 1]].forEach((values) => {
+      const steps = traceHeap(values, Array(values.length + 1).fill('poll').concat('peek').join(','));
+      expect(steps.filter((step) => step.type === 'poll').map((step) => step.variables.result))
+        .toEqual([...values].sort((a, b) => a - b).concat('null'));
+      expect(steps[0].array).toEqual([]);
+      expect(steps.at(-1).array).toEqual([]);
+      const source = algorithmCode(fs.readFileSync(path.resolve(__dirname, '../../data-structures/heap/Heap.js'), 'utf8'));
+      steps.forEach((step) => {
+        expect(source).toContain(step.code);
+        expect(step.indices.every((index) => index >= 0 && index < step.array.length)).toBe(true);
+        if (!step.variables.adjusting) {
+          step.array.slice(1).forEach((item, index) => {
+            expect(step.array[Math.floor(index / 2)].value).toBeLessThanOrEqual(item.value);
+          });
+        }
+      });
+    });
+    const steps = traceHeap([6, 3, 9], 'add 1, peek, poll, peek');
+    expect(steps.filter((step) => step.type === 'peek').map((step) => step.variables.result)).toEqual([1, 3]);
+    expect(steps.find((step) => step.type === 'settled').array.map((item) => item.value)).toEqual([6]);
+    expect(steps.some((step) => step.type === 'compare-down')).toBe(true);
+    expect(steps.some((step) => step.type === 'swap')).toBe(true);
+    expect(traceHeap([])).toHaveLength(2);
+    expect(() => traceHeap(Array(33).fill(1))).toThrow('limit');
+    expect(() => traceHeap(Array(32).fill(1), 'add 2')).toThrow('capacity');
   });
 });
