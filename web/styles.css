@@ -144,6 +144,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .bloom-bit small { font-size: 10px; color: #617469; }
 .bloom-bit.set-bit { background: #e3ece4; }
 .bloom-bit.active-bit { background: #fff0d8; border-color: #d8964a; }
+.string-scroll { overflow-x: auto; margin: 20px 0; padding: 8px 0; }
+.string-row { display: flex; min-height: 62px; }
+.pattern-row { margin-top: 12px; }
+.string-cell { flex: 0 0 32px; margin: 0 2px; padding: 7px 1px; display: grid; gap: 6px; text-align: center; border-radius: 6px; background: #eaf0e9; border: 1px solid #cddbd1; }
+.string-cell small { font-size: 10px; color: #617469; }
+.string-cell strong { font-size: 11px; }
+.string-cell.current-character { background: #fff0d8; border-color: #d8964a; }
+.string-cell.matched-character { background: #d4e9dc; border-color: #326f54; }
 
 @media (max-width: 650px) {
   .playback-card .mantine-Button-root { min-height: 40px; }

@@ -7,6 +7,8 @@ import traceDisjointSet from '../src/visualization/sets';
 import graphSource from '../src/data-structures/graph/Graph.js?raw';
 import graphVertexSource from '../src/data-structures/graph/GraphVertex.js?raw';
 import traceGraphStructure from '../src/visualization/graph-structure';
+import naiveSource from '../src/algorithms/string/naive-search/naiveSearch.js?raw';
+import { traceStringSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -81,7 +83,7 @@ type AlgorithmConfig = {
   summary: Record<Language, string>;
   source: string;
   time: string | Record<Language, string>;
-  category: 'sort' | 'search' | 'graph' | 'structure';
+  category: 'sort' | 'search' | 'graph' | 'structure' | 'string';
   operations?: string;
   operationHint?: string;
   target?: number;
@@ -106,7 +108,12 @@ export type WordAlgorithm = AlgorithmConfig & {
   example: string[];
   run(words: string[], target?: number, edges?: number[][], directed?: boolean, operations?: string): Step[];
 };
-export type Algorithm = NumericAlgorithm | WordAlgorithm;
+export type TextAlgorithm = AlgorithmConfig & {
+  inputMode: 'text';
+  example: [string, string];
+  run(values: string[], target?: number, edges?: number[][], directed?: boolean, operations?: string): Step[];
+};
+export type Algorithm = NumericAlgorithm | WordAlgorithm | TextAlgorithm;
 
 function runSort(Sorter: typeof BubbleSort, values: number[]): Step[] {
   const steps: Step[] = [];
@@ -1249,4 +1256,28 @@ export const graphStructure: NumericAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure];
+export const naive: TextAlgorithm = {
+  id: 'naive-search', category: 'string', inputMode: 'text', usesStart: false,
+  name: { ko: '단순 문자열 검색', en: 'Naive string search' },
+  summary: { ko: '패턴을 한 위치씩 옮기며 왼쪽부터 비교합니다. 불일치하면 첫 글자부터 다시 비교합니다.', en: 'Shift the pattern one position at a time and compare left to right. Restart from its first character after a mismatch.' },
+  source: algorithmCode(naiveSource), example: ['ABABABCABABABC', 'ABABC'],
+  inputHint: { ko: 'UTF-16 기준 텍스트 48·패턴 16개 코드 단위 · 빈 패턴은 0 · 공백 유지', en: 'Up to 48 text / 16 pattern UTF-16 units · empty pattern returns 0 · spaces preserved' },
+  time: 'O(nm)',
+  run: ([text, pattern]) => traceStringSearch(text, pattern),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['텍스트·패턴 준비', '원래 문자열과 공백을 그대로 유지합니다. 패턴이 비어 있으면 비교 없이 첫 위치 0을 반환합니다.']
+        : ['Prepare text and pattern', 'Preserve strings and spaces exactly. An empty pattern returns index zero without comparisons.'];
+      case 'compare': return ko ? ['문자 비교', `텍스트[${v.textIndex}]와 패턴[${v.wordIndex}]를 비교합니다. 같으면 다음 문자, 다르면 현재 정렬 위치 ${v.alignment}의 시도를 끝냅니다.`]
+        : ['Compare characters', `Compare text[${v.textIndex}] with pattern[${v.wordIndex}]. Continue on equality; a mismatch ends the attempt at alignment ${v.alignment}.`];
+      case 'shift': return ko ? ['패턴을 한 위치 이동', `다음 시작 위치는 ${v.alignment}입니다. 앞서 일치한 글자도 다시 비교하며, 패턴이 텍스트 끝을 넘으면 탐색을 종료합니다.`]
+        : ['Shift the pattern one position', `The next alignment is ${v.alignment}. Compare previously matched characters again; stop when the pattern extends past the text.`];
+      default: return ko ? ['검색 완료', v.result === -1 ? '전체 패턴이 일치하는 위치가 없어 -1을 반환합니다.' : `첫 일치 위치는 ${v.result}입니다. 인덱스는 JavaScript의 UTF-16 코드 단위 기준이며 뒤의 일치는 찾지 않습니다.`]
+        : ['Search complete', v.result === -1 ? 'No full match exists; return -1.' : `The first match starts at ${v.result}, using JavaScript UTF-16 indices. Do not search for later occurrences.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive];
