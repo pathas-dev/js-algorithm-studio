@@ -1,6 +1,6 @@
 import type { Step, Language } from './algorithms';
 
-function display(character: string) {
+export function display(character: string) {
   const code = character.charCodeAt(0);
   if (code >= 0xd800 && code <= 0xdfff) return code.toString(16).toUpperCase();
   return character === ' ' ? '␠' : character === '\t' ? '⇥' : character === '\n' ? '↵' : character;

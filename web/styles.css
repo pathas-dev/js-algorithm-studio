@@ -153,6 +153,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .string-cell.current-character { background: #fff0d8; border-color: #d8964a; }
 .string-cell.matched-character { background: #d4e9dc; border-color: #326f54; }
 .graph-table .active-cell { background: #fff0d8; color: #80531e; }
+.graph-table .dependency-cell { background: #d4e9dc; color: #305645; }
 
 @media (max-width: 650px) {
   .playback-card .mantine-Button-root { min-height: 40px; }

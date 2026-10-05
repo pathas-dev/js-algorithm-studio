@@ -1,9 +1,11 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * @param {string[]} set1
  * @param {string[]} set2
  * @return {string[]}
  */
-export default function longestCommonSubsequence(set1, set2) {
+export default function longestCommonSubsequence(set1, set2, stepCallback) {
   // Init LCS matrix.
   const lcsMatrix = Array(set2.length + 1).fill(null).map(() => Array(set1.length + 1).fill(null));
 
@@ -16,17 +18,32 @@ export default function longestCommonSubsequence(set1, set2) {
   for (let rowIndex = 0; rowIndex <= set2.length; rowIndex += 1) {
     lcsMatrix[rowIndex][0] = 0;
   }
+  recordStep(stepCallback, 'initialize', [], [], () => ({
+    dpMatrix: JSON.stringify(lcsMatrix),
+  }), 'lcsMatrix[rowIndex][0] = 0;');
 
   // Fill rest of the column that correspond to each of two strings.
   for (let rowIndex = 1; rowIndex <= set2.length; rowIndex += 1) {
     for (let columnIndex = 1; columnIndex <= set1.length; columnIndex += 1) {
       if (set1[columnIndex - 1] === set2[rowIndex - 1]) {
         lcsMatrix[rowIndex][columnIndex] = lcsMatrix[rowIndex - 1][columnIndex - 1] + 1;
+        recordStep(stepCallback, 'cell-match', [], [], () => ({
+          dpMatrix: JSON.stringify(lcsMatrix),
+          row: rowIndex,
+          column: columnIndex,
+          dependencies: JSON.stringify([[rowIndex - 1, columnIndex - 1]]),
+        }), 'lcsMatrix[rowIndex][columnIndex] = lcsMatrix[rowIndex - 1][columnIndex - 1] + 1;');
       } else {
         lcsMatrix[rowIndex][columnIndex] = Math.max(
           lcsMatrix[rowIndex - 1][columnIndex],
           lcsMatrix[rowIndex][columnIndex - 1],
         );
+        recordStep(stepCallback, 'cell-max', [], [], () => ({
+          dpMatrix: JSON.stringify(lcsMatrix),
+          row: rowIndex,
+          column: columnIndex,
+          dependencies: JSON.stringify([[rowIndex - 1, columnIndex], [rowIndex, columnIndex - 1]]),
+        }), 'lcsMatrix[rowIndex][columnIndex] = Math.max(');
       }
     }
   }
@@ -45,14 +62,30 @@ export default function longestCommonSubsequence(set1, set2) {
     if (set1[columnIndex - 1] === set2[rowIndex - 1]) {
       // Move by diagonal left-top.
       longestSequence.unshift(set1[columnIndex - 1]);
+      recordStep(stepCallback, 'trace-match', [], [], () => ({
+        row: rowIndex,
+        column: columnIndex,
+        sequence: longestSequence.join(''),
+        dependencies: JSON.stringify([[rowIndex - 1, columnIndex - 1]]),
+      }), 'longestSequence.unshift(set1[columnIndex - 1]);');
       columnIndex -= 1;
       rowIndex -= 1;
     } else if (lcsMatrix[rowIndex][columnIndex] === lcsMatrix[rowIndex][columnIndex - 1]) {
+      recordStep(stepCallback, 'trace-left', [], [], () => ({
+        row: rowIndex,
+        column: columnIndex,
+        dependencies: JSON.stringify([[rowIndex, columnIndex - 1]]),
+      }), 'columnIndex -= 1; // skip');
       // Move left.
-      columnIndex -= 1;
+      columnIndex -= 1; // skip
     } else {
+      recordStep(stepCallback, 'trace-up', [], [], () => ({
+        row: rowIndex,
+        column: columnIndex,
+        dependencies: JSON.stringify([[rowIndex - 1, columnIndex]]),
+      }), 'rowIndex -= 1; // skip');
       // Move up.
-      rowIndex -= 1;
+      rowIndex -= 1; // skip
     }
   }
 

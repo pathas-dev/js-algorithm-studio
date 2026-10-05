@@ -11,6 +11,8 @@ import naiveSource from '../src/algorithms/string/naive-search/naiveSearch.js?ra
 import kmpSource from '../src/algorithms/string/knuth-morris-pratt/knuthMorrisPratt.js?raw';
 import zSource from '../src/algorithms/string/z-algorithm/zAlgorithm.js?raw';
 import rabinSource from '../src/algorithms/string/rabin-karp/rabinKarp.js?raw';
+import lcsSource from '../src/algorithms/sets/longest-common-subsequence/longestCommonSubsequence.js?raw';
+import { traceLcs } from '../src/visualization/dynamic';
 import { traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
@@ -86,7 +88,8 @@ type AlgorithmConfig = {
   summary: Record<Language, string>;
   source: string;
   time: string | Record<Language, string>;
-  category: 'sort' | 'search' | 'graph' | 'structure' | 'string';
+  category: 'sort' | 'search' | 'graph' | 'structure' | 'string' | 'dp';
+  inputLabels?: [Record<Language, string>, Record<Language, string>];
   operations?: string;
   operationHint?: string;
   target?: number;
@@ -1346,4 +1349,27 @@ export const rabin: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin];
+export const lcs: TextAlgorithm = {
+  ...naive, id: 'lcs', category: 'dp', name: { ko: '최장 공통 부분 수열', en: 'Longest common subsequence' },
+  summary: { ko: '두 문자열에서 순서를 유지하며 공통으로 선택할 수 있는 가장 긴 수열을 찾습니다. 셀을 채우고 역추적으로 수열을 복원합니다.', en: 'Find the longest shared subsequence while preserving order. Fill prefix cells and recover a sequence by traceback.' },
+  source: algorithmCode(lcsSource), time: 'O(nm)', example: ['ABCDAF', 'ACBCF'],
+  inputLabels: [{ ko: '첫 문자열 입력', en: 'First string' }, { ko: '두 번째 문자열 입력', en: 'Second string' }],
+  inputHint: { ko: '각 문자열 최대 12개 UTF-16 단위 · 공백 유지 · 부분 수열은 연속일 필요 없음', en: 'Up to 12 UTF-16 units per string · spaces preserved · subsequences need not be contiguous' },
+  run: ([first, second]) => traceLcs(first, second),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    const matrix: (number | null)[][] = JSON.parse(String(v.dpMatrix));
+    switch (step.type) {
+      case 'start': return ko ? ['접두사 표 준비', '각 셀은 두 접두사 사이의 LCS 길이입니다. 원본 문자열의 순서를 유지하면서 공통 글자를 선택합니다.'] : ['Prepare the prefix table', 'Each cell holds the LCS length of two prefixes. Select common characters while preserving their original order.'];
+      case 'initialize': return ko ? ['빈 접두사 길이 0', '첫 행과 첫 열은 빈 문자열과 비교하므로 공통 부분 수열 길이가 0입니다. 나머지 셀은 아직 계산 전입니다.'] : ['Empty prefixes have length zero', 'The first row and column compare against an empty string, so their LCS length is zero. Other cells are not calculated yet.'];
+      case 'cell-match': return ko ? ['같은 문자 → 대각선 + 1', `셀[${v.row}, ${v.column}] = ${matrix[Number(v.row)][Number(v.column)]}입니다. 두 접두사의 마지막 문자가 같아 이전 대각선 셀에 1을 더합니다.`] : ['Equal characters → diagonal + 1', `Cell[${v.row}, ${v.column}] = ${matrix[Number(v.row)][Number(v.column)]}. Equal final characters extend the diagonal prefix answer by one.`];
+      case 'cell-max': return ko ? ['다른 문자 → 위·왼쪽 중 최대', `셀[${v.row}, ${v.column}] = ${matrix[Number(v.row)][Number(v.column)]}입니다. 한쪽 마지막 문자를 건너뛴 위·왼쪽 셀 중 큰 값을 선택합니다.`] : ['Different characters → maximum of top and left', `Cell[${v.row}, ${v.column}] = ${matrix[Number(v.row)][Number(v.column)]}. Choose the larger prefix answer after skipping either final character.`];
+      case 'trace-match': return ko ? ['역추적 · 공통 문자 선택', `셀[${v.row}, ${v.column}]의 같은 문자를 수열 앞에 추가했습니다. 복원 중인 수열은 “${v.sequence}”이며 대각선으로 이동합니다.`] : ['Traceback · select a shared character', `Prepend the matching character at [${v.row}, ${v.column}]. Recovered sequence: “${v.sequence}”. Move diagonally.`];
+      case 'trace-left': return ko ? ['역추적 · 첫 문자열 문자 건너뛰기', `왼쪽 셀도 길이가 같아 첫 문자열의 마지막 문자를 건너뜁니다. 동률이면 이 구현은 왼쪽을 우선합니다.`] : ['Traceback · skip from the first string', 'The left cell has the same length, so skip the final character of the first prefix. This implementation prefers left on ties.'];
+      case 'trace-up': return ko ? ['역추적 · 두 번째 문자열 문자 건너뛰기', '위 셀로 이동해 두 번째 문자열의 마지막 문자를 건너뜁니다.'] : ['Traceback · skip from the second string', 'Move up and skip the final character of the second prefix.'];
+      default: return ko ? ['최장 공통 부분 수열 완성', `한 최적 수열은 “${v.result || '∅'}”, 길이는 ${v.length}입니다. 같은 길이의 다른 답도 있을 수 있습니다.`] : ['Longest common subsequence ready', `One optimal sequence is “${v.result || '∅'}”, of length ${v.length}. Other sequences of the same length may exist.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs];
