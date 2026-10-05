@@ -8,6 +8,7 @@ import trieNodeSource from '../src/data-structures/trie/TrieNode.js?raw';
 import { traceTrie } from '../src/visualization/trie';
 import bstSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTree.js?raw';
 import avlSource from '../src/data-structures/tree/avl-tree/AvlTree.js?raw';
+import rbSource from '../src/data-structures/tree/red-black-tree/RedBlackTree.js?raw';
 import bstNodeSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTreeNode.js?raw';
 import priorityQueueSource from '../src/data-structures/priority-queue/PriorityQueue.js?raw';
 import heapClassSource from '../src/data-structures/heap/Heap.js?raw';
@@ -15,7 +16,7 @@ import minHeapSource from '../src/data-structures/heap/MinHeap.js?raw';
 import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -915,6 +916,39 @@ export const avlTree: NumericAlgorithm = {
   },
 };
 
+export const redBlackTree: NumericAlgorithm = {
+  ...binarySearchTree,
+  id: 'red-black-tree', name: { ko: '레드–블랙 트리', en: 'Red–black tree' },
+  summary: { ko: '새 노드의 색을 배정하고, 빨강 부모와의 충돌을 삼촌 색에 따라 색 변경 또는 회전으로 복구합니다.', en: 'Assign new node colors and repair red-parent conflicts with recoloring or rotations according to the uncle’s color.' },
+  source: algorithmCode(bstSource + '\n' + bstNodeSource + '\n' + rbSource),
+  example: [30, 20, 10, 25], operations: 'insert 28, insert 40, insert 50, find 28, insert 25',
+  operationHint: 'insert 28, find 25',
+  inputHint: { ko: '서로 다른 노드 최대 12개 · 삽입·검색만 지원 · 기존 구현의 삭제는 미구현', en: 'At most 12 distinct nodes · insert / find only · deletion is unimplemented in the existing class' },
+  time: 'O(log n)',
+  run: (values, _target, _edges, _directed, operations = redBlackTree.operations) => traceRedBlackTree(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'rb-balance': return ko ? ['부모·삼촌 색 검사', `${v.current}이 루트이거나 부모가 검정이면 종료합니다. 부모와 삼촌이 모두 빨강이면 색을 바꾸고, 삼촌이 검정 또는 빈 자식이면 LL·LR·RR·RL 회전으로 복구합니다.`]
+        : ['Check parent and uncle colors', `Stop when ${v.current} is the root or its parent is black. A red parent and uncle require recoloring; a black or null uncle requires an LL, LR, RR or RL repair.`];
+      case 'recolor': return ko ? ['노드 색 배정·변경', `${v.current}을 ${v.color === 'black' ? '검정' : '빨강'}으로 칠했습니다. 색 변경 중간에는 규칙이 아직 복구되지 않을 수 있습니다. 다음 부모·삼촌 검사를 이어서 보세요.`]
+        : ['Assign or change color', `Color ${v.current} ${v.color}. Intermediate recoloring can temporarily violate invariants; continue to the next parent and uncle check.`];
+      case 'duplicate': return ko ? ['중복 값 유지', `${v.value}이 이미 있으므로 기존 노드를 반환합니다. 색이나 연결을 바꾸지 않아 검정 높이가 유지됩니다.`]
+        : ['Keep the existing value', `Value ${v.value} already exists. Return its node without changing colors or links, preserving black heights.`];
+      case 'rotation-start': return ko ? [`${v.rotation} 회전 선택`, `${v.current}의 부분 트리를 ${v.rotation} 경우에 맞게 회전합니다. 가운데 가지와 상위 부모 연결을 보존합니다.`]
+        : [`Select ${v.rotation} rotation`, `Rotate the subtree at ${v.current} for the ${v.rotation} case. Preserve the middle branch and parent connection.`];
+      case 'inner-rotation': return ko ? ['이중 회전의 첫 단계', `${v.rotation}의 안쪽 자식을 ${v.current}에서 바깥쪽으로 옮겼습니다. 다음 단일 회전에서 조부모를 내리고 색을 교환합니다.`]
+        : ['First stage of a double rotation', `Straighten the inner child at ${v.current} for ${v.rotation}. The next single rotation lowers the grandparent and exchanges colors.`];
+      case 'rotation': return ko ? ['회전·색 교환 완료', `부분 트리 루트는 ${v.current}입니다. 기존 부모와 조부모의 색을 교환했고, 모든 값의 중위 순서가 유지됩니다.`]
+        : ['Rotation and color exchange complete', `The subtree root is ${v.current}. Exchange the former parent and grandparent colors and preserve inorder order.`];
+      case 'done': return ko ? ['레드–블랙 규칙 복구 완료', '루트는 검정이고 빨강 노드의 자식은 검정입니다. 각 노드에서 빈 자식으로 가는 경로의 검정 노드 수가 같습니다. 되감기로 색 변경·회전의 중간 상태를 비교하세요.']
+        : ['Red–black invariants restored', 'The root is black, red nodes have black children, and every path from a node to null has equal black height. Rewind to compare intermediate recoloring and rotations.'];
+      default: return binarySearchTree.explain(step, language);
+    }
+  },
+};
+
 export const trie: WordAlgorithm = {
   id: 'trie', category: 'structure', inputMode: 'words', usesStart: false,
   name: { ko: '트라이', en: 'Trie' },
@@ -1054,4 +1088,4 @@ export const hashTable: WordAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, avlTree, trie, fenwick, segment, hashTable];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable];

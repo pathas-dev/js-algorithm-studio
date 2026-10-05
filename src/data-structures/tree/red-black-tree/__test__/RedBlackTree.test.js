@@ -1,6 +1,29 @@
 import RedBlackTree from '../RedBlackTree';
 
 describe('RedBlackTree', () => {
+  it('keeps parent links, black heights and colors after each insertion, including duplicates', () => {
+    const tree = new RedBlackTree();
+    const values = new Set();
+    const check = (node, parent) => {
+      if (!node) return 1;
+      expect(node.parent).toBe(parent);
+      if (tree.isNodeRed(node)) {
+        expect(!node.left || tree.isNodeBlack(node.left)).toBe(true);
+        expect(!node.right || tree.isNodeBlack(node.right)).toBe(true);
+      }
+      const leftHeight = check(node.left, node);
+      expect(check(node.right, node)).toBe(leftHeight);
+      return leftHeight + Number(tree.isNodeBlack(node));
+    };
+    [30, 20, 40, 10, 25, 35, 50, 5, 15, 22, 28, 32, 38, 45, 60, 25, 5, 40].forEach((value) => {
+      tree.insert(value);
+      values.add(value);
+      check(tree.root, null);
+      expect(tree.isNodeBlack(tree.root)).toBe(true);
+      expect(tree.root.traverseInOrder()).toEqual([...values].sort((a, b) => a - b));
+    });
+  });
+
   it('should always color first inserted node as black', () => {
     const tree = new RedBlackTree();
 

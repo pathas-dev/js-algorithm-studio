@@ -2,6 +2,8 @@
 
 [English](README.md) | [한국어](README.ko-KR.md)
 
+The repository and visualizer support insertion and search. Duplicate insertion returns the existing node without changing its color. The existing `remove` method is unimplemented; the visualizer rejects deletion commands. It records color assignment, recoloring and both stages of double rotations. Null children count as black when checking equal black heights.
+
 
 A **red–black tree** is a kind of self-balancing binary search 
 tree in computer science. Each node of the binary tree has 

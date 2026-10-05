@@ -101,7 +101,7 @@ export default function App() {
     'empty-array': t('구간 트리에는 값을 최소 1개 입력하세요.', 'The segment tree requires at least one input value.'),
     positions: t('유효한 정수 인덱스를 입력하세요. 펜윅 트리는 1부터, 구간 트리는 0부터 시작합니다.', 'Enter a valid integer index. Fenwick indices start at 1; segment indices start at 0.'),
     'range-order': t('구간의 왼쪽 인덱스는 오른쪽 이하여야 합니다.', 'The left range index must not exceed the right index.'),
-    'tree-limit': t('이진 검색 트리는 최대 12개의 서로 다른 노드를 표시합니다.', 'The BST supports at most 12 distinct nodes.'),
+    'tree-limit': t('트리는 최대 12개의 서로 다른 노드를 표시합니다.', 'The tree supports at most 12 distinct nodes.'),
     'duplicate-values': t('우선순위 큐의 값은 서로 달라야 합니다. 같은 값을 두 번 넣을 수 없습니다.', 'Priority queue values must be distinct; do not add the same value twice.'),
     'missing-value': t('변경·삭제할 값이 현재 자료 구조에 없습니다.', 'The item to update or remove is not in the current structure.'),
     words: algorithm.id === 'hash-table' ? t('키와 값은 각각 16글자 이내여야 합니다. 초기 키는 쉼표 또는 공백으로 구분하세요.', 'Keys and values must have at most 16 code points. Separate initial keys with commas or spaces.') : t('단어는 쉼표 또는 공백으로 구분하고, 각 단어는 최대 16글자까지 입력하세요. 빈 항목은 허용하지 않습니다.', 'Separate words with commas or spaces; use at most 16 code points per word, without empty entries.'),

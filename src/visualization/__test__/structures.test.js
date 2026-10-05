@@ -5,10 +5,46 @@ import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
 import {
   parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue,
-  traceBinarySearchTree, traceAvlTree,
+  traceBinarySearchTree, traceAvlTree, traceRedBlackTree,
 } from '../structures';
 
 describe('structure lessons', () => {
+  it('records red-black colors and rotations while preserving black heights and duplicates', () => {
+    const source = algorithmCode([
+      'tree/red-black-tree/RedBlackTree.js', 'tree/binary-search-tree/BinarySearchTree.js',
+      'tree/binary-search-tree/BinarySearchTreeNode.js',
+    ].map((file) => fs.readFileSync(path.resolve(__dirname, '../../data-structures', file), 'utf8')).join('\n'));
+    [[3, 2, 1], [3, 1, 2], [1, 2, 3], [1, 3, 2], [30, 20, 40, 10, 25, 35, 50]].forEach((values) => {
+      const steps = traceRedBlackTree(values, 'insert 25, insert 25, find 25, find 999');
+      steps.forEach((step) => {
+        expect(source).toContain(step.code);
+        expect(step.indices.every((i) => i >= 0 && i < step.array.length)).toBe(true);
+        const nodes = JSON.parse(step.variables.tree);
+        if (!nodes.length || !['insert-done', 'done'].includes(step.type)) return;
+        expect(nodes[0].color).toBe('black');
+        const height = (id) => {
+          const node = nodes.find((item) => item.id === id);
+          if (!node) return 1;
+          if (node.color === 'red') {
+            expect([node.left, node.right].every((child) => child < 0
+              || nodes.find((item) => item.id === child).color === 'black')).toBe(true);
+          }
+          const leftHeight = height(node.left);
+          expect(height(node.right)).toBe(leftHeight);
+          return leftHeight + Number(node.color === 'black');
+        };
+        height(nodes[0].id);
+      });
+      const duplicates = steps.filter((step) => step.type === 'duplicate');
+      expect(duplicates.length).toBeGreaterThan(0);
+      expect(duplicates.at(-1).variables.tree).toBe(duplicates[0].variables.tree);
+      expect(steps.filter((step) => step.type === 'find').map((step) => step.variables.result))
+        .toEqual([25, 'null']);
+    });
+    expect(traceRedBlackTree([]).at(-1).array).toEqual([]);
+    expect(() => traceRedBlackTree([1], 'remove 1')).toThrow('operations');
+  });
+
   it('records all AVL rotations with stable identities, actual source and balanced operation results', () => {
     const source = algorithmCode([
       'tree/avl-tree/AvlTree.js', 'tree/binary-search-tree/BinarySearchTree.js',

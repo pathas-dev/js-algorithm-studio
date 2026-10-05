@@ -1,5 +1,6 @@
 import BinarySearchTree from '../data-structures/tree/binary-search-tree/BinarySearchTree';
 import AvlTree from '../data-structures/tree/avl-tree/AvlTree';
+import RedBlackTree from '../data-structures/tree/red-black-tree/RedBlackTree';
 import PriorityQueue from '../data-structures/priority-queue/PriorityQueue';
 import MinHeap from '../data-structures/heap/MinHeap';
 import LinkedList from '../data-structures/linked-list/LinkedList';
@@ -272,7 +273,8 @@ export function tracePriorityQueue(values, operations = '') {
 }
 
 export function traceBinarySearchTree(values, operations = '', Tree = BinarySearchTree, structure = 'binary-search-tree') {
-  const commands = parseOperations(operations, { insert: 1, find: 1, remove: 1 });
+  const commands = parseOperations(operations, structure === 'red-black-tree'
+    ? { insert: 1, find: 1 } : { insert: 1, find: 1, remove: 1 });
   // ponytail: 12 nodes keep an unbalanced tree readable; expand with a zoomable canvas if needed.
   if (values.length > MAX_VALUES) throw new Error('limit');
   if (new Set(values).size > 12) throw new Error('tree-limit');
@@ -314,6 +316,7 @@ export function traceBinarySearchTree(values, operations = '', Tree = BinarySear
           left: identify(node.left),
           right: identify(node.right),
           ...(structure === 'avl-tree' ? { balance: node.balanceFactor, height: node.height } : {}),
+          ...(structure === 'red-black-tree' ? { color: node.meta.get('color') || 'uncolored' } : {}),
         }))),
         inorder: tree.root.value === null ? '' : tree.root.traverseInOrder().join(', '),
         ...variables,
@@ -331,7 +334,10 @@ export function traceBinarySearchTree(values, operations = '', Tree = BinarySear
       if (tree.root.traverseInOrder().length >= 12 && !tree.contains(value)) throw new Error('tree-limit');
       tree.insert(value, observe);
       const result = tree.root.find(value);
-      snapshot('insert-done', 'insert(value, stepCallback) {', {}, result);
+      let code = 'return this.root.insert(value, stepCallback);';
+      if (structure === 'red-black-tree') code = 'return insertedNode;';
+      if (structure === 'avl-tree') code = 'currentNode = currentNode.parent;';
+      snapshot('insert-done', code, {}, result);
     } else {
       const result = tree.root.find(value, observe);
       if (name === 'find') {
@@ -361,4 +367,8 @@ export function traceBinarySearchTree(values, operations = '', Tree = BinarySear
 
 export function traceAvlTree(values, operations = '') {
   return traceBinarySearchTree(values, operations, AvlTree, 'avl-tree');
+}
+
+export function traceRedBlackTree(values, operations = '') {
+  return traceBinarySearchTree(values, operations, RedBlackTree, 'red-black-tree');
 }
