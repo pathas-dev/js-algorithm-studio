@@ -20,6 +20,7 @@ export default class QuickSortInPlace extends Sort {
   ) {
     // Copies array on initial call, and then sorts in place.
     const array = recursiveCall ? originalArray : [...originalArray];
+    this.recordStep(recursiveCall ? 'range' : 'start', array, [], { lowIndex: inputLowIndex, highIndex: inputHighIndex }, 'const array =');
 
     /**
      * The partitionArray() operates on the subarray between lowIndex and highIndex, inclusive.
@@ -42,14 +43,21 @@ export default class QuickSortInPlace extends Sort {
         const temp = array[leftIndex];
         array[leftIndex] = array[rightIndex];
         array[rightIndex] = temp;
+        this.recordStep('swap', array, [leftIndex, rightIndex], {
+          lowIndex, highIndex, leftIndex, rightIndex,
+        }, 'array[rightIndex] = temp;');
       };
 
       const pivot = array[highIndex];
+      this.recordStep('pivot', array, [highIndex], { lowIndex, highIndex, pivotIndex: highIndex }, 'const pivot =');
       // visitingCallback is used for time-complexity analysis.
       this.callbacks.visitingCallback(pivot);
 
       let partitionIndex = lowIndex;
       for (let currentIndex = lowIndex; currentIndex < highIndex; currentIndex += 1) {
+        this.recordStep('compare', array, [currentIndex, highIndex], {
+          lowIndex, highIndex, currentIndex, partitionIndex, pivotIndex: highIndex,
+        }, 'if (this.comparator.lessThan');
         if (this.comparator.lessThan(array[currentIndex], pivot)) {
           swap(partitionIndex, currentIndex);
           partitionIndex += 1;
@@ -61,6 +69,7 @@ export default class QuickSortInPlace extends Sort {
       // Swapping the pivot with the partitionIndex therefore places the pivot in its
       // final sorted position.
       swap(partitionIndex, highIndex);
+      this.recordStep('partition', array, [partitionIndex], { lowIndex, highIndex, pivotIndex: partitionIndex }, 'swap(partitionIndex, highIndex);');
 
       return partitionIndex;
     };
@@ -73,6 +82,7 @@ export default class QuickSortInPlace extends Sort {
       this.sort(array, partitionIndex + 1, inputHighIndex, RECURSIVE_CALL);
     }
 
+    this.recordStep(recursiveCall ? 'return' : 'done', array, [], { lowIndex: inputLowIndex, highIndex: inputHighIndex, sortedCount: recursiveCall ? 0 : array.length }, 'return array;');
     return array;
   }
 }

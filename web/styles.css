@@ -72,3 +72,5 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
   .playback-card .mantine-Group-root { gap: 6px; }
   .play-button { min-width: 68px; }
 }
+
+.pivot .bar { outline: 2px dashed #476756; outline-offset: 2px; }

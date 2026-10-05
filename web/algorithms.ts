@@ -1,3 +1,5 @@
+import QuickSortInPlace from '../src/algorithms/sorting/quick-sort/QuickSortInPlace';
+import quickSource from '../src/algorithms/sorting/quick-sort/QuickSortInPlace.js?raw';
 import MergeSort from '../src/algorithms/sorting/merge-sort/MergeSort';
 import mergeSource from '../src/algorithms/sorting/merge-sort/MergeSort.js?raw';
 import InsertionSort from '../src/algorithms/sorting/insertion-sort/InsertionSort';
@@ -161,4 +163,34 @@ export const merge = {
   },
 };
 
-export const algorithms = [bubble, selection, insertion, merge];
+export const quick = {
+  id: 'quick-sort',
+  name: { ko: '퀵 정렬', en: 'Quick sort' },
+  summary: { ko: '입력을 복사하고 구간 내에서 교환합니다. 마지막 값을 피벗으로 삼아 작은 값들을 왼쪽에 모읍니다.', en: 'Copy the input, then partition each range in place using its last value as the pivot.' },
+  source: algorithmCode(quickSource),
+  example: [8, 3, 6, 1, 5, 2],
+  time: 'O(n log n) · worst O(n²)',
+  run: (values: number[]) => runSort(QuickSortInPlace, values),
+  explain(step: Step, language: Language): [string, string] {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return bubble.explain(step, language);
+      case 'range': return ko ? ['재귀 구간 확인', `현재 구간은 ${v.lowIndex}부터 ${v.highIndex}까지입니다. 두 끝이 같거나 역전되면 분할할 필요가 없습니다.`]
+        : ['Inspect the recursive range', `Current range: ${v.lowIndex} through ${v.highIndex}. Equal or inverted bounds need no partition.`];
+      case 'pivot': return ko ? ['피벗 선택', `구간의 마지막 값(${step.array[Number(v.pivotIndex)].value})을 피벗으로 선택합니다. 점선 테두리와 ◆가 피벗을 표시합니다.`]
+        : ['Choose the pivot', `Choose the last value, ${step.array[Number(v.pivotIndex)].value}, as pivot. A dashed outline and ◆ mark it.`];
+      case 'compare': return ko ? ['피벗과 비교', `인덱스 ${v.currentIndex}의 값이 피벗보다 작은지 확인합니다. 작으면 partitionIndex 앞쪽 구간에 넣습니다.`]
+        : ['Compare with the pivot', `Check whether value at ${v.currentIndex} is smaller than the pivot. If so, move it to the left partition.`];
+      case 'swap': return ko ? ['구간 내 교환', `인덱스 ${v.leftIndex}와 ${v.rightIndex}를 교환합니다. 같은 인덱스라면 배열은 그대로입니다. 이 방식은 안정 정렬이 아닙니다.`]
+        : ['Swap within the range', `Swap indices ${v.leftIndex} and ${v.rightIndex}. Swapping an index with itself leaves the array unchanged. This variant is not stable.`];
+      case 'partition': return ko ? ['피벗 위치 확정', `피벗을 인덱스 ${v.pivotIndex}에 놓았습니다. 왼쪽은 피벗보다 작고 오른쪽은 크거나 같습니다. 양쪽 구간을 각각 정렬합니다.`]
+        : ['Pivot settled', `Place the pivot at ${v.pivotIndex}. Left values are smaller; right values are greater or equal. Sort the two ranges recursively.`];
+      case 'return': return ko ? ['구간 처리 완료', `구간 ${v.lowIndex}…${v.highIndex}의 처리가 끝나 상위 호출로 돌아갑니다.`]
+        : ['Range complete', `Range ${v.lowIndex}…${v.highIndex} is complete. Return to the parent call.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms = [bubble, selection, insertion, merge, quick];

@@ -37,7 +37,7 @@ export default class Sort {
     if (this.callbacks.stepCallback) {
       this.callbacks.stepCallback({
         type,
-        array: [...array],
+        array: [...(typeof array === 'function' ? array() : array)],
         indices: [...indices],
         variables: { ...variables },
         code,

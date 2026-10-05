@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import QuickSortInPlace from '../../algorithms/sorting/quick-sort/QuickSortInPlace';
 import MergeSort from '../../algorithms/sorting/merge-sort/MergeSort';
 import InsertionSort from '../../algorithms/sorting/insertion-sort/InsertionSort';
 import SelectionSort from '../../algorithms/sorting/selection-sort/SelectionSort';
@@ -9,7 +10,7 @@ import {
 } from '../playback';
 
 describe('visualizer execution and playback', () => {
-  it.each([[BubbleSort, 'bubble-sort/BubbleSort'], [SelectionSort, 'selection-sort/SelectionSort'], [InsertionSort, 'insertion-sort/InsertionSort'], [MergeSort, 'merge-sort/MergeSort']])('records %s results without changing inputs or past snapshots', (Sorter, file) => {
+  it.each([[BubbleSort, 'bubble-sort/BubbleSort'], [SelectionSort, 'selection-sort/SelectionSort'], [InsertionSort, 'insertion-sort/InsertionSort'], [MergeSort, 'merge-sort/MergeSort'], [QuickSortInPlace, 'quick-sort/QuickSortInPlace']])('records %s results without changing inputs or past snapshots', (Sorter, file) => {
     const source = algorithmCode(fs.readFileSync(path.join(__dirname, `../../algorithms/sorting/${file}.js`), 'utf8'));
     expect(source).not.toContain('this.recordStep(');
     [[], [1], [1, 2, 3], [3, 2, 1], [0, -2, -2, 4], Array(MAX_VALUES).fill(2)].forEach((input) => {
@@ -29,6 +30,16 @@ describe('visualizer execution and playback', () => {
         steps[steps.length - 1].array.push(1000);
         expect(steps[0].array).toEqual(original);
       }
+    });
+    const objectSteps = [];
+    const objects = [2, 1, 2, -3].map((value, id) => ({ value, id }));
+    const objectResult = new Sorter({
+      compareCallback: (a, b) => a.value - b.value,
+      stepCallback: (step) => objectSteps.push(step),
+    }).sort(objects);
+    expect(objectResult.map((item) => item.value)).toEqual([-3, 1, 2, 2]);
+    objectSteps.forEach((step) => {
+      expect(new Set(step.array.map((item) => item.id)).size).toBe(step.array.length);
     });
     const items = [{ value: 2, id: 0 }, { value: 1, id: 1 }, { value: 2, id: 2 }];
     const result = new BubbleSort({ compareCallback: (a, b) => a.value - b.value }).sort(items);

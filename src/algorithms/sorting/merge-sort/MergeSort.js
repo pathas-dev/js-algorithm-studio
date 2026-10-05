@@ -38,7 +38,7 @@ export default class MergeSort extends Sort {
     while (leftIndex < leftArray.length && rightIndex < rightArray.length) {
       let minElement = null;
 
-      this.recordStep('compare', [...sortedArray, ...leftArray.slice(leftIndex), ...rightArray.slice(rightIndex)], [sortedArray.length, sortedArray.length + leftArray.length - leftIndex], {
+      this.recordStep('compare', () => [...sortedArray, ...leftArray.slice(leftIndex), ...rightArray.slice(rightIndex)], [sortedArray.length, sortedArray.length + leftArray.length - leftIndex], {
         depth, leftIndex, rightIndex, sortedCount: sortedArray.length,
       }, 'if (this.comparator.lessThanOrEqual');
 
@@ -55,7 +55,7 @@ export default class MergeSort extends Sort {
 
       // Add the minimum element to the sorted array.
       sortedArray.push(minElement);
-      this.recordStep('take', [...sortedArray, ...leftArray.slice(leftIndex), ...rightArray.slice(rightIndex)], [sortedArray.length - 1], {
+      this.recordStep('take', () => [...sortedArray, ...leftArray.slice(leftIndex), ...rightArray.slice(rightIndex)], [sortedArray.length - 1], {
         depth, leftIndex, rightIndex, sortedCount: sortedArray.length,
       }, 'sortedArray.push(minElement);');
 

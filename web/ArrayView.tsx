@@ -9,13 +9,14 @@ export default function ArrayView({ step, language }: { step: Step; language: 'k
       <div className="array-chart" role="list" aria-label={language === 'ko' ? '현재 배열' : 'Current array'} style={{ minWidth: Math.max(260, step.array.length * 30) }}>
         {step.array.map((item, index) => {
           const height = Math.max(3, Math.abs(item.value) / max * 90);
+          const pivot = step.variables.pivotIndex === index;
           const active = step.indices.includes(index);
           const sorted = index < Number(step.variables.sortedCount ?? 0) || index >= Number(step.variables.sortedFrom ?? step.array.length);
           return (
-            <motion.div layout="position" transition={{ duration: reducedMotion ? 0 : 0.24 }} key={item.id} className={`array-item ${active ? step.type === 'swap' ? 'swapping' : 'comparing' : sorted ? 'settled' : ''}`} role="listitem" aria-label={`${index}: ${item.value}`}>
+            <motion.div layout="position" transition={{ duration: reducedMotion ? 0 : 0.24 }} key={item.id} className={`array-item ${pivot ? 'pivot' : ''} ${active ? step.type === 'swap' ? 'swapping' : 'comparing' : sorted ? 'settled' : ''}`} role="listitem" aria-label={`${index}: ${item.value}${pivot ? language === 'ko' ? ' · 피벗' : ' · pivot' : ''}`}>
               <span className="bar-label" style={{ top: item.value >= 0 ? 94 - height : 114 + height }}>{item.value}</span>
               <motion.div className="bar" animate={{ height, top: item.value >= 0 ? 110 - height : 110 }} transition={{ duration: reducedMotion ? 0 : 0.24 }} />
-              <span className="array-index">{index}</span>
+              <span className="array-index">{index}{pivot && ' ◆'}</span>
             </motion.div>
           );
         })}
