@@ -1,3 +1,5 @@
+import recordStep from '../../utils/trace/recordStep';
+
 export default class DisjointSetItem {
   /**
    * @param {*} value
@@ -27,8 +29,9 @@ export default class DisjointSetItem {
   /**
    * @return {DisjointSetItem}
    */
-  getRoot() {
-    return this.isRoot() ? this : this.parent.getRoot();
+  getRoot(stepCallback) {
+    recordStep(stepCallback, 'find-root', [this], [], {}, 'getRoot(stepCallback) {');
+    return this.isRoot() ? this : this.parent.getRoot(stepCallback);
   }
 
   /**

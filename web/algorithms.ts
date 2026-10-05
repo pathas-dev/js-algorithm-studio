@@ -1,4 +1,7 @@
 import hashTableSource from '../src/data-structures/hash-table/HashTable.js?raw';
+import disjointSource from '../src/data-structures/disjoint-set/DisjointSet.js?raw';
+import disjointItemSource from '../src/data-structures/disjoint-set/DisjointSetItem.js?raw';
+import traceDisjointSet from '../src/visualization/sets';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -1141,4 +1144,40 @@ export const hashTable: WordAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable];
+export const disjointSet: NumericAlgorithm = {
+  id: 'disjoint-set', category: 'structure', usesStart: false,
+  name: { ko: '분리 집합', en: 'Disjoint set' },
+  summary: { ko: '서로 겹치지 않는 집합의 대표를 찾고, 작은 집합의 루트를 큰 집합 아래로 연결합니다.', en: 'Find representatives of disjoint sets and link the smaller set’s root below the larger one.' },
+  source: algorithmCode(disjointSource + '\n' + disjointItemSource), example: [1, 2, 3, 4, 5, 6],
+  operations: 'union 1 2, union 3 4, union 1 3, find 4, inSameSet 2 4, inSameSet 1 5',
+  operationHint: 'makeSet 7, union 1 2, find 4, inSameSet 2 4',
+  inputHint: { ko: '서로 다른 값 최대 12개 · 중복 makeSet은 무시 · 연산 최대 64개', en: 'At most 12 distinct values · duplicate makeSet ignored · at most 64 operations' },
+  time: { ko: 'find O(log n) · union O(n): 후손 수 재계산 · 경로 압축 없음', en: 'find O(log n) · union O(n): recount descendants · no path compression' },
+  run: (values, _target, _edges, _directed, operations = disjointSet.operations) => traceDisjointSet(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 분리 집합 준비', '기존 DisjointSet의 원소 목록은 비어 있습니다. makeSet으로 각 값을 자기 자신이 대표인 집합으로 만듭니다.']
+        : ['Create an empty disjoint set', 'The existing DisjointSet starts empty. makeSet creates singleton sets represented by their own values.'];
+      case 'makeSet': return ko ? ['단일 집합 생성', `${v.value}을 원소 목록에 추가했습니다. 이미 있으면 그대로 유지합니다. 부모가 ∅인 노드가 대표입니다.`]
+        : ['Create a singleton set', `Add ${v.value}, or keep its existing set. A node with null parent is a representative.`];
+      case 'find-root': return ko ? ['부모를 따라 대표 탐색', `${v.current}의 부모가 없으면 이 노드가 대표입니다. 부모가 있으면 다음 부모를 재귀적으로 검사합니다. 이 구현은 탐색 후 부모 연결을 압축하지 않습니다.`]
+        : ['Follow parents to the representative', `If ${v.current} has no parent it is the representative. Otherwise recurse to its parent. This implementation does not compress paths.`];
+      case 'compare-size': return ko ? ['두 집합 크기 비교', `크기는 ${v.sizeA}와 ${v.sizeB}입니다. 기존 getRank는 높이 대신 후손 수를 셉니다. 작은 집합을 큰 집합 아래로 연결하고, 같으면 첫 번째 대표를 유지합니다.`]
+        : ['Compare set sizes', `Sizes are ${v.sizeA} and ${v.sizeB}. The existing getRank counts descendants rather than height. Link the smaller set below the larger; ties keep the first representative.`];
+      case 'union-link': return ko ? ['대표 연결 완료', `${v.current}이 합쳐진 집합의 대표입니다. 다른 대표를 자식으로 연결해 구성원들의 새 대표가 같아졌습니다.`]
+        : ['Connect representatives', `${v.current} represents the merged set. Link the other representative as a child so all members now share a representative.`];
+      case 'union': return ko ? ['집합 병합 완료', `${v.value}과 ${v.other}의 집합을 합쳤습니다. 이미 같은 집합이면 연결을 바꾸지 않습니다.`]
+        : ['Union complete', `Merge sets containing ${v.value} and ${v.other}. Leave links unchanged if they already belong to the same set.`];
+      case 'find': return ko ? ['대표 조회 결과', `${v.value}의 대표는 ${v.result}입니다. 없는 값은 null을 반환합니다.`]
+        : ['Representative result', `The representative of ${v.value} is ${v.result}. Missing values return null.`];
+      case 'inSameSet': return ko ? ['같은 집합인지 확인', `${v.value}과 ${v.other}의 대표 비교 결과는 ${v.result}입니다.`]
+        : ['Check shared membership', `Comparing representatives of ${v.value} and ${v.other} gives ${v.result}.`];
+      default: return ko ? ['집합 연산 완료', '현재 부모 연결과 대표별 구성원입니다. 되감기로 병합 전후와 대표 탐색 경로를 비교하세요.']
+        : ['Set operations complete', 'Inspect parent links and members by representative. Rewind to compare unions and representative search paths.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet];

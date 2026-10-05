@@ -7,8 +7,17 @@ import FenwickView from './FenwickView';
 import SegmentView from './SegmentView';
 import HashView from './HashView';
 import LinkedListView from './LinkedListView';
+import GraphView from './GraphView';
 
 export default function StructureView({ step, language }: { step: Step; language: Language }) {
+  if (step.variables.structure === 'disjoint-set') {
+    const nodes: { value: number; parent: number | null; root: number; size: number }[] = JSON.parse(String(step.variables.setNodes));
+    const ko = language === 'ko';
+    return <div><p>{ko ? '자식 → 부모 연결 · 초록: 대표 · 파랑: 구성원 · 주황: 검사 중' : 'Child → parent links · green: representative · blue: member · orange: current'}</p><GraphView step={step} language={language} />
+      <table className="graph-table" data-testid="set-table"><caption>{ko ? '실제 부모와 대표 · size는 해당 노드 아래 원소 수' : 'Actual parent and representative · size counts the node’s subtree'}</caption><thead><tr><th>{ko ? '값' : 'Value'}</th><th>{ko ? '부모' : 'Parent'}</th><th>{ko ? '대표' : 'Root'}</th><th>size</th></tr></thead><tbody>{nodes.map((node, i) => <tr key={node.value} className={step.indices.includes(i) ? 'active-bucket' : undefined}><td>{node.value}</td><td>{node.parent ?? '∅'}</td><td>{node.root}</td><td>{node.size}</td></tr>)}</tbody></table>
+      {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
+    </div>;
+  }
   if (step.variables.structure === 'hash-table') return <HashView step={step} language={language} />;
   if (step.variables.structure === 'segment-tree') return <SegmentView step={step} language={language} />;
   if (step.variables.structure === 'fenwick') return <FenwickView step={step} language={language} />;

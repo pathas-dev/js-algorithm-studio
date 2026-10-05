@@ -1,11 +1,13 @@
 import DisjointSetItem from './DisjointSetItem';
+import recordStep from '../../utils/trace/recordStep';
 
 export default class DisjointSet {
   /**
    * @param {function(value: *)} [keyCallback]
    */
-  constructor(keyCallback) {
+  constructor(keyCallback, stepCallback) {
     this.keyCallback = keyCallback;
+    this.stepCallback = stepCallback;
     this.items = {};
   }
 
@@ -40,7 +42,7 @@ export default class DisjointSet {
       return null;
     }
 
-    return requiredDisjointItem.getRoot().getKey();
+    return requiredDisjointItem.getRoot(this.stepCallback).getKey();
   }
 
   /**
@@ -65,16 +67,21 @@ export default class DisjointSet {
 
     const rootA = this.items[rootKeyA];
     const rootB = this.items[rootKeyB];
+    recordStep(this.stepCallback, 'compare-size', [rootA, rootB], [], () => ({
+      sizeA: rootA.getRank() + 1, sizeB: rootB.getRank() + 1,
+    }), 'if (rootA.getRank() < rootB.getRank()) {');
 
     if (rootA.getRank() < rootB.getRank()) {
       // If rootB's tree is bigger then make rootB to be a new root.
       rootB.addChild(rootA);
+      recordStep(this.stepCallback, 'union-link', [rootB], [], {}, 'rootB.addChild(rootA);');
 
       return this;
     }
 
     // If rootA's tree is bigger then make rootA to be a new root.
     rootA.addChild(rootB);
+    recordStep(this.stepCallback, 'union-link', [rootA], [], {}, 'rootA.addChild(rootB);');
 
     return this;
   }
