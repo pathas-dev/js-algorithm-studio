@@ -6,6 +6,7 @@ import Comparator from '../../utils/comparator/Comparator';
  *  will be done through this callback.
  * @property {function(a: *)} visitingCallback - If provided it will be called each time the sorting
  *  function is visiting the next element.
+ * @property {function(step: Object): void} [stepCallback] - Optional execution snapshots.
  */
 
 export default class Sort {
@@ -30,5 +31,17 @@ export default class Sort {
 
   sort() {
     throw new Error('sort method must be implemented');
+  }
+
+  recordStep(type, array, indices = [], variables = {}, code = '') {
+    if (this.callbacks.stepCallback) {
+      this.callbacks.stepCallback({
+        type,
+        array: [...array],
+        indices: [...indices],
+        variables: { ...variables },
+        code,
+      });
+    }
   }
 }
