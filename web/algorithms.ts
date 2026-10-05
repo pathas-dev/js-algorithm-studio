@@ -1,9 +1,10 @@
+import priorityQueueSource from '../src/data-structures/priority-queue/PriorityQueue.js?raw';
 import heapClassSource from '../src/data-structures/heap/Heap.js?raw';
 import minHeapSource from '../src/data-structures/heap/MinHeap.js?raw';
 import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList, traceHeap } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -794,4 +795,44 @@ export const minHeap: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap];
+export const priorityQueue: Algorithm = {
+  id: 'priority-queue', category: 'structure', usesStart: false,
+  name: { ko: '우선순위 큐', en: 'Priority queue' },
+  summary: { ko: '값과 별개인 우선순위로 처리 순서를 정합니다. 작은 우선순위 숫자가 먼저 나옵니다.', en: 'Order items by priority independently of their value. Smaller priority numbers come first.' },
+  source: algorithmCode(heapClassSource + '\n' + priorityQueueSource), example: [8, 3, 6],
+  operations: 'add 42 -1, peek, changePriority 8 -2, poll, remove 6, peek',
+  operationHint: 'add 42 -1, changePriority 8 -2, remove 6, poll, peek',
+  inputHint: { ko: '서로 다른 값 최대 32개 · 초기 우선순위 = 값 · 연산 최대 64개', en: 'Up to 32 distinct values · initial priority = value · at most 64 operations' },
+  time: { ko: 'add · poll O(log n) · 변경·삭제 최악 O(n)', en: 'add · poll O(log n) · update / remove worst O(n)' },
+  run: (values, _target, _edges, _directed, operations = priorityQueue.operations) => tracePriorityQueue(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['우선순위 큐 준비', '기존 PriorityQueue는 최소 힙에 우선순위 비교를 연결합니다. 초기 값의 우선순위는 그 값이며, add 값 우선순위로 서로 다르게 지정할 수 있습니다.']
+        : ['Prepare the priority queue', 'The existing PriorityQueue compares heap items by priority. Initial priorities equal their values; use add value priority to set them independently.'];
+      case 'add': return ko ? ['힙 끝에 넣기', `값 ${v.value}, 우선순위 ${v.priority}을 넣었습니다. 값의 크기가 아닌 우선순위로 부모와 비교합니다.`]
+        : ['Append to the heap', `Add value ${v.value} with priority ${v.priority}. Compare parent priorities, not item values.`];
+      case 'compare-up': return ko ? ['부모의 우선순위 비교', step.indices.length > 1 ? '부모 우선순위 ≤ 자식 우선순위이면 멈춥니다. 자식이 더 먼저 처리돼야 하면 교환합니다.' : '루트에 도달해 위로 올리기를 끝냅니다.']
+        : ['Compare parent priority', step.indices.length > 1 ? 'Stop if parent priority ≤ child priority; otherwise swap.' : 'The item reached the root. Stop moving upward.'];
+      case 'compare-down': return ko ? ['자식의 우선순위 비교', '두 자식 중 우선순위 숫자가 작은 쪽을 선택해 부모와 비교합니다. 부모가 더 늦게 처리돼야 한다면 교환합니다.']
+        : ['Compare child priority', 'Choose the child with the smaller priority number. Swap if the parent should be processed later.'];
+      case 'swap': return ko ? ['우선순위로 위치 교환', '부모와 자식을 교환했습니다. 표시된 p가 우선순위이며, 값이 큰 노드도 우선순위가 작으면 위로 갑니다.']
+        : ['Swap by priority', 'Swap parent and child. The p label is priority; a larger value can move upward when its priority number is smaller.'];
+      case 'replace-root': return ko ? ['루트 자리 채우기', '우선순위가 가장 앞선 노드를 꺼내고 마지막 노드를 루트로 옮겼습니다. 아래로 비교해 우선순위 순서를 복원합니다.']
+        : ['Fill the root position', 'Extract the item with the smallest priority number, then move the last item to the root and restore priority order.'];
+      case 'settled': return ko ? ['우선순위 저장과 삽입 완료', `값 ${v.value}의 우선순위는 ${v.priority}입니다. 같은 우선순위끼리의 처리 순서는 보장하지 않습니다.`]
+        : ['Priority saved and insertion complete', `Value ${v.value} has priority ${v.priority}. Equal-priority processing order is not guaranteed.`];
+      case 'changePriority': return ko ? ['우선순위 변경', `값 ${v.value}을 기존 위치에서 제거하고 우선순위 ${v.priority}로 다시 넣었습니다. 실제 구현의 remove와 add가 순서를 복원합니다.`]
+        : ['Change priority', `Remove ${v.value} and add it back with priority ${v.priority}. The existing remove and add methods restore order.`];
+      case 'remove': return ko ? ['지정한 값 삭제', `값 ${v.value}과 그 우선순위 항목을 제거했습니다. 남은 힙을 확인하세요.`]
+        : ['Remove an item', `Remove value ${v.value} and its priority entry. Inspect the remaining heap.`];
+      case 'peek': case 'poll': return ko ? [step.type === 'peek' ? '다음 값 조회' : '다음 값 추출', v.result === 'null' ? '빈 큐이므로 null을 반환합니다.' : `${v.operation}()은 값 ${v.result}을 반환합니다. 가장 작은 값이 아니라 우선순위가 가장 앞선 값입니다.`]
+        : [step.type === 'peek' ? 'Peek at the next item' : 'Extract the next item', v.result === 'null' ? 'The queue is empty; return null.' : `${v.operation}() returns value ${v.result}, selected by priority rather than minimum value.`];
+      default: return ko ? ['연산 완료', '남은 우선순위 큐입니다. 노드 값과 p 우선순위를 비교하고, 되감기로 위치 변화를 살펴보세요.']
+        : ['Operations complete', 'The remaining priority queue is shown. Compare values with p priorities and rewind to inspect movement.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue];

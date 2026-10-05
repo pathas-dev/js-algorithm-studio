@@ -4,7 +4,7 @@ import LinkedList from '../../data-structures/linked-list/LinkedList';
 import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
 import {
-  parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap,
+  parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue,
 } from '../structures';
 
 describe('structure lessons', () => {
@@ -114,5 +114,41 @@ describe('structure lessons', () => {
     expect(traceHeap([])).toHaveLength(2);
     expect(() => traceHeap(Array(33).fill(1))).toThrow('limit');
     expect(() => traceHeap(Array(32).fill(1), 'add 2')).toThrow('capacity');
+  });
+  it('orders by priority independently of values and records reprioritization', () => {
+    const steps = tracePriorityQueue([8, 3, 6], 'add 42 -1, peek, changePriority 8 -2, poll, remove 6, peek');
+    expect(steps.filter((step) => step.type === 'peek' || step.type === 'poll').map((step) => step.variables.result))
+      .toEqual([42, 8, 42]);
+    expect(steps.at(-1).array.map((item) => item.value)).toEqual([42, 3]);
+    const old = steps.find((step) => step.type === 'settled' && step.variables.value === 8);
+    expect(JSON.parse(old.variables.priorities)).toEqual({ 8: 8 });
+    const changed = steps.find((step) => step.type === 'changePriority');
+    expect(JSON.parse(changed.variables.priorities)[8]).toBe(-2);
+    expect(changed.array.find((item) => item.value === 8).id).toBe(old.array[0].id);
+    const source = algorithmCode(fs.readFileSync(path.resolve(__dirname, '../../data-structures/heap/Heap.js'), 'utf8')
+      + fs.readFileSync(path.resolve(__dirname, '../../data-structures/priority-queue/PriorityQueue.js'), 'utf8'));
+    steps.forEach((step) => {
+      expect(source).toContain(step.code);
+      expect(step.indices.every((index) => index >= 0 && index < step.array.length)).toBe(true);
+      if (!step.variables.adjusting) {
+        const priorities = JSON.parse(step.variables.priorities);
+        step.array.slice(1).forEach((item, index) => {
+          expect(priorities[step.array[Math.floor(index / 2)].value])
+            .toBeLessThanOrEqual(priorities[item.value]);
+        });
+      }
+    });
+    expect(tracePriorityQueue([])).toHaveLength(2);
+    expect(tracePriorityQueue([], 'poll, peek, add 0 0, poll').filter((step) => 'result' in step.variables).map((step) => step.variables.result))
+      .toEqual(['null', 'null', 0]);
+    expect(() => tracePriorityQueue([1, 1])).toThrow('duplicate-values');
+    expect(() => tracePriorityQueue([1], 'add 1 2')).toThrow('duplicate-values');
+    expect(() => tracePriorityQueue([1], 'remove 2')).toThrow('missing-value');
+    expect(() => tracePriorityQueue([1], 'changePriority 2 0')).toThrow('missing-value');
+    expect(() => tracePriorityQueue(Array.from({ length: 33 }, (_, index) => index))).toThrow('limit');
+    expect(() => tracePriorityQueue(Array.from({ length: 32 }, (_, index) => index), 'add 40 1')).toThrow('capacity');
+    expect(() => tracePriorityQueue([], 'add 1 nope')).toThrow('operations');
+    expect(tracePriorityQueue([], 'add 1 0, add 2 0, add 3 -1, poll, poll, poll').at(-1).array).toEqual([]);
+    expect(tracePriorityQueue([1], 'poll, add 1 2').at(-1).array[0].id).toBe(1);
   });
 });

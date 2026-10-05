@@ -1,3 +1,4 @@
+import PriorityQueue from '../data-structures/priority-queue/PriorityQueue';
 import MinHeap from '../data-structures/heap/MinHeap';
 import LinkedList from '../data-structures/linked-list/LinkedList';
 import Queue from '../data-structures/queue/Queue';
@@ -14,11 +15,9 @@ export function parseOperations(text, commands) {
     if (!Object.prototype.hasOwnProperty.call(commands, name) || args.length !== commands[name]) {
       throw new Error('operations');
     }
-    let value;
-    if (args.length) {
-      try { value = parseTarget(args[0]); } catch (cause) { throw new Error('operations'); }
-    }
-    return { name, value };
+    let parsed = [];
+    try { parsed = args.map((arg) => parseTarget(arg)); } catch (cause) { throw new Error('operations'); }
+    return { name, value: parsed[0], ...(parsed.length > 1 ? { priority: parsed[1] } : {}) };
   });
 }
 
@@ -197,6 +196,75 @@ export function traceHeap(values, operations = '') {
   commands.forEach((command) => run(command, 'commands'));
   context = {};
   heap.toString();
+  snapshot('done', 'return this.heapContainer.toString();');
+  return steps;
+}
+
+export function tracePriorityQueue(values, operations = '') {
+  const commands = parseOperations(operations, {
+    add: 2, changePriority: 2, remove: 1, poll: 0, peek: 0,
+  });
+  if (values.length > MAX_VALUES) throw new Error('limit');
+  if (new Set(values).size !== values.length) throw new Error('duplicate-values');
+  const queue = new PriorityQueue();
+  const steps = [];
+  const ids = new Map();
+  let nextId = 0;
+  let context = {};
+  const snapshot = (type, code, indices = [], variables = {}, array = queue.heapContainer) => {
+    steps.push({
+      type,
+      code,
+      indices: [...indices],
+      array: array.map((value) => ({ value, id: ids.get(value) })),
+      variables: {
+        ...context,
+        structure: 'priority-queue',
+        sortedCount: 0,
+        heapSize: array.length,
+        priorities: JSON.stringify(Object.fromEntries(
+          array.map((value) => [value, queue.priorities.get(value)]),
+        )),
+        ...variables,
+      },
+    });
+  };
+  queue.stepCallback = (step) => {
+    snapshot(step.type, step.code, step.indices, { adjusting: true }, step.array);
+  };
+  snapshot('start', 'this.priorities = new Map();');
+  const run = ({ name, value, priority }, phase) => {
+    context = { operation: name, phase };
+    if (name === 'add') {
+      if (queue.hasValue(value)) throw new Error('duplicate-values');
+      if (queue.heapContainer.length >= MAX_VALUES) throw new Error('capacity');
+      ids.set(value, nextId);
+      nextId += 1;
+      context = { ...context, value, priority };
+      queue.add(value, priority);
+      snapshot('settled', 'this.priorities.set(item, priority);');
+    } else if (name === 'changePriority' || name === 'remove') {
+      if (!queue.hasValue(value)) throw new Error('missing-value');
+      context = { ...context, value };
+      if (name === 'changePriority') {
+        context.priority = priority;
+        queue.changePriority(value, priority);
+        snapshot(name, 'this.add(item, priority);');
+      } else {
+        queue.remove(value);
+        snapshot(name, 'this.priorities.delete(item);');
+        ids.delete(value);
+      }
+    } else {
+      const result = queue[name]();
+      snapshot(name, `${name}() {`, name === 'peek' && result !== null ? [0] : [], { result: result === null ? 'null' : result });
+      if (name === 'poll' && result !== null) ids.delete(result);
+    }
+  };
+  values.forEach((value) => run({ name: 'add', value, priority: value }, 'input'));
+  commands.forEach((command) => run(command, 'commands'));
+  context = {};
+  queue.toString();
   snapshot('done', 'return this.heapContainer.toString();');
   return steps;
 }
