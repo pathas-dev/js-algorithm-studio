@@ -186,7 +186,7 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="studio">
+      <div className={`studio${action ? ' studio--bubble' : ''}`}>
         <header className="studio-header">
           <a className="brand" href="/"><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" /> Algorithm Studio</a>
           <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('작은 단계가 만드는 큰 이해', 'Small steps. Clear understanding.')}</Text>
@@ -194,19 +194,7 @@ export default function App() {
           </Group>
         </header>
         <main>
-          {action ? <section className="lesson-explanation bubble-action" aria-label={t('단계 해설', 'Step explanation')}>
-            <Text className="action-name" fw={700}>{action[0]}</Text>
-            <output className="action-evidence">{action[1]}</output>
-            <div className="action-decision"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg><Text data-testid="step-action">{action[2]}</Text></div>
-            <Popover opened={whyOpen} onChange={setWhyOpen} position="bottom-end" width={380} trapFocus returnFocus withArrow shadow="md">
-              <Popover.Target><Button className="why-button" variant="subtle" aria-expanded={whyOpen} aria-label={t('왜? 단계 해설 열기', 'Why? Open step explanation')} onClick={() => { dispatch({ type: 'seek', index: playback.index }); setWhyOpen(!whyOpen); }}>{t('왜?', 'Why?')}</Button></Popover.Target>
-              <Popover.Dropdown className="bubble-why" role="dialog" aria-label={t('상세 단계 해설', 'Detailed step explanation')}>
-                <Group justify="space-between"><Text fw={700}>{stepTitle}</Text><Button variant="subtle" size="xs" onClick={() => setWhyOpen(false)}>{t('닫기', 'Close')}</Button></Group>
-                <Text className="step-reason" data-testid="step-reason">{reason}</Text>
-                <Group gap="xs" mt="sm">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'swapped'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="teal">{name} = {String(value)}</Badge>)}</Group>
-              </Popover.Dropdown>
-            </Popover>
-          </section> : <section className="lesson-explanation" aria-label={t('단계 해설', 'Step explanation')}>
+          {!action && <section className="lesson-explanation" aria-label={t('단계 해설', 'Step explanation')}>
             <div className="explanation-heading"><Text fw={600} size="sm" c="teal">{t('단계 해설', 'Step explanation')}</Text><Text fw={700} className="reason-title">{stepTitle}</Text></div>
             <div className="explanation-content"><Text className="step-reason" data-testid="step-reason">{reason}</Text>
               <Group gap="xs" mt="xs" className="step-variables">{Object.entries(step.variables).filter(([name]) => ['key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'leftResult', 'rightResult', 'left', 'lowbit', 'sum', 'right', 'operation', 'word', 'character', 'charIndex', 'value', 'priority', 'result', 'weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent', 'previous'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
@@ -250,6 +238,19 @@ export default function App() {
                   </div>
                 </fieldset>
               </Paper>
+              {action && <section className="bubble-action" data-step={step.type} aria-label={t('단계 해설', 'Step explanation')}>
+            <Text className="action-name" fw={700}>{action[0]}</Text>
+            <output className="action-evidence">{action[1]}</output>
+            <div className="action-decision"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg><Text data-testid="step-action">{action[2]}</Text></div>
+            <Popover opened={whyOpen} onChange={setWhyOpen} position="bottom-end" width={380} trapFocus returnFocus withArrow shadow="md">
+              <Popover.Target><Button className="why-button" variant="subtle" aria-expanded={whyOpen} aria-label={t('왜? 단계 해설 열기', 'Why? Open step explanation')} onClick={() => { dispatch({ type: 'seek', index: playback.index }); setWhyOpen(!whyOpen); }}>{t('왜?', 'Why?')}</Button></Popover.Target>
+              <Popover.Dropdown className="bubble-why" role="dialog" aria-label={t('상세 단계 해설', 'Detailed step explanation')}>
+                <Group justify="space-between"><Text fw={700}>{stepTitle}</Text><Button variant="subtle" size="xs" onClick={() => setWhyOpen(false)}>{t('닫기', 'Close')}</Button></Group>
+                <Text className="step-reason" data-testid="step-reason">{reason}</Text>
+                <Group gap="xs" mt="sm">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'swapped'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="teal">{name} = {String(value)}</Badge>)}</Group>
+              </Popover.Dropdown>
+            </Popover>
+          </section>}
               <div className="lesson-panels">
                   <Paper withBorder className="canvas-card">
                     <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
