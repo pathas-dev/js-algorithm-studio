@@ -252,4 +252,25 @@ describe('BinarySearchTreeNode', () => {
 
     expect(childNode.parent).toBeNull();
   });
+  it('preserves parent links after consecutive removals and allows root reuse', () => {
+    const root = new BinarySearchTreeNode();
+    [10, 5, 2, 7, 6, 8, 20, 30].forEach((value) => root.insert(value));
+    const retained = root.find(5);
+    root.remove(5);
+    expect(retained.parent).toBe(root);
+    expect(root.find(6).parent).toBe(root);
+    root.remove(6);
+    root.remove(20);
+    expect(root.find(30).parent).toBe(root);
+    root.remove(30);
+    expect(root.toString()).toBe('2,7,8,10');
+    [2, 7, 8, 10].forEach((value) => root.remove(value));
+    expect(root.value).toBeNull();
+    root.insert(4);
+    root.insert(3);
+    root.remove(4);
+    root.remove(3);
+    root.insert(0);
+    expect(root.value).toBe(0);
+  });
 });

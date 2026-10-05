@@ -1,5 +1,6 @@
 import BinaryTreeNode from '../BinaryTreeNode';
 import Comparator from '../../../utils/comparator/Comparator';
+import recordStep from '../../../utils/trace/recordStep';
 
 export default class BinarySearchTreeNode extends BinaryTreeNode {
   /**
@@ -18,9 +19,11 @@ export default class BinarySearchTreeNode extends BinaryTreeNode {
    * @param {*} value
    * @return {BinarySearchTreeNode}
    */
-  insert(value) {
+  insert(value, stepCallback) {
+    recordStep(stepCallback, 'inspect-insert', [this], [], { value }, 'insert(value, stepCallback) {');
     if (this.nodeValueComparator.equal(this.value, null)) {
       this.value = value;
+      recordStep(stepCallback, 'insert', [this], [], { value }, 'this.value = value;');
 
       return this;
     }
@@ -28,11 +31,12 @@ export default class BinarySearchTreeNode extends BinaryTreeNode {
     if (this.nodeValueComparator.lessThan(value, this.value)) {
       // Insert to the left.
       if (this.left) {
-        return this.left.insert(value);
+        return this.left.insert(value, stepCallback);
       }
 
       const newNode = new BinarySearchTreeNode(value, this.compareFunction);
       this.setLeft(newNode);
+      recordStep(stepCallback, 'insert', [newNode], [], { value }, 'this.setLeft(newNode);');
 
       return newNode;
     }
@@ -40,11 +44,12 @@ export default class BinarySearchTreeNode extends BinaryTreeNode {
     if (this.nodeValueComparator.greaterThan(value, this.value)) {
       // Insert to the right.
       if (this.right) {
-        return this.right.insert(value);
+        return this.right.insert(value, stepCallback);
       }
 
       const newNode = new BinarySearchTreeNode(value, this.compareFunction);
       this.setRight(newNode);
+      recordStep(stepCallback, 'insert', [newNode], [], { value }, 'this.setRight(newNode);');
 
       return newNode;
     }
@@ -56,7 +61,8 @@ export default class BinarySearchTreeNode extends BinaryTreeNode {
    * @param {*} value
    * @return {BinarySearchTreeNode}
    */
-  find(value) {
+  find(value, stepCallback) {
+    recordStep(stepCallback, 'inspect-find', [this], [], { value }, 'find(value, stepCallback) {');
     // Check the root.
     if (this.nodeValueComparator.equal(this.value, value)) {
       return this;
@@ -64,12 +70,12 @@ export default class BinarySearchTreeNode extends BinaryTreeNode {
 
     if (this.nodeValueComparator.lessThan(value, this.value) && this.left) {
       // Check left nodes.
-      return this.left.find(value);
+      return this.left.find(value, stepCallback);
     }
 
     if (this.nodeValueComparator.greaterThan(value, this.value) && this.right) {
       // Check right nodes.
-      return this.right.find(value);
+      return this.right.find(value, stepCallback);
     }
 
     return null;
@@ -103,7 +109,7 @@ export default class BinarySearchTreeNode extends BinaryTreeNode {
         parent.removeChild(nodeToRemove);
       } else {
         // Node has no parent. Just erase current node value.
-        nodeToRemove.setValue(undefined);
+        nodeToRemove.setValue(null);
       }
     } else if (nodeToRemove.left && nodeToRemove.right) {
       // Node has two children.
@@ -131,9 +137,6 @@ export default class BinarySearchTreeNode extends BinaryTreeNode {
         BinaryTreeNode.copyNode(childNode, nodeToRemove);
       }
     }
-
-    // Clear the parent of removed node.
-    nodeToRemove.parent = null;
 
     return true;
   }

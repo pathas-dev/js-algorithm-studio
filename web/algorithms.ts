@@ -1,10 +1,12 @@
+import bstSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTree.js?raw';
+import bstNodeSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTreeNode.js?raw';
 import priorityQueueSource from '../src/data-structures/priority-queue/PriorityQueue.js?raw';
 import heapClassSource from '../src/data-structures/heap/Heap.js?raw';
 import minHeapSource from '../src/data-structures/heap/MinHeap.js?raw';
 import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -835,4 +837,35 @@ export const priorityQueue: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue];
+export const binarySearchTree: Algorithm = {
+  id: 'binary-search-tree', category: 'structure', usesStart: false,
+  name: { ko: '이진 검색 트리', en: 'Binary search tree' },
+  summary: { ko: '왼쪽은 더 작은 값, 오른쪽은 더 큰 값입니다. 비교 경로를 따라 삽입·검색·삭제합니다.', en: 'Smaller values go left, larger values right. Follow comparisons to insert, find and remove.' },
+  source: algorithmCode(bstSource + '\n' + bstNodeSource), example: [8, 4, 12, 2, 6, 10, 14],
+  operations: 'find 6, insert 5, remove 4, find 4', operationHint: 'insert 5, find 6, remove 4',
+  inputHint: { ko: '서로 다른 노드 최대 12개 · 중복 삽입은 무시 · 연산 최대 64개', en: 'At most 12 distinct nodes · duplicate inserts ignored · at most 64 operations' },
+  time: { ko: 'O(h) · 균형을 맞추지 않아 최악 O(n)', en: 'O(h) · unbalanced, worst O(n)' },
+  run: (values, _target, _edges, _directed, operations = binarySearchTree.operations) => traceBinarySearchTree(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 이진 검색 트리 준비', '기존 BinarySearchTree의 루트는 빈 값을 표시하는 null로 시작합니다. 첫 삽입이 이 루트의 값을 채웁니다.']
+        : ['Create an empty BST', 'The existing BinarySearchTree starts with a null root value. The first insertion fills that root.'];
+      case 'inspect-insert': case 'inspect-find': return ko ? ['현재 노드와 비교', v.current === '∅' ? `빈 루트입니다. 삽입이면 ${v.value}으로 채우고, 검색이면 일치하는 값이 없습니다.` : `현재 값 ${v.current}과 목표 ${v.value}을 비교합니다. 목표가 작으면 왼쪽, 크면 오른쪽으로 이동합니다. 같으면 ${step.type === 'inspect-insert' ? '중복을 추가하지 않습니다' : '이 노드를 반환합니다'}.`]
+        : ['Compare at the current node', v.current === '∅' ? `The root is empty. An insertion fills it with ${v.value}; a search has no match.` : `Compare current value ${v.current} with target ${v.value}. Go left if smaller, right if larger. On equality, ${step.type === 'inspect-insert' ? 'do not add a duplicate' : 'return this node'}.`];
+      case 'insert': return ko ? ['값 배치', `값 ${v.value}을 빈 루트 또는 부모의 빈 자식 위치에 배치했습니다. 경로의 모든 대소 관계가 유지됩니다.`]
+        : ['Place the value', `Place ${v.value} in the empty root or a vacant child position. Preserve every comparison along the path.`];
+      case 'insert-done': return ko ? ['삽입 완료', `값 ${v.value}의 위치가 정해졌습니다. 같은 값이 있었다면 새 노드를 만들지 않습니다. 아래 중위 순회는 오름차순입니다.`]
+        : ['Insertion complete', `Value ${v.value} has its position. Existing values do not create duplicate nodes. Inorder output below is ascending.`];
+      case 'find': return ko ? ['검색 결과', v.result === 'null' ? `값 ${v.value}이 없어 null을 반환합니다. 비어 있는 다음 가지에서 탐색이 끝납니다.` : `값 ${v.result}의 노드를 찾았습니다. 트리는 변경하지 않습니다.`]
+        : ['Search result', v.result === 'null' ? `Value ${v.value} is absent; return null when the next branch is empty.` : `Find node value ${v.result} without changing the tree.`];
+      case 'remove': return ko ? ['노드 삭제', `${v.value}을 삭제했습니다. ${v.children === 0 ? '잎이면 부모의 연결을 끊고, 마지막 루트면 null로 비웁니다.' : v.children === 1 ? '유일한 자식을 부모에 연결합니다. 루트라면 자식의 값과 연결을 복사합니다.' : '오른쪽 부분 트리의 최솟값으로 대체하고 그 노드를 제거합니다.'} 부모 연결도 유지해 이후 삭제를 계속할 수 있습니다.`]
+        : ['Remove a node', `Remove ${v.value}. ${v.children === 0 ? 'Detach a leaf, or clear the last root to null.' : v.children === 1 ? 'Connect its only child to the parent; for the root, copy the child’s value and links.' : 'Replace it with the minimum from its right subtree and remove that successor.'} Preserve parent links for later removals.`];
+      default: return ko ? ['연산 완료', '현재 트리와 중위 순회 결과입니다. 균형을 맞추지 않으므로 정렬된 입력은 긴 한쪽 가지를 만들 수 있습니다.']
+        : ['Operations complete', 'Inspect the current tree and inorder output. This tree does not balance itself, so sorted input can form a long one-sided chain.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree];

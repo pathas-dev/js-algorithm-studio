@@ -1,3 +1,4 @@
+import BinarySearchTree from '../data-structures/tree/binary-search-tree/BinarySearchTree';
 import PriorityQueue from '../data-structures/priority-queue/PriorityQueue';
 import MinHeap from '../data-structures/heap/MinHeap';
 import LinkedList from '../data-structures/linked-list/LinkedList';
@@ -266,5 +267,84 @@ export function tracePriorityQueue(values, operations = '') {
   context = {};
   queue.toString();
   snapshot('done', 'return this.heapContainer.toString();');
+  return steps;
+}
+
+export function traceBinarySearchTree(values, operations = '') {
+  const commands = parseOperations(operations, { insert: 1, find: 1, remove: 1 });
+  // ponytail: 12 nodes keep an unbalanced tree readable; expand with a zoomable canvas if needed.
+  if (values.length > MAX_VALUES) throw new Error('limit');
+  if (new Set(values).size > 12) throw new Error('tree-limit');
+  const tree = new BinarySearchTree();
+  const steps = [];
+  const ids = new WeakMap();
+  let nextId = 0;
+  let context = {};
+  const identify = (node) => {
+    if (!node) return -1;
+    if (!ids.has(node)) {
+      ids.set(node, nextId);
+      nextId += 1;
+    }
+    return ids.get(node);
+  };
+  const snapshot = (type, code, variables = {}, active = null) => {
+    const nodes = [];
+    const visit = (node, depth) => {
+      if (!node || node.value === null) return;
+      nodes.push({ node, depth });
+      visit(node.left, depth + 1);
+      visit(node.right, depth + 1);
+    };
+    visit(tree.root, 0);
+    steps.push({
+      type,
+      code,
+      array: nodes.map(({ node }) => ({ value: node.value, id: identify(node) })),
+      indices: nodes.map(({ node }, index) => (node === active ? index : -1))
+        .filter((index) => index >= 0),
+      variables: {
+        ...context,
+        structure: 'binary-search-tree',
+        tree: JSON.stringify(nodes.map(({ node, depth }) => ({
+          id: identify(node),
+          value: node.value,
+          depth,
+          left: identify(node.left),
+          right: identify(node.right),
+        }))),
+        inorder: tree.root.value === null ? '' : tree.root.traverseInOrder().join(', '),
+        ...variables,
+      },
+    });
+  };
+  const observe = (step) => {
+    const node = step.array[0];
+    snapshot(step.type, step.code, { current: node.value === null ? '∅' : node.value }, node);
+  };
+  snapshot('start', 'this.root = new BinarySearchTreeNode(null, nodeValueCompareFunction);');
+  const run = ({ name, value }, phase) => {
+    context = { operation: name, value, phase };
+    if (name === 'insert') {
+      if (tree.root.traverseInOrder().length >= 12 && !tree.contains(value)) throw new Error('tree-limit');
+      const result = tree.root.insert(value, observe);
+      snapshot('insert-done', 'insert(value, stepCallback) {', {}, result);
+    } else {
+      const result = tree.root.find(value, observe);
+      if (name === 'find') {
+        snapshot(name, 'find(value, stepCallback) {', { result: result ? result.value : 'null' }, result);
+      } else {
+        if (!result) throw new Error('missing-value');
+        const children = Number(!!result.left) + Number(!!result.right);
+        tree.remove(value);
+        snapshot(name, 'remove(value) {', { children });
+      }
+    }
+  };
+  values.forEach((value) => run({ name: 'insert', value }, 'input'));
+  commands.forEach((command) => run(command, 'commands'));
+  context = {};
+  tree.toString();
+  snapshot('done', 'return this.root.toString();');
   return steps;
 }

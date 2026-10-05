@@ -5,6 +5,7 @@ import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
 import {
   parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue,
+  traceBinarySearchTree,
 } from '../structures';
 
 describe('structure lessons', () => {
@@ -150,5 +151,32 @@ describe('structure lessons', () => {
     expect(() => tracePriorityQueue([], 'add 1 nope')).toThrow('operations');
     expect(tracePriorityQueue([], 'add 1 0, add 2 0, add 3 -1, poll, poll, poll').at(-1).array).toEqual([]);
     expect(tracePriorityQueue([1], 'poll, add 1 2').at(-1).array[0].id).toBe(1);
+  });
+  it('traces BST comparison paths and preserves order through repeated removals', () => {
+    const steps = traceBinarySearchTree([8, 4, 12, 2, 6, 10, 14], 'find 6, find 9, insert 5, insert 5, remove 4, remove 5, remove 12, remove 14');
+    expect(steps.filter((step) => step.type === 'find').map((step) => step.variables.result)).toEqual([6, 'null']);
+    expect(steps.at(-1).variables.inorder).toBe('2, 6, 8, 10');
+    const source = algorithmCode(fs.readFileSync(path.resolve(__dirname, '../../data-structures/tree/binary-search-tree/BinarySearchTree.js'), 'utf8')
+      + fs.readFileSync(path.resolve(__dirname, '../../data-structures/tree/binary-search-tree/BinarySearchTreeNode.js'), 'utf8'));
+    steps.forEach((step) => {
+      expect(source).toContain(step.code);
+      const nodes = JSON.parse(step.variables.tree);
+      nodes.forEach((node) => {
+        const left = nodes.find((item) => item.id === node.left);
+        const right = nodes.find((item) => item.id === node.right);
+        if (left) expect(left.value).toBeLessThan(node.value);
+        if (right) expect(right.value).toBeGreaterThan(node.value);
+      });
+      expect(step.indices.every((index) => index >= 0 && index < step.array.length)).toBe(true);
+    });
+    expect(steps[0].array).toEqual([]);
+    expect(traceBinarySearchTree([])).toHaveLength(2);
+    expect(traceBinarySearchTree([], 'find 1, insert 0, remove 0, insert 2').at(-1).variables.inorder).toBe('2');
+    expect(traceBinarySearchTree([2, 1], 'remove 2, remove 1, insert -2.5').at(-1).variables.inorder).toBe('-2.5');
+    expect(() => traceBinarySearchTree([], 'remove 2')).toThrow('missing-value');
+    expect(() => traceBinarySearchTree(Array(33).fill(1))).toThrow('limit');
+    expect(() => traceBinarySearchTree(Array.from({ length: 13 }, (_, index) => index))).toThrow('tree-limit');
+    expect(() => traceBinarySearchTree(Array.from({ length: 12 }, (_, index) => index), 'insert 12')).toThrow('tree-limit');
+    expect(traceBinarySearchTree(Array.from({ length: 12 }, (_, index) => index), 'insert 11').at(-1).array).toHaveLength(12);
   });
 });

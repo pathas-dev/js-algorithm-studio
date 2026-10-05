@@ -143,12 +143,12 @@ export default class BinaryTreeNode {
    */
   removeChild(nodeToRemove) {
     if (this.left && this.nodeComparator.equal(this.left, nodeToRemove)) {
-      this.left = null;
+      this.setLeft(null);
       return true;
     }
 
     if (this.right && this.nodeComparator.equal(this.right, nodeToRemove)) {
-      this.right = null;
+      this.setRight(null);
       return true;
     }
 
@@ -166,12 +166,12 @@ export default class BinaryTreeNode {
     }
 
     if (this.left && this.nodeComparator.equal(this.left, nodeToReplace)) {
-      this.left = replacementNode;
+      this.setLeft(replacementNode);
       return true;
     }
 
     if (this.right && this.nodeComparator.equal(this.right, nodeToReplace)) {
-      this.right = replacementNode;
+      this.setRight(replacementNode);
       return true;
     }
 

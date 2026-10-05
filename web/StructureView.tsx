@@ -1,9 +1,11 @@
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
 import HeapView from './HeapView';
+import TreeView from './TreeView';
 import LinkedListView from './LinkedListView';
 
 export default function StructureView({ step, language }: { step: Step; language: Language }) {
+  if (step.variables.structure === 'binary-search-tree') return <TreeView step={step} language={language} />;
   if (step.variables.structure === 'linked-list') return <LinkedListView step={step} language={language} />;
   if (['heap', 'priority-queue'].includes(String(step.variables.structure))) return <><HeapView step={step} language={language} />{'result' in step.variables && <div className="frontier">{language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}</>;
   const ko = language === 'ko';

@@ -129,3 +129,5 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .stack-nodes .structure-node { flex: 0 0 auto; width: 120px; }
 .list-scroll { overflow-x: auto; }
 .list-scroll svg { display: block; min-width: 100%; }
+.tree-scroll { overflow: auto; max-height: 340px; }
+.tree-scroll svg { display: block; min-width: 100%; }
