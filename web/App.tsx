@@ -159,7 +159,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>

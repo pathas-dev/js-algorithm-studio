@@ -1,3 +1,5 @@
+import interpolationSearch from '../src/algorithms/search/interpolation-search/interpolationSearch';
+import interpolationSource from '../src/algorithms/search/interpolation-search/interpolationSearch.js?raw';
 import jumpSearch from '../src/algorithms/search/jump-search/jumpSearch';
 import jumpSource from '../src/algorithms/search/jump-search/jumpSearch.js?raw';
 import radixSource from '../src/algorithms/sorting/radix-sort/RadixSort.js?raw';
@@ -468,4 +470,36 @@ export const jump: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, bfs, dfs];
+export const interpolation: Algorithm = {
+  id: 'interpolation-search', category: 'search', target: 40, requiresSorted: true,
+  name: { ko: '보간 검색', en: 'Interpolation search' },
+  summary: { ko: '값의 비율로 위치를 예상합니다. 균등 분포에서는 효율적이지만 치우친 분포에서는 느릴 수 있습니다.', en: 'Estimate a position from value ratios. Efficient for uniform values, potentially slow for skewed distributions.' },
+  source: algorithmCode(interpolationSource), example: [10, 20, 30, 40, 50, 60, 70],
+  time: { ko: '균등 분포 평균 O(log log n) · 최악 O(n)', en: 'Uniform avg O(log log n) · worst O(n)' },
+  run(values, target = 40) {
+    requireSorted(values);
+    const steps: (Omit<Step, 'array'> & { array: number[] })[] = [];
+    interpolationSearch(values, target, (step: Omit<Step, 'array'> & { array: number[] }) => steps.push(step));
+    return numericSteps(steps);
+  },
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['검색 범위 준비', '양쪽 끝 인덱스를 준비합니다. 비어 있는 배열은 바로 -1을 반환합니다.']
+        : ['Prepare the range', 'Prepare both endpoint indices. An empty array returns -1 immediately.'];
+      case 'range': return ko ? ['값 범위 확인', `끝값 차이 ${v.rangeDelta}, 목표와 왼쪽 값 차이 ${v.valueDelta}를 계산합니다. 목표가 범위 밖이면 종료하고, 끝값이 같으면 나눗셈 없이 일치 여부를 확인합니다.`]
+        : ['Inspect the value range', `Endpoint difference: ${v.rangeDelta}; target minus left value: ${v.valueDelta}. Reject out-of-range targets; equal endpoints require no division.`];
+      case 'probe': return ko ? ['보간 위치 예상', `low + floor(valueDelta × indexDelta / rangeDelta)로 인덱스 ${v.middleIndex}를 예상했습니다. 이 위치의 값과 목표를 비교합니다.`]
+        : ['Estimate the probe', `low + floor(valueDelta × indexDelta / rangeDelta) estimates index ${v.middleIndex}. Compare this value with the target.`];
+      case 'right': return ko ? ['오른쪽 범위 선택', `예상 위치의 값이 작으므로 시작을 ${v.low}로 옮깁니다. 새 범위에서 위치를 다시 예상합니다.`]
+        : ['Choose the right range', `The probe value is smaller. Move the start to ${v.low} and estimate again.`];
+      case 'left': return ko ? ['왼쪽 범위 선택', `예상 위치의 값이 크므로 끝을 ${v.high}로 옮깁니다. 새 범위에서 위치를 다시 예상합니다.`]
+        : ['Choose the left range', `The probe value is greater. Move the end to ${v.high} and estimate again.`];
+      default: return ko ? ['검색 완료', v.matches ? `인덱스 ${v.matches}에서 찾았습니다. 같은 값이 여러 개면 그중 하나를 반환합니다.` : '목표가 값 범위 밖이거나 탐색 범위를 모두 확인했습니다. -1을 반환합니다.']
+        : ['Search complete', v.matches ? `Found at index ${v.matches}. Return one occurrence when duplicates exist.` : 'The target is outside the value range or the search is exhausted. Return -1.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs];

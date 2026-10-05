@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import interpolationSearch from '../../algorithms/search/interpolation-search/interpolationSearch';
 import jumpSearch from '../../algorithms/search/jump-search/jumpSearch';
 import binarySearch from '../../algorithms/search/binary-search/binarySearch';
 import linearSearch from '../../algorithms/search/linear-search/linearSearch';
@@ -94,6 +95,30 @@ describe('visualizer execution and playback', () => {
         steps.forEach((step) => {
           expect(source).toContain(step.code);
           expect(step.array).toEqual(input);
+          expect(step.indices.every((index) => index >= 0 && index < input.length)).toBe(true);
+        });
+      });
+    });
+  });
+
+  it('bounds interpolation probes for outliers, duplicates and nonuniform arrays', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(
+      __dirname,
+      '../../algorithms/search/interpolation-search/interpolationSearch.js',
+    ), 'utf8'));
+    [[], [1], [1, 1, 1], [-3, -0.5, 0, 4], [0, 1, 2, 3, 700, 800, 999],
+      [0, 700, 701, 702, 999]].forEach((input) => {
+      [-999, -3, -0.5, 0, 1, 2, 3, 4, 5, 700, 702, 998, 999].forEach((target) => {
+        const steps = [];
+        const original = [...input];
+        const result = interpolationSearch(input, target, (step) => steps.push(step));
+        expect(input).toEqual(original);
+        expect(result === -1 ? !input.includes(target) : input[result] === target).toBe(true);
+        expect(steps.at(-1).type).toBe('done');
+        expect(steps.at(-1).indices).toEqual(result === -1 ? [] : [result]);
+        steps.forEach((step) => {
+          expect(source).toContain(step.code);
+          expect(step.array).toEqual(original);
           expect(step.indices.every((index) => index >= 0 && index < input.length)).toBe(true);
         });
       });
