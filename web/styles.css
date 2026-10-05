@@ -299,3 +299,6 @@ input { caret-color: #196d53; }
   .bubble-lesson .array-scroll { min-height: 128px; }
   .studio:has(.bubble-lesson) .studio-footer { padding-top: 8px; }
 }
+
+.algorithm-button:disabled, .algorithm-button:disabled:hover { color: #748279; background: transparent; cursor: not-allowed; font-weight: 500; }
+.planned-status { flex-shrink: 0; font-size: 10px; font-weight: 500; line-height: 1.5; padding-top: 3px; }

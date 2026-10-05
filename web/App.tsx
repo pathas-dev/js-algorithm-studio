@@ -3,6 +3,7 @@ import { Badge, Button, Group, NativeSelect, Paper, Text, TextInput, Title } fro
 import { MotionConfig } from 'motion/react';
 import { MAX_VALUES, parseTarget, parseValues, playbackReducer } from '../src/visualization/playback';
 import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
+import { catalogCategories, plannedAlgorithms } from './catalog';
 import { parseWords } from '../src/visualization/trie';
 import { parseEdges, parseWeightedEdges } from '../src/visualization/graph';
 import GraphView from './GraphView';
@@ -171,16 +172,17 @@ export default function App() {
             </div>
           </section>
           <div className="workspace">
-            <NativeSelect className="mobile-catalog" label={t('알고리즘 선택', 'Choose an algorithm')} value={algorithm.id} data={algorithms.map((entry) => ({ value: entry.id, label: entry.name[language] }))} onChange={(event) => {
+            <NativeSelect className="mobile-catalog" label={t('알고리즘 선택', 'Choose an algorithm')} value={algorithm.id} data={catalogCategories.map((category) => ({ group: category.name[language], items: [...algorithms.filter((entry) => entry.category === category.id).map((entry) => ({ value: entry.id, label: entry.name[language] })), ...plannedAlgorithms.filter((entry) => entry.category === category.id).map((entry) => ({ value: entry.id, label: `${entry.name[language]} · ${t('준비 중', 'Coming soon')}`, disabled: true }))] }))} onChange={(event) => {
               const next = algorithms.find((entry) => entry.id === event.currentTarget.value);
               if (next) selectAlgorithm(next);
             }} />
             <nav className="catalog" aria-label={t('알고리즘 목록', 'Algorithms')}>
-              {(['sort', 'search', 'graph', 'structure', 'string', 'dp'] as const).map((category) => <div key={category} className="catalog-group">
-                <Text size="xs" fw={700} c="dimmed" mb="sm" mt="md" className="catalog-label">{category === 'sort' ? t('정렬', 'SORTING') : category === 'search' ? t('검색', 'SEARCHING') : category === 'graph' ? t('그래프', 'GRAPHS') : category === 'string' ? t('문자열', 'STRINGS') : category === 'dp' ? t('동적 계획', 'DYNAMIC PROGRAMMING') : t('자료 구조', 'DATA STRUCTURES')}</Text>
-                {algorithms.filter((entry) => entry.category === category).map((entry) => <button key={entry.id} className={`algorithm-button ${entry.id === algorithm.id ? 'selected' : ''}`} aria-current={entry.id === algorithm.id ? 'page' : undefined} onClick={() => selectAlgorithm(entry)}>
+              {catalogCategories.map((category) => <div key={category.id} className="catalog-group">
+                <Text size="xs" fw={700} c="dimmed" mb="sm" mt="md" className="catalog-label">{category.name[language]}</Text>
+                {algorithms.filter((entry) => entry.category === category.id).map((entry) => <button key={entry.id} className={`algorithm-button ${entry.id === algorithm.id ? 'selected' : ''}`} aria-current={entry.id === algorithm.id ? 'page' : undefined} onClick={() => selectAlgorithm(entry)}>
                   <span>{entry.name[language]}</span><span className="algorithm-arrow">↗</span>
                 </button>)}
+                {plannedAlgorithms.filter((entry) => entry.category === category.id).map((entry) => <button key={entry.id} className="algorithm-button" disabled><span>{entry.name[language]}</span><span className="planned-status">{t('준비 중', 'Coming soon')}</span></button>)}
               </div>)}
               <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
