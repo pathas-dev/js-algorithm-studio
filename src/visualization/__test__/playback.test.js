@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import InsertionSort from '../../algorithms/sorting/insertion-sort/InsertionSort';
 import SelectionSort from '../../algorithms/sorting/selection-sort/SelectionSort';
 import BubbleSort from '../../algorithms/sorting/bubble-sort/BubbleSort';
 import {
@@ -7,7 +8,7 @@ import {
 } from '../playback';
 
 describe('visualizer execution and playback', () => {
-  it.each([[BubbleSort, 'bubble-sort/BubbleSort'], [SelectionSort, 'selection-sort/SelectionSort']])('records %s results without changing inputs or past snapshots', (Sorter, file) => {
+  it.each([[BubbleSort, 'bubble-sort/BubbleSort'], [SelectionSort, 'selection-sort/SelectionSort'], [InsertionSort, 'insertion-sort/InsertionSort']])('records %s results without changing inputs or past snapshots', (Sorter, file) => {
     const source = algorithmCode(fs.readFileSync(path.join(__dirname, `../../algorithms/sorting/${file}.js`), 'utf8'));
     expect(source).not.toContain('this.recordStep(');
     [[], [1], [1, 2, 3], [3, 2, 1], [0, -2, -2, 4], Array(MAX_VALUES).fill(2)].forEach((input) => {

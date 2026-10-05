@@ -1,3 +1,5 @@
+import InsertionSort from '../src/algorithms/sorting/insertion-sort/InsertionSort';
+import insertionSource from '../src/algorithms/sorting/insertion-sort/InsertionSort.js?raw';
 import SelectionSort from '../src/algorithms/sorting/selection-sort/SelectionSort';
 import selectionSource from '../src/algorithms/sorting/selection-sort/SelectionSort.js?raw';
 import BubbleSort from '../src/algorithms/sorting/bubble-sort/BubbleSort';
@@ -96,4 +98,32 @@ export const selection = {
   },
 };
 
-export const algorithms = [bubble, selection];
+export const insertion = {
+  id: 'insertion-sort',
+  name: { ko: '삽입 정렬', en: 'Insertion sort' },
+  summary: { ko: '다음 값을 앞의 정렬된 구간에 삽입합니다. 이 구간의 값은 이후에도 이동할 수 있습니다.', en: 'Insert the next value into the sorted prefix. Prefix values may still move later.' },
+  source: algorithmCode(insertionSource),
+  example: [8, 3, 6, 1, 5, 2],
+  time: 'O(n²)',
+  run: (values: number[]) => runSort(InsertionSort, values),
+  explain(step: Step, language: Language): [string, string] {
+    const ko = language === 'ko';
+    switch (step.type) {
+      case 'start': return bubble.explain(step, language);
+      case 'compare': {
+        if (step.variables.currentIndex === 0) return ko ? ['왼쪽 끝 도달', '삽입할 값이 맨 앞에 도달했습니다. 왼쪽 이웃이 없으므로 while 조건이 거짓이 되어 멈춥니다.']
+          : ['Left boundary', 'The value reached the beginning. No left neighbor exists, so the while condition is false.'];
+        const [left, current] = step.indices.map((index) => step.array[index].value);
+        return ko ? ['삽입 위치 찾기', `왼쪽 값(${left})과 삽입할 값(${current})을 비교합니다. 왼쪽이 더 크면 교환하고 한 칸 더 왼쪽을 확인합니다.`]
+          : ['Find the insertion position', `Compare left value ${left} with current value ${current}. Swap and move left if the left value is greater.`];
+      }
+      case 'swap': return ko ? ['왼쪽으로 이동', '삽입할 값을 한 칸 왼쪽으로 옮겼습니다. 같은 값끼리는 교환하지 않아 기존 순서를 유지합니다.']
+        : ['Move left', 'Move the current value one position left. Equal values are not swapped, preserving their original order.'];
+      case 'pass': return ko ? ['정렬된 앞쪽 구간', `앞의 ${step.variables.sortedCount}개 값이 정렬됐습니다. 다음 값을 삽입하면 이 구간의 위치가 다시 바뀔 수 있습니다.`]
+        : ['Sorted prefix', `The first ${step.variables.sortedCount} values are sorted. Inserting later values can still shift their positions.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms = [bubble, selection, insertion];
