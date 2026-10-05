@@ -8,6 +8,7 @@ import GraphView from './GraphView';
 import BucketView from './BucketView';
 import HeapView from './HeapView';
 import ArrayView from './ArrayView';
+import StructureView from './StructureView';
 import CodePanel from './CodePanel';
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
   const t = (korean: string, english: string) => ko ? korean : english;
   const [algorithm, setAlgorithm] = useState<Algorithm>(bubble);
   const [input, setInput] = useState(bubble.example.join(', '));
+  const [operationInput, setOperationInput] = useState('');
   const [targetInput, setTargetInput] = useState('3');
   const [directed, setDirected] = useState(false);
   const [edgeInput, setEdgeInput] = useState('');
@@ -57,7 +59,7 @@ export default function App() {
       }
       const values = parseValues(text);
       const edges = algorithm.category === 'graph' ? algorithm.graphWeighted ? parseWeightedEdges(edgeInput, values, directed) : parseEdges(edgeInput, values, directed) : undefined;
-      const next = algorithm.run(values, target, edges, directed);
+      const next = algorithm.run(values, target, edges, directed, operationInput);
       setSteps(next);
       setInput(text);
       setError('');
@@ -70,6 +72,7 @@ export default function App() {
   function selectAlgorithm(next: Algorithm) {
     const trace = next.run(next.example, next.target, next.graphEdges, next.graphDirected);
     setAlgorithm(next);
+    setOperationInput(next.operations ?? '');
     setTargetInput(String(next.target ?? 3));
     setDirected(next.graphDirected ?? false);
     setEdgeInput(next.graphEdges?.map((edge) => `${edge[0]}-${edge[1]}${next.graphWeighted ? `:${edge[2]}` : ''}`).join(', ') ?? '');
@@ -86,6 +89,9 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    operations: t('연산 형식이 잘못됐습니다. 아래 예시의 연산을 쉼표로 구분해 입력하세요. 값은 -999부터 999까지입니다.', 'Invalid operations. Separate the supported commands below with commas; values must be between -999 and 999.'),
+    'operations-limit': t('연산은 최대 64개까지 입력할 수 있습니다.', 'Use at most 64 operations.'),
+    capacity: t('연산 중 저장된 값이 32개를 초과할 수 없습니다. 삭제 연산을 먼저 넣으세요.', 'The structure may hold at most 32 values. Remove values before adding more.'),
     cycle: t('방향 사이클이 있어 위상 정렬할 수 없습니다. 사이클을 만드는 간선을 제거하세요.', 'A directed cycle prevents topological ordering. Remove an edge from the cycle.'),
     'negative-weight': t('다익스트라에는 음수 가중치를 사용할 수 없습니다.', 'Dijkstra requires nonnegative weights.'),
     weights: t('가중치 간선은 1-2:7 형식으로 입력하세요. 가중치는 -999부터 999까지입니다.', 'Use weighted edges such as 1-2:7, with weights between -999 and 999.'),
@@ -123,8 +129,8 @@ export default function App() {
               if (next) selectAlgorithm(next);
             }} />
             <nav className="catalog" aria-label={t('알고리즘 목록', 'Algorithms')}>
-              {(['sort', 'search', 'graph'] as const).map((category) => <div key={category} className="catalog-group">
-                <Text size="xs" fw={700} c="dimmed" mb="sm" mt="md" className="catalog-label">{category === 'sort' ? t('정렬', 'SORTING') : category === 'search' ? t('검색', 'SEARCHING') : t('그래프', 'GRAPHS')}</Text>
+              {(['sort', 'search', 'graph', 'structure'] as const).map((category) => <div key={category} className="catalog-group">
+                <Text size="xs" fw={700} c="dimmed" mb="sm" mt="md" className="catalog-label">{category === 'sort' ? t('정렬', 'SORTING') : category === 'search' ? t('검색', 'SEARCHING') : category === 'graph' ? t('그래프', 'GRAPHS') : t('자료 구조', 'DATA STRUCTURES')}</Text>
                 {algorithms.filter((entry) => entry.category === category).map((entry) => <button key={entry.id} className={`algorithm-button ${entry.id === algorithm.id ? 'selected' : ''}`} aria-current={entry.id === algorithm.id ? 'page' : undefined} onClick={() => selectAlgorithm(entry)}>
                   <span>{entry.name[language]}</span><span className="algorithm-arrow">↗</span>
                 </button>)}
@@ -133,7 +139,7 @@ export default function App() {
             </nav>
             <div className="lesson">
               <div className="lesson-heading">
-                <div><Group gap="sm"><Title order={2}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : algorithm.category === 'search' ? t('검색', 'SEARCHING') : t('그래프', 'GRAPHS')}</Badge></Group>
+                <div><Group gap="sm"><Title order={2}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : algorithm.category === 'search' ? t('검색', 'SEARCHING') : algorithm.category === 'graph' ? t('그래프', 'GRAPHS') : t('자료 구조', 'DATA STRUCTURES')}</Badge></Group>
                   <Text size="sm" c="dimmed" mt={6}>{algorithm.summary[language]}</Text>
                 </div>
                 <Badge variant="outline" color="gray">{typeof algorithm.time === 'string' ? algorithm.time : algorithm.time[language]}</Badge>
@@ -145,16 +151,17 @@ export default function App() {
                     {algorithm.category === 'sort' && 'depth' in step.variables && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
                     {'buckets' in step.variables && <BucketView step={step} language={language} />}
                     {'heapSize' in step.variables && <HeapView step={step} language={language} />}
-                    {algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : <ArrayView step={step} language={language} />}
-                    <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : ['heap-sort', 'counting-sort', 'radix-sort'].includes(algorithm.id) ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span><span><i className="dot settled" />{t('정렬된 결과', 'Sorted output')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
-                    <div className="array-state"><Text size="xs" c="dimmed">{distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : step.array.map((item) => item.value).join(', '))}]</output></div>
+                    {algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : algorithm.category === 'structure' ? <StructureView step={step} language={language} /> : <ArrayView step={step} language={language} />}
+                    <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'structure' ? <><span><i className="dot comparing" />{t('추가·조회한 노드', 'Added / inspected node')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : ['heap-sort', 'counting-sort', 'radix-sort'].includes(algorithm.id) ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span><span><i className="dot settled" />{t('정렬된 결과', 'Sorted output')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
+                    <div className="array-state"><Text size="xs" c="dimmed">{distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : algorithm.category === 'structure' ? t('현재 노드 · 앞 → 뒤', 'Current nodes · front → back') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : step.array.map((item) => item.value).join(', '))}]</output></div>
                   </Paper>
                   <Paper withBorder p="lg">
                     <form onSubmit={(event) => { event.preventDefault(); apply(input); }}>
                       {algorithm.category !== 'sort' && algorithm.usesStart !== false && <TextInput label={algorithm.category === 'graph' ? t('시작 정점', 'Start vertex') : t('목표 값', 'Target value')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} error={['target', 'start'].includes(error) ? errors[error] : undefined} autoComplete="off" mb="sm" />}
+                      {algorithm.category === 'structure' && <TextInput label={t('연산 입력', 'Operations')} value={operationInput} onChange={(event) => setOperationInput(event.currentTarget.value)} description={algorithm.operationHint} error={['operations', 'operations-limit', 'capacity'].includes(error) ? errors[error] : undefined} autoComplete="off" mb="sm" />}
                       {algorithm.graphWeighted && !algorithm.fixedDirection && <NativeSelect label={t('간선 방향', 'Edge direction')} value={directed ? 'directed' : 'undirected'} data={[{ value: 'undirected', label: t('무방향', 'Undirected') }, { value: 'directed', label: t('방향 · 첫 정점 → 두 번째 정점', 'Directed · first → second') }]} onChange={(event) => setDirected(event.currentTarget.value === 'directed')} mb="sm" />}
-                      {algorithm.category === 'graph' && <TextInput label={t('간선 입력', 'Edges')} value={edgeInput} onChange={(event) => setEdgeInput(event.currentTarget.value)} error={['edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle'].includes(error) ? errors[error] : undefined} placeholder={algorithm.graphWeighted ? "1-2:7, 1-3:2" : "1-2, 1-3, 2-4"} autoComplete="off" mb="sm" />}
-                      <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={algorithm.category === 'graph' ? t('정점 입력', 'Vertices') : t('배열 입력', 'Array input')} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder="8, 3, 6, 1, 5, 2" error={!['target', 'start', 'edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle'].includes(error) ? errors[error] : undefined} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
+                      {algorithm.category === 'graph' && <TextInput label={t('간선 입력', 'Edges')} value={edgeInput} onChange={(event) => setEdgeInput(event.currentTarget.value)} error={['edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle', 'operations', 'operations-limit', 'capacity'].includes(error) ? errors[error] : undefined} placeholder={algorithm.graphWeighted ? "1-2:7, 1-3:2" : "1-2, 1-3, 2-4"} autoComplete="off" mb="sm" />}
+                      <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={algorithm.category === 'graph' ? t('정점 입력', 'Vertices') : algorithm.category === 'structure' ? t('초기 값 입력', 'Initial values') : t('배열 입력', 'Array input')} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder="8, 3, 6, 1, 5, 2" error={!['target', 'start', 'edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle', 'operations', 'operations-limit', 'capacity'].includes(error) ? errors[error] : undefined} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
                       {error && <span role="alert" className="sr-only">{errors[error]}</span>}
                     </form>
                     {algorithm.requiresSorted && <Text size="xs" c="teal" mt="xs">{t('오름차순 배열이 필요합니다. 인덱스는 입력 배열 기준입니다.', 'Requires an ascending array. Indices refer to the input array.')}</Text>}
@@ -166,7 +173,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['operation', 'value', 'result', 'weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>

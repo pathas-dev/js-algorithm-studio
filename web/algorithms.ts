@@ -1,3 +1,5 @@
+import stackSource from '../src/data-structures/stack/Stack.js?raw';
+import { traceStack } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -53,7 +55,9 @@ export type Algorithm = {
   source: string;
   example: number[];
   time: string | Record<Language, string>;
-  category: 'sort' | 'search' | 'graph';
+  category: 'sort' | 'search' | 'graph' | 'structure';
+  operations?: string;
+  operationHint?: string;
   target?: number;
   requiresSorted?: boolean;
   inputHint?: Record<Language, string>;
@@ -63,7 +67,7 @@ export type Algorithm = {
   graphWeighted?: boolean;
   graphDirected?: boolean;
   fixedDirection?: boolean;
-  run(values: number[], target?: number, edges?: number[][], directed?: boolean): Step[];
+  run(values: number[], target?: number, edges?: number[][], directed?: boolean, operations?: string): Step[];
   explain(step: Step, language: Language): [string, string];
 };
 
@@ -670,4 +674,29 @@ export const topological: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological];
+export const stack: Algorithm = {
+  id: 'stack', category: 'structure', usesStart: false,
+  name: { ko: '스택', en: 'Stack' },
+  summary: { ko: '맨 위에 넣고 맨 위에서 꺼내는 LIFO 구조입니다. 초기 값도 순서대로 push합니다.', en: 'Push and pop at the top: last in, first out. Initial values are also pushed in order.' },
+  source: stackSource, example: [3, 6, 2], operations: 'peek, push 9, pop, pop, peek', operationHint: 'push 9, pop, peek',
+  time: { ko: 'push · pop · peek O(1)', en: 'push · pop · peek O(1)' },
+  run: (values, _target, _edges, _directed, operations = stack.operations) => traceStack(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 스택 준비', '기존 Stack 클래스로 빈 연결 리스트를 만듭니다. 초기 값을 왼쪽부터 하나씩 넣은 뒤 입력한 연산을 실행합니다.']
+        : ['Create an empty stack', 'The existing Stack class creates an empty linked list. Push initial values from left to right, then execute your operations.'];
+      case 'push': return ko ? [v.phase === 'input' ? '초기 값 넣기' : '맨 위에 넣기', `push(${v.value}): 연결 리스트 앞에 새 노드를 넣었습니다. TOP은 ${v.value}이며 기존 노드들은 아래로 이동합니다.`]
+        : [v.phase === 'input' ? 'Push an initial value' : 'Push onto the top', `push(${v.value}) prepends a new linked-list node. TOP is ${v.value}; existing nodes move below it.`];
+      case 'pop': return ko ? ['맨 위에서 꺼내기', v.result === 'null' ? '빈 스택이라 삭제할 노드가 없습니다. pop()은 null을 반환합니다.' : `TOP 노드를 삭제하고 값 ${v.result}을 반환했습니다. 다음 노드가 새로운 TOP이 됩니다.`]
+        : ['Pop from the top', v.result === 'null' ? 'There is no node to remove. pop() returns null on an empty stack.' : `Remove the TOP node and return ${v.result}. The next node becomes TOP.`];
+      case 'peek': return ko ? ['맨 위 값 조회', v.result === 'null' ? '빈 스택이므로 peek()은 null을 반환합니다. 구조는 바뀌지 않습니다.' : `TOP의 값 ${v.result}을 읽기만 합니다. 노드를 삭제하지 않으므로 구조는 그대로입니다.`]
+        : ['Peek at the top', v.result === 'null' ? 'peek() returns null on an empty stack, without changing it.' : `Read TOP value ${v.result} without removing its node.`];
+      default: return ko ? ['연산 완료', '모든 연산을 실행했습니다. 아래 값은 TOP부터 아래 방향의 순서입니다. 이전 단계로 돌아가 각 연산 전후를 비교하세요.']
+        : ['Operations complete', 'All operations have run. Values are shown from TOP downward. Rewind to compare before and after each operation.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack];
