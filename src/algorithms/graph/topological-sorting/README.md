@@ -55,3 +55,8 @@ next dependency has its dependent packages to be installed in prior.
 
 - [Wikipedia](https://en.wikipedia.org/wiki/Topological_sorting)
 - [Topological Sorting on YouTube by Tushar Roy](https://www.youtube.com/watch?v=ddTC4Zovtbc&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## Implementation notes
+
+The optional second `stepCallback` records DFS and completion-stack snapshots. Undirected graphs throw `directed`; an edge to an active DFS ancestor throws `cycle`. Every vertex, including isolated vertices, is included in a valid order.

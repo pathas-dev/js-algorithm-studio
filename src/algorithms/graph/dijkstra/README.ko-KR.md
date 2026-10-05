@@ -143,3 +143,8 @@
 - [위키백과](https://ko.wikipedia.org/wiki/다익스트라_알고리즘)
 - [YouTube - Nathaniel Fan](https://www.youtube.com/watch?v=gdmfOwyQlcI&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
 - [YouTube - Tushar Roy](https://www.youtube.com/watch?v=lAXZGERcDf4&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## 구현 참고
+
+선택적인 세 번째 `stepCallback` 인수로 거리·이전 정점·우선순위 큐 상태를 기록할 수 있습니다. 웹 학습 화면은 실행 전에 음수 가중치를 차단합니다. 저장소의 우선순위 큐는 값을 선형으로 검색하므로 인덱스를 사용하는 힙 구현과 실행 비용이 다릅니다.

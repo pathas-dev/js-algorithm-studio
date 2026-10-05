@@ -94,3 +94,8 @@ In the tables below `i` is row numbers and `j` is column numbers.
 - [Wikipedia](https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm)
 - [YouTube (by Abdul Bari)](https://www.youtube.com/watch?v=oNI0rf2P9gE&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8&index=74)
 - [YouTube (by Tushar Roy)](https://www.youtube.com/watch?v=LwJdNfdLF9s&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8&index=75)
+
+
+## Implementation notes
+
+The optional second `stepCallback` records execution snapshots. The result includes `negativeCycle`, detected by a negative diagonal entry. When it is true, do not treat the entire distance matrix as a finalized shortest-path result.

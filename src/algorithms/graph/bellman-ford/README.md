@@ -21,3 +21,8 @@ Worst-case space complexity `O(|V|)`
 
 - [Wikipedia](https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm)
 - [On YouTube by Michael Sambol](https://www.youtube.com/watch?v=obWXjtg0L64&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## Implementation notes
+
+The optional third `stepCallback` records execution snapshots. The result also includes `negativeCycle`: `true` means a negative cycle is reachable from the start, so returned distances are tentative rather than finalized shortest paths. Disconnected negative cycles do not set this flag.

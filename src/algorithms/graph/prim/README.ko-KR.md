@@ -22,3 +22,8 @@
 - [Prim's Algorithm on Wikipedia](https://en.wikipedia.org/wiki/Prim%27s_algorithm)
 - [Prim's Algorithm on YouTube by Tushar Roy](https://www.youtube.com/watch?v=oP2-8ysT3QQ&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
 - [Prim's Algorithm on YouTube by Michael Sambol](https://www.youtube.com/watch?v=cplfcGZmX7I&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## 구현 참고
+
+선택적인 두 번째 `stepCallback` 인수로 간선 선택을 기록할 수 있습니다. 이 구현은 그래프 내부 순서의 첫 정점에서 시작하여 도달 가능한 성분의 트리를 반환합니다. 다른 성분은 이 트리에 포함되지 않습니다.

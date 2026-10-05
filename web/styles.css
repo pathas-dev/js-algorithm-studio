@@ -18,7 +18,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .algorithm-button.selected { background: #e3ece4; color: #14533d; }
 .algorithm-arrow { opacity: .65; }
 .lesson { min-width: 0; }
-.lesson-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.lesson-heading { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .lesson-heading h2 { font-size: 24px; letter-spacing: -.03em; }
 .lesson-panels { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; }
 .visual-column, .detail-column { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
@@ -109,3 +109,12 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 
 .matrix-scroll { overflow-x: auto; }
 .matrix-scroll td, .matrix-scroll th { min-width: 32px; }
+
+.lesson-heading > div:first-child { flex: 1 1 300px; min-width: 0; }
+.lesson-heading > .mantine-Badge-root { max-width: 100%; height: auto; text-transform: none; }
+.lesson-heading > .mantine-Badge-root .mantine-Badge-label { white-space: normal; line-height: 1.6; padding: 2px 0; }
+.heap-view { overflow-x: auto; }
+.heap-view svg { min-width: 600px; }
+
+.detail-column { align-self: start; }
+.reason-card .mantine-Badge-root { text-transform: none; }

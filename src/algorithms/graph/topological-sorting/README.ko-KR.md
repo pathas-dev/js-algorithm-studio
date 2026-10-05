@@ -19,3 +19,8 @@
 - [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph)
 - [Wikipedia](https://en.wikipedia.org/wiki/Topological_sorting)
 - [Topological Sorting on YouTube by Tushar Roy](https://www.youtube.com/watch?v=ddTC4Zovtbc&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## 구현 참고
+
+선택적인 두 번째 `stepCallback` 인수로 DFS와 완료 스택 상태를 기록할 수 있습니다. 무방향 그래프는 `directed` 오류를, 현재 DFS 호출 경로로 돌아가는 간선은 `cycle` 오류를 발생시킵니다. 유효한 순서는 고립 정점을 포함한 모든 정점을 담습니다.

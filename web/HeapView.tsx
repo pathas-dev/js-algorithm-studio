@@ -8,7 +8,7 @@ export default function HeapView({ step, language }: { step: Step; language: Lan
   const nodes = heap.map((item, index) => {
     const level = Math.floor(Math.log2(index + 1));
     const position = index - (2 ** level - 1);
-    return { ...item, x: (position + .5) / 2 ** level * 600, y: 25 + level * 48 };
+    return { ...item, x: 16 + (position + .5) / 2 ** level * 568, y: 25 + level * 48 };
   });
   return <div className="heap-view">
     <p>{language === 'ko' ? '최소 힙 · 부모 ≤ 자식' : 'Min heap · parent ≤ child'}</p>

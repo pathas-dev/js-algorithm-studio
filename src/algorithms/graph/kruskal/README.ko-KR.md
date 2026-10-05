@@ -29,3 +29,8 @@
 - [Kruskal's Algorithm on Wikipedia](https://en.wikipedia.org/wiki/Kruskal%27s_algorithm)
 - [Kruskal's Algorithm on YouTube by Tushar Roy](https://www.youtube.com/watch?v=fAuF0EuZVCk&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
 - [Kruskal's Algorithm on YouTube by Michael Sambol](https://www.youtube.com/watch?v=71UQH7Pr9kU&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## 구현 참고
+
+선택적인 두 번째 `stepCallback` 인수로 간선 선택과 분리 집합 상태를 기록할 수 있습니다. 미연결 그래프에서는 최소 신장 숲을 반환하며 고립 정점도 독립 성분으로 보존합니다.

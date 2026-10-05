@@ -130,3 +130,8 @@ For example, the shorter path from `A` to `E` is `A → C → F → E`.
 - [Wikipedia](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
 - [On YouTube by Nathaniel Fan](https://www.youtube.com/watch?v=gdmfOwyQlcI&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
 - [On YouTube by Tushar Roy](https://www.youtube.com/watch?v=lAXZGERcDf4&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## Implementation notes
+
+The optional third `stepCallback` records distances, predecessors and priority-queue snapshots. The web lesson rejects negative edge weights before execution. This repository’s priority queue uses linear value lookup, so its running time differs from an indexed-heap implementation.

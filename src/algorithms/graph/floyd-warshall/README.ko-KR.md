@@ -58,3 +58,8 @@
 - [Wikipedia](https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm)
 - [YouTube (by Abdul Bari)](https://www.youtube.com/watch?v=oNI0rf2P9gE&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8&index=74)
 - [YouTube (by Tushar Roy)](https://www.youtube.com/watch?v=LwJdNfdLF9s&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8&index=75)
+
+
+## 구현 참고
+
+선택적인 두 번째 `stepCallback` 인수로 실행 스냅샷을 기록할 수 있습니다. 반환 값의 `negativeCycle`은 거리 행렬의 음수 대각선으로 검사합니다. 이 값이 참이면 행렬 전체를 확정된 최단 거리 결과로 해석하면 안 됩니다.

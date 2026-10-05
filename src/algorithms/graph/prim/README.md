@@ -47,3 +47,8 @@ are two possibilities of minimum spanning tree of the given graph.
 - [Prim's Algorithm on Wikipedia](https://en.wikipedia.org/wiki/Prim%27s_algorithm)
 - [Prim's Algorithm on YouTube by Tushar Roy](https://www.youtube.com/watch?v=oP2-8ysT3QQ&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
 - [Prim's Algorithm on YouTube by Michael Sambol](https://www.youtube.com/watch?v=cplfcGZmX7I&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## Implementation notes
+
+The optional second `stepCallback` records edge choices. This implementation starts at the first vertex in the graph’s internal order and returns the tree for its reachable component. Other components remain outside this tree.

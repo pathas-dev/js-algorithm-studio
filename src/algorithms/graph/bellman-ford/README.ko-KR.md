@@ -14,3 +14,8 @@
 
 - [Wikipedia](https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm)
 - [On YouTube by Michael Sambol](https://www.youtube.com/watch?v=obWXjtg0L64&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
+
+
+## 구현 참고
+
+선택적인 세 번째 `stepCallback` 인수로 실행 스냅샷을 기록할 수 있습니다. 반환 값에는 `negativeCycle`도 포함됩니다. `true`이면 시작점에서 음수 사이클에 도달할 수 있으므로 거리 값은 확정된 최단 거리가 아닌 잠정값입니다. 시작점과 연결되지 않은 음수 사이클은 이 값을 바꾸지 않습니다.

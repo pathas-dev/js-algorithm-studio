@@ -27,7 +27,7 @@ to YouTube videos).
 
 Use Node.js 22.12 or newer. Run `npm ci`, then `npm run dev` to open the local visualizer. `npm run build` type-checks the web app and generates `dist`; `npm run preview` serves that production build locally. `npm run check:docs` checks bilingual documentation and local links.
 
-The current visualizer supports bubble, selection, insertion, merge and quick sort, linear and binary search, and BFS/DFS. Each lesson supports previous/next steps, timeline seeking, playback speed, source highlighting and Korean/English explanations. Array lessons allow up to 32 values; graph lessons allow up to 12 vertices and 24 undirected edges.
+The visualizer supports 21 lessons: nine sorts (bubble, selection, insertion, merge, quick, shell, heap, counting, radix), four array searches (linear, binary, jump, interpolation), and eight graph algorithms (BFS, DFS, Dijkstra, Bellman–Ford, Floyd–Warshall, Prim, Kruskal, topological sort). Each supports reversible steps, playback speed, source highlighting and Korean/English explanations. Inspect heap trees, digit/count buckets, distance tables/matrices and disjoint sets. Arrays allow up to 32 values; graphs allow up to 12 vertices and 24 edges. Weighted lessons support directed/undirected edges as appropriate. Counting sort accepts integers spanning at most 64 buckets; radix sort accepts nonnegative integers. Negative cycles and invalid topological inputs are identified explicitly.
 
 See the [development plan and verification checklist](DEVELOPMENT_PLAN.md) (Korean) for completed milestones and remaining work.
 
