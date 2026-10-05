@@ -13,7 +13,8 @@ import zSource from '../src/algorithms/string/z-algorithm/zAlgorithm.js?raw';
 import rabinSource from '../src/algorithms/string/rabin-karp/rabinKarp.js?raw';
 import lcsSource from '../src/algorithms/sets/longest-common-subsequence/longestCommonSubsequence.js?raw';
 import editSource from '../src/algorithms/string/levenshtein-distance/levenshteinDistance.js?raw';
-import { traceLcs, traceEditDistance } from '../src/visualization/dynamic';
+import knapsackSource from '../src/algorithms/sets/knapsack-problem/Knapsack.js?raw';
+import { traceLcs, traceEditDistance, traceKnapsack } from '../src/visualization/dynamic';
 import { traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
@@ -1390,4 +1391,25 @@ export const editDistance: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance];
+export const knapsack: TextAlgorithm = {
+  ...lcs, id: 'knapsack', name: { ko: '0/1 배낭 문제', en: '0/1 knapsack' },
+  summary: { ko: '물건을 각각 최대 한 번 선택해 허용 무게 안에서 가치를 최대화합니다. 물건별 DP 표와 역추적으로 선택 결과를 확인합니다.', en: 'Choose each item at most once to maximize value within capacity. Inspect the item-prefix DP table and traceback selections.' },
+  source: algorithmCode(knapsackSource), time: 'O(nW)', example: ['1:1, 3:4, 4:5, 5:7', '7'],
+  inputLabels: [{ ko: '물건 입력 · 무게:가치', en: 'Items · weight:value' }, { ko: '허용 무게', en: 'Capacity' }],
+  inputHint: { ko: '최대 8개 물건 · 무게 1~24 · 가치 0~999 · 허용 무게 0~24 · 각 물건 1개씩', en: 'Up to 8 items · weight 1–24 · value 0–999 · capacity 0–24 · one of each item' },
+  run: ([items, capacity]) => traceKnapsack(items, capacity),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['물건 정렬·표 준비', '기존 클래스가 가치 내림차순, 무게 오름차순의 안정 정렬을 적용합니다. 표에는 원래 입력 번호 #을 유지하며 각 물건은 한 번만 선택합니다.'] : ['Sort items and prepare the table', 'The existing class stably sorts by descending value then ascending weight. Preserve original input numbers #; each item can be selected once.'];
+      case 'initialize': return ko ? ['물건 없음·무게 0 초기화', '물건이 없는 첫 행과 허용 무게 0인 첫 열의 가치는 0입니다. 각 행은 그 행까지의 물건으로 얻을 수 있는 최대 가치를 나타냅니다.'] : ['Initialize no-item and zero-capacity cases', 'The no-item row and zero-capacity column have value zero. Each row represents the best value using only items through that row.'];
+      case 'too-heavy': return ko ? ['너무 무거운 물건 제외', `물건 무게 ${v.itemWeight}가 현재 허용 무게 ${v.column}보다 큽니다. 이전 행의 가치 ${v.skip}를 그대로 가져옵니다.`] : ['Exclude an overweight item', `Item weight ${v.itemWeight} exceeds capacity ${v.column}. Copy the previous row value ${v.skip}.`];
+      case 'choose-value': return ko ? ['선택·제외 가치 비교', `제외하면 ${v.skip}, 선택하면 물건 가치 ${v.itemValue}와 남은 무게의 이전 행 답을 더한 ${v.take}입니다. 큰 값을 저장하며 이전 행만 참조해 중복 선택을 막습니다.`] : ['Compare taking and skipping', `Skipping gives ${v.skip}; taking gives ${v.itemValue} plus the previous-row answer for remaining capacity, totaling ${v.take}. Use the larger value. Refer only to the previous row to prevent selecting an item twice.`];
+      case 'take-item': return ko ? ['역추적 · 물건 선택', `이 행의 가치가 이전 행보다 커 물건을 선택했습니다. 무게 ${v.itemWeight}를 빼고 이전 행으로 이동합니다.`] : ['Traceback · take an item', `This row improves on the previous row, so select the item. Subtract weight ${v.itemWeight} and move to the previous row.`];
+      case 'skip-item': return ko ? ['역추적 · 물건 제외', '현재 가치가 이전 행과 같으므로 이 물건을 선택하지 않습니다. 남은 무게를 유지하고 이전 행으로 이동합니다.'] : ['Traceback · skip an item', 'The value equals the previous row, so skip this item and move up without reducing remaining capacity.'];
+      default: return ko ? ['최적 선택 완료', `최대 가치 ${v.result}, 총 무게 ${v.totalWeight}입니다. 선택한 원래 입력 번호는 ${v.selectedItems}입니다. 같은 최댓값의 다른 선택도 있을 수 있습니다.`] : ['Optimal selection ready', `Maximum value ${v.result}, total weight ${v.totalWeight}. Original item numbers: ${v.selectedItems}. Other equally valuable selections may exist.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

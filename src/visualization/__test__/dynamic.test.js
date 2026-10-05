@@ -1,9 +1,43 @@
 import fs from 'fs';
 import path from 'path';
-import { traceLcs, traceEditDistance } from '../dynamic';
+import { traceLcs, traceEditDistance, traceKnapsack } from '../dynamic';
 import { algorithmCode } from '../playback';
 
 describe('dynamic programming lessons', () => {
+  it('matches exhaustive 0/1 subsets and recovers actual items for empty, single and tied inputs', () => {
+    const source = algorithmCode(fs.readFileSync(path.resolve(
+      __dirname,
+      '../../algorithms/sets/knapsack-problem/Knapsack.js',
+    ), 'utf8'));
+    ['', '2:3', '2:3, 2:3', '1:0, 3:4', '1:1, 3:4, 4:5, 5:7', '1:7, 1:5, 1:4, 1:4']
+      .forEach((text) => {
+        const items = text ? text.split(',').map((part) => part.trim().split(':').map(Number)) : [];
+        for (let limit = 0; limit <= 8; limit += 1) {
+          const subsets = Array.from({ length: 2 ** items.length }, (_, bits) => items
+            .filter((item, i) => bits & (2 ** i)))
+            .filter((subset) => subset.reduce((sum, [weight]) => sum + weight, 0) <= limit);
+          const best = Math.max(...subsets.map((subset) => subset
+            .reduce((sum, [, value]) => sum + value, 0)));
+          const steps = traceKnapsack(text, String(limit));
+          const last = steps.at(-1).variables;
+          const selected = JSON.parse(last.selectedItems).map((id) => items[id - 1]);
+          expect(last.result).toBe(best);
+          expect(last.totalWeight).toBeLessThanOrEqual(limit);
+          expect(selected.reduce((sum, [, value]) => sum + value, 0)).toBe(best);
+          expect(new Set(JSON.parse(last.selectedItems)).size).toBe(selected.length);
+          expect(JSON.parse(last.dpMatrix).at(-1)[limit]).toBe(best);
+          steps.forEach((s) => expect(source).toContain(s.code));
+          expect(JSON.parse(steps[0].variables.dpMatrix).every((r) => r.every((v) => v === null)))
+            .toBe(true);
+        }
+      });
+    ['0:1', '-1:2', '1.5:2', '1:-2', '25:1', '1:1000', '1:2,', Array(9).fill('1:2').join(',')]
+      .forEach((input) => expect(() => traceKnapsack(input, '5')).toThrow('knapsack-input'));
+    ['-1', '1.5', '', '25'].forEach((limit) => {
+      expect(() => traceKnapsack('1:2', limit)).toThrow('knapsack-input');
+    });
+    expect(() => traceKnapsack(null, '5')).toThrow('knapsack-input');
+  });
   it('uses deletion, insertion and substitution costs and restores uncomputed cells on rewind', () => {
     const source = algorithmCode(fs.readFileSync(path.resolve(
       __dirname,

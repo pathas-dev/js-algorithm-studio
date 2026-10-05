@@ -1,4 +1,5 @@
 import MergeSort from '../../sorting/merge-sort/MergeSort';
+import recordStep from '../../../utils/trace/recordStep';
 
 export default class Knapsack {
   /**
@@ -59,94 +60,79 @@ export default class Knapsack {
     }).sort(this.possibleItems);
   }
 
-  // Solve 0/1 knapsack problem
-  // Dynamic Programming approach.
-  solveZeroOneKnapsackProblem() {
-    // We do two sorts because in case of equal weights but different values
-    // we need to take the most valuable items first.
+  // Solve 0/1 knapsack by prefix items and integer capacity, then trace selected rows.
+  solveZeroOneKnapsackProblem(stepCallback) {
     this.sortPossibleItemsByValue();
     this.sortPossibleItemsByWeight();
-
     this.selectedItems = [];
-
-    // Create knapsack values matrix.
-    const numberOfRows = this.possibleItems.length;
-    const numberOfColumns = this.weightLimit;
-    const knapsackMatrix = Array(numberOfRows).fill(null).map(() => {
-      return Array(numberOfColumns + 1).fill(null);
-    });
-
-    // Fill the first column with zeros since it would mean that there is
-    // no items we can add to knapsack in case if weight limitation is zero.
-    for (let itemIndex = 0; itemIndex < this.possibleItems.length; itemIndex += 1) {
+    const knapsackMatrix = Array(this.possibleItems.length + 1).fill(null)
+      .map(() => Array(this.weightLimit + 1).fill(null));
+    knapsackMatrix[0].fill(0);
+    for (let itemIndex = 1; itemIndex <= this.possibleItems.length; itemIndex += 1) {
       knapsackMatrix[itemIndex][0] = 0;
     }
+    recordStep(stepCallback, 'initialize', [], [], () => ({
+      dpMatrix: JSON.stringify(knapsackMatrix), selected: '[]',
+    }), 'knapsackMatrix[0].fill(0);');
 
-    // Fill the first row with max possible values we would get by just adding
-    // or not adding the first item to the knapsack.
-    for (let weightIndex = 1; weightIndex <= this.weightLimit; weightIndex += 1) {
-      const itemIndex = 0;
-      const itemWeight = this.possibleItems[itemIndex].weight;
-      const itemValue = this.possibleItems[itemIndex].value;
-      knapsackMatrix[itemIndex][weightIndex] = itemWeight <= weightIndex ? itemValue : 0;
-    }
-
-    // Go through combinations of how we may add items to knapsack and
-    // define what weight/value we would receive using Dynamic Programming
-    // approach.
-    for (let itemIndex = 1; itemIndex < this.possibleItems.length; itemIndex += 1) {
+    for (let itemIndex = 1; itemIndex <= this.possibleItems.length; itemIndex += 1) {
+      const item = this.possibleItems[itemIndex - 1];
       for (let weightIndex = 1; weightIndex <= this.weightLimit; weightIndex += 1) {
-        const currentItemWeight = this.possibleItems[itemIndex].weight;
-        const currentItemValue = this.possibleItems[itemIndex].value;
-
-        if (currentItemWeight > weightIndex) {
-          // In case if item's weight is bigger then currently allowed weight
-          // then we can't add it to knapsack and the max possible value we can
-          // gain at the moment is the max value we got for previous item.
-          knapsackMatrix[itemIndex][weightIndex] = knapsackMatrix[itemIndex - 1][weightIndex];
+        const skip = knapsackMatrix[itemIndex - 1][weightIndex];
+        if (item.weight > weightIndex) {
+          knapsackMatrix[itemIndex][weightIndex] = skip;
+          recordStep(stepCallback, 'too-heavy', [], [], () => ({
+            dpMatrix: JSON.stringify(knapsackMatrix),
+            row: itemIndex,
+            column: weightIndex,
+            skip,
+            itemWeight: item.weight,
+            itemValue: item.value,
+            dependencies: JSON.stringify([[itemIndex - 1, weightIndex]]),
+          }), 'knapsackMatrix[itemIndex][weightIndex] = skip;');
         } else {
-          // Else we need to consider the max value we can gain at this point by adding
-          // current value or just by keeping the previous item for current weight.
-          knapsackMatrix[itemIndex][weightIndex] = Math.max(
-            currentItemValue + knapsackMatrix[itemIndex - 1][weightIndex - currentItemWeight],
-            knapsackMatrix[itemIndex - 1][weightIndex],
-          );
+          const take = item.value + knapsackMatrix[itemIndex - 1][weightIndex - item.weight];
+          knapsackMatrix[itemIndex][weightIndex] = Math.max(skip, take);
+          recordStep(stepCallback, 'choose-value', [], [], () => ({
+            dpMatrix: JSON.stringify(knapsackMatrix),
+            row: itemIndex,
+            column: weightIndex,
+            skip,
+            take,
+            itemWeight: item.weight,
+            itemValue: item.value,
+            dependencies: JSON.stringify([
+              [itemIndex - 1, weightIndex], [itemIndex - 1, weightIndex - item.weight],
+            ]),
+          }), 'knapsackMatrix[itemIndex][weightIndex] = Math.max(skip, take);');
         }
       }
     }
 
-    // Now let's trace back the knapsack matrix to see what items we're going to add
-    // to the knapsack.
-    let itemIndex = this.possibleItems.length - 1;
     let weightIndex = this.weightLimit;
-
-    while (itemIndex > 0) {
-      const currentItem = this.possibleItems[itemIndex];
-      const prevItem = this.possibleItems[itemIndex - 1];
-
-      // Check if matrix value came from top (from previous item).
-      // In this case this would mean that we need to include previous item
-      // to the list of selected items.
-      if (
-        knapsackMatrix[itemIndex][weightIndex]
-        && knapsackMatrix[itemIndex][weightIndex] === knapsackMatrix[itemIndex - 1][weightIndex]
-      ) {
-        // Check if there are several items with the same weight but with the different values.
-        // We need to add highest item in the matrix that is possible to get the highest value.
-        const prevSumValue = knapsackMatrix[itemIndex - 1][weightIndex];
-        const prevPrevSumValue = knapsackMatrix[itemIndex - 2][weightIndex];
-        if (
-          !prevSumValue
-          || (prevSumValue && prevPrevSumValue !== prevSumValue)
-        ) {
-          this.selectedItems.push(prevItem);
-        }
-      } else if (knapsackMatrix[itemIndex - 1][weightIndex - currentItem.weight]) {
-        this.selectedItems.push(prevItem);
-        weightIndex -= currentItem.weight;
+    for (let itemIndex = this.possibleItems.length; itemIndex > 0; itemIndex -= 1) {
+      const item = this.possibleItems[itemIndex - 1];
+      if (knapsackMatrix[itemIndex][weightIndex] > knapsackMatrix[itemIndex - 1][weightIndex]) {
+        item.quantity = 1;
+        this.selectedItems.push(item);
+        recordStep(stepCallback, 'take-item', [], [], () => ({
+          row: itemIndex,
+          column: weightIndex,
+          itemWeight: item.weight,
+          itemValue: item.value,
+          selected: JSON.stringify(this.selectedItems.map((selected) => {
+            return this.possibleItems.indexOf(selected) + 1;
+          })),
+          dependencies: JSON.stringify([[itemIndex - 1, weightIndex - item.weight]]),
+        }), 'this.selectedItems.push(item);');
+        weightIndex -= item.weight;
+      } else {
+        recordStep(stepCallback, 'skip-item', [], [], () => ({
+          row: itemIndex,
+          column: weightIndex,
+          dependencies: JSON.stringify([[itemIndex - 1, weightIndex]]),
+        }), 'if (knapsackMatrix[itemIndex][weightIndex] > knapsackMatrix[itemIndex - 1][weightIndex]) {');
       }
-
-      itemIndex -= 1;
     }
   }
 

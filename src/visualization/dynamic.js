@@ -1,5 +1,7 @@
 import longestCommonSubsequence from '../algorithms/sets/longest-common-subsequence/longestCommonSubsequence';
 import levenshteinDistance from '../algorithms/string/levenshtein-distance/levenshteinDistance';
+import Knapsack from '../algorithms/sets/knapsack-problem/Knapsack';
+import KnapsackItem from '../algorithms/sets/knapsack-problem/KnapsackItem';
 import { requireStrings } from './strings';
 
 export function requireDpStrings(first, second) {
@@ -57,4 +59,54 @@ export function traceLcs(first, second) {
 
 export function traceEditDistance(first, second) {
   return traceStringDp(first, second, levenshteinDistance);
+}
+
+export function traceKnapsack(text, capacity) {
+  if (typeof text !== 'string' || !/^\d+$/.test(capacity)) throw new Error('knapsack-input');
+  const limit = Number(capacity);
+  const entries = text.trim() ? text.split(',').map((part) => part.trim()) : [];
+  if (limit > 24 || entries.length > 8) throw new Error('knapsack-input');
+  const items = entries.map((entry) => {
+    if (!/^\d+:\d+$/.test(entry)) throw new Error('knapsack-input');
+    const [weight, value] = entry.split(':').map(Number);
+    if (weight < 1 || weight > 24 || value > 999) throw new Error('knapsack-input');
+    return new KnapsackItem({ weight, value });
+  });
+  const knapsack = new Knapsack(items, limit);
+  const steps = [];
+  let context = {
+    mode: 'knapsack',
+    columns: JSON.stringify(Array.from({ length: limit + 1 }, (_, i) => String(i))),
+    rows: JSON.stringify(['∅', ...entries]),
+    dpMatrix: JSON.stringify(Array(items.length + 1).fill(null)
+      .map(() => Array(limit + 1).fill(null))),
+    selected: '[]',
+    dependencies: '[]',
+    row: -1,
+    column: -1,
+  };
+  const snapshot = (type, code, variables = {}) => {
+    context = { ...context, ...variables };
+    steps.push({
+      type, code, array: [], indices: [], variables: { ...context },
+    });
+  };
+  snapshot('start', 'this.sortPossibleItemsByValue();');
+  knapsack.solveZeroOneKnapsackProblem((step) => {
+    snapshot(step.type, step.code, {
+      ...step.variables,
+      rows: JSON.stringify(['∅', ...knapsack.possibleItems.map((item) => {
+        return `#${items.indexOf(item) + 1} · w${item.weight} v${item.value}`;
+      })]),
+    });
+  });
+  snapshot('done', 'return this.selectedItems.reduce((accumulator, item) => {', {
+    result: knapsack.totalValue,
+    totalWeight: knapsack.totalWeight,
+    dependencies: '[]',
+    row: -1,
+    column: -1,
+    selectedItems: JSON.stringify(knapsack.selectedItems.map((item) => items.indexOf(item) + 1)),
+  });
+  return steps;
 }
