@@ -40,6 +40,8 @@ export default function App() {
   const [steps, setSteps] = useState(() => bubble.run(bubble.example));
   const [playback, dispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
   const step = steps[playback.index];
+  const isSort = algorithm.category === 'sort';
+  const partialArray = isSort && 'depth' in step.variables;
   const [stepTitle, reason] = algorithm.explain(step, language);
   const distanceSummary = 'distances' in step.variables ? Object.entries(JSON.parse(String(step.variables.distances))).map(([node, distance]) => `${node}: ${distance ?? '∞'}`).join(', ') : undefined;
   const seek = (index: number) => dispatch({ type: 'seek', index });
@@ -186,7 +188,7 @@ export default function App() {
               </div>)}
               <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
-            <div className={`lesson ${algorithm.id === 'bubble-sort' ? 'bubble-lesson' : ''}`}>
+            <div className={`lesson ${isSort ? 'sort-lesson' : ''}`}>
               <div className="lesson-heading">
                 <div><Group gap="sm"><Title order={1}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : algorithm.category === 'search' ? t('검색', 'SEARCHING') : algorithm.category === 'graph' ? t('그래프', 'GRAPHS') : algorithm.category === 'string' ? t('문자열', 'STRINGS') : algorithm.category === 'dp' ? t('동적 계획', 'DYNAMIC PROGRAMMING') : t('자료 구조', 'DATA STRUCTURES')}</Badge></Group>
                   <Text size="sm" c="dimmed" mt={6}>{algorithm.summary[language]}</Text>
@@ -213,24 +215,26 @@ export default function App() {
                 <div className="visual-column">
                   <Paper withBorder className="canvas-card">
                     <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
-                    {algorithm.category === 'sort' && 'depth' in step.variables && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
+                    <div className={isSort ? 'sort-visual' : undefined}>
+                    {partialArray && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
                     {'buckets' in step.variables && <BucketView step={step} language={language} />}
                     {'heapSize' in step.variables && algorithm.category !== 'structure' && <HeapView step={step} language={language} />}
                     {algorithm.category === 'dp' ? <DpView step={step} language={language} /> : algorithm.category === 'string' ? <StringView step={step} language={language} /> : algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : algorithm.category === 'structure' ? <StructureView step={step} language={language} /> : <ArrayView step={step} language={language} />}
+                    </div>
                     <Group gap="lg" className="legend">{algorithm.category === 'dp' ? <><span><i className="dot comparing" />{t('현재 셀', 'Current cell')}</span><span><i className="dot matched" />{t('참조 셀', 'Referenced cell')}</span></> : algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'structure' ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span></> : ['search', 'string'].includes(algorithm.category) ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : ['heap-sort', 'counting-sort', 'radix-sort'].includes(algorithm.id) ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span><span><i className="dot settled" />{t('정렬된 결과', 'Sorted output')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
-                    {algorithm.id === 'bubble-sort' ? <div className="inline-array-editor">
-                      <Group justify="space-between" gap="sm"><Text size="xs" c="dimmed">{t('현재 배열', 'Current array')}</Text><Button variant="subtle" size="compact-sm" onClick={randomize} disabled={editingArray}>{t('무작위', 'Randomize')}</Button></Group>
+                    {isSort ? <div className="inline-array-editor">
+                      <Group justify="space-between" gap="sm"><Text size="xs" c="dimmed">{partialArray ? t('현재 부분 배열', 'Current subarray') : t('현재 배열', 'Current array')}</Text><Button variant="subtle" size="compact-sm" onClick={randomize} disabled={editingArray}>{t('무작위', 'Randomize')}</Button></Group>
                       {editingArray ? <form onSubmit={(event) => { event.preventDefault(); apply(input); }} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); setEditingArray(false); setError(''); } }}>
-                        <div className="input-row"><TextInput className="array-input" size="md" aria-label={t('현재 배열', 'Current array')} value={input} onChange={(event) => setInput(event.currentTarget.value)} error={error ? errors[error] : undefined} autoFocus autoComplete="off" /><div className="array-edit-actions"><Button type="submit" variant="light" className="apply-button">{t('적용', 'Apply')}</Button><Button variant="subtle" onClick={() => { setEditingArray(false); setError(''); }}>{t('취소', 'Cancel')}</Button></div></div>
-                        <Text size="xs" c="dimmed" mt="xs">{t(`최대 ${MAX_VALUES}개 · Enter 적용 · Esc 취소`, `Up to ${MAX_VALUES} values · Enter apply · Esc cancel`)}</Text>
+                        <div className="input-row"><TextInput className="array-input" size="md" aria-label={partialArray ? t('전체 입력 배열', 'Full input array') : t('현재 배열', 'Current array')} value={input} onChange={(event) => setInput(event.currentTarget.value)} error={error ? errors[error] : undefined} autoFocus autoComplete="off" /><div className="array-edit-actions"><Button type="submit" variant="light" className="apply-button">{t('적용', 'Apply')}</Button><Button variant="subtle" onClick={() => { setEditingArray(false); setError(''); }}>{t('취소', 'Cancel')}</Button></div></div>
+                        <Text size="xs" c="dimmed" mt="xs">{partialArray && t('전체 입력 배열 수정 · ', 'Editing the full input array · ')}{algorithm.inputHint?.[language] ?? t(`최대 ${MAX_VALUES}개`, `Up to ${MAX_VALUES} values`)}{t(' · Enter 적용 · Esc 취소', ' · Enter apply · Esc cancel')}</Text>
                         {error && <span role="alert" className="sr-only">{errors[error]}</span>}
-                      </form> : <button className="editable-array" aria-label={t('현재 배열 수정', 'Edit current array')} onClick={() => { seek(playback.index); setInput(step.array.map((item) => item.value).join(', ')); setError(''); setEditingArray(true); }}>
+                      </form> : <button className="editable-array" aria-label={t('현재 배열 수정', 'Edit current array')} onClick={() => { seek(playback.index); setInput((partialArray ? steps[0].array : step.array).map((item) => item.value).join(', ')); setError(''); setEditingArray(true); }}>
                         <output data-testid="array-values">[{step.array.map((item) => item.value).join(', ')}]</output><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15Z" /></svg><span>{t('수정', 'Edit')}</span>
                       </button>}
                     </div> : <div className="array-state"><Text size="xs" c="dimmed">{algorithm.category === 'dp' ? t('결과', 'Result') : algorithm.category === 'string' ? t('검색 결과', 'Search result') : distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : 'hashTable' in step.variables ? t('저장된 키', 'Stored keys') : 'trie' in step.variables ? t('저장된 단어', 'Stored words') : 'tree' in step.variables ? t('중위 순회 · 왼쪽 → 루트 → 오른쪽', 'Inorder · left → root → right') : step.variables.structure === 'stack' ? t('현재 노드 · TOP → 아래', 'Current nodes · TOP → bottom') : step.variables.structure === 'queue' ? t('현재 노드 · FRONT → REAR', 'Current nodes · FRONT → REAR') : step.variables.structure === 'linked-list' ? t('노드 표시 순서 · 연결은 화살표 참고', 'Displayed nodes · follow arrows for links') : algorithm.category === 'structure' ? t('현재 입력·저장 값', 'Current input / stored values') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{['string', 'dp'].includes(algorithm.category) ? step.variables.result ?? '—' : distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : 'hashTable' in step.variables ? step.variables.keys : 'trie' in step.variables ? step.variables.words : 'tree' in step.variables ? step.variables.inorder : step.array.map((item) => item.value).join(', '))}]</output></div>}
                   </Paper>
-                  {algorithm.id === 'bubble-sort' && <CodePanel source={algorithm.source} activeCode={step.code} language={language} />}
-                  {algorithm.id !== 'bubble-sort' && <Paper withBorder p="lg" className="input-card">
+                  {isSort && <CodePanel source={algorithm.source} activeCode={step.code} language={language} />}
+                  {!isSort && <Paper withBorder p="lg" className="input-card">
                     <form onSubmit={(event) => { event.preventDefault(); apply(input); }}>
                       {algorithm.inputMode === 'text' && <TextInput label={algorithm.inputLabels?.[1][language] ?? t('패턴 입력', 'Pattern')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} autoComplete="off" mb="sm" />}
                       {algorithm.category !== 'sort' && algorithm.usesStart !== false && <TextInput label={algorithm.category === 'graph' ? t('시작 정점', 'Start vertex') : t('목표 값', 'Target value')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} error={['target', 'start'].includes(error) ? errors[error] : undefined} autoComplete="off" mb="sm" />}
@@ -246,7 +250,7 @@ export default function App() {
                 </div>
                 <div className="detail-column">
 
-                  {algorithm.id !== 'bubble-sort' && <CodePanel source={algorithm.source} activeCode={step.code} language={language} />}
+                  {!isSort && <CodePanel source={algorithm.source} activeCode={step.code} language={language} />}
                 </div>
               </div>
 

@@ -188,32 +188,32 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
   .timeline { min-height: 40px; }
 }
 
-/* Bubble sort is the first lesson to use the refined reading layout. */
-.bubble-lesson .lesson-heading h1 { font-size: 30px; font-weight: 750; }
-.bubble-lesson .lesson-heading > div > p { font-size: 15px; line-height: 1.75; max-width: 65ch; }
-.bubble-lesson .canvas-card { padding: 24px; background: #fff; border-color: #d9e3db; }
-.bubble-lesson .array-chart { height: 236px; }
-.bubble-lesson .bar { background: #afc5b5; border-radius: 6px 6px 3px 3px; }
-.bubble-lesson .comparing .bar { background: #d8964a; }
-.bubble-lesson .swapping .bar { background: #8e79b4; }
-.bubble-lesson .settled .bar { background: #42886c; }
-.bubble-lesson .bar-label { font-size: 14px; }
-.bubble-lesson .array-index { color: #586d60; font-size: 12px; }
-.bubble-lesson .legend { font-size: 12px; color: #52695c; }
-.bubble-lesson .visual-column, .bubble-lesson .detail-column { display: contents; }
-.bubble-lesson .lesson-panels { grid-template-areas: "execution code"; align-items: start; }
-.bubble-lesson .canvas-card { grid-area: execution; }
-.bubble-lesson .source-panel { grid-area: code; }
-.bubble-lesson .input-row { display: flex; align-items: flex-start; gap: 10px; }
-.bubble-lesson .array-input input { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 14px; background: #f7faf6; border-color: #c9d7cd; }
-.bubble-lesson .array-input input:focus { border-color: #196d53; }
-.bubble-lesson .apply-button { height: 42px; background: #e5efe7; color: #196d53; }
-.bubble-lesson .apply-button:hover { background: #d6e7da; }
+/* Implemented sorting lessons share the refined reading layout. */
+.sort-lesson .lesson-heading h1 { font-size: 30px; font-weight: 750; }
+.sort-lesson .lesson-heading > div > p { font-size: 15px; line-height: 1.75; max-width: 65ch; }
+.sort-lesson .canvas-card { padding: 24px; background: #fff; border-color: #d9e3db; }
+.sort-lesson .array-chart { height: 236px; }
+.sort-lesson .bar { background: #afc5b5; border-radius: 6px 6px 3px 3px; }
+.sort-lesson .comparing .bar { background: #d8964a; }
+.sort-lesson .swapping .bar { background: #8e79b4; }
+.sort-lesson .settled .bar { background: #42886c; }
+.sort-lesson .bar-label { font-size: 14px; }
+.sort-lesson .array-index { color: #586d60; font-size: 12px; }
+.sort-lesson .legend { font-size: 12px; color: #52695c; }
+.sort-lesson .visual-column, .sort-lesson .detail-column { display: contents; }
+.sort-lesson .lesson-panels { grid-template-areas: "execution code"; align-items: start; }
+.sort-lesson .canvas-card { grid-area: execution; }
+.sort-lesson .source-panel { grid-area: code; }
+.sort-lesson .input-row { display: flex; align-items: flex-start; gap: 10px; }
+.sort-lesson .array-input input { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 14px; background: #f7faf6; border-color: #c9d7cd; }
+.sort-lesson .array-input input:focus { border-color: #196d53; }
+.sort-lesson .apply-button { height: 42px; background: #e5efe7; color: #196d53; }
+.sort-lesson .apply-button:hover { background: #d6e7da; }
 .lesson-explanation .mantine-Badge-root { text-transform: none; font: 12px/1.5 ui-monospace, monospace; background: #dce8dc; color: #355441; height: auto; padding: 5px 9px; }
-.bubble-lesson .source-heading { font-size: 12px; padding: 15px 18px; }
-.bubble-lesson .source-scroll pre { font-size: 13px; }
-.bubble-lesson .line-number { color: #9db3a5; }
-.bubble-lesson .active-line { background: #304f40; border-left-color: #a7d7b6; }
+.sort-lesson .source-heading { font-size: 12px; padding: 15px 18px; }
+.sort-lesson .source-scroll pre { font-size: 13px; }
+.sort-lesson .line-number { color: #9db3a5; }
+.sort-lesson .active-line { background: #304f40; border-left-color: #a7d7b6; }
 ::selection { background: #c9e3d2; color: #173d2b; }
 .source-panel ::selection { background: #416953; color: #fff; }
 input { caret-color: #196d53; }
@@ -226,9 +226,9 @@ input { caret-color: #196d53; }
   .transport { grid-column: 1 / -1; justify-content: center; width: 100%; }
   .transport-button { width: 42px; height: 42px; }
   .playback-meta { gap: 10px; }
-  .bubble-lesson .canvas-card { padding: 20px; }
-  .bubble-lesson .lesson-heading h1 { font-size: 27px; }
-  .bubble-lesson .source-scroll { min-height: 320px; max-height: 320px; }
+  .sort-lesson .canvas-card { padding: 20px; }
+  .sort-lesson .lesson-heading h1 { font-size: 27px; }
+  .sort-lesson .source-scroll { min-height: 320px; max-height: 320px; }
 }
 
 @media (max-width: 380px) {
@@ -241,7 +241,7 @@ input { caret-color: #196d53; }
 }
 
 @media (max-width: 1050px) {
-  .bubble-lesson .lesson-panels { grid-template-areas: "execution" "code"; }
+  .sort-lesson .lesson-panels { grid-template-areas: "execution" "code"; }
   .playback-toolbar { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; }
   .playback-toolbar .timeline { grid-column: 1; grid-row: 2; }
   .playback-meta { grid-column: 2; grid-row: 2; justify-content: flex-end; }
@@ -273,31 +273,33 @@ input { caret-color: #196d53; }
 
 /* Desktop lessons allocate the viewport once; each pane owns its overflow. */
 @media (min-width: 1051px) {
-  .studio:has(.bubble-lesson) { height: 100dvh; box-sizing: border-box; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
-  .studio:has(.bubble-lesson) > main { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
-  .studio:has(.bubble-lesson) .workspace { min-height: 0; }
-  .studio:has(.bubble-lesson) .catalog { position: static; align-self: stretch; min-height: 0; max-height: none; }
-  .bubble-lesson { min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
-  .bubble-lesson .lesson-panels { min-height: 0; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
-  .bubble-lesson .canvas-card, .bubble-lesson .source-panel { min-height: 0; display: flex; flex-direction: column; }
-  .bubble-lesson .canvas-card { overflow: auto; }
-  .bubble-lesson .canvas-card > :not(.array-scroll) { flex-shrink: 0; }
-  .bubble-lesson .array-scroll { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
-  .bubble-lesson .array-chart { --array-baseline: 50%; --array-scale: max(12px, calc(50% - 48px)); flex: 1 0 120px; min-height: 120px; height: auto; }
-  .bubble-lesson .bar { min-height: 3px; }
-  .bubble-lesson .source-heading { flex-shrink: 0; }
-  .bubble-lesson .source-scroll { flex: 1; min-height: 0; max-height: none; }
-  .studio:has(.bubble-lesson) .studio-footer { padding: 12px 0 0; }
+  .studio:has(.sort-lesson) { height: 100dvh; box-sizing: border-box; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+  .studio:has(.sort-lesson) > main { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+  .studio:has(.sort-lesson) .workspace { min-height: 0; }
+  .studio:has(.sort-lesson) .catalog { position: static; align-self: stretch; min-height: 0; max-height: none; }
+  .sort-lesson { min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
+  .sort-lesson .lesson-panels { min-height: 0; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+  .sort-lesson .canvas-card, .sort-lesson .source-panel { min-height: 0; display: flex; flex-direction: column; }
+  .sort-lesson .canvas-card { overflow: auto; }
+  .sort-lesson .canvas-card > :not(.sort-visual) { flex-shrink: 0; }
+  .sort-lesson .sort-visual { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
+  .sort-lesson .sort-visual > :not(.array-scroll) { flex-shrink: 0; }
+  .sort-lesson .array-scroll { flex: 1 0 128px; min-height: 128px; display: flex; flex-direction: column; }
+  .sort-lesson .array-chart { --array-baseline: 50%; --array-scale: max(12px, calc(50% - 48px)); flex: 1 0 120px; min-height: 120px; height: auto; }
+  .sort-lesson .bar { min-height: 3px; }
+  .sort-lesson .source-heading { flex-shrink: 0; }
+  .sort-lesson .source-scroll { flex: 1; min-height: 0; max-height: none; }
+  .studio:has(.sort-lesson) .studio-footer { padding: 12px 0 0; }
 }
 @media (min-width: 1051px) and (max-height: 800px) {
-  .studio:has(.bubble-lesson) { padding: 16px 28px; }
-  .studio:has(.bubble-lesson) .studio-header { padding-bottom: 12px; }
-  .studio:has(.bubble-lesson) .lesson-explanation { margin: 12px 0 16px; padding: 12px 20px; }
-  .bubble-lesson .lesson-heading { margin-bottom: 12px; }
-  .bubble-lesson .playback-card { margin-bottom: 12px; }
-  .bubble-lesson .canvas-card { padding: 20px; }
-  .bubble-lesson .array-scroll { min-height: 128px; }
-  .studio:has(.bubble-lesson) .studio-footer { padding-top: 8px; }
+  .studio:has(.sort-lesson) { padding: 16px 28px; }
+  .studio:has(.sort-lesson) .studio-header { padding-bottom: 12px; }
+  .studio:has(.sort-lesson) .lesson-explanation { margin: 12px 0 16px; padding: 12px 20px; }
+  .sort-lesson .lesson-heading { margin-bottom: 12px; }
+  .sort-lesson .playback-card { margin-bottom: 12px; }
+  .sort-lesson .canvas-card { padding: 20px; }
+  .sort-lesson .array-scroll { min-height: 128px; }
+  .studio:has(.sort-lesson) .studio-footer { padding-top: 8px; }
 }
 
 .algorithm-button:disabled, .algorithm-button:disabled:hover { color: #748279; background: transparent; cursor: not-allowed; font-weight: 500; }
