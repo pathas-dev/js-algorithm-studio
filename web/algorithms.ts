@@ -1,3 +1,4 @@
+import primSource from '../src/algorithms/graph/prim/prim.js?raw';
 import floydSource from '../src/algorithms/graph/floyd-warshall/floydWarshall.js?raw';
 import bellmanSource from '../src/algorithms/graph/bellman-ford/bellmanFord.js?raw';
 import dijkstraSource from '../src/algorithms/graph/dijkstra/dijkstra.js?raw';
@@ -14,7 +15,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall } from '../src/visualization/graph';
+import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -59,6 +60,7 @@ export type Algorithm = {
   usesStart?: boolean;
   graphWeighted?: boolean;
   graphDirected?: boolean;
+  fixedDirection?: boolean;
   run(values: number[], target?: number, edges?: number[][], directed?: boolean): Step[];
   explain(step: Step, language: Language): [string, string];
 };
@@ -593,4 +595,28 @@ export const floyd: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd];
+export const prim: Algorithm = {
+  id: 'prim', category: 'graph', graphWeighted: true, fixedDirection: true, usesStart: false,
+  name: { ko: '프림', en: 'Prim' },
+  summary: { ko: '첫 정점과 연결된 성분에서 가장 싼 경계 간선으로 최소 신장 트리를 확장합니다.', en: 'Grow a minimum spanning tree of the first vertex’s component using the cheapest frontier edge.' },
+  source: algorithmCode(primSource), example: dijkstra.example, graphEdges: dijkstra.graphEdges, time: 'O(V + E log E)',
+  run: (nodes, _start, edges = prim.graphEdges!) => tracePrim(nodes, edges),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['트리 시작', `내부 정점 순서의 첫 정점 ${v.current}에서 시작합니다. 이 정점의 간선을 가중치 우선순위 큐에 넣고 최소 간선을 선택합니다.`]
+        : ['Start the tree', `Start at vertex ${v.current}, first in the internal vertex order. Enqueue its edges by weight and select the minimum.`];
+      case 'edge': return ko ? ['가장 싼 경계 간선 선택', `간선 ${v.current}–${v.next}를 꺼냈습니다. 한쪽 끝이 미방문이면 트리에 추가할 수 있고, 양쪽 모두 방문했다면 건너뜁니다.`]
+        : ['Select the cheapest frontier edge', `Poll edge ${v.current}–${v.next}. Add it if one endpoint is unvisited; skip if both were visited.`];
+      case 'choose': return ko ? ['트리 확장', `간선 ${v.current}–${v.next}를 추가했습니다. 초록색 간선이 선택된 트리이며 현재 가중치 합은 ${v.weight}입니다. 새 정점의 경계 간선을 큐에 넣습니다.`]
+        : ['Grow the tree', `Add edge ${v.current}–${v.next}. Green edges form the selected tree, totaling ${v.weight}. Enqueue frontier edges of the new vertex.`];
+      case 'skip': return ko ? ['사이클 간선 제외', '양쪽 끝이 이미 트리에 있습니다. 이 간선을 넣으면 사이클이 생기므로 건너뜁니다.']
+        : ['Skip a cycle edge', 'Both endpoints are already in the tree. Adding this edge would create a cycle, so skip it.'];
+      default: return ko ? ['성분의 최소 트리 완료', `선택한 간선의 가중치 합은 ${v.weight}입니다. 흐린 정점은 시작 성분과 연결되지 않았으며 이 트리에 포함되지 않습니다.`]
+        : ['Component tree complete', `Selected edges total ${v.weight}. Dim vertices lie outside the starting component and are not part of this tree.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim];

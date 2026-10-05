@@ -1,11 +1,27 @@
 import fs from 'fs';
 import path from 'path';
 import {
-  parseWeightedEdges, traceDijkstra, traceBellmanFord, traceFloydWarshall,
+  tracePrim, parseWeightedEdges, traceDijkstra, traceBellmanFord, traceFloydWarshall,
 } from '../graph';
 import { algorithmCode } from '../playback';
 
 describe('weighted graph lessons', () => {
+  it('traces Prim choices and cycle rejection within the starting component', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(
+      __dirname,
+      '../../algorithms/graph/prim/prim.js',
+    ), 'utf8'));
+    const edges = [[1, 2, 7], [1, 3, 2], [3, 2, 1], [2, 4, 3], [3, 5, 8], [4, 5, 1]];
+    const steps = tracePrim([1, 2, 3, 4, 5, 6], edges);
+    expect(steps.at(-1).variables.weight).toBe(7);
+    expect(JSON.parse(steps.at(-1).variables.chosen)).toHaveLength(4);
+    expect(steps.some((step) => step.type === 'skip')).toBe(true);
+    expect(steps.at(-1).variables.seen.split(',')).not.toContain('6');
+    steps.forEach((step) => expect(source).toContain(step.code));
+    expect(JSON.parse(steps[0].variables.chosen)).toEqual([]);
+    expect(tracePrim([1], []).at(-1).variables.weight).toBe(0);
+    expect(tracePrim([1, 2], [[1, 2, -1]]).at(-1).variables.weight).toBe(-1);
+  });
   it('traces every pair and detects negative diagonals without mutating earlier matrices', () => {
     const source = algorithmCode(fs.readFileSync(path.join(
       __dirname,

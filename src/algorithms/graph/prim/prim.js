@@ -1,11 +1,13 @@
+import recordGraphStep from '../../../utils/trace/recordGraphStep';
 import Graph from '../../../data-structures/graph/Graph';
 import PriorityQueue from '../../../data-structures/priority-queue/PriorityQueue';
 
 /**
  * @param {Graph} graph
+ * @param {function(step: Object): void} [stepCallback] - Optional execution snapshots.
  * @return {Graph}
  */
-export default function prim(graph) {
+export default function prim(graph, stepCallback) {
   // It should fire error if graph is directed since the algorithm works only
   // for undirected graphs.
   if (graph.isDirected) {
@@ -34,11 +36,39 @@ export default function prim(graph) {
     edgesQueue.add(graphEdge, graphEdge.weight);
   });
 
+  recordGraphStep(
+    stepCallback,
+    graph,
+    'start',
+    () => ({
+      current: startVertex.getKey(),
+      seen: Object.keys(visitedVertices).join(','),
+      chosen: '[]',
+      weight: 0,
+    }),
+    'const startVertex = graph.getAllVertices()[0];',
+  );
+
   // Now let's explore all queued edges.
   while (!edgesQueue.isEmpty()) {
     // Fetch next queued edge with minimal weight.
     /** @var {GraphEdge} currentEdge */
     const currentMinEdge = edgesQueue.poll();
+    recordGraphStep(
+      stepCallback,
+      graph,
+      'edge',
+      () => ({
+        current: currentMinEdge.startVertex.getKey(),
+        next: currentMinEdge.endVertex.getKey(),
+        seen: Object.keys(visitedVertices).join(','),
+        weight: minimumSpanningTree.getWeight(),
+        chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
+          edge.startVertex.getKey(), edge.endVertex.getKey(),
+        ])),
+      }),
+      'const currentMinEdge = edgesQueue.poll();',
+    );
 
     // Find out the next unvisited minimal vertex to traverse.
     let nextMinVertex = null;
@@ -56,6 +86,22 @@ export default function prim(graph) {
       // Add vertex to the set of visited ones.
       visitedVertices[nextMinVertex.getKey()] = nextMinVertex;
 
+      recordGraphStep(
+        stepCallback,
+        graph,
+        'choose',
+        () => ({
+          current: currentMinEdge.startVertex.getKey(),
+          next: currentMinEdge.endVertex.getKey(),
+          seen: Object.keys(visitedVertices).join(','),
+          weight: minimumSpanningTree.getWeight(),
+          chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
+            edge.startVertex.getKey(), edge.endVertex.getKey(),
+          ])),
+        }),
+        'minimumSpanningTree.addEdge(currentMinEdge);',
+      );
+
       // Add all current vertex's edges to the queue.
       nextMinVertex.getEdges().forEach((graphEdge) => {
         // Add only vertices that link to unvisited nodes.
@@ -66,8 +112,38 @@ export default function prim(graph) {
           edgesQueue.add(graphEdge, graphEdge.weight);
         }
       });
+    } else {
+      recordGraphStep(
+        stepCallback,
+        graph,
+        'skip',
+        () => ({
+          current: currentMinEdge.startVertex.getKey(),
+          next: currentMinEdge.endVertex.getKey(),
+          seen: Object.keys(visitedVertices).join(','),
+          weight: minimumSpanningTree.getWeight(),
+          chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
+            edge.startVertex.getKey(), edge.endVertex.getKey(),
+          ])),
+        }),
+        'if (nextMinVertex)',
+      );
     }
   }
 
+  recordGraphStep(
+    stepCallback,
+    graph,
+    'done',
+    () => ({
+      seen: Object.keys(visitedVertices).join(','),
+      processed: Object.keys(visitedVertices).join(','),
+      weight: minimumSpanningTree.getWeight(),
+      chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
+        edge.startVertex.getKey(), edge.endVertex.getKey(),
+      ])),
+    }),
+    'return minimumSpanningTree;',
+  );
   return minimumSpanningTree;
 }

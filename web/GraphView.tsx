@@ -12,6 +12,7 @@ export default function GraphView({ step, language }: { step: Step; language: La
     return { ...item, x: 220 + Math.cos(angle) * 150, y: 155 + Math.sin(angle) * 116 };
   });
   const distances: Record<string, number | null> | undefined = step.variables.distances === undefined ? undefined : JSON.parse(String(step.variables.distances));
+  const chosen: number[][] = JSON.parse(String(step.variables.chosen ?? '[]'));
   const matrix: (number | null)[][] | undefined = step.variables.matrix === undefined ? undefined : JSON.parse(String(step.variables.matrix));
   const previous: Record<string, number | null> | undefined = step.variables.previous === undefined ? undefined : JSON.parse(String(step.variables.previous));
   const seen = matrix ? step.array.map((item) => String(item.value)) : distances ? Object.keys(distances).filter((key) => distances[key] !== null) : String(step.variables.seen ?? '').split(',');
@@ -26,11 +27,12 @@ export default function GraphView({ step, language }: { step: Step; language: La
         const from = positions.find((node) => node.value === a)!;
         const to = positions.find((node) => node.value === b)!;
         const active = matrix ? (step.variables.current === a && step.variables.via === b) || (step.variables.via === a && step.variables.next === b) || (!step.variables.directed && ((step.variables.current === b && step.variables.via === a) || (step.variables.via === b && step.variables.next === a))) : (step.variables.current === a && step.variables.next === b) || (!step.variables.directed && step.variables.current === b && step.variables.next === a);
+        const selected = chosen.some(([c, d]) => (c === a && d === b) || (c === b && d === a));
         const dx = to.x - from.x, dy = to.y - from.y, length = Math.hypot(dx, dy);
         const reciprocal = step.variables.directed && step.edges?.some(([c, d]) => c === b && d === a);
         const bend = reciprocal ? 28 : 0;
         const cx = (from.x + to.x) / 2 - dy / length * bend, cy = (from.y + to.y) / 2 + dx / length * bend;
-        return <g key={`${a}-${b}`}><path d={`M ${from.x + dx / length * 22} ${from.y + dy / length * 22} Q ${cx} ${cy} ${to.x - dx / length * 24} ${to.y - dy / length * 24}`} fill="none" stroke={active ? '#d8964a' : '#aabdb0'} strokeWidth={active ? 4 : 2} markerEnd={step.variables.directed ? `url(#${markerId})` : undefined} />
+        return <g key={`${a}-${b}`}><path d={`M ${from.x + dx / length * 22} ${from.y + dy / length * 22} Q ${cx} ${cy} ${to.x - dx / length * 24} ${to.y - dy / length * 24}`} fill="none" stroke={active ? '#d8964a' : selected ? '#326f54' : '#aabdb0'} strokeWidth={active || selected ? 4 : 2} markerEnd={step.variables.directed ? `url(#${markerId})` : undefined} />
           {weight !== undefined && <text x={(from.x + 2 * cx + to.x) / 4} y={(from.y + 2 * cy + to.y) / 4 - 5} textAnchor="middle" fontSize={12} fontWeight={700} fill="#305645" stroke="#fff" strokeWidth={4} paintOrder="stroke">{weight}</text>}
         </g>;
       })}
