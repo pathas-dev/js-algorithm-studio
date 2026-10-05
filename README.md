@@ -27,6 +27,10 @@ to YouTube videos).
 
 Use Node.js 22.12 or newer. Run `npm ci`, then `npm run dev` to open the local visualizer. `npm run build` type-checks the web app and generates `dist`; `npm run preview` serves that production build locally. `npm run check:docs` checks bilingual documentation and local links.
 
+The current visualizer supports bubble, selection, insertion, merge and quick sort, linear and binary search, and BFS/DFS. Each lesson supports previous/next steps, timeline seeking, playback speed, source highlighting and Korean/English explanations. Array lessons allow up to 32 values; graph lessons allow up to 12 vertices and 24 undirected edges.
+
+See the [development plan and verification checklist](DEVELOPMENT_PLAN.md) (Korean) for completed milestones and remaining work.
+
 The repository includes a Vercel build configuration. Deployment is performed separately; development commands do not publish or push anything.
 
 ## Data Structures

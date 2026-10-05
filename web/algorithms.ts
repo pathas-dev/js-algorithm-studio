@@ -76,7 +76,7 @@ export const bubble: Algorithm = {
       case 'compare': {
         const [a, b] = step.indices.map((index) => step.array[index].value);
         return ko
-          ? ['이웃한 값 비교', `${a}와 ${b}를 비교합니다. 오른쪽 값이 더 작으면 교환하여 작은 값을 왼쪽으로 보냅니다.`]
+          ? ['이웃한 값 비교', `두 값(${a}, ${b})을 비교합니다. 오른쪽 값이 더 작으면 교환하여 작은 값을 왼쪽으로 보냅니다.`]
           : ['Compare neighbors', `Compare ${a} and ${b}. Swap if the right value is smaller, moving it to the left.`];
       }
       case 'swap': {
@@ -172,7 +172,7 @@ export const merge: Algorithm = {
         : ['Begin dividing', 'Check the current subarray length. Zero or one value is already sorted; otherwise split it in half.'];
       case 'focus': return ko ? ['부분 배열 진입', `재귀 깊이 ${step.variables.depth}의 부분 배열을 보고 있습니다. 인덱스는 이 부분 배열 기준입니다.`]
         : ['Enter a subarray', `Viewing the subarray at recursion depth ${step.variables.depth}. Indices are local to this subarray.`];
-      case 'split': return ko ? ['반으로 나누기', `인덱스 ${step.variables.middleIndex}를 기준으로 왼쪽과 오른쪽을 나눕니다. 왼쪽부터 재귀적으로 정렬합니다.`]
+      case 'split': return ko ? ['반으로 나누기', `분할 위치(${step.variables.middleIndex})를 기준으로 왼쪽과 오른쪽을 나눕니다. 왼쪽부터 재귀적으로 정렬합니다.`]
         : ['Split in half', `Split at index ${step.variables.middleIndex}, then recursively sort the left half before the right half.`];
       case 'base': return ko ? ['재귀 종료 조건', '부분 배열의 길이가 1 이하이므로 비교 없이 반환합니다. 상위 호출에서 이 결과를 병합합니다.']
         : ['Base case', 'Return this subarray without comparisons because it has at most one value. The parent call will merge it.'];
