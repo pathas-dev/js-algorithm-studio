@@ -1,3 +1,4 @@
+import dijkstraSource from '../src/algorithms/graph/dijkstra/dijkstra.js?raw';
 import interpolationSearch from '../src/algorithms/search/interpolation-search/interpolationSearch';
 import interpolationSource from '../src/algorithms/search/interpolation-search/interpolationSearch.js?raw';
 import jumpSearch from '../src/algorithms/search/jump-search/jumpSearch';
@@ -11,7 +12,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs, traceDfs } from '../src/visualization/graph';
+import { traceBfs, traceDfs, traceDijkstra } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -53,7 +54,9 @@ export type Algorithm = {
   inputHint?: Record<Language, string>;
   randomMax?: number;
   graphEdges?: number[][];
-  run(values: number[], target?: number, edges?: number[][]): Step[];
+  graphWeighted?: boolean;
+  graphDirected?: boolean;
+  run(values: number[], target?: number, edges?: number[][], directed?: boolean): Step[];
   explain(step: Step, language: Language): [string, string];
 };
 
@@ -502,4 +505,32 @@ export const interpolation: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs];
+export const dijkstra: Algorithm = {
+  id: 'dijkstra', category: 'graph', target: 1, graphWeighted: true,
+  name: { ko: '다익스트라', en: 'Dijkstra' },
+  summary: { ko: '가장 가까운 미처리 정점을 먼저 꺼내 이웃의 거리를 줄입니다. 음수 가중치는 허용하지 않습니다.', en: 'Process the closest unsettled vertex and relax neighbor distances. Requires nonnegative weights.' },
+  source: algorithmCode(dijkstraSource), example: [1, 2, 3, 4, 5, 6],
+  graphEdges: [[1, 2, 7], [1, 3, 2], [3, 2, 1], [2, 4, 3], [3, 5, 8], [4, 5, 1]],
+  time: { ko: '이 구현 O(VE + V log V)', en: 'This implementation O(VE + V log V)' },
+  run: (nodes, start = 1, edges = dijkstra.graphEdges!, directed = false) => traceDijkstra(nodes, start, edges, directed),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['거리 초기화', `시작 정점 ${v.current}의 거리는 0, 나머지는 ∞입니다. 시작점을 우선순위 큐에 넣습니다. 이전 정점은 경로를 복원할 때 사용합니다.`]
+        : ['Initialize distances', `Start vertex ${v.current} has distance 0; all others have ∞. Enqueue the start. Previous vertices allow path reconstruction.`];
+      case 'enter': return ko ? ['가장 가까운 정점 선택', `우선순위 큐에서 최소 거리의 정점 ${v.current}를 꺼냈습니다. 음수 간선이 없으므로 이 거리는 확정할 수 있습니다.`]
+        : ['Select the closest vertex', `Poll minimum-distance vertex ${v.current}. Without negative edges, this distance can be settled.`];
+      case 'compare': return ko ? ['이웃의 거리 비교', `정점 ${v.current}를 거쳐 ${v.next}로 가는 후보 거리는 ${v.candidate}입니다. 기존 거리보다 작을 때만 갱신합니다.`]
+        : ['Compare a neighbor distance', `The candidate distance to ${v.next} through ${v.current} is ${v.candidate}. Update only if it is smaller.`];
+      case 'relax': return ko ? ['더 짧은 경로 갱신', `정점 ${v.next}의 거리를 ${v.candidate}로 줄이고 이전 정점을 ${v.current}로 기록했습니다. 큐에 이미 있다면 우선순위도 바꿉니다.`]
+        : ['Relax the path', `Set distance to ${v.next} to ${v.candidate} and predecessor to ${v.current}. Change its queue priority if already present.`];
+      case 'leave': return ko ? ['정점 처리 완료', `정점 ${v.current}의 모든 미처리 이웃을 확인했습니다. 초록색 정점의 최단 거리는 확정됐습니다.`]
+        : ['Vertex complete', `All unsettled neighbors of ${v.current} were checked. Green vertices have settled shortest distances.`];
+      default: return ko ? ['최단 거리 계산 완료', '큐가 비었습니다. ∞인 정점에는 시작점에서 도달할 수 없습니다. 이전 정점 열을 따라가면 각 최단 경로를 복원할 수 있습니다.']
+        : ['Shortest distances complete', 'The queue is empty. Vertices at ∞ are unreachable. Follow previous vertices to reconstruct shortest paths.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra];

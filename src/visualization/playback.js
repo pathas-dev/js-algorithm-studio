@@ -1,7 +1,7 @@
 export const MAX_VALUES = 32;
 
 export function algorithmCode(source) {
-  return source.replace(/^import recordStep[^\n]*\n/gm, '').replace(/^\s*(?:this\.)?recordStep\([\s\S]*?\);\n/gm, '');
+  return source.replace(/^import record(?:Graph)?Step[^\n]*\n/gm, '').replace(/^\s*(?:this\.)?record(?:Graph)?Step\([\s\S]*?\);\n/gm, '');
 }
 
 export function parseValues(text) {

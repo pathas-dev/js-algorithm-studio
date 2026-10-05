@@ -102,3 +102,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .bucket-cell span { display: block; color: #617469; font-size: 10px; }
 .bucket-cell strong { color: #305645; font-size: 12px; }
 .active-bucket { background: #fff0d8; border-color: #d8964a; }
+.graph-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; text-align: center; }
+.graph-table caption { color: #617469; font-size: 11px; margin-bottom: 6px; }
+.graph-table th, .graph-table td { padding: 5px; border-bottom: 1px solid #e4ece6; }
+.graph-table th { background: #f5f7f2; }

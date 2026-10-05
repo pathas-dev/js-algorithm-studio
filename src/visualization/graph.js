@@ -1,3 +1,4 @@
+import dijkstra from '../algorithms/graph/dijkstra/dijkstra';
 import Graph from '../data-structures/graph/Graph';
 import GraphVertex from '../data-structures/graph/GraphVertex';
 import GraphEdge from '../data-structures/graph/GraphEdge';
@@ -11,8 +12,8 @@ export function requireNodes(nodes) {
   }
 }
 
-function requireEdges(edges, nodes) {
-  const keys = edges.map(([a, b]) => [a, b].sort((x, y) => x - y).join('-'));
+function requireEdges(edges, nodes, directed = false) {
+  const keys = edges.map(([a, b]) => (directed ? [a, b] : [a, b].sort((x, y) => x - y)).join('-'));
   if (edges.length > 24 || new Set(keys).size !== edges.length
     || edges.some(([a, b]) => a === b || !nodes.includes(a) || !nodes.includes(b))) {
     throw new Error('edges');
@@ -87,4 +88,50 @@ export function traceBfs(nodes, start, edges) {
 
 export function traceDfs(nodes, start, edges) {
   return traceGraph(nodes, start, edges, 'dfs');
+}
+
+export function requireWeightedEdges(edges, nodes, directed) {
+  requireNodes(nodes);
+  requireEdges(edges, nodes, directed);
+  if (edges.some((edge) => edge.length !== 3
+    || !Number.isFinite(edge[2]) || Math.abs(edge[2]) > 999)) throw new Error('weights');
+}
+
+export function parseWeightedEdges(text, nodes, directed) {
+  requireNodes(nodes);
+  if (!text.trim()) return [];
+  if (/(?:^|,)\s*(?:,|$)/.test(text)) throw new Error('weights');
+  const edges = text.split(/[,\n]+/).map((part) => {
+    const match = part.trim().match(
+      /^(\d+)\s*-\s*(\d+)\s*:\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))$/,
+    );
+    if (!match) throw new Error('weights');
+    return match.slice(1).map(Number);
+  });
+  requireWeightedEdges(edges, nodes, directed);
+  return edges;
+}
+
+export function traceWeighted(nodes, start, edges, directed, algorithm) {
+  requireWeightedEdges(edges, nodes, directed);
+  if (!nodes.includes(start)) throw new Error('start');
+  const graph = new Graph(directed);
+  nodes.forEach((node) => graph.addVertex(new GraphVertex(node)));
+  edges.forEach(([a, b, weight]) => {
+    graph.addEdge(new GraphEdge(graph.getVertexByKey(a), graph.getVertexByKey(b), weight));
+  });
+  const items = nodes.map((value, id) => ({ value, id }));
+  const steps = [];
+  algorithm(graph, graph.getVertexByKey(start), (step) => steps.push({
+    ...step,
+    array: [...items],
+    edges: edges.map((edge) => [...edge]),
+    variables: { ...step.variables, directed, mode: 'weighted' },
+  }));
+  return steps;
+}
+
+export function traceDijkstra(nodes, start, edges, directed = false) {
+  if (edges.some((edge) => edge[2] < 0)) throw new Error('negative-weight');
+  return traceWeighted(nodes, start, edges, directed, dijkstra);
 }
