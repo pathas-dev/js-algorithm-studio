@@ -5,7 +5,7 @@ export default function recordStep(callback, type, array, indices = [], variable
       type,
       array: [...(typeof array === 'function' ? array() : array)],
       indices: [...indices],
-      variables: { ...variables },
+      variables: { ...(typeof variables === 'function' ? variables() : variables) },
       code,
     });
   }

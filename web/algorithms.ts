@@ -1,3 +1,5 @@
+import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
+import { traceBfs } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -22,6 +24,7 @@ export type Step = {
   indices: number[];
   variables: Record<string, number | string | boolean>;
   code: string;
+  edges?: number[][];
 };
 
 
@@ -32,10 +35,11 @@ export type Algorithm = {
   source: string;
   example: number[];
   time: string;
-  category: 'sort' | 'search';
+  category: 'sort' | 'search' | 'graph';
   target?: number;
   requiresSorted?: boolean;
-  run(values: number[], target?: number): Step[];
+  graphEdges?: number[][];
+  run(values: number[], target?: number, edges?: number[][]): Step[];
   explain(step: Step, language: Language): [string, string];
 };
 
@@ -269,4 +273,34 @@ export const binary: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear, binary];
+export const bfs: Algorithm = {
+  id: 'breadth-first-search', category: 'graph', target: 1,
+  name: { ko: '너비 우선 탐색', en: 'Breadth-first search' },
+  summary: { ko: '무방향 그래프를 큐로 탐색합니다. 발견한 정점을 기억해 순환에서도 한 번씩만 방문합니다.', en: 'Use a FIFO queue to traverse an undirected graph. Mark discoveries to avoid revisiting cycles.' },
+  source: algorithmCode(bfsSource), example: [1, 2, 3, 4, 5, 6, 7],
+  graphEdges: [[1, 2], [1, 3], [2, 4], [2, 5], [3, 6], [4, 5]], time: 'O(V + E)',
+  run: (nodes, start = 1, edges = bfs.graphEdges!) => traceBfs(nodes, start, edges),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['시작 정점 준비', `정점 ${v.current}를 큐에 넣고 발견 상태로 표시합니다. 연결되지 않은 정점은 이 시작점에서 도달할 수 없습니다.`]
+        : ['Prepare the start', `Enqueue vertex ${v.current} and mark it discovered. Disconnected vertices cannot be reached from this start.`];
+      case 'enter': return ko ? ['큐의 맨 앞 방문', `큐에서 정점 ${v.current}를 꺼냈습니다. 먼저 들어온 정점부터 처리해 가까운 정점을 우선 탐색합니다.`]
+        : ['Visit the queue head', `Dequeue vertex ${v.current}. FIFO processing visits closer vertices first.`];
+      case 'edge': {
+        const seen = String(v.seen).split(',').includes(String(v.next));
+        return ko ? ['이웃 확인', seen ? `정점 ${v.next}는 이미 발견했습니다. 다시 큐에 넣지 않아 순환이나 여러 경로로 중복 방문하지 않습니다.` : `정점 ${v.current}의 이웃 ${v.next}는 아직 발견하지 않았습니다. 다음 단계에서 큐의 뒤쪽에 넣습니다.`]
+          : ['Inspect a neighbor', seen ? `Vertex ${v.next} was already discovered. Skip it to avoid duplicate visits through cycles or multiple paths.` : `Neighbor ${v.next} of ${v.current} is new. Enqueue it at the back next.`];
+      }
+      case 'enqueue': return ko ? ['이웃을 큐에 추가', `정점 ${v.next}를 발견 표시하고 큐의 뒤에 넣었습니다. 표시 순서가 아니라 실제 방문 순서는 큐에서 꺼낼 때 결정됩니다.`]
+        : ['Enqueue a neighbor', `Mark ${v.next} discovered and enqueue it. Visit order is determined when vertices are dequeued.`];
+      case 'leave': return ko ? ['정점 처리 완료', `정점 ${v.current}의 모든 이웃을 확인했습니다. 다음 큐 항목으로 진행합니다.`]
+        : ['Vertex complete', `All neighbors of ${v.current} have been inspected. Continue with the next queued vertex.`];
+      default: return ko ? ['탐색 완료', `큐가 비었습니다. 방문 순서: ${v.order}. 흐린 정점은 시작점에서 도달할 수 없었습니다.`]
+        : ['Traversal complete', `The queue is empty. Visit order: ${v.order}. Dim vertices were unreachable from the start.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear, binary, bfs];

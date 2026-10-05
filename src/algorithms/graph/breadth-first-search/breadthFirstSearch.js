@@ -1,3 +1,4 @@
+import recordStep from '../../../utils/trace/recordStep';
 import Queue from '../../../data-structures/queue/Queue';
 
 /**
@@ -9,6 +10,7 @@ import Queue from '../../../data-structures/queue/Queue';
  *
  * @property {function(vertices: Object)} [enterVertex] - Called when BFS enters the vertex.
  *
+ * @property {function(step: Object): void} [stepCallback] - Optional execution snapshots.
  * @property {function(vertices: Object)} [leaveVertex] - Called when BFS leaves the vertex.
  */
 
@@ -52,6 +54,7 @@ export default function breadthFirstSearch(graph, startVertex, originalCallbacks
 
   // Do initial queue setup.
   vertexQueue.enqueue(startVertex);
+  recordStep(callbacks.stepCallback, 'start', () => graph.getAllVertices(), [], () => ({ current: startVertex.getKey(), queue: vertexQueue.toString() }), 'vertexQueue.enqueue(startVertex);');
 
   let previousVertex = null;
 
@@ -59,17 +62,22 @@ export default function breadthFirstSearch(graph, startVertex, originalCallbacks
   while (!vertexQueue.isEmpty()) {
     const currentVertex = vertexQueue.dequeue();
     callbacks.enterVertex({ currentVertex, previousVertex });
+    recordStep(callbacks.stepCallback, 'enter', () => graph.getAllVertices(), [], () => ({ current: currentVertex.getKey(), queue: vertexQueue.toString() }), 'const currentVertex = vertexQueue.dequeue();');
 
     // Add all neighbors to the queue for future traversals.
     graph.getNeighbors(currentVertex).forEach((nextVertex) => {
+      recordStep(callbacks.stepCallback, 'edge', () => graph.getAllVertices(), [], () => ({ current: currentVertex.getKey(), next: nextVertex.getKey(), queue: vertexQueue.toString() }), 'if (callbacks.allowTraversal');
       if (callbacks.allowTraversal({ previousVertex, currentVertex, nextVertex })) {
         vertexQueue.enqueue(nextVertex);
+        recordStep(callbacks.stepCallback, 'enqueue', () => graph.getAllVertices(), [], () => ({ current: currentVertex.getKey(), next: nextVertex.getKey(), queue: vertexQueue.toString() }), 'vertexQueue.enqueue(nextVertex);');
       }
     });
 
     callbacks.leaveVertex({ currentVertex, previousVertex });
+    recordStep(callbacks.stepCallback, 'leave', () => graph.getAllVertices(), [], () => ({ current: currentVertex.getKey(), queue: vertexQueue.toString() }), 'callbacks.leaveVertex');
 
     // Memorize current vertex before next loop.
     previousVertex = currentVertex;
   }
+  recordStep(callbacks.stepCallback, 'done', () => graph.getAllVertices(), [], { queue: '' }, 'while (!vertexQueue.isEmpty())');
 }

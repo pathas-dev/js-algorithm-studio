@@ -75,10 +75,14 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 
 .pivot .bar { outline: 2px dashed #476756; outline-offset: 2px; }
 
-.matched .bar, .dot.matched { background: #3c8dba; }
+.matched .bar, .dot.matched { background: #2c7198; }
 @media (max-width: 650px) {
   .catalog-group { display: flex; flex-wrap: wrap; gap: 4px; }
   .catalog-label { flex-basis: 100%; }
 }
 
 .outside-range { opacity: .3; }
+.graph-view svg { display: block; width: 100%; max-height: 310px; }
+.frontier { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 10px; background: #f5f7f2; border-radius: 7px; font-size: 12px; color: #466553; }
+.frontier output { font: 12px ui-monospace, monospace; overflow-wrap: anywhere; }
+.graph-status { margin: 10px 0; font-size: 11px; color: #617469; overflow-wrap: anywhere; }
