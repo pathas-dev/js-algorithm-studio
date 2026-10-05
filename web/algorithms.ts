@@ -1,3 +1,5 @@
+import HeapSort from '../src/algorithms/sorting/heap-sort/HeapSort';
+import heapSource from '../src/algorithms/sorting/heap-sort/HeapSort.js?raw';
 import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
@@ -357,4 +359,26 @@ export const shell: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, linear, binary, bfs, dfs];
+export const heap: Algorithm = {
+  id: 'heap-sort', category: 'sort',
+  name: { ko: '힙 정렬', en: 'Heap sort' },
+  summary: { ko: '최소 힙에 값을 넣고, 루트의 최솟값을 하나씩 꺼내 결과 배열에 쌓습니다.', en: 'Build a min heap, then repeatedly extract its root into the sorted output.' },
+  source: algorithmCode(heapSource), example: bubble.example, time: 'O(n log n)',
+  run: (values) => runSort(HeapSort, values),
+  explain(step, language) {
+    const ko = language === 'ko';
+    switch (step.type) {
+      case 'start': return ko ? ['최소 힙 준비', '별도의 최소 힙과 빈 결과 배열을 준비합니다. 이 구현은 추가 공간 O(n)을 사용하며 원본을 보존합니다.']
+        : ['Prepare a min heap', 'Prepare a separate min heap and empty output. This implementation uses O(n) extra space and preserves the input.'];
+      case 'add': return ko ? ['힙에 삽입', `입력 인덱스 ${step.variables.index}의 값을 넣고 힙 순서를 복구했습니다. 부모는 자식보다 작거나 같습니다. 형제 사이의 순서는 정렬되지 않아도 됩니다.`]
+        : ['Insert into the heap', `Insert input index ${step.variables.index} and restore heap order. Parents are no greater than children; siblings need not be sorted.`];
+      case 'poll': return ko ? ['루트의 최솟값 선택', '루트가 현재 힙의 최솟값입니다. poll은 루트를 꺼내고 마지막 값을 위로 옮긴 뒤 아래로 내려 힙 순서를 복구합니다.']
+        : ['Select the minimum root', 'The root is the heap minimum. Poll removes it, moves the last value to the root, then sifts down to restore heap order.'];
+      case 'extract': return ko ? ['결과에 최솟값 추가', `꺼낸 값을 결과 뒤에 추가했습니다. 앞의 ${step.variables.sortedCount}개 값은 확정됐으며 남은 힙의 루트를 계속 꺼냅니다.`]
+        : ['Append the minimum', `Append the extracted value. The first ${step.variables.sortedCount} values are settled; continue extracting from the remaining heap.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, linear, binary, bfs, dfs];

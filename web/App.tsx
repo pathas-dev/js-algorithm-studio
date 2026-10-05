@@ -5,6 +5,7 @@ import { MAX_VALUES, parseTarget, parseValues, playbackReducer } from '../src/vi
 import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
 import { parseEdges } from '../src/visualization/graph';
 import GraphView from './GraphView';
+import HeapView from './HeapView';
 import ArrayView from './ArrayView';
 import CodePanel from './CodePanel';
 
@@ -132,6 +133,7 @@ export default function App() {
                   <Paper withBorder className="canvas-card">
                     <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
                     {algorithm.category === 'sort' && 'depth' in step.variables && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
+                    {'heapSize' in step.variables && <HeapView step={step} language={language} />}
                     {algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : <ArrayView step={step} language={language} />}
                     <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
                     <div className="array-state"><Text size="xs" c="dimmed">{algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{algorithm.category === 'graph' ? step.variables.order : step.array.map((item) => item.value).join(', ')}]</output></div>
@@ -152,7 +154,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>
