@@ -1,3 +1,5 @@
+import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
+import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
 import { traceBfs, traceDfs } from '../src/visualization/graph';
@@ -331,4 +333,28 @@ export const dfs: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear, binary, bfs, dfs];
+export const shell: Algorithm = {
+  id: 'shell-sort', category: 'sort',
+  name: { ko: '셸 정렬', en: 'Shell sort' },
+  summary: { ko: '간격을 둔 값들을 비교하고, 간격을 절반씩 줄여 마지막에는 이웃한 값을 정렬합니다.', en: 'Compare distant values, halve the gap, then finish with neighboring values.' },
+  source: algorithmCode(shellSource), example: bubble.example,
+  time: { ko: '최악 O(n²) · 간격에 따라 달라짐', en: 'Worst O(n²) · depends on gaps' },
+  run: (values) => runSort(ShellSort, values),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'gap': return ko ? ['간격 선택', `현재 간격은 ${v.gap}입니다. 같은 간격으로 연결된 위치들을 삽입 정렬하듯 처리합니다.`]
+        : ['Choose the gap', `The gap is ${v.gap}. Process positions linked by this gap similarly to insertion sort.`];
+      case 'compare': return ko ? ['떨어진 값 비교', `인덱스 ${v.currentIndex}와 ${v.gapShiftedIndex}의 값을 비교합니다. 오른쪽이 더 작으면 간격 ${v.gap}만큼 왼쪽으로 옮깁니다.`]
+        : ['Compare distant values', `Compare indices ${v.currentIndex} and ${v.gapShiftedIndex}. A smaller right value moves left by ${v.gap}.`];
+      case 'swap': return ko ? ['간격만큼 교환', '두 값을 교환했습니다. 멀리 떨어진 교환은 같은 값들의 기존 순서를 바꿀 수 있으므로 안정 정렬이 아닙니다.']
+        : ['Swap across the gap', 'Swap the pair. Distant swaps can change the order of equal values, so this sort is not stable.'];
+      case 'pass': return ko ? ['간격 정렬 완료', `간격 ${v.gap}의 처리를 마쳤습니다. 간격을 절반으로 줄입니다. 간격 1을 마치면 전체가 정렬됩니다.`]
+        : ['Gap pass complete', `Finish gap ${v.gap} and halve it. Finishing gap 1 sorts the entire array.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, linear, binary, bfs, dfs];

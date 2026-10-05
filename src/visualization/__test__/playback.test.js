@@ -6,13 +6,14 @@ import QuickSortInPlace from '../../algorithms/sorting/quick-sort/QuickSortInPla
 import MergeSort from '../../algorithms/sorting/merge-sort/MergeSort';
 import InsertionSort from '../../algorithms/sorting/insertion-sort/InsertionSort';
 import SelectionSort from '../../algorithms/sorting/selection-sort/SelectionSort';
+import ShellSort from '../../algorithms/sorting/shell-sort/ShellSort';
 import BubbleSort from '../../algorithms/sorting/bubble-sort/BubbleSort';
 import {
   MAX_VALUES, algorithmCode, parseTarget, parseValues, playbackReducer, requireSorted,
 } from '../playback';
 
 describe('visualizer execution and playback', () => {
-  it.each([[BubbleSort, 'bubble-sort/BubbleSort'], [SelectionSort, 'selection-sort/SelectionSort'], [InsertionSort, 'insertion-sort/InsertionSort'], [MergeSort, 'merge-sort/MergeSort'], [QuickSortInPlace, 'quick-sort/QuickSortInPlace']])('records %s results without changing inputs or past snapshots', (Sorter, file) => {
+  it.each([[ShellSort, 'shell-sort/ShellSort'], [BubbleSort, 'bubble-sort/BubbleSort'], [SelectionSort, 'selection-sort/SelectionSort'], [InsertionSort, 'insertion-sort/InsertionSort'], [MergeSort, 'merge-sort/MergeSort'], [QuickSortInPlace, 'quick-sort/QuickSortInPlace']])('records %s results without changing inputs or past snapshots', (Sorter, file) => {
     const source = algorithmCode(fs.readFileSync(path.join(__dirname, `../../algorithms/sorting/${file}.js`), 'utf8'));
     expect(source).not.toContain('this.recordStep(');
     [[], [1], [1, 2, 3], [3, 2, 1], [0, -2, -2, 4], Array(MAX_VALUES).fill(2)].forEach((input) => {
