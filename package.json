@@ -1,32 +1,27 @@
 {
-  "name": "javascript-algorithms-and-data-structures",
+  "name": "js-algorithm-studio",
   "version": "0.0.4",
-  "description": "Algorithms and data-structures implemented on JavaScript",
+  "description": "알고리즘 실행 단계를 시각화하고 코드와 설명을 함께 탐색하는 한국어·영어 학습 웹 서비스, Algorithm Studio",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trekhleb/javascript-algorithms.git"
+    "url": "git+https://github.com/pathas-dev/js-algorithm-studio.git"
   },
   "keywords": [
-    "computer-science",
-    "cs",
+    "algorithm-studio",
+    "algorithm-visualization",
     "algorithms",
     "data-structures",
     "javascript",
-    "algorithm",
-    "javascript-algorithms",
-    "sorting-algorithms",
-    "graph",
-    "tree",
-    "interview",
-    "interview-preparation"
+    "typescript",
+    "react",
+    "education"
   ],
-  "author": "Oleksii Trekhleb (https://trekhleb.dev)",
+  "author": "pathas-dev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/trekhleb/javascript-algorithms/issues"
+    "url": "https://github.com/pathas-dev/js-algorithm-studio/issues"
   },
-  "homepage": "https://github.com/trekhleb/javascript-algorithms#readme",
-  "main": "index.js",
+  "homepage": "https://github.com/pathas-dev/js-algorithm-studio#readme",
   "scripts": {
     "lint": "eslint ./src/**",
     "test": "jest",
@@ -69,5 +64,9 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "shiki": "4.5.0"
-  }
+  },
+  "private": true,
+  "contributors": [
+    "Oleksii Trekhleb (https://trekhleb.dev)"
+  ]
 }

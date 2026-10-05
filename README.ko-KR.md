@@ -1,27 +1,10 @@
-# JavaScript 알고리즘 및 자료 구조
+# Algorithm Studio · 알고리즘 설명 목록
 
-[English](README.md) | [한국어](README.ko-KR.md)
+[프로젝트 소개](README.md) | [알고리즘 설명 목록](README.ko-KR.md)
 
-[![CI](https://github.com/trekhleb/javascript-algorithms/workflows/CI/badge.svg)](https://github.com/trekhleb/javascript-algorithms/actions?query=workflow%3ACI+branch%3Amaster)
-[![codecov](https://codecov.io/gh/trekhleb/javascript-algorithms/branch/master/graph/badge.svg)](https://codecov.io/gh/trekhleb/javascript-algorithms)
+[`js-algorithm-studio`](https://github.com/pathas-dev/js-algorithm-studio)는 JavaScript 알고리즘을 단계별로 탐색하는 **Algorithm Studio**의 저장소입니다.
 
-이 저장소에는 많이 알려진 알고리즘 및 자료 구조의 Javascript 기반 예제를 담고 있습니다.
-
-각 알고리즘과 자료 구조에 대해 연관되어 있는 설명이 README에 작성되어 있으며,
-링크를 통해 더 자세한 설명을 만날 수 있습니다. (관련된 YouTube 영상도 포함).
-
-
-## 시각화 웹 개발
-
-Node.js 22.12 이상에서 `npm ci`로 의존성을 설치한 뒤 `npm run dev`로 로컬 화면을 실행합니다. `npm run build`는 웹 코드의 자료형을 검사하고 `dist`에 배포용 파일을 만듭니다. `npm run preview`로 그 결과를 로컬에서 확인하고, `npm run check:docs`로 한영 설명과 내부 링크를 검사합니다.
-
-현재 38개 시각화를 지원합니다. 정렬 9개(버블·선택·삽입·병합·퀵·셸·힙·계수·기수), 배열 검색 4개(선형·이진·점프·보간), 그래프 8개(BFS·DFS·다익스트라·벨만–포드·플로이드–워셜·프림·크루스칼·위상 정렬), 자료 구조 17개(스택·큐·연결 리스트·이중 연결 리스트·최소 힙·최대 힙·우선순위 큐·이진 검색 트리·AVL 트리·레드–블랙 트리·트라이·펜윅 트리·구간 트리·해시 테이블·분리 집합·블룸 필터·그래프 구조)입니다. 이전·다음 단계, 타임라인, 재생 속도, 실행 코드 강조와 한국어·영어 설명을 제공합니다. 포인터 이동, 힙 복구, 단어의 공유 접두사, 해시 충돌, 구간 질의, 거리 표·행렬, 분리 집합도 확인할 수 있습니다.
-
-배열은 최대 32개 값, 그래프는 최대 12개 정점과 24개 간선입니다. 가중치 알고리즘은 해당 조건에 맞는 방향·무방향 간선을 지원합니다. 계수 정렬은 최대 64개 버킷 범위의 정수, 기수 정렬은 0 이상 정수를 받습니다. 음수 사이클과 위상 정렬의 잘못된 입력은 명시적으로 표시합니다. 자료 구조 연산은 최대 64개이며, 우선순위 큐의 값은 서로 달라야 하고 BST·AVL·레드–블랙 트리는 서로 다른 노드 최대 12개를 표시합니다. AVL은 삭제 후 복구까지 지원하며, 레드–블랙은 삽입·검색을 지원하고 기존에 미구현인 삭제는 차단합니다. 트라이·해시는 최대 12개의 단어·키를 받으며, 단어·키·해시 값은 각각 유니코드 코드 포인트 기준 16글자까지입니다. 트라이는 최대 80개 노드를 표시합니다. 펜윅 트리는 1부터 시작하는 위치, 구간 트리는 0부터 시작하는 양 끝 포함 범위를 사용합니다. 구간 트리는 현재 입력의 합 트리를 만들며, 값을 바꾸려면 입력을 다시 적용합니다. 분리 집합은 경로 압축 없이 실제 부모 경로와 크기 기준 병합을 표시합니다. 블룸 필터는 16비트로 확실한 부재와 거짓 양성을 구분하며, 정확한 삽입 기록은 학습용입니다. 그래프 구조는 정점 번호 1~12와 간선 최대 24개의 무방향 단순 그래프이며 정점 삭제는 지원하지 않습니다.
-
-완료 단계와 남은 확장은 [개발 계획 및 검증 목록](DEVELOPMENT_PLAN.md)에 기록합니다.
-
-Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다. 개발 명령은 푸시나 배포를 실행하지 않습니다.
+아래 목록은 저장소에 포함된 전체 알고리즘·자료 구조 코드와 한국어 설명입니다. 웹에서 지원하는 **45개 시각화**의 목록과 실행 방법은 [프로젝트 소개](README.md)를 참고하세요. 설명 파일이 있다고 웹 시각화까지 구현된 것은 아닙니다. 개별 설명에는 영어·한국어 전환 링크를 제공합니다.
 
 ## 자료 구조
 
@@ -59,7 +42,7 @@ Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다.
 
 ### 주제별 알고리즘
 
-* **Math**
+* **수학**
   * `B` [Bit Manipulation](src/algorithms/math/bits/README.ko-KR.md) - set/get/update/clear bits, 2의 곱 / 나누기, 음수로 만들기 etc.
   * `B` [팩토리얼](src/algorithms/math/factorial/README.ko-KR.md)
   * `B` [피보나치 수](src/algorithms/math/fibonacci/README.ko-KR.md)
@@ -71,7 +54,7 @@ Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다.
   * `B` [파스칼 삼각형](src/algorithms/math/pascal-triangle/README.ko-KR.md)
   * `A` [자연수 분할](src/algorithms/math/integer-partition/README.ko-KR.md)
   * `A` [리우 후이 π 알고리즘](src/algorithms/math/liu-hui/README.ko-KR.md) - N-각형을 기반으로 π 근사치 구하기
-* **Sets**
+* **집합**
   * `B` [카티지언 프로덕트](src/algorithms/sets/cartesian-product/README.ko-KR.md) - 곱집합
   * `B` [Fisher–Yates 셔플](src/algorithms/sets/fisher-yates/README.ko-KR.md) - 유한 시퀀스의 무작위 순열
   * `A` [멱집합](src/algorithms/sets/power-set/README.ko-KR.md) - 집합의 모든 부분집합
@@ -83,7 +66,8 @@ Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다.
   * `A` [배낭 문제](src/algorithms/sets/knapsack-problem/README.ko-KR.md) - "0/1" 과 "Unbound"
   * `A` [최대 구간합](src/algorithms/sets/maximum-subarray/README.ko-KR.md) - "브루트 포스" 과 "동적 계획법" (Kadane's) 버전
   * `A` [조합 합](src/algorithms/sets/combination-sum/README.ko-KR.md) - 특정 합을 구성하는 모든 조합 찾기
-* **Strings**
+* **문자열**
+  * `B` [단순 문자열 검색](src/algorithms/string/naive-search/README.ko-KR.md) - 첫 일치 위치 반환
   * `B` [해밍 거리](src/algorithms/string/hamming-distance/README.ko-KR.md) - 심볼이 다른 위치의 갯수
   * `A` [편집 거리](src/algorithms/string/levenshtein-distance/README.ko-KR.md) - 두 시퀀스 간위 최소 편집거리
   * `A` [커누스-모리스-프랫 알고리즘](src/algorithms/string/knuth-morris-pratt/README.ko-KR.md) (KMP 알고리즘) - 부분 문자열 탐색 (패턴 매칭)
@@ -91,12 +75,12 @@ Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다.
   * `A` [라빈 카프 알고리즘](src/algorithms/string/rabin-karp/README.ko-KR.md) - 부분 문자열 탐색
   * `A` [최장 공통 부분 문자열](src/algorithms/string/longest-common-substring/README.ko-KR.md)
   * `A` [정규 표현식 매칭](src/algorithms/string/regular-expression-matching/README.ko-KR.md)
-* **Searches**
+* **검색**
   * `B` [선형 탐색](src/algorithms/search/linear-search/README.ko-KR.md)
   * `B` [점프 탐색](src/algorithms/search/jump-search/README.ko-KR.md) (or Block Search) - 정렬된 배열에서 탐색
   * `B` [이진 탐색](src/algorithms/search/binary-search/README.ko-KR.md) - 정렬된 배열에서 탐색
   * `B` [보간 탐색](src/algorithms/search/interpolation-search/README.ko-KR.md) - 균등한 분포를 이루는 정렬된 배열에서 탐색
-* **Sorting**
+* **정렬**
   * `B` [거품 정렬](src/algorithms/sorting/bubble-sort/README.ko-KR.md)
   * `B` [선택 정렬](src/algorithms/sorting/selection-sort/README.ko-KR.md)
   * `B` [삽입 정렬](src/algorithms/sorting/insertion-sort/README.ko-KR.md)
@@ -106,10 +90,10 @@ Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다.
   * `B` [셸 정렬](src/algorithms/sorting/shell-sort/README.ko-KR.md)
   * `B` [계수 정렬](src/algorithms/sorting/counting-sort/README.ko-KR.md)
   * `B` [기수 정렬](src/algorithms/sorting/radix-sort/README.ko-KR.md)
-* **Trees**
+* **트리**
   * `B` [깊이 우선 탐색](src/algorithms/tree/depth-first-search/README.ko-KR.md) (DFS)
   * `B` [너비 우선 탐색](src/algorithms/tree/breadth-first-search/README.ko-KR.md) (BFS)
-* **Graphs**
+* **그래프**
   * `B` [깊이 우선 탐색](src/algorithms/graph/depth-first-search/README.ko-KR.md) (DFS)
   * `B` [너비 우선 탐색](src/algorithms/graph/breadth-first-search/README.ko-KR.md) (BFS)
   * `B` [크루스칼 알고리즘](src/algorithms/graph/kruskal/README.ko-KR.md) - 최소 신장 트리 찾기 (MST) 무방향 가중 그래프
@@ -125,7 +109,7 @@ Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다.
   * `A` [해밀턴 경로](src/algorithms/graph/hamiltonian-cycle/README.ko-KR.md) - 모든 꼭짓점을 한번만 방문
   * `A` [강결합 컴포넌트](src/algorithms/graph/strongly-connected-components/README.ko-KR.md) - Kosaraju의 알고리즘
   * `A` [외판원 문제](src/algorithms/graph/travelling-salesman/README.ko-KR.md) - 각 도시를 다 방문하고 다시 출발점으로 돌아오는 최단 경로 찾기
-* **Uncategorized**
+* **기타**
   * `B` [하노이 탑](src/algorithms/uncategorized/hanoi-tower/README.ko-KR.md)
   * `B` [정방 행렬 회전](src/algorithms/uncategorized/square-matrix-rotation/README.ko-KR.md) - 제자리(in-place) 알고리즘
   * `B` [점프 게임](src/algorithms/uncategorized/jump-game/README.ko-KR.md) - 백트래킹, 동적계획법 (top-down + bottom-up), 탐욕 알고리즘 예제
@@ -186,41 +170,6 @@ Vercel 빌드 설정을 포함하며 실제 배포는 별도로 진행합니다.
   * `A` [조합 합](src/algorithms/sets/combination-sum/README.ko-KR.md) - 특정 합을 구성하는 모든 조합 찾기
 * **분기 한정법** - 백트래킹으로 찾은 각 단계의 최소 비용이 드는 해를 기억해 두고 있다가, 이 비용을 이용해서 더 낮은 최적의 해를 찾습니다. 기억해둔 최소 비용들을 이용해 더 높은 비용이 드는 해결법을 탐색 안함으로써 불필요한 시간 소모를 줄입니다. 보통 상태 공간 트리의 DFS 탐색을 이용한 BFS 탐색 방식에서 사용됩니다.
 
-## 이 저장소의 사용법
-
-**모든 종속 모듈들 설치**
-```
-npm install
-```
-
-**ESLint 실행**
-
-코드의 품질을 확인 할 수 있습니다.
-
-```
-npm run lint
-```
-
-**모든 테스트 실행**
-```
-npm test
-```
-
-**이름을 통해 특정 테스트 실행**
-```
-npm test -- 'LinkedList'
-```
-
-**Playground**
-
- `./src/playground/playground.js` 파일을 통해 자료 구조와 알고리즘을 작성하고 `./src/playground/__test__/playground.test.js`에 테스트를 작성할 수 있습니다.
-
-그리고 간단하게 아래 명령어를 통해 의도한대로 동작하는지 확인 할 수 있습니다.:
-
-```
-npm test -- 'playground'
-```
-
 ## 유용한 정보
 
 ### 참고
@@ -275,8 +224,6 @@ Source: [Big O Cheat Sheet](http://bigocheatsheet.com/).
 | **셸 정렬**            | n&nbsp;log(n)   | 간격 순서에 영향을 받습니다.   | n&nbsp;(log(n))<sup>2</sup>  | 1         | No         |           |
 | **계수 정렬**          | n + r           | n + r               | n + r               | n + r     | Yes              | r - 배열내 가장 큰 수 |
 | **기수 정렬**          | n * k           | n * k               | n * k               | n + k     | Yes              | k - 키값의 최대 길이 |
-
-> ℹ️ A few more [projects](https://trekhleb.dev/projects/) and [articles](https://trekhleb.dev/blog/) about JavaScript and algorithms on [trekhleb.dev](https://trekhleb.dev)
 
 ## 추가 알고리즘과 자료 구조
 

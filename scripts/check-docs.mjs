@@ -21,15 +21,20 @@ function check(directory) {
       continue;
     }
     const text = readFileSync(path, 'utf8');
+    const projectDoc = directory === root;
     if (entry.name === 'README.md') {
-      pairs += 1;
+      if (!projectDoc) pairs += 1;
       if (!existsSync(resolve(directory, 'README.ko-KR.md'))) {
         errors.push(`${path}: missing Korean explanation`);
       }
-    } else if (!/[가-힣]/.test(text)) {
+    }
+    if ((projectDoc || entry.name === 'README.ko-KR.md') && !/[가-힣]/.test(text)) {
       errors.push(`${path}: missing Korean content`);
     }
-    if (!text.includes('[English](README.md) | [한국어](README.ko-KR.md)')) {
+    const selector = projectDoc
+      ? '[프로젝트 소개](README.md) | [알고리즘 설명 목록](README.ko-KR.md)'
+      : '[English](README.md) | [한국어](README.ko-KR.md)';
+    if (!text.includes(selector)) {
       errors.push(`${path}: missing language selector`);
     }
     const prose = text.replace(/^```[^\n]*\n[\s\S]*?^```\s*$/gm, '');
@@ -47,4 +52,4 @@ function check(directory) {
 
 check(root);
 assert.equal(errors.length, 0, errors.join('\n'));
-console.log(`Documentation OK: ${pairs} English/Korean pairs; local links and images exist.`);
+console.log(`Documentation OK: ${pairs} algorithm English/Korean pairs; Korean project docs; local links and images exist.`);

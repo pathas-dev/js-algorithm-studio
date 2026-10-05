@@ -1,375 +1,97 @@
-# JavaScript Algorithms and Data Structures
+# Algorithm Studio
 
-[English](README.md) | [한국어](README.ko-KR.md)
+[프로젝트 소개](README.md) | [알고리즘 설명 목록](README.ko-KR.md)
 
-> 🇺🇦 UKRAINE [IS BEING ATTACKED](https://war.ukraine.ua/) BY RUSSIAN ARMY. CIVILIANS ARE GETTING KILLED. RESIDENTIAL AREAS ARE GETTING BOMBED.
-> - Help Ukraine via:
->   - [Serhiy Prytula Charity Foundation](https://prytulafoundation.org/en/)
->   - [Come Back Alive Charity Foundation](https://savelife.in.ua/en/donate-en/)
->   - [National Bank of Ukraine](https://bank.gov.ua/en/news/all/natsionalniy-bank-vidkriv-spetsrahunok-dlya-zboru-koshtiv-na-potrebi-armiyi)
-> - More info on [war.ukraine.ua](https://war.ukraine.ua/) and [MFA of Ukraine](https://twitter.com/MFA_Ukraine)
+**작은 단계가 만드는 큰 이해.** 알고리즘의 실행 과정을 움직임으로 보고, 실행 중인 코드와 이유를 함께 탐색하는 학습 웹 서비스입니다.
 
-<hr/>
+저장소 이름은 [js-algorithm-studio](https://github.com/pathas-dev/js-algorithm-studio), 서비스 이름은 **Algorithm Studio**입니다. 화면과 개별 알고리즘 설명은 한국어·영어를 지원합니다.
 
-[![CI](https://github.com/trekhleb/javascript-algorithms/workflows/CI/badge.svg)](https://github.com/trekhleb/javascript-algorithms/actions?query=workflow%3ACI+branch%3Amaster)
-[![codecov](https://codecov.io/gh/trekhleb/javascript-algorithms/branch/master/graph/badge.svg)](https://codecov.io/gh/trekhleb/javascript-algorithms)
-![repo size](https://img.shields.io/github/repo-size/trekhleb/javascript-algorithms.svg)
+## 주요 기능
 
-This repository contains JavaScript based examples of many
-popular algorithms and data structures.
+- 처음·이전·다음·마지막 단계와 타임라인으로 실행 시간을 앞뒤로 탐색합니다.
+- 자동 재생·일시정지·속도 조절을 지원합니다. 언어를 바꿔도 현재 단계가 유지됩니다.
+- 실행 중인 실제 JavaScript 소스 위치와 해당 코드가 실행되는 이유를 함께 표시합니다.
+- 배열 비교·교환, 트리 회전·포인터, 그래프 거리·집합, 문자열 검색·해시 충돌, DP 표·역추적을 시각화합니다.
+- 모바일·태블릿 화면과 키보드 조작, 모션 감소 설정을 지원합니다. 큰 트리·문자열·표는 화면 안에서 스크롤합니다.
+- 입력을 바꾸거나 오류가 발생해도 원본을 보존합니다. 잘못된 입력은 안내하고 이전 실행 결과를 유지합니다.
 
-Each algorithm and data structure has its own separate README
-with related explanations and links for further reading (including ones
-to YouTube videos).
+## 지원하는 시각화
 
+현재 **45개**입니다. 각 항목은 단계별 재생·되감기, 소스 강조, 한국어·영어 설명을 제공합니다.
 
-## Visualizer development
+| 분류 | 개수 | 알고리즘·자료 구조 |
+| --- | ---: | --- |
+| 정렬 | 9 | 버블, 선택, 삽입, 병합, 퀵, 셸, 힙, 계수, 기수 |
+| 배열 검색 | 4 | 선형, 이진, 점프, 보간 |
+| 그래프 | 8 | 너비 우선, 깊이 우선, 다익스트라, 벨만–포드, 플로이드–워셜, 프림, 크루스칼, 위상 정렬 |
+| 자료 구조 | 17 | 스택, 큐, 연결 리스트, 이중 연결 리스트, 최소 힙, 최대 힙, 우선순위 큐, 이진 검색 트리, AVL 트리, 레드–블랙 트리, 트라이, 펜윅 트리, 구간 트리, 해시 테이블, 분리 집합, 블룸 필터, 그래프 구조 |
+| 문자열 검색 | 4 | 단순 문자열 검색, KMP, Z, 라빈–카프 |
+| 동적 계획 | 3 | 최장 공통 부분 수열, 편집 거리, 0/1 배낭 문제 |
 
-Use Node.js 22.12 or newer. Run `npm ci`, then `npm run dev` to open the local visualizer. `npm run build` type-checks the web app and generates `dist`; `npm run preview` serves that production build locally. `npm run check:docs` checks bilingual documentation and local links.
+저장소의 전체 코드·설명 목록은 [알고리즘 설명 목록](README.ko-KR.md)에 있습니다. 목록 전체가 웹 시각화로 구현된 것은 아니며, 완료 항목과 남은 확장은 [개발 계획](DEVELOPMENT_PLAN.md)에 기록합니다.
 
-The visualizer supports 38 lessons: nine sorts (bubble, selection, insertion, merge, quick, shell, heap, counting, radix), four array searches (linear, binary, jump, interpolation), eight graph algorithms (BFS, DFS, Dijkstra, Bellman–Ford, Floyd–Warshall, Prim, Kruskal, topological sort), and seventeen data structures (stack, queue, linked list, doubly linked list, min heap, max heap, priority queue, binary search tree, AVL tree, red–black tree, trie, Fenwick tree, segment tree, hash table, disjoint set, Bloom filter, graph structure). Each supports reversible steps, playback speed, source highlighting and Korean/English explanations. Inspect pointers, heap repairs, shared word prefixes, hash collisions, range queries, distance tables/matrices and disjoint sets.
+## 로컬 실행
 
-Arrays allow up to 32 values; graphs allow up to 12 vertices and 24 edges. Weighted lessons support directed/undirected edges as appropriate. Counting sort accepts integers spanning at most 64 buckets; radix sort accepts nonnegative integers. Negative cycles and invalid topological inputs are identified explicitly. Structure lessons accept up to 64 operations; the priority queue requires distinct values, and BST/AVL/red–black trees display at most 12 distinct nodes. AVL includes deletion repairs; red–black insertion/search are supported, while the existing deletion method is unimplemented. Trie/hash inputs allow 12 words/keys with at most 16 Unicode code points each (also for hash values); the trie displays at most 80 nodes. Fenwick positions are one-based; segment queries use zero-based inclusive ranges. The segment lesson builds a sum tree from the current input; reapply the input to change its values. Disjoint sets show actual parent paths and size-based unions without path compression. The Bloom lesson uses 16 bits and distinguishes definite absence from false positives; its exact insertion record is only a teaching aid. Graph structure operations use simple undirected graphs with integer vertices 1–12, up to 24 edges, and no vertex deletion.
+Node.js **22.12 이상**, npm **10 이상**이 필요합니다.
 
-See the [development plan and verification checklist](DEVELOPMENT_PLAN.md) (Korean) for completed milestones and remaining work.
-
-The repository includes a Vercel build configuration. Deployment is performed separately; development commands do not publish or push anything.
-
-## Data Structures
-
-A data structure is a particular way of organizing and storing data in a computer so that it can
-be accessed and modified efficiently. More precisely, a data structure is a collection of data
-values, the relationships among them, and the functions or operations that can be applied to
-the data.
-
-Remember that each data has its own trade-offs. And you need to pay attention more to why you're choosing a certain data structure than to how to implement it.
-
-`B` - Beginner, `A` - Advanced
-
-* `B` [Linked List](src/data-structures/linked-list)
-* `B` [Doubly Linked List](src/data-structures/doubly-linked-list)
-* `B` [Queue](src/data-structures/queue)
-* `B` [Stack](src/data-structures/stack)
-* `B` [Deque](src/data-structures/deque) - double-ended queue
-* `B` [Hash Table](src/data-structures/hash-table)
-* `B` [Heap](src/data-structures/heap) - max and min heap versions
-* `B` [Priority Queue](src/data-structures/priority-queue)
-* `A` [Trie](src/data-structures/trie)
-* `A` [Tree](src/data-structures/tree)
-  * `A` [Binary Search Tree](src/data-structures/tree/binary-search-tree)
-  * `A` [AVL Tree](src/data-structures/tree/avl-tree)
-  * `A` [Red-Black Tree](src/data-structures/tree/red-black-tree)
-  * `A` [Segment Tree](src/data-structures/tree/segment-tree) - with min/max/sum range queries examples
-  * `A` [Fenwick Tree](src/data-structures/tree/fenwick-tree) (Binary Indexed Tree)
-* `A` [Graph](src/data-structures/graph) (both directed and undirected)
-* `A` [Disjoint Set](src/data-structures/disjoint-set) - a union–find data structure or merge–find set
-* `A` [Bloom Filter](src/data-structures/bloom-filter)
-* `A` [LRU Cache](src/data-structures/lru-cache/) - Least Recently Used (LRU) cache
-
-## Algorithms
-
-An algorithm is an unambiguous specification of how to solve a class of problems. It is
-a set of rules that precisely define a sequence of operations.
-
-`B` - Beginner, `A` - Advanced
-
-### Algorithms by Topic
-
-* **Math**
-  * `B` [Bit Manipulation](src/algorithms/math/bits) - set/get/update/clear bits, multiplication/division by two, make negative etc.
-  * `B` [Binary Floating Point](src/algorithms/math/binary-floating-point) - binary representation of the floating-point numbers.
-  * `B` [Factorial](src/algorithms/math/factorial)
-  * `B` [Fibonacci Number](src/algorithms/math/fibonacci) - classic and closed-form versions
-  * `B` [Prime Factors](src/algorithms/math/prime-factors) - finding prime factors and counting them using Hardy-Ramanujan's theorem
-  * `B` [Primality Test](src/algorithms/math/primality-test) (trial division method)
-  * `B` [Euclidean Algorithm](src/algorithms/math/euclidean-algorithm) - calculate the Greatest Common Divisor (GCD)
-  * `B` [Least Common Multiple](src/algorithms/math/least-common-multiple) (LCM)
-  * `B` [Sieve of Eratosthenes](src/algorithms/math/sieve-of-eratosthenes) - finding all prime numbers up to any given limit
-  * `B` [Is Power of Two](src/algorithms/math/is-power-of-two) - check if the number is power of two (naive and bitwise algorithms)
-  * `B` [Pascal's Triangle](src/algorithms/math/pascal-triangle)
-  * `B` [Complex Number](src/algorithms/math/complex-number) - complex numbers and basic operations with them
-  * `B` [Radian & Degree](src/algorithms/math/radian) - radians to degree and backwards conversion
-  * `B` [Fast Powering](src/algorithms/math/fast-powering)
-  * `B` [Horner's method](src/algorithms/math/horner-method) - polynomial evaluation
-  * `B` [Matrices](src/algorithms/math/matrix) - matrices and basic matrix operations (multiplication, transposition, etc.)
-  * `B` [Euclidean Distance](src/algorithms/math/euclidean-distance) - distance between two points/vectors/matrices
-  * `A` [Integer Partition](src/algorithms/math/integer-partition)
-  * `A` [Square Root](src/algorithms/math/square-root) - Newton's method
-  * `A` [Liu Hui π Algorithm](src/algorithms/math/liu-hui) - approximate π calculations based on N-gons
-  * `A` [Discrete Fourier Transform](src/algorithms/math/fourier-transform) - decompose a function of time (a signal) into the frequencies that make it up
-* **Sets**
-  * `B` [Cartesian Product](src/algorithms/sets/cartesian-product) - product of multiple sets
-  * `B` [Fisher–Yates Shuffle](src/algorithms/sets/fisher-yates) - random permutation of a finite sequence
-  * `A` [Power Set](src/algorithms/sets/power-set) - all subsets of a set (bitwise, backtracking, and cascading solutions)
-  * `A` [Permutations](src/algorithms/sets/permutations) (with and without repetitions)
-  * `A` [Combinations](src/algorithms/sets/combinations) (with and without repetitions)
-  * `A` [Longest Common Subsequence](src/algorithms/sets/longest-common-subsequence) (LCS)
-  * `A` [Longest Increasing Subsequence](src/algorithms/sets/longest-increasing-subsequence)
-  * `A` [Shortest Common Supersequence](src/algorithms/sets/shortest-common-supersequence) (SCS)
-  * `A` [Knapsack Problem](src/algorithms/sets/knapsack-problem) - "0/1" and "Unbound" ones
-  * `A` [Maximum Subarray](src/algorithms/sets/maximum-subarray) - "Brute Force" and "Dynamic Programming" (Kadane's) versions
-  * `A` [Combination Sum](src/algorithms/sets/combination-sum) - find all combinations that form specific sum
-* **Strings**
-  * `B` [Hamming Distance](src/algorithms/string/hamming-distance) - number of positions at which the symbols are different
-  * `B` [Palindrome](src/algorithms/string/palindrome) - check if the string is the same in reverse
-  * `A` [Levenshtein Distance](src/algorithms/string/levenshtein-distance) - minimum edit distance between two sequences
-  * `A` [Knuth–Morris–Pratt Algorithm](src/algorithms/string/knuth-morris-pratt) (KMP Algorithm) - substring search (pattern matching)
-  * `A` [Z Algorithm](src/algorithms/string/z-algorithm) - substring search (pattern matching)
-  * `A` [Rabin Karp Algorithm](src/algorithms/string/rabin-karp) - substring search
-  * `A` [Longest Common Substring](src/algorithms/string/longest-common-substring)
-  * `A` [Regular Expression Matching](src/algorithms/string/regular-expression-matching)
-* **Searches**
-  * `B` [Linear Search](src/algorithms/search/linear-search)
-  * `B` [Jump Search](src/algorithms/search/jump-search) (or Block Search) - search in sorted array
-  * `B` [Binary Search](src/algorithms/search/binary-search) - search in sorted array
-  * `B` [Interpolation Search](src/algorithms/search/interpolation-search) - search in uniformly distributed sorted array
-* **Sorting**
-  * `B` [Bubble Sort](src/algorithms/sorting/bubble-sort)
-  * `B` [Selection Sort](src/algorithms/sorting/selection-sort)
-  * `B` [Insertion Sort](src/algorithms/sorting/insertion-sort)
-  * `B` [Heap Sort](src/algorithms/sorting/heap-sort)
-  * `B` [Merge Sort](src/algorithms/sorting/merge-sort)
-  * `B` [Quicksort](src/algorithms/sorting/quick-sort) - in-place and non-in-place implementations
-  * `B` [Shellsort](src/algorithms/sorting/shell-sort)
-  * `B` [Counting Sort](src/algorithms/sorting/counting-sort)
-  * `B` [Radix Sort](src/algorithms/sorting/radix-sort)
-  * `B` [Bucket Sort](src/algorithms/sorting/bucket-sort)
-* **Linked Lists**
-  * `B` [Straight Traversal](src/algorithms/linked-list/traversal)
-  * `B` [Reverse Traversal](src/algorithms/linked-list/reverse-traversal)
-* **Trees**
-  * `B` [Depth-First Search](src/algorithms/tree/depth-first-search) (DFS)
-  * `B` [Breadth-First Search](src/algorithms/tree/breadth-first-search) (BFS)
-* **Graphs**
-  * `B` [Depth-First Search](src/algorithms/graph/depth-first-search) (DFS)
-  * `B` [Breadth-First Search](src/algorithms/graph/breadth-first-search) (BFS)
-  * `B` [Kruskal’s Algorithm](src/algorithms/graph/kruskal) - finding Minimum Spanning Tree (MST) for weighted undirected graph
-  * `A` [Dijkstra Algorithm](src/algorithms/graph/dijkstra) - finding the shortest paths to all graph vertices from single vertex
-  * `A` [Bellman-Ford Algorithm](src/algorithms/graph/bellman-ford) - finding the shortest paths to all graph vertices from single vertex
-  * `A` [Floyd-Warshall Algorithm](src/algorithms/graph/floyd-warshall) - find the shortest paths between all pairs of vertices
-  * `A` [Detect Cycle](src/algorithms/graph/detect-cycle) - for both directed and undirected graphs (DFS and Disjoint Set based versions)
-  * `A` [Prim’s Algorithm](src/algorithms/graph/prim) - finding Minimum Spanning Tree (MST) for weighted undirected graph
-  * `A` [Topological Sorting](src/algorithms/graph/topological-sorting) - DFS method
-  * `A` [Articulation Points](src/algorithms/graph/articulation-points) - Tarjan's algorithm (DFS based)
-  * `A` [Bridges](src/algorithms/graph/bridges) - DFS based algorithm
-  * `A` [Eulerian Path and Eulerian Circuit](src/algorithms/graph/eulerian-path) - Fleury's algorithm - Visit every edge exactly once
-  * `A` [Hamiltonian Cycle](src/algorithms/graph/hamiltonian-cycle) - Visit every vertex exactly once
-  * `A` [Strongly Connected Components](src/algorithms/graph/strongly-connected-components) - Kosaraju's algorithm
-  * `A` [Travelling Salesman Problem](src/algorithms/graph/travelling-salesman) - shortest possible route that visits each city and returns to the origin city
-* **Cryptography**
-  * `B` [Polynomial Hash](src/algorithms/cryptography/polynomial-hash) - rolling hash function based on polynomial
-  * `B` [Rail Fence Cipher](src/algorithms/cryptography/rail-fence-cipher) - a transposition cipher algorithm for encoding messages
-  * `B` [Caesar Cipher](src/algorithms/cryptography/caesar-cipher) - simple substitution cipher
-  * `B` [Hill Cipher](src/algorithms/cryptography/hill-cipher) - substitution cipher based on linear algebra
-* **Machine Learning**
-  * `B` [NanoNeuron](https://github.com/trekhleb/nano-neuron) - 7 simple JS functions that illustrate how machines can actually learn (forward/backward propagation)
-  * `B` [k-NN](src/algorithms/ml/knn) - k-nearest neighbors classification algorithm
-  * `B` [k-Means](src/algorithms/ml/k-means) - k-Means clustering algorithm
-* **Image Processing**
-  * `B` [Seam Carving](src/algorithms/image-processing/seam-carving) - content-aware image resizing algorithm
-* **Statistics**
-  * `B` [Weighted Random](src/algorithms/statistics/weighted-random) - select the random item from the list based on items' weights
-* **Evolutionary algorithms**
-  * `A` [Genetic algorithm](https://github.com/trekhleb/self-parking-car-evolution) - example of how the genetic algorithm may be applied for training the self-parking cars
-* **Uncategorized**
-  * `B` [Tower of Hanoi](src/algorithms/uncategorized/hanoi-tower)
-  * `B` [Square Matrix Rotation](src/algorithms/uncategorized/square-matrix-rotation) - in-place algorithm
-  * `B` [Jump Game](src/algorithms/uncategorized/jump-game) - backtracking, dynamic programming (top-down + bottom-up) and greedy examples
-  * `B` [Unique Paths](src/algorithms/uncategorized/unique-paths) - backtracking, dynamic programming and Pascal's Triangle based examples
-  * `B` [Rain Terraces](src/algorithms/uncategorized/rain-terraces) - trapping rain water problem (dynamic programming and brute force versions)
-  * `B` [Recursive Staircase](src/algorithms/uncategorized/recursive-staircase) - count the number of ways to reach to the top (4 solutions)
-  * `B` [Best Time To Buy Sell Stocks](src/algorithms/uncategorized/best-time-to-buy-sell-stocks) - divide and conquer and one-pass examples
-  * `B` [Valid Parentheses](src/algorithms/stack/valid-parentheses) - check if a string has valid parentheses (using stack)
-  * `A` [N-Queens Problem](src/algorithms/uncategorized/n-queens)
-  * `A` [Knight's Tour](src/algorithms/uncategorized/knight-tour)
-
-### Algorithms by Paradigm
-
-An algorithmic paradigm is a generic method or approach which underlies the design of a class
-of algorithms. It is an abstraction higher than the notion of an algorithm, just as an
-algorithm is an abstraction higher than a computer program.
-
-* **Brute Force** - look at all the possibilities and selects the best solution
-  * `B` [Linear Search](src/algorithms/search/linear-search)
-  * `B` [Rain Terraces](src/algorithms/uncategorized/rain-terraces) - trapping rain water problem
-  * `B` [Recursive Staircase](src/algorithms/uncategorized/recursive-staircase) - count the number of ways to reach the top
-  * `A` [Maximum Subarray](src/algorithms/sets/maximum-subarray)
-  * `A` [Travelling Salesman Problem](src/algorithms/graph/travelling-salesman) - shortest possible route that visits each city and returns to the origin city
-  * `A` [Discrete Fourier Transform](src/algorithms/math/fourier-transform) - decompose a function of time (a signal) into the frequencies that make it up
-* **Greedy** - choose the best option at the current time, without any consideration for the future
-  * `B` [Jump Game](src/algorithms/uncategorized/jump-game)
-  * `A` [Unbound Knapsack Problem](src/algorithms/sets/knapsack-problem)
-  * `A` [Dijkstra Algorithm](src/algorithms/graph/dijkstra) - finding the shortest path to all graph vertices
-  * `A` [Prim’s Algorithm](src/algorithms/graph/prim) - finding Minimum Spanning Tree (MST) for weighted undirected graph
-  * `A` [Kruskal’s Algorithm](src/algorithms/graph/kruskal) - finding Minimum Spanning Tree (MST) for weighted undirected graph
-* **Divide and Conquer** - divide the problem into smaller parts and then solve those parts
-  * `B` [Binary Search](src/algorithms/search/binary-search)
-  * `B` [Tower of Hanoi](src/algorithms/uncategorized/hanoi-tower)
-  * `B` [Pascal's Triangle](src/algorithms/math/pascal-triangle)
-  * `B` [Euclidean Algorithm](src/algorithms/math/euclidean-algorithm) - calculate the Greatest Common Divisor (GCD)
-  * `B` [Merge Sort](src/algorithms/sorting/merge-sort)
-  * `B` [Quicksort](src/algorithms/sorting/quick-sort)
-  * `B` [Tree Depth-First Search](src/algorithms/tree/depth-first-search) (DFS)
-  * `B` [Graph Depth-First Search](src/algorithms/graph/depth-first-search) (DFS)
-  * `B` [Matrices](src/algorithms/math/matrix) - generating and traversing the matrices of different shapes
-  * `B` [Jump Game](src/algorithms/uncategorized/jump-game)
-  * `B` [Fast Powering](src/algorithms/math/fast-powering)
-  * `B` [Best Time To Buy Sell Stocks](src/algorithms/uncategorized/best-time-to-buy-sell-stocks) - divide and conquer and one-pass examples
-  * `A` [Permutations](src/algorithms/sets/permutations) (with and without repetitions)
-  * `A` [Combinations](src/algorithms/sets/combinations) (with and without repetitions)
-  * `A` [Maximum Subarray](src/algorithms/sets/maximum-subarray)
-* **Dynamic Programming** - build up a solution using previously found sub-solutions
-  * `B` [Fibonacci Number](src/algorithms/math/fibonacci)
-  * `B` [Jump Game](src/algorithms/uncategorized/jump-game)
-  * `B` [Unique Paths](src/algorithms/uncategorized/unique-paths)
-  * `B` [Rain Terraces](src/algorithms/uncategorized/rain-terraces) - trapping rain water problem
-  * `B` [Recursive Staircase](src/algorithms/uncategorized/recursive-staircase) - count the number of ways to reach the top
-  * `B` [Seam Carving](src/algorithms/image-processing/seam-carving) - content-aware image resizing algorithm
-  * `A` [Levenshtein Distance](src/algorithms/string/levenshtein-distance) - minimum edit distance between two sequences
-  * `A` [Longest Common Subsequence](src/algorithms/sets/longest-common-subsequence) (LCS)
-  * `A` [Longest Common Substring](src/algorithms/string/longest-common-substring)
-  * `A` [Longest Increasing Subsequence](src/algorithms/sets/longest-increasing-subsequence)
-  * `A` [Shortest Common Supersequence](src/algorithms/sets/shortest-common-supersequence)
-  * `A` [0/1 Knapsack Problem](src/algorithms/sets/knapsack-problem)
-  * `A` [Integer Partition](src/algorithms/math/integer-partition)
-  * `A` [Maximum Subarray](src/algorithms/sets/maximum-subarray)
-  * `A` [Bellman-Ford Algorithm](src/algorithms/graph/bellman-ford) - finding the shortest path to all graph vertices
-  * `A` [Floyd-Warshall Algorithm](src/algorithms/graph/floyd-warshall) - find the shortest paths between all pairs of vertices
-  * `A` [Regular Expression Matching](src/algorithms/string/regular-expression-matching)
-* **Backtracking** - similarly to brute force, try to generate all possible solutions, but each time you generate the next solution, you test
-if it satisfies all conditions and only then continue generating subsequent solutions. Otherwise, backtrack and go on a
-different path to finding a solution. Normally the DFS traversal of state-space is being used.
-  * `B` [Jump Game](src/algorithms/uncategorized/jump-game)
-  * `B` [Unique Paths](src/algorithms/uncategorized/unique-paths)
-  * `B` [Power Set](src/algorithms/sets/power-set) - all subsets of a set
-  * `A` [Hamiltonian Cycle](src/algorithms/graph/hamiltonian-cycle) - Visit every vertex exactly once
-  * `A` [N-Queens Problem](src/algorithms/uncategorized/n-queens)
-  * `A` [Knight's Tour](src/algorithms/uncategorized/knight-tour)
-  * `A` [Combination Sum](src/algorithms/sets/combination-sum) - find all combinations that form specific sum
-* **Branch & Bound** - remember the lowest-cost solution found at each stage of the backtracking
-search, and use the cost of the lowest-cost solution found so far as a lower bound on the cost of
-a least-cost solution to the problem in order to discard partial solutions with costs larger than the
-lowest-cost solution found so far. Normally, BFS traversal in combination with DFS traversal of state-space
-tree is being used.
-
-## How to use this repository
-
-**Install all dependencies**
-
-```
-npm install
+```sh
+npm ci
+npm run dev
 ```
 
-**Run ESLint**
+터미널에 표시되는 로컬 주소를 엽니다. 프로덕션 결과는 다음 명령으로 확인합니다.
 
-You may want to run it to check code quality.
-
+```sh
+npm run build
+npm run preview
 ```
+
+`build`는 타입 검사 후 `dist`를 생성합니다. 위 명령은 로컬에서만 실행되며 Git 푸시나 배포를 수행하지 않습니다.
+
+## 화면 조작
+
+알고리즘을 선택하고 입력을 적용한 뒤 재생 버튼이나 타임라인으로 탐색합니다. 데스크톱에서는 실행 코드·설명을 오른쪽에서, 좁은 화면에서는 시각화 아래에서 확인합니다.
+
+- `←` / `→`: 이전·다음 단계
+- `Home` / `End`: 처음·마지막 단계
+- `Space`: 재생·일시정지
+
+입력 칸이나 버튼에 포커스가 있을 때는 해당 요소의 기본 키보드 동작을 유지합니다.
+
+## 입력 범위와 구현 특성
+
+- 배열은 최대 32개 값입니다. 이진·점프·보간 검색에는 오름차순 입력이 필요합니다. 계수 정렬은 최대 64개 버킷 범위의 정수, 기수 정렬은 0 이상 정수를 받습니다.
+- 그래프는 정점 1~12, 간선 최대 24개입니다. 다익스트라는 음수 가중치를 차단하고, 음수 사이클과 위상 정렬의 사이클은 명시적으로 표시합니다.
+- 자료 구조 연산은 최대 64개입니다. 트리는 서로 다른 노드 최대 12개, 트라이는 최대 80개 글자 노드입니다. 단어·키는 최대 12개, 각각 16개 유니코드 코드 포인트까지입니다.
+- AVL은 삽입·검색·삭제를 지원합니다. 레드–블랙 트리는 삽입·검색을 지원하며 기존 클래스의 미구현 삭제는 차단합니다. 그래프 구조는 무방향 단순 그래프이고 정점 삭제를 지원하지 않습니다.
+- 분리 집합은 후손 수 기반 크기 비교로 병합하며 경로 압축을 하지 않습니다. 블룸 필터는 16비트·3개 해시를 사용하고 거짓 양성을 구분합니다. 정확한 삽입 목록은 학습용 정답 확인입니다.
+- 문자열 검색은 텍스트 48개·패턴 16개 UTF-16 코드 단위까지입니다. 공백을 유지하고 이모지의 서로게이트 단위를 16진수로 표시합니다. 단순·KMP·라빈–카프는 첫 일치 또는 -1, Z는 겹치는 일치도 모두 반환합니다. 빈 패턴은 첫 위치 0이며, Z에서는 모든 경계 위치입니다.
+- LCS·편집 거리는 각 문자열 최대 12개 UTF-16 단위입니다. 편집 거리는 삭제·삽입·치환 횟수이며 문자 교환은 포함하지 않습니다.
+- 0/1 배낭 문제는 `무게:가치` 형식의 물건 최대 8개, 무게 1~24, 가치 0~999, 허용 무게 0~24입니다. 각 물건을 최대 한 번 선택합니다.
+
+화면의 복잡도 설명은 실제 구현을 기준으로 합니다. 예를 들어 현재 라빈–카프는 창 복사와 롤링 계수 계산 때문에 `O(nm)`이며, AVL의 재귀 높이 계산도 갱신 비용에 포함합니다.
+
+## 개발 및 점검
+
+React·TypeScript·Vite로 구성하고, Mantine으로 UI, Motion으로 애니메이션, Shiki로 소스 구문 강조를 처리합니다. 기존 알고리즘에 선택적인 단계 기록을 연결하며 시각화용 알고리즘을 복제하지 않습니다.
+
+```sh
+npm run check:docs
 npm run lint
+npm run build
+npm run coverage -- --runInBand
 ```
 
-**Run all tests**
+Jest는 알고리즘·단계 기록·입력 검증·재생 로직을 검사합니다. React 화면은 실제 브라우저에서 별도로 점검하며, 해당 화면의 DOM 테스트 커버리지는 Jest 수치에 포함하지 않습니다. 최신 검사 결과는 [개발 계획](DEVELOPMENT_PLAN.md)에 기록합니다.
 
-```
-npm test
-```
+## Vercel 배포 준비
 
-**Run tests by name**
+[vercel.json](vercel.json)에 Vite 프레임워크, `npm ci`, `npm run build`, 출력 폴더 `dist`를 설정했습니다. 별도 서버나 환경 변수 없이 정적 웹 앱으로 빌드할 수 있습니다.
 
-```
-npm test -- 'LinkedList'
-```
+아직 실제 배포를 수행하지 않았습니다. Vercel 프로젝트 연결·배포와 Git 푸시는 별도 명시적 지시가 있을 때 진행합니다.
 
-**Troubleshooting**
+## 원본과 라이선스
 
-If linting or testing is failing, try to delete the `node_modules` folder and re-install npm packages:
+알고리즘·자료 구조 코드는 [Oleksii Trekhleb의 javascript-algorithms](https://github.com/trekhleb/javascript-algorithms)를 기반으로 합니다. 이 프로젝트는 그 코드에 시각화, 한국어 설명, 실행 기록 및 일부 오류 수정을 더했습니다.
 
-```
-rm -rf ./node_modules
-npm i
-```
-
-Also, make sure that you're using the correct Node version (`>=16`). If you're using [nvm](https://github.com/nvm-sh/nvm) for Node version management you may run `nvm use` from the root folder of the project and the correct version will be picked up.
-
-**Playground**
-
-You may play with data-structures and algorithms in `./src/playground/playground.js` file and write
-tests for it in `./src/playground/__test__/playground.test.js`.
-
-Then just, simply run the following command to test if your playground code works as expected:
-
-```
-npm test -- 'playground'
-```
-
-## Useful Information
-
-### References
-
-- [▶ Data Structures and Algorithms on YouTube](https://www.youtube.com/playlist?list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8)
-- [✍🏻 Data Structure Sketches](https://okso.app/showcase/data-structures)
-
-### Big O Notation
-
-*Big O notation* is used to classify algorithms according to how their running time or space requirements grow as the input size grows.
-On the chart below, you may find the most common orders of growth of algorithms specified in Big O notation.
-
-![Big O graphs](./assets/big-o-graph.png)
-
-Source: [Big O Cheat Sheet](http://bigocheatsheet.com/).
-
-Below is the list of some of the most used Big O notations and their performance comparisons against different sizes of the input data.
-
-| Big O Notation | Type        | Computations for 10 elements | Computations for 100 elements | Computations for 1000 elements  |
-| -------------- | ----------- | ---------------------------- | ----------------------------- | ------------------------------- |
-| **O(1)**       | Constant    | 1                            | 1                             | 1                               |
-| **O(log N)**   | Logarithmic | 3                            | 6                             | 9                               |
-| **O(N)**       | Linear      | 10                           | 100                           | 1000                            |
-| **O(N log N)** | n log(n)    | 30                           | 600                           | 9000                            |
-| **O(N^2)**     | Quadratic   | 100                          | 10000                         | 1000000                         |
-| **O(2^N)**     | Exponential | 1024                         | 1.26e+29                      | 1.07e+301                       |
-| **O(N!)**      | Factorial   | 3628800                      | 9.3e+157                      | 4.02e+2567                      |
-
-### Data Structure Operations Complexity
-
-| Data Structure          | Access    | Search    | Insertion | Deletion  | Comments  |
-| ----------------------- | :-------: | :-------: | :-------: | :-------: | :-------- |
-| **Array**               | 1         | n         | n         | n         |           |
-| **Stack**               | n         | n         | 1         | 1         |           |
-| **Queue**               | n         | n         | 1         | 1         |           |
-| **Linked List**         | n         | n         | 1         | n         |           |
-| **Hash Table**          | -         | n         | n         | n         | In case of perfect hash function costs would be O(1) |
-| **Binary Search Tree**  | n         | n         | n         | n         | In case of balanced tree costs would be O(log(n)) |
-| **B-Tree**              | log(n)    | log(n)    | log(n)    | log(n)    |           |
-| **Red-Black Tree**      | log(n)    | log(n)    | log(n)    | log(n)    |           |
-| **AVL Tree**            | log(n)    | log(n)    | log(n)    | log(n)    |           |
-| **Bloom Filter**        | -         | 1         | 1         | -         | False positives are possible while searching |
-
-### Array Sorting Algorithms Complexity
-
-| Name                  | Best            | Average             | Worst               | Memory    | Stable    | Comments  |
-| --------------------- | :-------------: | :-----------------: | :-----------------: | :-------: | :-------: | :-------- |
-| **Bubble sort**       | n               | n<sup>2</sup>       | n<sup>2</sup>       | 1         | Yes       |           |
-| **Insertion sort**    | n               | n<sup>2</sup>       | n<sup>2</sup>       | 1         | Yes       |           |
-| **Selection sort**    | n<sup>2</sup>   | n<sup>2</sup>       | n<sup>2</sup>       | 1         | No        |           |
-| **Heap sort**         | n&nbsp;log(n)   | n&nbsp;log(n)       | n&nbsp;log(n)       | 1         | No        |           |
-| **Merge sort**        | n&nbsp;log(n)   | n&nbsp;log(n)       | n&nbsp;log(n)       | n         | Yes       |           |
-| **Quick sort**        | n&nbsp;log(n)   | n&nbsp;log(n)       | n<sup>2</sup>       | log(n)    | No        | Quicksort is usually done in-place with O(log(n)) stack space |
-| **Shell sort**        | n&nbsp;log(n)   | depends on gap sequence   | n&nbsp;(log(n))<sup>2</sup>  | 1         | No         |           |
-| **Counting sort**     | n + r           | n + r               | n + r               | n + r     | Yes       | r - biggest number in array |
-| **Radix sort**        | n * k           | n * k               | n * k               | n + k     | Yes       | k - length of longest key |
-
-<!-- ## Project Backers
-
-> You may support this project via ❤️️ [GitHub](https://github.com/sponsors/trekhleb) or ❤️️ [Patreon](https://www.patreon.com/trekhleb).
-
-[Folks who are backing this project](https://github.com/trekhleb/javascript-algorithms/blob/master/BACKERS.md) `∑ = 1` -->
-
-## Author
-
-[@trekhleb](https://trekhleb.dev)
-
-A few more [projects](https://trekhleb.dev/projects/) and [articles](https://trekhleb.dev/blog/) about JavaScript and algorithms on [trekhleb.dev](https://trekhleb.dev):
-
-- 🧠 [yesbrainer.ai](https://yesbrainer.ai/) – council of AI models for the decisions that aren’t no-brainers (BYOK, private, no account)
-- ✍🏻 [okso.app](https://okso.app/) – drawing app to express, grasp, and organize your thoughts and ideas
+[MIT 라이선스](LICENSE)를 따르며 원본 저작권 고지를 유지합니다.
