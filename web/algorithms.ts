@@ -12,7 +12,8 @@ import kmpSource from '../src/algorithms/string/knuth-morris-pratt/knuthMorrisPr
 import zSource from '../src/algorithms/string/z-algorithm/zAlgorithm.js?raw';
 import rabinSource from '../src/algorithms/string/rabin-karp/rabinKarp.js?raw';
 import lcsSource from '../src/algorithms/sets/longest-common-subsequence/longestCommonSubsequence.js?raw';
-import { traceLcs } from '../src/visualization/dynamic';
+import editSource from '../src/algorithms/string/levenshtein-distance/levenshteinDistance.js?raw';
+import { traceLcs, traceEditDistance } from '../src/visualization/dynamic';
 import { traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
@@ -1372,4 +1373,21 @@ export const lcs: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs];
+export const editDistance: TextAlgorithm = {
+  ...lcs, id: 'edit-distance', name: { ko: '편집 거리', en: 'Edit distance' },
+  summary: { ko: '첫 문자열을 두 번째 문자열로 바꾸는 최소 삭제·삽입·치환 횟수를 구합니다. 같은 문자는 비용 0, 각 편집은 비용 1입니다.', en: 'Find the fewest deletions, insertions and substitutions that transform the first string into the second. Equal characters cost zero; each edit costs one.' },
+  source: algorithmCode(editSource), example: ['kitten', 'sitting'],
+  inputHint: { ko: '각 문자열 최대 12개 UTF-16 단위 · 삭제·삽입·치환만 지원 · 문자 교환은 없음', en: 'Up to 12 UTF-16 units per string · delete / insert / substitute · no transposition' },
+  run: ([first, second]) => traceEditDistance(first, second),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['편집 거리 표 준비', '열은 첫 문자열의 접두사, 행은 두 번째 문자열의 접두사입니다. 각 셀은 열의 접두사를 행의 접두사로 바꾸는 최소 비용입니다.'] : ['Prepare the edit distance table', 'Columns represent first-string prefixes; rows represent second-string prefixes. Each cell is the minimum cost to transform its column prefix into its row prefix.'];
+      case 'initialize': return ko ? ['빈 문자열의 편집 비용', '첫 행에는 첫 문자열의 글자를 모두 삭제하는 비용, 첫 열에는 두 번째 문자열의 글자를 모두 삽입하는 비용을 넣습니다. 빈 문자열끼리는 0입니다.'] : ['Costs for empty strings', 'The first row counts deleting every character from the first prefix. The first column counts inserting every character of the second prefix. Two empty strings cost zero.'];
+      case 'cell-min': return ko ? ['세 후보 중 최소 비용 선택', `셀[${v.row}, ${v.column}]에서 삭제 ${v.deletion}, 삽입 ${v.insertion}, ${v.indicator === 0 ? '같은 문자 유지' : '치환'} ${v.substitution} 중 최소를 선택합니다. 대각선의 추가 비용은 ${v.indicator}입니다.`] : ['Choose the minimum of three costs', `At [${v.row}, ${v.column}], choose among deletion ${v.deletion}, insertion ${v.insertion}, and ${v.indicator === 0 ? 'keeping an equal character' : 'substitution'} ${v.substitution}. The diagonal adds ${v.indicator}.`];
+      default: return ko ? ['최소 편집 횟수 확정', `오른쪽 아래 셀의 답은 ${v.result}입니다. UTF-16 단위 기준이며 구체적인 편집 목록 대신 최소 횟수를 반환합니다.`] : ['Minimum edit count ready', `The bottom-right answer is ${v.result}, measured in UTF-16 units. Return the minimum count rather than a concrete edit script.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance];

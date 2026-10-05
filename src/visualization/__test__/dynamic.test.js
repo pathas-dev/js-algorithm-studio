@@ -1,9 +1,42 @@
 import fs from 'fs';
 import path from 'path';
-import { traceLcs } from '../dynamic';
+import { traceLcs, traceEditDistance } from '../dynamic';
 import { algorithmCode } from '../playback';
 
 describe('dynamic programming lessons', () => {
+  it('uses deletion, insertion and substitution costs and restores uncomputed cells on rewind', () => {
+    const source = algorithmCode(fs.readFileSync(path.resolve(
+      __dirname,
+      '../../algorithms/string/levenshtein-distance/levenshteinDistance.js',
+    ), 'utf8'));
+    const distance = (a, b) => {
+      if (!a.length) return b.length;
+      if (!b.length) return a.length;
+      return Math.min(
+        distance(a.slice(1), b) + 1,
+        distance(a, b.slice(1)) + 1,
+        distance(a.slice(1), b.slice(1)) + (a[0] === b[0] ? 0 : 1),
+      );
+    };
+    ['', 'a', 'ba', 'abc', '가나', '😀'].forEach((first) => {
+      ['', 'b', 'ab', '가', '😀'].forEach((second) => {
+        const steps = traceEditDistance(first, second);
+        expect(steps.at(-1).variables.result).toBe(distance(first, second));
+        steps.forEach((s) => {
+          expect(source).toContain(s.code);
+          if (s.type === 'cell-min') {
+            const v = s.variables;
+            expect(JSON.parse(v.dpMatrix)[v.row][v.column])
+              .toBe(Math.min(v.deletion, v.insertion, v.substitution));
+            expect(JSON.parse(v.dependencies)).toHaveLength(3);
+          }
+        });
+        expect(JSON.parse(steps[0].variables.dpMatrix).every((r) => r.every((v) => v === null)))
+          .toBe(true);
+      });
+    });
+    expect(traceEditDistance('kitten', 'sitting').at(-1).variables.result).toBe(3);
+  });
   it('recovers an optimal LCS and records immutable prefix tables and valid references', () => {
     const source = algorithmCode(fs.readFileSync(path.resolve(
       __dirname,
