@@ -1,3 +1,4 @@
+import Queue from '../data-structures/queue/Queue';
 import Stack from '../data-structures/stack/Stack';
 import { MAX_VALUES, parseTarget } from './playback';
 
@@ -19,10 +20,12 @@ export function parseOperations(text, commands) {
   });
 }
 
-export function traceStack(values, operations = '') {
-  const commands = parseOperations(operations, { push: 1, pop: 0, peek: 0 });
+function traceLinear(values, operations, queue) {
+  const insert = queue ? 'enqueue' : 'push';
+  const remove = queue ? 'dequeue' : 'pop';
+  const commands = parseOperations(operations, { [insert]: 1, [remove]: 0, peek: 0 });
   if (values.length > MAX_VALUES) throw new Error('limit');
-  const stack = new Stack();
+  const stack = queue ? new Queue() : new Stack();
   const steps = [];
   const ids = new WeakMap();
   let nextId = 0;
@@ -35,26 +38,35 @@ export function traceStack(values, operations = '') {
       return { value: node.value, id: ids.get(node) };
     });
     steps.push({
-      type, code, array, indices, variables: { structure: 'stack', ...variables },
+      type, code, array, indices, variables: { structure: queue ? 'queue' : 'stack', ...variables },
     });
   };
   snapshot('start', 'this.linkedList = new LinkedList();');
   const run = ({ name, value }, phase) => {
     const variables = { operation: name, phase };
-    if (name === 'push') {
+    if (name === insert) {
       if (stack.linkedList.toArray().length >= MAX_VALUES) throw new Error('capacity');
-      stack.push(value);
-      snapshot(name, 'this.linkedList.prepend(value);', { ...variables, value }, [0]);
+      stack[insert](value);
+      snapshot(name, queue ? 'this.linkedList.append(value);' : 'this.linkedList.prepend(value);', { ...variables, value }, [queue ? stack.linkedList.toArray().length - 1 : 0]);
     } else {
       const result = stack[name]();
       let code = result === null ? 'return null;' : 'return this.linkedList.head.value;';
-      if (name === 'pop') code = 'return removedHead ? removedHead.value : null;';
+      if (name === remove) code = 'return removedHead ? removedHead.value : null;';
       snapshot(name, code, { ...variables, result: result === null ? 'null' : result }, name === 'peek' && result !== null ? [0] : []);
     }
   };
-  values.forEach((value) => run({ name: 'push', value }, 'input'));
+  values.forEach((value) => run({ name: insert, value }, 'input'));
   commands.forEach((command) => run(command, 'commands'));
-  stack.toArray();
-  snapshot('done', 'toArray() {');
+  if (queue) stack.toString();
+  else stack.toArray();
+  snapshot('done', queue ? 'return this.linkedList.toString(callback);' : 'toArray() {');
   return steps;
+}
+
+export function traceStack(values, operations = '') {
+  return traceLinear(values, operations, false);
+}
+
+export function traceQueue(values, operations = '') {
+  return traceLinear(values, operations, true);
 }

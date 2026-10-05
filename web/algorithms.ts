@@ -1,5 +1,6 @@
+import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack } from '../src/visualization/structures';
+import { traceStack, traceQueue } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -699,4 +700,29 @@ export const stack: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack];
+export const queue: Algorithm = {
+  id: 'queue', category: 'structure', usesStart: false,
+  name: { ko: '큐', en: 'Queue' },
+  summary: { ko: '뒤로 넣고 앞에서 꺼내는 FIFO 구조입니다. 먼저 들어온 값이 먼저 나갑니다.', en: 'Enqueue at the rear and dequeue at the front: first in, first out.' },
+  source: queueSource, example: [3, 6, 2], operations: 'peek, enqueue 9, dequeue, dequeue, peek', operationHint: 'enqueue 9, dequeue, peek',
+  time: { ko: 'enqueue · dequeue · peek O(1)', en: 'enqueue · dequeue · peek O(1)' },
+  run: (values, _target, _edges, _directed, operations = queue.operations) => traceQueue(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 큐 준비', '기존 Queue 클래스로 빈 연결 리스트를 만듭니다. 초기 값을 왼쪽부터 뒤에 넣은 뒤 입력한 연산을 실행합니다.']
+        : ['Create an empty queue', 'The existing Queue class creates an empty linked list. Enqueue initial values from left to right, then execute your operations.'];
+      case 'enqueue': return ko ? [v.phase === 'input' ? '초기 값 넣기' : '뒤에 넣기', `enqueue(${v.value}): 연결 리스트 뒤에 새 노드를 붙였습니다. REAR는 ${v.value}이며 앞의 노드들 다음에 처리됩니다.`]
+        : [v.phase === 'input' ? 'Enqueue an initial value' : 'Enqueue at the rear', `enqueue(${v.value}) appends a node. REAR is ${v.value}; it is processed after the nodes ahead of it.`];
+      case 'dequeue': return ko ? ['앞에서 꺼내기', v.result === 'null' ? '빈 큐라 삭제할 노드가 없습니다. dequeue()은 null을 반환합니다.' : `FRONT 노드를 삭제하고 값 ${v.result}을 반환했습니다. 다음 노드가 새로운 FRONT가 됩니다.`]
+        : ['Dequeue from the front', v.result === 'null' ? 'There is no node to remove. dequeue() returns null on an empty queue.' : `Remove the FRONT node and return ${v.result}. The next node becomes FRONT.`];
+      case 'peek': return ko ? ['앞의 값 조회', v.result === 'null' ? '빈 큐이므로 peek()은 null을 반환합니다. 구조는 바뀌지 않습니다.' : `FRONT의 값 ${v.result}을 읽기만 합니다. 노드를 삭제하지 않습니다.`]
+        : ['Peek at the front', v.result === 'null' ? 'peek() returns null on an empty queue, without changing it.' : `Read FRONT value ${v.result} without removing its node.`];
+      default: return ko ? ['연산 완료', '모든 연산을 실행했습니다. 아래 값은 FRONT에서 REAR 순서입니다. 뒤로 이동해 FIFO 처리 순서를 다시 살펴보세요.']
+        : ['Operations complete', 'All operations have run. Values are ordered FRONT to REAR. Rewind to inspect FIFO processing.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue];
