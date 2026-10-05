@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import binarySearch from '../../algorithms/search/binary-search/binarySearch';
 import linearSearch from '../../algorithms/search/linear-search/linearSearch';
 import QuickSortInPlace from '../../algorithms/sorting/quick-sort/QuickSortInPlace';
 import MergeSort from '../../algorithms/sorting/merge-sort/MergeSort';
@@ -7,7 +8,7 @@ import InsertionSort from '../../algorithms/sorting/insertion-sort/InsertionSort
 import SelectionSort from '../../algorithms/sorting/selection-sort/SelectionSort';
 import BubbleSort from '../../algorithms/sorting/bubble-sort/BubbleSort';
 import {
-  MAX_VALUES, algorithmCode, parseTarget, parseValues, playbackReducer,
+  MAX_VALUES, algorithmCode, parseTarget, parseValues, playbackReducer, requireSorted,
 } from '../playback';
 
 describe('visualizer execution and playback', () => {
@@ -68,9 +69,31 @@ describe('visualizer execution and playback', () => {
     });
   });
 
+  it('records binary search boundaries, matches and misses', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(__dirname, '../../algorithms/search/binary-search/binarySearch.js'), 'utf8'));
+    [[], [1], [-2, 0, 1, 1, 3, 5], [1, 1, 1]].forEach((input) => {
+      [-3, -2, 0, 1, 2, 3, 5, 10].forEach((target) => {
+        const steps = [];
+        const result = binarySearch(input, target, undefined, (step) => steps.push(step));
+        expect(result).toBe(binarySearch(input, target));
+        const last = steps[steps.length - 1];
+        expect(last.type).toBe('done');
+        expect(last.indices).toEqual(result === -1 ? [] : [result]);
+        steps.forEach((step) => {
+          expect(source).toContain(step.code);
+          expect(step.array).toEqual(input);
+          expect(step.indices.every((index) => index >= 0 && index < input.length)).toBe(true);
+        });
+      });
+    });
+  });
+
   it('validates user values before recording bounded snapshots', () => {
     expect(parseValues('')).toEqual([]);
     expect(parseTarget('-2.5')).toBe(-2.5);
+    expect(() => requireSorted([3, 1])).toThrow('sorted');
+    expect(() => requireSorted([-2, -2, 0, 3])).not.toThrow();
+    expect(() => requireSorted([])).not.toThrow();
     expect(() => parseTarget('')).toThrow('target');
     expect(() => parseTarget('1,2')).toThrow('target');
     expect(parseValues(' 1, -2  3.5, .5 ')).toEqual([1, -2, 3.5, 0.5]);

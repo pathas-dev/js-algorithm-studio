@@ -80,3 +80,5 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
   .catalog-group { display: flex; flex-wrap: wrap; gap: 4px; }
   .catalog-label { flex-basis: 100%; }
 }
+
+.outside-range { opacity: .3; }

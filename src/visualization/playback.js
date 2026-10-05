@@ -55,3 +55,9 @@ export function parseTarget(text) {
   if (values.length !== 1) throw new Error('target');
   return values[0];
 }
+
+export function requireSorted(values) {
+  if (values.some((value, index) => index > 0 && value < values[index - 1])) {
+    throw new Error('sorted');
+  }
+}

@@ -1,3 +1,5 @@
+import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
+import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
 import linearSource from '../src/algorithms/search/linear-search/linearSearch.js?raw';
 import QuickSortInPlace from '../src/algorithms/sorting/quick-sort/QuickSortInPlace';
@@ -10,7 +12,7 @@ import SelectionSort from '../src/algorithms/sorting/selection-sort/SelectionSor
 import selectionSource from '../src/algorithms/sorting/selection-sort/SelectionSort.js?raw';
 import BubbleSort from '../src/algorithms/sorting/bubble-sort/BubbleSort';
 import bubbleSource from '../src/algorithms/sorting/bubble-sort/BubbleSort.js?raw';
-import { algorithmCode } from '../src/visualization/playback';
+import { algorithmCode, requireSorted } from '../src/visualization/playback';
 
 export type Language = 'ko' | 'en';
 export type Item = { value: number; id: number };
@@ -32,6 +34,7 @@ export type Algorithm = {
   time: string;
   category: 'sort' | 'search';
   target?: number;
+  requiresSorted?: boolean;
   run(values: number[], target?: number): Step[];
   explain(step: Step, language: Language): [string, string];
 };
@@ -213,7 +216,7 @@ export const quick: Algorithm = {
   },
 };
 
-function runSearch(Search: typeof linearSearch, values: number[], target = 3): Step[] {
+function runSearch(Search: typeof linearSearch | typeof binarySearch, values: number[], target = 3): Step[] {
   const steps: Step[] = [];
   const items = values.map((value, id) => ({ value, id }));
   Search(values, target, (a: number, b: number) => a - b, (step: Omit<Step, 'array'>) => steps.push({ ...step, array: [...items] }));
@@ -242,4 +245,28 @@ export const linear: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear];
+export const binary: Algorithm = {
+  id: 'binary-search', category: 'search', target: 3, requiresSorted: true,
+  name: { ko: '이진 검색', en: 'Binary search' },
+  summary: { ko: '정렬된 배열의 중간 값을 비교해 탐색 범위를 절반씩 줄입니다. 중복 값은 일치 위치 하나를 반환합니다.', en: 'Halve the search range in a sorted array. Return one matching index when duplicates exist.' },
+  source: algorithmCode(binarySource), example: [1, 2, 3, 5, 6, 8], time: 'O(log n)',
+  run(values, target) { requireSorted(values); return runSearch(binarySearch, values, target); },
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['검색 구간 준비', `목표 값은 ${v.target}입니다. 오름차순 배열의 양 끝을 탐색 범위로 설정합니다.`]
+        : ['Prepare the range', `Target: ${v.target}. Start with the full ascending array.`];
+      case 'compare': return ko ? ['중간 값 비교', `구간 ${v.low}…${v.high}의 중간 인덱스 ${v.middleIndex}에서 값(${step.array[Number(v.middleIndex)].value})을 확인합니다.`]
+        : ['Inspect the middle', `Inspect value ${step.array[Number(v.middleIndex)].value} at midpoint ${v.middleIndex} of range ${v.low}…${v.high}.`];
+      case 'right': return ko ? ['오른쪽 절반 선택', `중간 값이 목표보다 작습니다. 왼쪽과 중간 위치를 제외하고 시작 인덱스를 ${v.low}로 옮깁니다. 흐린 막대는 제외된 위치입니다.`]
+        : ['Choose the right half', `The middle value is smaller than the target. Exclude it and the left half; move the start to ${v.low}. Dim bars are excluded.`];
+      case 'left': return ko ? ['왼쪽 절반 선택', `중간 값이 목표보다 큽니다. 오른쪽과 중간 위치를 제외하고 끝 인덱스를 ${v.high}로 옮깁니다. 흐린 막대는 제외된 위치입니다.`]
+        : ['Choose the left half', `The middle value is larger than the target. Exclude it and the right half; move the end to ${v.high}. Dim bars are excluded.`];
+      default: return ko ? ['검색 완료', v.matches ? `인덱스 ${v.matches}에서 찾았습니다. 중복 값 중 하나의 위치를 반환합니다.` : '탐색 범위가 비었습니다. 목표 값이 없으므로 -1을 반환합니다.']
+        : ['Search complete', v.matches ? `Found at index ${v.matches}. Return one matching position.` : 'The search range is empty. Return -1 because the target was not found.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear, binary];

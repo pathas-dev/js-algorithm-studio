@@ -44,7 +44,11 @@ export default function App() {
 
   function apply(text: string) {
     try {
-      const next = algorithm.run(parseValues(text), algorithm.category === 'search' ? parseTarget(targetInput) : undefined);
+      let target;
+      if (algorithm.category === 'search') {
+        try { target = parseTarget(targetInput); } catch { throw new Error('target'); }
+      }
+      const next = algorithm.run(parseValues(text), target);
       setSteps(next);
       setInput(text);
       setError('');
@@ -64,8 +68,15 @@ export default function App() {
     dispatch({ type: 'reset', length: trace.length });
   }
 
+  function randomize() {
+    const values = Array.from({ length: 8 }, () => Math.floor(Math.random() * 90) + 1);
+    if (algorithm.requiresSorted) values.sort((a, b) => a - b);
+    apply(values.join(', '));
+  }
+
   const errors: Record<string, string> = {
-    target: t('목표 값으로 숫자 하나를 입력하세요.', 'Enter exactly one target number.'),
+    sorted: t('오름차순으로 정렬된 배열을 입력하세요.', 'Enter an array sorted in ascending order.'),
+    target: t('목표 값으로 -999부터 999 사이의 숫자 하나를 입력하세요.', 'Enter one target number between -999 and 999.'),
     invalid: t('쉼표 또는 공백으로 구분한 숫자를 입력하세요. 빈 항목은 허용하지 않습니다.', 'Enter numbers separated by commas or spaces, without empty entries.'),
     limit: t(`최대 ${MAX_VALUES}개까지 입력할 수 있습니다.`, `Use at most ${MAX_VALUES} values.`),
     range: t('각 값은 -999부터 999 사이여야 합니다.', 'Each value must be between -999 and 999.'),
@@ -114,11 +125,12 @@ export default function App() {
                   </Paper>
                   <Paper withBorder p="lg">
                     <form onSubmit={(event) => { event.preventDefault(); apply(input); }}>
-                      {algorithm.category === 'search' && <TextInput label={t('목표 값', 'Target value')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} autoComplete="off" mb="sm" />}
-                      <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={t('배열 입력', 'Array input')} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder="8, 3, 6, 1, 5, 2" error={errors[error]} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
+                      {algorithm.category === 'search' && <TextInput label={t('목표 값', 'Target value')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} error={error === 'target' ? errors.target : undefined} autoComplete="off" mb="sm" />}
+                      <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={t('배열 입력', 'Array input')} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder="8, 3, 6, 1, 5, 2" error={error !== 'target' ? errors[error] : undefined} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
                       {error && <span role="alert" className="sr-only">{errors[error]}</span>}
                     </form>
-                    <Group justify="space-between" mt="sm"><Text size="xs" c="dimmed">{t(`최대 ${MAX_VALUES}개 · 음수·중복·소수 지원`, `Up to ${MAX_VALUES} values · negatives, duplicates, decimals`)}</Text><Button variant="subtle" size="compact-xs" onClick={() => apply(Array.from({ length: 8 }, () => Math.floor(Math.random() * 90) + 1).join(', '))}>{t('무작위', 'Randomize')}</Button></Group>
+                    {algorithm.requiresSorted && <Text size="xs" c="teal" mt="xs">{t('오름차순 배열이 필요합니다. 인덱스는 입력 배열 기준입니다.', 'Requires an ascending array. Indices refer to the input array.')}</Text>}
+                    <Group justify="space-between" mt="sm"><Text size="xs" c="dimmed">{t(`최대 ${MAX_VALUES}개 · 음수·중복·소수 지원`, `Up to ${MAX_VALUES} values · negatives, duplicates, decimals`)}</Text><Button variant="subtle" size="compact-xs" onClick={randomize}>{t('무작위', 'Randomize')}</Button></Group>
                   </Paper>
                 </div>
                 <div className="detail-column">
@@ -126,7 +138,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>
