@@ -1,11 +1,14 @@
+import recordStep from '../../utils/trace/recordStep';
+
 export default class BloomFilter {
   /**
    * @param {number} size - the size of the storage.
    */
-  constructor(size = 100) {
+  constructor(size = 100, stepCallback = undefined) {
     // Bloom filter size directly affects the likelihood of false positives.
     // The bigger the size the lower the likelihood of false positives.
     this.size = size;
+    this.stepCallback = stepCallback;
     this.storage = this.createStore(size);
   }
 
@@ -16,7 +19,10 @@ export default class BloomFilter {
     const hashValues = this.getHashValues(item);
 
     // Set each hashValue index to true.
-    hashValues.forEach((val) => this.storage.setValue(val));
+    hashValues.forEach((val) => {
+      this.storage.setValue(val);
+      recordStep(this.stepCallback, 'set-bit', [], [], { position: val }, 'this.storage.setValue(val);');
+    });
   }
 
   /**
@@ -27,6 +33,9 @@ export default class BloomFilter {
     const hashValues = this.getHashValues(item);
 
     for (let hashIndex = 0; hashIndex < hashValues.length; hashIndex += 1) {
+      recordStep(this.stepCallback, 'test-bit', [], [], () => ({
+        position: hashValues[hashIndex], bit: this.storage.getValue(hashValues[hashIndex]),
+      }), 'if (!this.storage.getValue(hashValues[hashIndex])) {');
       if (!this.storage.getValue(hashValues[hashIndex])) {
         // We know that the item was definitely not inserted.
         return false;
@@ -122,10 +131,19 @@ export default class BloomFilter {
    * @return {number[]}
    */
   getHashValues(item) {
-    return [
+    const hashValues = [
       this.hash1(item),
       this.hash2(item),
       this.hash3(item),
     ];
+    recordStep(
+      this.stepCallback,
+      'hashes',
+      [],
+      [],
+      { hashes: hashValues.join(', ') },
+      'const hashValues = [',
+    );
+    return hashValues;
   }
 }

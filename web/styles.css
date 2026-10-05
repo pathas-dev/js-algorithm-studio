@@ -139,6 +139,11 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .hash-entry { padding: 5px 8px; border: 1px solid #cddbd1; border-radius: 6px; background: #eaf0e9; overflow-wrap: anywhere; }
 .hash-entry strong, .hash-entry span { display: block; }
 .hash-entry.active-node { background: #fff0d8; border-color: #d8964a; }
+.bloom-bits { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; margin: 18px 0; }
+.bloom-bit { display: grid; gap: 5px; padding: 8px 2px; text-align: center; border: 1px solid #cddbd1; border-radius: 6px; }
+.bloom-bit small { font-size: 10px; color: #617469; }
+.bloom-bit.set-bit { background: #e3ece4; }
+.bloom-bit.active-bit { background: #fff0d8; border-color: #d8964a; }
 
 @media (max-width: 650px) {
   .playback-card .mantine-Button-root { min-height: 40px; }

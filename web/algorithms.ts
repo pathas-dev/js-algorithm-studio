@@ -1,4 +1,6 @@
 import hashTableSource from '../src/data-structures/hash-table/HashTable.js?raw';
+import bloomSource from '../src/data-structures/bloom-filter/BloomFilter.js?raw';
+import traceBloomFilter from '../src/visualization/bloom';
 import disjointSource from '../src/data-structures/disjoint-set/DisjointSet.js?raw';
 import disjointItemSource from '../src/data-structures/disjoint-set/DisjointSetItem.js?raw';
 import traceDisjointSet from '../src/visualization/sets';
@@ -1180,4 +1182,36 @@ export const disjointSet: NumericAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet];
+export const bloomFilter: WordAlgorithm = {
+  id: 'bloom-filter', category: 'structure', inputMode: 'words', usesStart: false,
+  name: { ko: '블룸 필터', en: 'Bloom filter' },
+  summary: { ko: '3개 해시 위치에 비트를 세웁니다. 조회 결과 false는 확실한 부재이고 true는 존재 가능성입니다. 기본 예제의 q는 거짓 양성입니다.', en: 'Set bits at three hash positions. A false query means definite absence; true means possible presence. The default q demonstrates a false positive.' },
+  source: algorithmCode(bloomSource), example: ['a'],
+  operations: 'mayContain a, mayContain q, mayContain z, insert 가방, mayContain 가방, mayContain q',
+  operationHint: 'insert 가방, mayContain q',
+  inputHint: { ko: '16비트 · 삽입 단어 최대 12개 · 단어별 16글자 · 삽입·조회만 지원', en: '16 bits · up to 12 inserted words · 16 code points each · insert / query only' },
+  time: { ko: '단어 길이 m · 해시 3개 · 삽입·조회 O(m)', en: 'Word length m · 3 hashes · insert / query O(m)' },
+  run: (words, _target, _edges, _directed, operations = bloomFilter.operations) => traceBloomFilter(words, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 비트 배열 준비', '16개 비트를 모두 0으로 초기화합니다. 작은 배열을 사용해 서로 다른 단어가 같은 비트에 겹치는 경우를 쉽게 볼 수 있습니다.']
+        : ['Create an empty bit array', 'Initialize all 16 bits to zero. A small array makes collisions between different words visible.'];
+      case 'hashes': return ko ? ['세 해시 위치 계산', `“${v.word}”의 해시 위치는 ${v.hashes}입니다. 같은 위치가 여러 번 나올 수 있으며, 모두 기존 hash1·hash2·hash3의 결과입니다.`]
+        : ['Compute three hash positions', `Hash positions for “${v.word}” are ${v.hashes}. Positions can repeat; they come from the existing hash1, hash2 and hash3 methods.`];
+      case 'set-bit': return ko ? ['비트를 1로 설정', `${v.position}번 비트를 1로 만들었습니다. 이미 1이면 그대로이며 다른 단어의 비트를 지우지 않습니다.`]
+        : ['Set a bit', `Set bit ${v.position} to one. Existing ones remain set; never clear other words’ bits.`];
+      case 'test-bit': return ko ? ['해시 위치 비트 확인', `${v.position}번 비트는 ${v.bit ? 1 : 0}입니다. ${v.bit ? '다음 해시 위치를 계속 확인합니다.' : '0을 만났으므로 확실히 넣지 않은 단어이며 즉시 false를 반환합니다.'}`]
+        : ['Inspect a hash bit', `Bit ${v.position} is ${v.bit ? 1 : 0}. ${v.bit ? 'Continue to the next hash.' : 'A zero proves absence; immediately return false.'}`];
+      case 'insert': return ko ? ['삽입 완료', `“${v.word}”의 모든 해시 위치가 1입니다. 필터는 원래 단어를 보관하지 않고 비트 배열만 사용합니다.`]
+        : ['Insertion complete', `All hash positions for “${v.word}” are one. The filter uses bits instead of storing the original word.`];
+      case 'mayContain': return ko ? ['조회 결과', v.falsePositive ? `“${v.word}”는 넣지 않았지만 다른 단어가 같은 위치를 채워 true입니다. 이것이 거짓 양성입니다.` : v.result ? `“${v.word}”는 실제 삽입한 단어입니다. 다만 필터의 true는 확정이 아닌 가능성을 뜻합니다.` : `“${v.word}”의 위치 중 0이 있으므로 확실히 없습니다.`]
+        : ['Query result', v.falsePositive ? `“${v.word}” was never inserted, but other words filled its bits: true is a false positive.` : v.result ? `“${v.word}” was actually inserted. The filter’s true alone means possibility, not proof.` : `A zero hash bit proves “${v.word}” is absent.`];
+      default: return ko ? ['블룸 필터 연산 완료', '되감기로 비트를 채우는 과정과 거짓 양성을 비교하세요. 이 필터는 삭제를 지원하지 않으며, 임의로 비트를 지우면 다른 단어의 존재를 놓칠 수 있습니다.']
+        : ['Bloom filter operations complete', 'Rewind to compare bit updates with false positives. This filter cannot delete: clearing shared bits can miss other inserted words.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter];

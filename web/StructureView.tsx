@@ -8,8 +8,10 @@ import SegmentView from './SegmentView';
 import HashView from './HashView';
 import LinkedListView from './LinkedListView';
 import GraphView from './GraphView';
+import BloomView from './BloomView';
 
 export default function StructureView({ step, language }: { step: Step; language: Language }) {
+  if (step.variables.structure === 'bloom-filter') return <BloomView step={step} language={language} />;
   if (step.variables.structure === 'disjoint-set') {
     const nodes: { value: number; parent: number | null; root: number; size: number }[] = JSON.parse(String(step.variables.setNodes));
     const ko = language === 'ko';
