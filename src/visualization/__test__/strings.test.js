@@ -1,10 +1,35 @@
 import fs from 'fs';
 import path from 'path';
 import naiveSearch from '../../algorithms/string/naive-search/naiveSearch';
-import { traceStringSearch, requireStrings } from '../strings';
+import { traceStringSearch, traceKmpSearch, requireStrings } from '../strings';
 import { algorithmCode } from '../playback';
 
 describe('string search lessons', () => {
+  it('records KMP prefix fallback without revisiting text and preserves tables when rewinding', () => {
+    const source = algorithmCode(fs.readFileSync(path.resolve(
+      __dirname,
+      '../../algorithms/string/knuth-morris-pratt/knuthMorrisPratt.js',
+    ), 'utf8'));
+    ['', 'a', 'aaaaa', 'ABABABC', 'a b', '가나가나', '😀집😀'].forEach((text) => {
+      ['', 'a', 'aaa', 'ABABC', ' ', '가나', '집', '😀', 'missing'].forEach((pattern) => {
+        const steps = traceKmpSearch(text, pattern);
+        expect(steps.at(-1).variables.result).toBe(text.indexOf(pattern));
+        steps.forEach((step) => {
+          expect(source).toContain(step.code);
+          expect(step.indices.every((i) => i >= 0 && i < text.length)).toBe(true);
+        });
+      });
+    });
+    const steps = traceKmpSearch('ABABABC', 'ABABC');
+    expect(JSON.parse(steps.find((s) => s.type === 'prefix-start').variables.table)).toEqual([0]);
+    expect(JSON.parse(steps.find((s) => s.type === 'prefix-done').variables.table))
+      .toEqual([0, 0, 1, 2, 0]);
+    const fallback = steps.findIndex((s) => s.type === 'fallback');
+    expect(steps[fallback].variables.textIndex).toBe(steps[fallback - 1].variables.textIndex);
+    expect(steps[fallback].variables.wordIndex).toBe(2);
+    expect(steps[fallback].variables.alignment).toBe(2);
+    expect(steps.at(-1).variables.result).toBe(2);
+  });
   it('matches String.indexOf including empty patterns, spaces and UTF-16 indices', () => {
     const inputs = ['', 'a', 'ab', 'aaa', 'abab', 'a b', '가나다가나', '😀집😀'];
     const patterns = ['', 'a', 'b', 'aa', 'ab', '가나', '😀', '집', 'nope', ' '];

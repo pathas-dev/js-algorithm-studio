@@ -8,7 +8,8 @@ import graphSource from '../src/data-structures/graph/Graph.js?raw';
 import graphVertexSource from '../src/data-structures/graph/GraphVertex.js?raw';
 import traceGraphStructure from '../src/visualization/graph-structure';
 import naiveSource from '../src/algorithms/string/naive-search/naiveSearch.js?raw';
-import { traceStringSearch } from '../src/visualization/strings';
+import kmpSource from '../src/algorithms/string/knuth-morris-pratt/knuthMorrisPratt.js?raw';
+import { traceStringSearch, traceKmpSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -1280,4 +1281,26 @@ export const naive: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive];
+export const kmp: TextAlgorithm = {
+  ...naive, id: 'kmp', name: { ko: 'KMP 검색', en: 'KMP search' },
+  summary: { ko: '패턴의 접두사 표를 먼저 만듭니다. 불일치하면 표를 이용해 패턴 위치만 되돌리고 텍스트 인덱스는 유지합니다.', en: 'Build the pattern prefix table first. On mismatch, fall back within the pattern while keeping the text index.' },
+  source: algorithmCode(kmpSource), time: 'O(n + m)',
+  run: ([text, pattern]) => traceKmpSearch(text, pattern),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'prefix-start': return ko ? ['접두사 표 초기화', '첫 글자의 진접두사는 없으므로 표[0] = 0입니다. 텍스트를 읽기 전에 패턴만 비교합니다.'] : ['Initialize the prefix table', 'The first character has no proper prefix, so table[0] = 0. Compare the pattern before reading the text.'];
+      case 'prefix-compare': return ko ? ['패턴 내부 문자 비교', `패턴[${v.prefixIndex}]와 패턴[${v.suffixIndex}]를 비교해 접두사·접미사 길이를 늘릴 수 있는지 확인합니다.`] : ['Compare within the pattern', `Compare pattern[${v.prefixIndex}] and pattern[${v.suffixIndex}] to extend the shared prefix and suffix.`];
+      case 'prefix-save': return ko ? ['일치 길이 저장', `표[${v.suffixIndex}] = ${Number(v.prefixIndex) + 1}입니다. 이 길이를 검색 중 불일치가 발생했을 때 재사용합니다.`] : ['Save the matching length', `table[${v.suffixIndex}] = ${Number(v.prefixIndex) + 1}. Reuse this length when the search encounters a mismatch.`];
+      case 'prefix-zero': return ko ? ['공유 접두사 없음', `표[${v.suffixIndex}] = 0입니다. 다음 패턴 문자에서 다시 시도합니다.`] : ['No shared prefix', `table[${v.suffixIndex}] = 0. Try the next pattern character.`];
+      case 'prefix-fallback': return ko ? ['더 짧은 접두사로 재시도', `표[${v.lookup}]를 읽어 접두사 길이를 ${v.prefixIndex}로 줄였습니다. 접미사 위치 ${v.suffixIndex}는 유지합니다.`] : ['Try a shorter prefix', `Read table[${v.lookup}] and reduce the prefix length to ${v.prefixIndex}, keeping suffix index ${v.suffixIndex}.`];
+      case 'prefix-done': return ko ? ['접두사 표 완성', `표 ${v.table}를 검색에 사용합니다. 이제 텍스트와 패턴을 비교합니다.`] : ['Prefix table ready', `Use ${v.table} during the search. Begin comparing the text and pattern.`];
+      case 'compare': return ko ? ['텍스트·패턴 비교', `텍스트[${v.textIndex}]와 패턴[${v.wordIndex}]를 비교합니다. 같으면 전진하고, 다르면 접두사 표로 다음 비교 위치를 결정합니다.`] : ['Compare text and pattern', `Compare text[${v.textIndex}] and pattern[${v.wordIndex}]. Advance on equality; otherwise use the prefix table to choose the next comparison.`];
+      case 'fallback': return ko ? ['일치한 접두사를 재사용', `표[${v.lookup}]를 읽어 패턴 인덱스를 ${v.wordIndex}로 바꿨습니다. 텍스트 인덱스 ${v.textIndex}는 그대로이며 패턴 시작 위치는 ${v.alignment}입니다.`] : ['Reuse the matched prefix', `Read table[${v.lookup}] and change the pattern index to ${v.wordIndex}. Keep text index ${v.textIndex}; the new alignment is ${v.alignment}.`];
+      case 'shift': return ko ? ['텍스트 다음 문자로 이동', `첫 패턴 문자부터 불일치했으므로 텍스트 인덱스를 ${v.textIndex}로 늘립니다.`] : ['Advance the text', `The first pattern character mismatched, so advance the text index to ${v.textIndex}.`];
+      default: return naive.explain(step, language);
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp];
