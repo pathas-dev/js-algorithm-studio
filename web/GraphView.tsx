@@ -20,7 +20,7 @@ export default function GraphView({ step, language }: { step: Step; language: La
   const previous: Record<string, number | null> | undefined = step.variables.previous === undefined ? undefined : JSON.parse(String(step.variables.previous));
   const seen = matrix ? step.array.map((item) => String(item.value)) : distances ? Object.keys(distances).filter((key) => distances[key] !== null) : String(step.variables.seen ?? '').split(',');
   const processed = matrix && step.type === 'done' ? seen : String(step.variables.processed ?? '').split(',');
-  const dfs = step.variables.mode === 'dfs';
+  const dfs = step.variables.mode === 'dfs' || step.variables.mode === 'topological';
   const frontier = String((dfs ? step.variables.stack : step.variables.queue) ?? '');
   return <div className="graph-view">
     <svg viewBox="0 0 440 310" role="img" aria-describedby={statusId} aria-label={ko ? '현재 그래프' : 'Current graph'}>

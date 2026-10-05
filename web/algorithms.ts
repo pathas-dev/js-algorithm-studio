@@ -1,3 +1,4 @@
+import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
 import floydSource from '../src/algorithms/graph/floyd-warshall/floydWarshall.js?raw';
@@ -16,7 +17,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal } from '../src/visualization/graph';
+import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -644,4 +645,29 @@ export const kruskal: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal];
+export const topological: Algorithm = {
+  id: 'topological-sort', category: 'graph', graphDirected: true, fixedDirection: true, usesStart: false,
+  name: { ko: '위상 정렬', en: 'Topological sort' },
+  summary: { ko: '방향 비순환 그래프의 의존 순서를 구합니다. DFS 종료 시 스택에 쌓아 역순으로 읽습니다.', en: 'Order dependencies in a directed acyclic graph. Push on DFS completion and read in reverse finish order.' },
+  source: algorithmCode(topologicalSource), example: [1, 2, 3, 4, 5, 6, 7],
+  graphEdges: [[1, 3], [2, 3], [2, 4], [3, 5], [4, 6], [5, 6]], time: { ko: '이 구현 최악 O(V² + E)', en: 'This implementation worst O(V² + E)' },
+  run: (nodes, _start, edges = topological.graphEdges!) => traceTopological(nodes, edges),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['의존 순서 탐색 준비', '각 간선 A→B는 A가 B보다 먼저 와야 함을 뜻합니다. 미방문 정점 모두에서 DFS를 시작하므로 고립 정점도 결과에 포함됩니다.']
+        : ['Prepare dependency ordering', 'Each edge A→B requires A before B. Start DFS from every unvisited vertex, including isolated vertices.'];
+      case 'enter': return ko ? ['DFS 진입', `정점 ${v.current}를 재귀 스택에 넣고 방문 표시합니다. 의존하는 다음 정점들을 처리한 뒤 완료 스택에 넣습니다.`]
+        : ['Enter DFS', `Push vertex ${v.current} onto the recursion stack and mark it visited. Process its successors before pushing it onto the completion stack.`];
+      case 'edge': return ko ? ['의존 간선 확인', `${v.current} → ${v.next}를 검사합니다. ${v.next}가 현재 재귀 스택 안에 있다면 사이클입니다. 이미 완료했다면 재방문하지 않습니다.`]
+        : ['Inspect a dependency', `Check ${v.current} → ${v.next}. A successor in the active recursion stack means a cycle; skip already completed vertices.`];
+      case 'leave': return ko ? ['완료 스택에 추가', `정점 ${v.current}의 다음 정점들을 모두 처리했습니다. 완료 스택 맨 위에 넣습니다. 아래 결과는 아직 최종 순서가 아니며 이후 앞쪽에 값이 더 들어갑니다.`]
+        : ['Push onto the completion stack', `Finish successors of ${v.current} and push it on top. This is not yet the final order; later completions are prepended.`];
+      default: return ko ? ['위상 순서 완료', `위상 순서: ${v.order}. 모든 간선의 출발 정점이 도착 정점보다 앞에 옵니다. 유효한 위상 순서는 여러 개일 수 있습니다.`]
+        : ['Topological order complete', `Order: ${v.order}. Every edge source precedes its destination. Multiple valid topological orders may exist.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological];

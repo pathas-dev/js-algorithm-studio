@@ -1,11 +1,33 @@
 import fs from 'fs';
 import path from 'path';
 import {
-  traceKruskal, tracePrim, parseWeightedEdges, traceDijkstra, traceBellmanFord, traceFloydWarshall,
+  traceTopological,
+  traceKruskal,
+  tracePrim,
+  parseWeightedEdges,
+  traceDijkstra,
+  traceBellmanFord,
+  traceFloydWarshall,
 } from '../graph';
 import { algorithmCode } from '../playback';
 
 describe('weighted graph lessons', () => {
+  it('traces reverse finish order, isolated vertices and rejects directed cycles', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(
+      __dirname,
+      '../../algorithms/graph/topological-sorting/topologicalSort.js',
+    ), 'utf8'));
+    const edges = [[1, 3], [2, 3], [2, 4], [3, 5], [4, 6], [5, 6]];
+    const steps = traceTopological([1, 2, 3, 4, 5, 6, 7], edges);
+    const order = steps.at(-1).variables.order.split(',').map(Number);
+    expect(new Set(order).size).toBe(7);
+    edges.forEach(([a, b]) => expect(order.indexOf(a)).toBeLessThan(order.indexOf(b)));
+    steps.forEach((step) => expect(source).toContain(step.code));
+    expect(steps[0].variables.order).toBe('');
+    expect(steps.at(-1).variables.stack).toBe('');
+    expect(() => traceTopological([1, 2], [[1, 2], [2, 1]])).toThrow('cycle');
+    expect(traceTopological([1], []).at(-1).variables.order).toBe('1');
+  });
   it('traces Kruskal unions, skipped cycles and disconnected forests', () => {
     const source = algorithmCode(fs.readFileSync(path.join(
       __dirname,

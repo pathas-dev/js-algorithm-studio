@@ -4,6 +4,15 @@ import Graph from '../../../../data-structures/graph/Graph';
 import topologicalSort from '../topologicalSort';
 
 describe('topologicalSort', () => {
+  it('rejects undirected graphs and directed cycles, and accepts an empty DAG', () => {
+    expect(() => topologicalSort(new Graph())).toThrow('directed');
+    expect(topologicalSort(new Graph(true))).toEqual([]);
+    const graph = new Graph(true);
+    const a = new GraphVertex('A');
+    const b = new GraphVertex('B');
+    graph.addEdge(new GraphEdge(a, b)).addEdge(new GraphEdge(b, a));
+    expect(() => topologicalSort(graph)).toThrow('cycle');
+  });
   it('should do topological sorting on graph', () => {
     const vertexA = new GraphVertex('A');
     const vertexB = new GraphVertex('B');

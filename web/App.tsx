@@ -56,7 +56,7 @@ export default function App() {
         try { target = parseTarget(targetInput); } catch { throw new Error('target'); }
       }
       const values = parseValues(text);
-      const edges = algorithm.category === 'graph' ? algorithm.graphWeighted ? parseWeightedEdges(edgeInput, values, directed) : parseEdges(edgeInput, values) : undefined;
+      const edges = algorithm.category === 'graph' ? algorithm.graphWeighted ? parseWeightedEdges(edgeInput, values, directed) : parseEdges(edgeInput, values, directed) : undefined;
       const next = algorithm.run(values, target, edges, directed);
       setSteps(next);
       setInput(text);
@@ -86,6 +86,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    cycle: t('방향 사이클이 있어 위상 정렬할 수 없습니다. 사이클을 만드는 간선을 제거하세요.', 'A directed cycle prevents topological ordering. Remove an edge from the cycle.'),
     'negative-weight': t('다익스트라에는 음수 가중치를 사용할 수 없습니다.', 'Dijkstra requires nonnegative weights.'),
     weights: t('가중치 간선은 1-2:7 형식으로 입력하세요. 가중치는 -999부터 999까지입니다.', 'Use weighted edges such as 1-2:7, with weights between -999 and 999.'),
     nonnegative: t('기수 정렬에는 0 이상의 정수만 입력할 수 있습니다.', 'Radix sort requires nonnegative integers.'),
@@ -146,14 +147,14 @@ export default function App() {
                     {'heapSize' in step.variables && <HeapView step={step} language={language} />}
                     {algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : <ArrayView step={step} language={language} />}
                     <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
-                    <div className="array-state"><Text size="xs" c="dimmed">{distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : step.array.map((item) => item.value).join(', '))}]</output></div>
+                    <div className="array-state"><Text size="xs" c="dimmed">{distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : step.array.map((item) => item.value).join(', '))}]</output></div>
                   </Paper>
                   <Paper withBorder p="lg">
                     <form onSubmit={(event) => { event.preventDefault(); apply(input); }}>
                       {algorithm.category !== 'sort' && algorithm.usesStart !== false && <TextInput label={algorithm.category === 'graph' ? t('시작 정점', 'Start vertex') : t('목표 값', 'Target value')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} error={['target', 'start'].includes(error) ? errors[error] : undefined} autoComplete="off" mb="sm" />}
                       {algorithm.graphWeighted && !algorithm.fixedDirection && <NativeSelect label={t('간선 방향', 'Edge direction')} value={directed ? 'directed' : 'undirected'} data={[{ value: 'undirected', label: t('무방향', 'Undirected') }, { value: 'directed', label: t('방향 · 첫 정점 → 두 번째 정점', 'Directed · first → second') }]} onChange={(event) => setDirected(event.currentTarget.value === 'directed')} mb="sm" />}
-                      {algorithm.category === 'graph' && <TextInput label={t('간선 입력', 'Edges')} value={edgeInput} onChange={(event) => setEdgeInput(event.currentTarget.value)} error={['edges', 'weights', 'negative-weight', 'negative-cycle'].includes(error) ? errors[error] : undefined} placeholder={algorithm.graphWeighted ? "1-2:7, 1-3:2" : "1-2, 1-3, 2-4"} autoComplete="off" mb="sm" />}
-                      <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={algorithm.category === 'graph' ? t('정점 입력', 'Vertices') : t('배열 입력', 'Array input')} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder="8, 3, 6, 1, 5, 2" error={!['target', 'start', 'edges', 'weights', 'negative-weight', 'negative-cycle'].includes(error) ? errors[error] : undefined} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
+                      {algorithm.category === 'graph' && <TextInput label={t('간선 입력', 'Edges')} value={edgeInput} onChange={(event) => setEdgeInput(event.currentTarget.value)} error={['edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle'].includes(error) ? errors[error] : undefined} placeholder={algorithm.graphWeighted ? "1-2:7, 1-3:2" : "1-2, 1-3, 2-4"} autoComplete="off" mb="sm" />}
+                      <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={algorithm.category === 'graph' ? t('정점 입력', 'Vertices') : t('배열 입력', 'Array input')} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder="8, 3, 6, 1, 5, 2" error={!['target', 'start', 'edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle'].includes(error) ? errors[error] : undefined} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
                       {error && <span role="alert" className="sr-only">{errors[error]}</span>}
                     </form>
                     {algorithm.requiresSorted && <Text size="xs" c="teal" mt="xs">{t('오름차순 배열이 필요합니다. 인덱스는 입력 배열 기준입니다.', 'Requires an ascending array. Indices refer to the input array.')}</Text>}

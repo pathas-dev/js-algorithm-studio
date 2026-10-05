@@ -1,3 +1,4 @@
+import topologicalSort from '../algorithms/graph/topological-sorting/topologicalSort';
 import kruskal from '../algorithms/graph/kruskal/kruskal';
 import prim from '../algorithms/graph/prim/prim';
 import floydWarshall from '../algorithms/graph/floyd-warshall/floydWarshall';
@@ -24,7 +25,7 @@ function requireEdges(edges, nodes, directed = false) {
   }
 }
 
-export function parseEdges(text, nodes) {
+export function parseEdges(text, nodes, directed = false) {
   requireNodes(nodes);
   if (!text.trim()) return [];
   if (/(?:^|,)\s*(?:,|$)/.test(text)) throw new Error('edges');
@@ -33,7 +34,7 @@ export function parseEdges(text, nodes) {
     if (!match) throw new Error('edges');
     return [Number(match[1]), Number(match[2])];
   });
-  requireEdges(edges, nodes);
+  requireEdges(edges, nodes, directed);
   return edges;
 }
 
@@ -116,7 +117,7 @@ export function parseWeightedEdges(text, nodes, directed) {
   return edges;
 }
 
-export function traceWeighted(nodes, start, edges, directed, algorithm) {
+export function traceWeighted(nodes, start, edges, directed, algorithm, mode = 'weighted') {
   requireWeightedEdges(edges, nodes, directed);
   if (!nodes.includes(start)) throw new Error('start');
   const graph = new Graph(directed);
@@ -130,7 +131,7 @@ export function traceWeighted(nodes, start, edges, directed, algorithm) {
     ...step,
     array: step.array.map((value) => items.find((item) => item.value === value)),
     edges: edges.map((edge) => [...edge]),
-    variables: { ...step.variables, directed, mode: 'weighted' },
+    variables: { ...step.variables, directed, mode },
   }));
   return steps;
 }
@@ -160,4 +161,17 @@ export function traceKruskal(nodes, edges) {
   return traceWeighted(nodes, nodes[0], edges, false, (graph, start, callback) => {
     return kruskal(graph, callback);
   });
+}
+
+export function traceTopological(nodes, edges) {
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    edges.map(([a, b]) => [a, b, 0]),
+    true,
+    (graph, start, callback) => topologicalSort(graph, callback),
+    'topological',
+  ).map((step) => ({
+    ...step, edges: edges.map((edge) => [...edge]),
+  }));
 }
