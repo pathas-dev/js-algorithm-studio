@@ -1,5 +1,6 @@
 import DoublyLinkedListNode from './DoublyLinkedListNode';
 import Comparator from '../../utils/comparator/Comparator';
+import recordStep from '../../utils/trace/recordStep';
 
 export default class DoublyLinkedList {
   /**
@@ -235,7 +236,7 @@ export default class DoublyLinkedList {
    * Reverse a linked list.
    * @returns {DoublyLinkedList}
    */
-  reverse() {
+  reverse(stepCallback) {
     let currNode = this.head;
     let prevNode = null;
     let nextNode = null;
@@ -248,6 +249,14 @@ export default class DoublyLinkedList {
       // Change next node of the current node so it would link to previous node.
       currNode.next = prevNode;
       currNode.previous = nextNode;
+      recordStep(
+        stepCallback,
+        'reverse-links',
+        [currNode, prevNode, nextNode],
+        [],
+        {},
+        'currNode.previous = nextNode;',
+      );
 
       // Move prevNode and currNode nodes one step forward.
       prevNode = currNode;

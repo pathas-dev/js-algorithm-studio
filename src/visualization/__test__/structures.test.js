@@ -5,10 +5,37 @@ import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
 import {
   parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue,
-  traceBinarySearchTree, traceAvlTree, traceRedBlackTree,
+  traceBinarySearchTree, traceAvlTree, traceRedBlackTree, traceDoublyLinkedList,
 } from '../structures';
 
 describe('structure lessons', () => {
+  it('records both actual doubly-linked pointers during reversal and after deletions', () => {
+    const steps = traceDoublyLinkedList([3, 6, 3], 'prepend 9, reverse, delete 3, deleteTail, deleteHead, deleteHead, append 0');
+    const reversed = steps.filter((step) => step.type === 'reverse-links');
+    expect(reversed).toHaveLength(4);
+    expect(JSON.parse(reversed[0].variables.links)).toEqual([[3, -1], [0, 1], [1, 2], [2, -1]]);
+    expect(JSON.parse(reversed[0].variables.previousLinks))
+      .toEqual([[3, 0], [0, 3], [1, 0], [2, 1]]);
+    expect(steps.find((step) => step.type === 'reverse').array.map((item) => item.id))
+      .toEqual([2, 1, 0, 3]);
+    const source = algorithmCode(fs.readFileSync(path.resolve(
+      __dirname,
+      '../../data-structures/doubly-linked-list/DoublyLinkedList.js',
+    ), 'utf8'));
+    steps.forEach((step) => {
+      expect(source).toContain(step.code);
+      if (step.type === 'reverse-links') return;
+      const next = JSON.parse(step.variables.links);
+      const previous = JSON.parse(step.variables.previousLinks);
+      next.filter(([, to]) => to >= 0)
+        .forEach(([from, to]) => expect(previous).toContainEqual([to, from]));
+      previous.filter(([, to]) => to >= 0)
+        .forEach(([from, to]) => expect(next).toContainEqual([to, from]));
+    });
+    expect(steps.at(-1).array.map((item) => item.value)).toEqual([0]);
+    expect(traceDoublyLinkedList([], 'find 0, reverse, deleteTail').at(-1).array).toEqual([]);
+  });
+
   it('records red-black colors and rotations while preserving black heights and duplicates', () => {
     const source = algorithmCode([
       'tree/red-black-tree/RedBlackTree.js', 'tree/binary-search-tree/BinarySearchTree.js',

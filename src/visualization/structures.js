@@ -4,6 +4,7 @@ import RedBlackTree from '../data-structures/tree/red-black-tree/RedBlackTree';
 import PriorityQueue from '../data-structures/priority-queue/PriorityQueue';
 import MinHeap from '../data-structures/heap/MinHeap';
 import LinkedList from '../data-structures/linked-list/LinkedList';
+import DoublyLinkedList from '../data-structures/doubly-linked-list/DoublyLinkedList';
 import Queue from '../data-structures/queue/Queue';
 import Stack from '../data-structures/stack/Stack';
 import { MAX_VALUES, parseTarget } from './playback';
@@ -75,12 +76,12 @@ export function traceQueue(values, operations = '') {
   return traceLinear(values, operations, true);
 }
 
-export function traceLinkedList(values, operations = '') {
+export function traceLinkedList(values, operations = '', List = LinkedList) {
   const commands = parseOperations(operations, {
     append: 1, prepend: 1, delete: 1, find: 1, reverse: 0, deleteHead: 0, deleteTail: 0,
   });
   if (values.length > MAX_VALUES) throw new Error('limit');
-  const list = new LinkedList();
+  const list = new List();
   const steps = [];
   const ids = new WeakMap();
   let nextId = 0;
@@ -101,10 +102,15 @@ export function traceLinkedList(values, operations = '') {
       indices: nodes.map((node, index) => (active.includes(node) ? index : -1))
         .filter((index) => index >= 0),
       variables: {
-        structure: 'linked-list',
+        structure: List === DoublyLinkedList ? 'doubly-linked-list' : 'linked-list',
         head: identify(list.head),
         tail: identify(list.tail),
         links: JSON.stringify(nodes.map((node) => [identify(node), identify(node.next)])),
+        ...(List === DoublyLinkedList ? {
+          previousLinks: JSON.stringify(nodes.map((node) => [
+            identify(node), identify(node.previous),
+          ])),
+        } : {}),
         ...variables,
       },
     });
@@ -149,6 +155,10 @@ export function traceLinkedList(values, operations = '') {
   list.toArray();
   snapshot('done', 'toArray() {');
   return steps;
+}
+
+export function traceDoublyLinkedList(values, operations = '') {
+  return traceLinkedList(values, operations, DoublyLinkedList);
 }
 
 export function traceHeap(values, operations = '') {

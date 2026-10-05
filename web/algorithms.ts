@@ -14,9 +14,10 @@ import priorityQueueSource from '../src/data-structures/priority-queue/PriorityQ
 import heapClassSource from '../src/data-structures/heap/Heap.js?raw';
 import minHeapSource from '../src/data-structures/heap/MinHeap.js?raw';
 import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
+import doublyListSource from '../src/data-structures/doubly-linked-list/DoublyLinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList, traceDoublyLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -783,6 +784,25 @@ export const linkedList: NumericAlgorithm = {
   },
 };
 
+export const doublyLinkedList: NumericAlgorithm = {
+  ...linkedList,
+  id: 'doubly-linked-list', name: { ko: '이중 연결 리스트', en: 'Doubly linked list' },
+  summary: { ko: 'next와 previous를 함께 저장합니다. 역순 전환은 각 노드의 두 연결을 교환합니다.', en: 'Store next and previous links. Reversal exchanges both connections of every node.' },
+  source: algorithmCode(doublyListSource),
+  operations: 'prepend 9, find 6, reverse, delete 3, deleteTail, append 7',
+  time: { ko: '앞·뒤 추가·삭제 O(1) · 검색·값 삭제·역순 O(n)', en: 'Insert / remove at ends O(1) · find / delete value / reverse O(n)' },
+  run: (values, _target, _edges, _directed, operations = doublyLinkedList.operations) => traceDoublyLinkedList(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    if (step.type === 'reverse-links') return ko ? ['next·previous 교환', `N${v.current}의 next를 이전 previous로, previous를 이전 next로 바꿨습니다. 초록·보라 화살표는 실제 연결입니다. 아직 처리하지 않은 노드는 기존 연결을 유지하고 HEAD·TAIL은 마지막에 갱신합니다.`]
+      : ['Exchange next and previous', `Point N${v.current}.next to its old previous and previous to its old next. Green and purple arrows show actual links; untouched nodes keep their old connections. Update HEAD and TAIL after the loop.`];
+    if (step.type === 'reverse') return ko ? ['양방향 역순 전환 완료', '모든 next·previous를 교환했습니다. 이전 HEAD는 새 TAIL, 이전 TAIL은 새 HEAD입니다. 두 끝의 바깥 연결은 null입니다.']
+      : ['Bidirectional reversal complete', 'Exchange all next and previous links. Old HEAD is new TAIL, old TAIL is new HEAD. Both outward end links are null.'];
+    return linkedList.explain(step, language);
+  },
+};
+
 export const minHeap: NumericAlgorithm = {
   id: 'min-heap', category: 'structure', usesStart: false,
   name: { ko: '최소 힙', en: 'Min heap' },
@@ -1088,4 +1108,4 @@ export const hashTable: WordAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable];
