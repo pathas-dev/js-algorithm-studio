@@ -1,4 +1,5 @@
 import LinkedList from '../linked-list/LinkedList';
+import recordStep from '../../utils/trace/recordStep';
 
 // Hash table size directly affects on the number of collisions.
 // The bigger the hash table size the less collisions you'll get.
@@ -10,12 +11,13 @@ export default class HashTable {
   /**
    * @param {number} hashTableSize
    */
-  constructor(hashTableSize = defaultHashTableSize) {
+  constructor(hashTableSize = defaultHashTableSize, stepCallback = undefined) {
     // Create hash table of certain size and fill each bucket with empty linked list.
     this.buckets = Array(hashTableSize).fill(null).map(() => new LinkedList());
 
     // Just to keep track of all actual keys in a fast way.
-    this.keys = {};
+    this.keys = Object.create(null);
+    this.stepCallback = stepCallback;
   }
 
   /**
@@ -41,7 +43,9 @@ export default class HashTable {
     );
 
     // Reduce hash number so it would fit hash table size.
-    return hash % this.buckets.length;
+    const keyHash = hash % this.buckets.length;
+    recordStep(this.stepCallback, 'hash', [], [], { key, keyHash, hash }, 'return keyHash;');
+    return keyHash;
   }
 
   /**
@@ -52,14 +56,21 @@ export default class HashTable {
     const keyHash = this.hash(key);
     this.keys[key] = keyHash;
     const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find({ callback: (nodeValue) => nodeValue.key === key });
+    const node = bucketLinkedList.find({
+      callback: (nodeValue) => {
+        recordStep(this.stepCallback, 'probe', [], [], { key, candidate: nodeValue.key }, 'return nodeValue.key === key; // set');
+        return nodeValue.key === key; // set
+      },
+    });
 
     if (!node) {
       // Insert new node.
       bucketLinkedList.append({ key, value });
+      recordStep(this.stepCallback, 'set-new', [], [], { key, value }, 'bucketLinkedList.append({ key, value });');
     } else {
       // Update value of existing node.
       node.value.value = value;
+      recordStep(this.stepCallback, 'set-update', [], [], { key, value }, 'node.value.value = value;');
     }
   }
 
@@ -71,7 +82,12 @@ export default class HashTable {
     const keyHash = this.hash(key);
     delete this.keys[key];
     const bucketLinkedList = this.buckets[keyHash];
-    const node = bucketLinkedList.find({ callback: (nodeValue) => nodeValue.key === key });
+    const node = bucketLinkedList.find({
+      callback: (nodeValue) => {
+        recordStep(this.stepCallback, 'probe', [], [], { key, candidate: nodeValue.key }, 'return nodeValue.key === key; // delete');
+        return nodeValue.key === key; // delete
+      },
+    });
 
     if (node) {
       return bucketLinkedList.delete(node.value);
@@ -86,7 +102,12 @@ export default class HashTable {
    */
   get(key) {
     const bucketLinkedList = this.buckets[this.hash(key)];
-    const node = bucketLinkedList.find({ callback: (nodeValue) => nodeValue.key === key });
+    const node = bucketLinkedList.find({
+      callback: (nodeValue) => {
+        recordStep(this.stepCallback, 'probe', [], [], { key, candidate: nodeValue.key }, 'return nodeValue.key === key; // get');
+        return nodeValue.key === key; // get
+      },
+    });
 
     return node ? node.value.value : undefined;
   }

@@ -1,3 +1,5 @@
+import hashTableSource from '../src/data-structures/hash-table/HashTable.js?raw';
+import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
 import { traceFenwick, traceSegment } from '../src/visualization/range';
@@ -987,4 +989,40 @@ export const segment: NumericAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie, fenwick, segment];
+export const hashTable: WordAlgorithm = {
+  id: 'hash-table', category: 'structure', inputMode: 'words', usesStart: false,
+  name: { ko: '해시 테이블', en: 'Hash table' },
+  summary: { ko: '키를 버킷으로 매핑하고, 같은 해시의 다른 키는 연결 리스트에서 비교합니다.', en: 'Map keys to buckets, then compare colliding keys in a linked list.' },
+  source: algorithmCode(hashTableSource), example: ['ab', 'ba', 'ac'],
+  operations: 'get ba, set ab updated, set cb new, delete ba, get ba, has ab',
+  operationHint: 'set ab updated, get ba, delete ba, has ab',
+  inputHint: { ko: '최대 12키 · 키·값 각각 16글자 · 8버킷 · 초기 값은 입력 인덱스', en: 'Up to 12 keys · 16 code points per key / value · 8 buckets · initial values are input indices' },
+  time: { ko: 'O(k + c) · 키 길이 k · 버킷 길이 c', en: 'O(k + c) · key length k · bucket length c' },
+  run: (keys, _target, _edges, _directed, operations = hashTable.operations) => traceHashTable(keys, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['8개 버킷 준비', '기존 HashTable을 8버킷으로 실행합니다. 각 버킷은 연결 리스트입니다. 초기 키의 값은 0부터 시작하는 입력 순서입니다.']
+        : ['Prepare eight buckets', 'Run the existing HashTable with eight linked-list buckets. Initial values are zero-based input positions.'];
+      case 'hash': return ko ? ['해시로 버킷 선택', `키 “${v.key}”의 문자 코드 합 ${v.hash}를 8로 나눈 나머지는 ${v.keyHash}입니다. “ab”와 “ba”처럼 서로 다른 키가 같은 버킷을 사용할 수 있습니다.`]
+        : ['Select a bucket by hash', `The character-code sum for “${v.key}” is ${v.hash}; modulo 8 selects bucket ${v.keyHash}. Different keys such as “ab” and “ba” can collide.`];
+      case 'probe': return ko ? ['버킷 안의 키 비교', `요청 키 “${v.key}”와 후보 “${v.candidate}”가 같은지 비교합니다. 해시가 같아도 키가 다르면 다음 노드를 확인합니다.`]
+        : ['Compare keys within the bucket', `Compare requested key “${v.key}” with candidate “${v.candidate}”. Equal hashes do not imply equal keys; follow the next node if different.`];
+      case 'set-new': return ko ? ['새 키 추가', `키 “${v.key}”, 값 “${v.value}”를 선택한 버킷의 연결 리스트 끝에 추가했습니다.`]
+        : ['Append a new key', `Append key “${v.key}” with value “${v.value}” to the selected bucket chain.`];
+      case 'set-update': return ko ? ['기존 값 변경', `기존 키 “${v.key}”의 값만 “${v.value}”로 바꿨습니다. 새 노드를 만들지 않습니다.`]
+        : ['Update an existing value', `Replace the value of “${v.key}” with “${v.value}” without creating a new node.`];
+      case 'get': return ko ? ['값 조회 결과', `get(“${v.key}”)의 결과는 ${v.result}입니다. 키가 없으면 undefined를 반환합니다.`]
+        : ['Get result', `get(“${v.key}”) returns ${v.result}. Missing keys return undefined.`];
+      case 'has': return ko ? ['키 존재 확인', `has(“${v.key}”)는 ${v.result}입니다. 이 구현은 키 사전을 직접 확인하므로 버킷을 순회하지 않습니다.`]
+        : ['Check key presence', `has(“${v.key}”) is ${v.result}. This implementation checks its key dictionary directly, without scanning buckets.`];
+      case 'delete': return ko ? ['키 삭제 결과', `키 “${v.key}”를 삭제했습니다. 반환 값은 ${v.result}입니다. 키가 없으면 null이며, 충돌한 다른 키는 남습니다.`]
+        : ['Delete result', `Remove “${v.key}”; returned value: ${v.result}. Missing keys return null; other colliding keys remain.`];
+      default: return ko ? ['연산 완료', '버킷의 키:값과 남은 키 목록입니다. 되감기로 충돌 처리, 값 변경, 삭제 전후를 비교하세요.']
+        : ['Operations complete', 'Inspect bucket key:value entries and remaining keys. Rewind to compare collisions, updates and deletions.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie, fenwick, segment, hashTable];

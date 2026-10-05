@@ -132,3 +132,10 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .tree-scroll { overflow: auto; max-height: 340px; }
 .tree-scroll svg { display: block; min-width: 100%; }
 .graph-table .active-row > * { background: #fff0d8; color: #80531e; }
+.hash-buckets { display: flex; flex-direction: column; gap: 6px; }
+.hash-bucket { display: flex; align-items: center; gap: 10px; border: 1px solid #dce5dd; border-radius: 6px; padding: 6px; min-width: 0; }
+.hash-index { flex: 0 0 18px; text-align: center; font-family: monospace; }
+.hash-chain { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.hash-entry { padding: 5px 8px; border: 1px solid #cddbd1; border-radius: 6px; background: #eaf0e9; overflow-wrap: anywhere; }
+.hash-entry strong, .hash-entry span { display: block; }
+.hash-entry.active-node { background: #fff0d8; border-color: #d8964a; }
