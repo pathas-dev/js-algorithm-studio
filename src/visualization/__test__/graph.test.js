@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { parseEdges, requireNodes, traceBfs } from '../graph';
+import {
+  parseEdges, requireNodes, traceBfs, traceDfs,
+} from '../graph';
 import { algorithmCode } from '../playback';
 
 describe('graph lesson', () => {
@@ -15,6 +17,25 @@ describe('graph lesson', () => {
     });
     expect(() => traceBfs([1], 2, [])).toThrow('start');
     expect(() => traceBfs([1, 2], 1, Array(25).fill([1, 2]))).toThrow('edges');
+  });
+
+  it('records DFS stack and backtracking without revisiting cycles', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(__dirname, '../../algorithms/graph/depth-first-search/depthFirstSearch.js'), 'utf8'));
+    const nodes = [1, 2, 3, 4, 5, 6, 7];
+    const edges = [[1, 2], [1, 3], [2, 4], [2, 5], [3, 6], [4, 5]];
+    const steps = traceDfs(nodes, 1, edges);
+    expect(steps[0].variables.stack).toBe('');
+    const enters = steps.filter((step) => step.type === 'enter');
+    expect(enters.map((step) => step.variables.current)).toEqual([1, 2, 4, 5, 3, 6]);
+    expect(enters[3].variables.stack).toBe('1,2,4,5');
+    const leaves = steps.filter((step) => step.type === 'leave');
+    expect(leaves.map((step) => step.variables.current)).toEqual([5, 4, 2, 6, 3, 1]);
+    expect(leaves[0].variables.stack).toBe('1,2,4');
+    expect(steps[steps.length - 1].variables.stack).toBe('');
+    expect(steps[steps.length - 1].variables.order).toBe('1,2,4,5,3,6');
+    steps.forEach((step) => expect(source).toContain(step.code));
+    const isolated = traceDfs(nodes, 7, edges);
+    expect(isolated[isolated.length - 1].variables.order).toBe('7');
   });
 
   it('records real queue order, skips cycles, preserves disconnected vertices and snapshots', () => {

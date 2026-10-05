@@ -1,5 +1,6 @@
+import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs } from '../src/visualization/graph';
+import { traceBfs, traceDfs } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -34,7 +35,7 @@ export type Algorithm = {
   summary: Record<Language, string>;
   source: string;
   example: number[];
-  time: string;
+  time: string | Record<Language, string>;
   category: 'sort' | 'search' | 'graph';
   target?: number;
   requiresSorted?: boolean;
@@ -196,7 +197,7 @@ export const quick: Algorithm = {
   summary: { ko: '입력을 복사하고 구간 내에서 교환합니다. 마지막 값을 피벗으로 삼아 작은 값들을 왼쪽에 모읍니다.', en: 'Copy the input, then partition each range in place using its last value as the pivot.' },
   source: algorithmCode(quickSource),
   example: [8, 3, 6, 1, 5, 2],
-  time: 'O(n log n) · worst O(n²)',
+  time: { ko: '평균 O(n log n) · 최악 O(n²)', en: 'Avg O(n log n) · worst O(n²)' },
   run: (values: number[]) => runSort(QuickSortInPlace, values),
   explain(step: Step, language: Language): [string, string] {
     const ko = language === 'ko';
@@ -303,4 +304,31 @@ export const bfs: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear, binary, bfs];
+export const dfs: Algorithm = {
+  id: 'depth-first-search', category: 'graph', target: 1,
+  name: { ko: '깊이 우선 탐색', en: 'Depth-first search' },
+  summary: { ko: '한 경로를 깊이 탐색한 뒤 돌아옵니다. 재귀 스택과 발견·처리 상태를 확인할 수 있습니다.', en: 'Explore one path deeply, then backtrack. Inspect the recursion stack and discovery states.' },
+  source: algorithmCode(dfsSource), example: bfs.example, graphEdges: bfs.graphEdges, time: 'O(V + E)',
+  run: (nodes, start = 1, edges = dfs.graphEdges!) => traceDfs(nodes, start, edges),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['시작 정점 준비', `정점 ${v.current}를 발견 상태로 표시하고 첫 재귀 호출을 준비합니다. 시작점을 미리 기억해 순환에서도 다시 방문하지 않습니다.`]
+        : ['Prepare the start', `Mark ${v.current} discovered and prepare the first recursive call. Remember the start to avoid revisiting it through a cycle.`];
+      case 'enter': return ko ? ['재귀 호출 진입', `정점 ${v.current}를 재귀 스택의 맨 위에 넣었습니다. 현재 깊이는 ${v.depth}입니다. 다음 미발견 이웃으로 더 깊이 들어갑니다.`]
+        : ['Enter a recursive call', `Push ${v.current} onto the recursion stack at depth ${v.depth}. Continue deeper through an undiscovered neighbor.`];
+      case 'edge': {
+        const seen = String(v.seen).split(',').includes(String(v.next));
+        return ko ? ['이웃 확인', seen ? `정점 ${v.next}는 이미 발견했으므로 건너뜁니다. 순환 때문에 같은 경로를 반복하지 않습니다.` : `정점 ${v.next}는 미발견 상태입니다. 이 이웃에 대한 재귀 호출을 시작합니다.`]
+          : ['Inspect a neighbor', seen ? `Vertex ${v.next} was already discovered. Skip it to avoid repeating paths through a cycle.` : `Vertex ${v.next} is undiscovered. Begin a recursive call for this neighbor.`];
+      }
+      case 'leave': return ko ? ['상위 호출로 복귀', v.parent ? `정점 ${v.current}의 모든 이웃을 처리했습니다. 스택에서 빼고 상위 정점 ${v.parent}로 돌아갑니다.` : `시작 정점 ${v.current}의 모든 이웃을 처리했습니다. 마지막 재귀 호출을 마칩니다.`]
+        : ['Backtrack', v.parent ? `All neighbors of ${v.current} are complete. Pop it and return to parent ${v.parent}.` : `All neighbors of start vertex ${v.current} are complete. Finish the last recursive call.`];
+      default: return ko ? ['탐색 완료', `재귀 스택이 비었습니다. 방문 순서: ${v.order}. 미연결 정점은 방문하지 않습니다.`]
+        : ['Traversal complete', `The recursion stack is empty. Visit order: ${v.order}. Disconnected vertices remain unvisited.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear, binary, bfs, dfs];

@@ -74,7 +74,7 @@ export default function breadthFirstSearch(graph, startVertex, originalCallbacks
     });
 
     callbacks.leaveVertex({ currentVertex, previousVertex });
-    recordStep(callbacks.stepCallback, 'leave', () => graph.getAllVertices(), [], () => ({ current: currentVertex.getKey(), queue: vertexQueue.toString() }), 'callbacks.leaveVertex');
+    recordStep(callbacks.stepCallback, 'leave', () => graph.getAllVertices(), [], () => ({ current: currentVertex.getKey(), queue: vertexQueue.toString() }), 'callbacks.leaveVertex({ currentVertex, previousVertex });');
 
     // Memorize current vertex before next loop.
     previousVertex = currentVertex;

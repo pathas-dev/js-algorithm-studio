@@ -1,6 +1,7 @@
 import Graph from '../data-structures/graph/Graph';
 import GraphVertex from '../data-structures/graph/GraphVertex';
 import GraphEdge from '../data-structures/graph/GraphEdge';
+import depthFirstSearch from '../algorithms/graph/depth-first-search/depthFirstSearch';
 import breadthFirstSearch from '../algorithms/graph/breadth-first-search/breadthFirstSearch';
 
 export function requireNodes(nodes) {
@@ -31,7 +32,7 @@ export function parseEdges(text, nodes) {
   return edges;
 }
 
-export function traceBfs(nodes, start, edges) {
+function traceGraph(nodes, start, edges, mode) {
   requireNodes(nodes);
   requireEdges(edges, nodes);
   if (!nodes.includes(start)) throw new Error('start');
@@ -45,22 +46,32 @@ export function traceBfs(nodes, start, edges) {
   const seen = new Set([start]);
   const order = [];
   const processed = [];
+  const stack = [];
   const steps = [];
-  breadthFirstSearch(graph, graph.getVertexByKey(start), {
+  const traverse = mode === 'dfs' ? depthFirstSearch : breadthFirstSearch;
+  traverse(graph, graph.getVertexByKey(start), {
     allowTraversal: ({ nextVertex }) => {
       const key = nextVertex.getKey();
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     },
-    enterVertex: ({ currentVertex }) => order.push(currentVertex.getKey()),
-    leaveVertex: ({ currentVertex }) => processed.push(currentVertex.getKey()),
+    enterVertex: ({ currentVertex }) => {
+      order.push(currentVertex.getKey());
+      if (mode === 'dfs') stack.push(currentVertex.getKey());
+    },
+    leaveVertex: ({ currentVertex }) => {
+      processed.push(currentVertex.getKey());
+      if (mode === 'dfs') stack.pop();
+    },
     stepCallback: (step) => steps.push({
       ...step,
       array: [...items],
       edges: edges.map((edge) => [...edge]),
       variables: {
         ...step.variables,
+        mode,
+        stack: stack.join(','),
         seen: [...seen].join(','),
         order: order.join(','),
         processed: processed.join(','),
@@ -68,4 +79,12 @@ export function traceBfs(nodes, start, edges) {
     }),
   });
   return steps;
+}
+
+export function traceBfs(nodes, start, edges) {
+  return traceGraph(nodes, start, edges, 'bfs');
+}
+
+export function traceDfs(nodes, start, edges) {
+  return traceGraph(nodes, start, edges, 'dfs');
 }

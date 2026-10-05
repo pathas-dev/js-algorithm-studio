@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
-import App from './App';
 import './styles.css';
+
+const App = lazy(() => import('./App'));
 
 const theme = createTheme({
   primaryColor: 'teal',
@@ -15,7 +16,7 @@ const theme = createTheme({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <MantineProvider theme={theme}>
-      <App />
+      <Suspense fallback={<div role="status" style={{ padding: 32 }}>불러오는 중 / Loading…</div>}><App /></Suspense>
     </MantineProvider>
   </React.StrictMode>,
 );

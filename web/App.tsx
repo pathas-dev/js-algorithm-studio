@@ -107,6 +107,10 @@ export default function App() {
             <Text c="dimmed" mt="sm">{t('시간을 앞뒤로 움직이며, 한 번의 비교부터 마지막 결과까지 살펴보세요.', 'Move through time, from the first comparison to the final result.')}</Text>
           </div>
           <div className="workspace">
+            <NativeSelect className="mobile-catalog" label={t('알고리즘 선택', 'Choose an algorithm')} value={algorithm.id} data={algorithms.map((entry) => ({ value: entry.id, label: entry.name[language] }))} onChange={(event) => {
+              const next = algorithms.find((entry) => entry.id === event.currentTarget.value);
+              if (next) selectAlgorithm(next);
+            }} />
             <nav className="catalog" aria-label={t('알고리즘 목록', 'Algorithms')}>
               {(['sort', 'search', 'graph'] as const).map((category) => <div key={category} className="catalog-group">
                 <Text size="xs" fw={700} c="dimmed" mb="sm" mt="md" className="catalog-label">{category === 'sort' ? t('정렬', 'SORTING') : category === 'search' ? t('검색', 'SEARCHING') : t('그래프', 'GRAPHS')}</Text>
@@ -121,13 +125,13 @@ export default function App() {
                 <div><Group gap="sm"><Title order={2}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : algorithm.category === 'search' ? t('검색', 'SEARCHING') : t('그래프', 'GRAPHS')}</Badge></Group>
                   <Text size="sm" c="dimmed" mt={6}>{algorithm.summary[language]}</Text>
                 </div>
-                <Badge variant="outline" color="gray">{algorithm.time}</Badge>
+                <Badge variant="outline" color="gray">{typeof algorithm.time === 'string' ? algorithm.time : algorithm.time[language]}</Badge>
               </div>
               <div className="lesson-panels">
                 <div className="visual-column">
                   <Paper withBorder className="canvas-card">
                     <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
-                    {'depth' in step.variables && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
+                    {algorithm.category === 'sort' && 'depth' in step.variables && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
                     {algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : <ArrayView step={step} language={language} />}
                     <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
                     <div className="array-state"><Text size="xs" c="dimmed">{algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{algorithm.category === 'graph' ? step.variables.order : step.array.map((item) => item.value).join(', ')}]</output></div>
@@ -148,7 +152,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>
