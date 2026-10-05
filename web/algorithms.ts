@@ -1,3 +1,5 @@
+import jumpSearch from '../src/algorithms/search/jump-search/jumpSearch';
+import jumpSource from '../src/algorithms/search/jump-search/jumpSearch.js?raw';
 import radixSource from '../src/algorithms/sorting/radix-sort/RadixSort.js?raw';
 import countingSource from '../src/algorithms/sorting/counting-sort/CountingSort.js?raw';
 import { traceCounting, traceRadix } from '../src/visualization/numeric';
@@ -230,7 +232,7 @@ export const quick: Algorithm = {
   },
 };
 
-function runSearch(Search: typeof linearSearch | typeof binarySearch, values: number[], target = 3): Step[] {
+function runSearch(Search: typeof linearSearch | typeof binarySearch | typeof jumpSearch, values: number[], target = 3): Step[] {
   const steps: Step[] = [];
   const items = values.map((value, id) => ({ value, id }));
   Search(values, target, (a: number, b: number) => a - b, (step: Omit<Step, 'array'>) => steps.push({ ...step, array: [...items] }));
@@ -442,4 +444,28 @@ export const radix: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, bfs, dfs];
+export const jump: Algorithm = {
+  id: 'jump-search', category: 'search', target: 21, requiresSorted: true,
+  name: { ko: '점프 검색', en: 'Jump search' },
+  summary: { ko: '√n 크기의 블록 끝을 확인해 점프하고, 후보 블록 안에서 순차 검색합니다.', en: 'Jump across block endpoints of size √n, then scan the candidate block.' },
+  source: algorithmCode(jumpSource), example: [1, 2, 5, 10, 20, 21, 24, 30, 48], time: 'O(√n)',
+  run(values, target) { requireSorted(values); return runSearch(jumpSearch, values, target); },
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['블록 검색 준비', '배열 크기를 확인합니다. 비어 있으면 -1을 반환하고, 나머지는 √n을 내림한 크기로 블록을 나눕니다.']
+        : ['Prepare block searching', 'Check the size. An empty array returns -1; otherwise use a block size of floor(√n).'];
+      case 'block': return ko ? ['블록 끝 비교', `블록 ${v.low}…${v.high}의 마지막 값을 목표 ${v.target}와 비교합니다. 목표가 더 크면 다음 블록으로 이동합니다.`]
+        : ['Inspect the block endpoint', `Compare the last value of block ${v.low}…${v.high} with target ${v.target}. Jump ahead if the target is greater.`];
+      case 'jump': return ko ? ['다음 블록으로 점프', `블록 시작을 ${v.low}로 옮겼습니다. 블록이 배열 밖이면 검색을 끝냅니다. 흐린 막대는 현재 블록 밖의 위치입니다.`]
+        : ['Jump to the next block', `Move the block start to ${v.low}. Stop if it is beyond the array. Dim bars lie outside the current block.`];
+      case 'compare': return ko ? ['블록 안 순차 검색', `후보 블록 안에서 인덱스 ${v.index}와 목표 값을 비교합니다. 일치하지 않으면 한 칸 전진합니다.`]
+        : ['Scan inside the block', `Compare index ${v.index} with the target. Advance one position on a mismatch.`];
+      default: return ko ? ['검색 완료', v.matches ? `인덱스 ${v.matches}에서 찾았습니다. 일치 위치 하나를 반환합니다.` : '후보 블록을 모두 확인했거나 배열 밖에 도달했습니다. 목표 값이 없어 -1을 반환합니다.']
+        : ['Search complete', v.matches ? `Found at index ${v.matches}. Return one matching position.` : 'The candidate block was exhausted or the search passed the array. Return -1.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, bfs, dfs];

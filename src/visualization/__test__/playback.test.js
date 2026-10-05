@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import jumpSearch from '../../algorithms/search/jump-search/jumpSearch';
 import binarySearch from '../../algorithms/search/binary-search/binarySearch';
 import linearSearch from '../../algorithms/search/linear-search/linearSearch';
 import QuickSortInPlace from '../../algorithms/sorting/quick-sort/QuickSortInPlace';
@@ -80,13 +81,13 @@ describe('visualizer execution and playback', () => {
     });
   });
 
-  it('records binary search boundaries, matches and misses', () => {
-    const source = algorithmCode(fs.readFileSync(path.join(__dirname, '../../algorithms/search/binary-search/binarySearch.js'), 'utf8'));
+  it.each([[binarySearch, 'binary-search/binarySearch'], [jumpSearch, 'jump-search/jumpSearch']])('records %s boundaries, matches and misses', (search, file) => {
+    const source = algorithmCode(fs.readFileSync(path.join(__dirname, `../../algorithms/search/${file}.js`), 'utf8'));
     [[], [1], [-2, 0, 1, 1, 3, 5], [1, 1, 1]].forEach((input) => {
       [-3, -2, 0, 1, 2, 3, 5, 10].forEach((target) => {
         const steps = [];
-        const result = binarySearch(input, target, undefined, (step) => steps.push(step));
-        expect(result).toBe(binarySearch(input, target));
+        const result = search(input, target, undefined, (step) => steps.push(step));
+        expect(result).toBe(search(input, target));
         const last = steps[steps.length - 1];
         expect(last.type).toBe('done');
         expect(last.indices).toEqual(result === -1 ? [] : [result]);
