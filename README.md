@@ -23,6 +23,12 @@ with related explanations and links for further reading (including ones
 to YouTube videos).
 
 
+## Visualizer development
+
+Use Node.js 22.12 or newer. Run `npm ci`, then `npm run dev` to open the local visualizer. `npm run build` type-checks the web app and generates `dist`; `npm run preview` serves that production build locally. `npm run check:docs` checks bilingual documentation and local links.
+
+The repository includes a Vercel build configuration. Deployment is performed separately; development commands do not publish or push anything.
+
 ## Data Structures
 
 A data structure is a particular way of organizing and storing data in a computer so that it can
