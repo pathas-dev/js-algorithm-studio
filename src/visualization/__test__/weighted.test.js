@@ -1,9 +1,30 @@
 import fs from 'fs';
 import path from 'path';
-import { parseWeightedEdges, traceDijkstra } from '../graph';
+import { parseWeightedEdges, traceDijkstra, traceBellmanFord } from '../graph';
 import { algorithmCode } from '../playback';
 
 describe('weighted graph lessons', () => {
+  it('traces negative edges and distinguishes reachable from disconnected negative cycles', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(
+      __dirname,
+      '../../algorithms/graph/bellman-ford/bellmanFord.js',
+    ), 'utf8'));
+    const steps = traceBellmanFord([1, 2, 3, 4], 1, [[1, 2, 2], [2, 3, -3]]);
+    expect(JSON.parse(steps.at(-1).variables.distances))
+      .toEqual({
+        1: 0, 2: 2, 3: -1, 4: null,
+      });
+    expect(steps.at(-1).variables.negativeCycle).toBe(false);
+    steps.forEach((step) => expect(source).toContain(step.code));
+    const cycle = traceBellmanFord([1, 2, 3], 1, [[1, 2, 1], [2, 3, -2], [3, 2, 1]]);
+    expect(cycle.at(-1).type).toBe('negative-cycle');
+    expect(cycle.at(-1).variables.negativeCycle).toBe(true);
+    expect(traceBellmanFord([1, 2, 3], 1, [[2, 3, -2], [3, 2, 1]])
+      .at(-1).variables.negativeCycle).toBe(false);
+    expect(traceBellmanFord([1], 1, []).at(-1).type).toBe('done');
+    expect(traceBellmanFord([1, 2], 1, [[1, 2, -1]], false).at(-1).type)
+      .toBe('negative-cycle');
+  });
   it('validates weights, direction, duplicates and endpoints before tracing', () => {
     expect(parseWeightedEdges('', [1], false)).toEqual([]);
     expect(parseWeightedEdges('1-2:0, 2-3:-2.5', [1, 2, 3], true))

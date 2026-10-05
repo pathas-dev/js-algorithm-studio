@@ -1,3 +1,4 @@
+import bellmanSource from '../src/algorithms/graph/bellman-ford/bellmanFord.js?raw';
 import dijkstraSource from '../src/algorithms/graph/dijkstra/dijkstra.js?raw';
 import interpolationSearch from '../src/algorithms/search/interpolation-search/interpolationSearch';
 import interpolationSource from '../src/algorithms/search/interpolation-search/interpolationSearch.js?raw';
@@ -12,7 +13,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs, traceDfs, traceDijkstra } from '../src/visualization/graph';
+import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -533,4 +534,34 @@ export const dijkstra: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra];
+export const bellman: Algorithm = {
+  id: 'bellman-ford', category: 'graph', target: 1, graphWeighted: true, graphDirected: true,
+  name: { ko: '벨만–포드', en: 'Bellman–Ford' },
+  summary: { ko: '음수 간선을 포함한 그래프에서 V−1회 완화한 뒤, 도달 가능한 음수 사이클을 검사합니다.', en: 'Relax edges V−1 times, including negative weights, then check for a reachable negative cycle.' },
+  source: algorithmCode(bellmanSource), example: [1, 2, 3, 4, 5, 6],
+  graphEdges: [[1, 2, 8], [1, 3, 10], [2, 4, 1], [4, 3, -4], [4, 5, -1], [3, 5, 2]],
+  time: { ko: 'O(VE) 완화 검사 · 간선 조회 비용 별도', en: 'O(VE) relaxation checks · edge lookup costs extra' },
+  run: (nodes, start = 1, edges = bellman.graphEdges!, directed = true) => traceBellmanFord(nodes, start, edges, directed),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['거리 초기화', `시작 정점 ${v.current}의 거리는 0, 나머지는 ∞입니다. 이전 정점은 아직 없으며 완화가 성공할 때 기록합니다.`]
+        : ['Initialize distances', `Start vertex ${v.current} has distance 0; all others have ∞. Predecessors are empty until a relaxation succeeds.`];
+      case 'pass': return ko ? ['완화 반복', `${v.iteration}번째 반복입니다. 모든 정점의 나가는 간선을 검사합니다. 사이클 없는 최단 경로는 최대 V−1개의 간선을 사용합니다.`]
+        : ['Relaxation round', `Round ${v.iteration}: inspect outgoing edges of every vertex. A shortest path without cycles uses at most V−1 edges.`];
+      case 'compare': return ko ? ['후보 거리 비교', `정점 ${v.current}를 거쳐 ${v.next}로 가는 후보 거리는 ${Number.isFinite(v.candidate) ? v.candidate : '∞'}입니다. 출발 정점에 도달할 수 없으면 이 간선으로도 거리를 줄일 수 없습니다.`]
+        : ['Compare a candidate', `Candidate distance to ${v.next} through ${v.current}: ${Number.isFinite(v.candidate) ? v.candidate : '∞'}. An unreachable source cannot improve this edge.`];
+      case 'relax': return ko ? ['거리와 이전 정점 갱신', `정점 ${v.next}의 거리를 ${v.candidate}로 줄이고 이전 정점을 ${v.current}로 기록했습니다. 값은 이후 반복에서 더 줄어들 수 있습니다.`]
+        : ['Update distance and predecessor', `Set distance to ${v.next} to ${v.candidate} and predecessor to ${v.current}. Later rounds may improve it further.`];
+      case 'check-cycle': return ko ? ['음수 사이클 검사', 'V−1회 이후에도 도달 가능한 간선에서 거리가 줄어드는지 검사합니다. 더 줄어든다면 반복해서 비용을 낮출 수 있는 음수 사이클이 있습니다.']
+        : ['Check for a negative cycle', 'Check for a reachable improvement after V−1 rounds. Any improvement proves a negative cycle can lower the cost indefinitely.'];
+      case 'negative-cycle': return ko ? ['음수 사이클 발견', '시작점에서 도달 가능한 음수 사이클이 있습니다. 표의 값은 잠정값이며 최단 거리로 확정할 수 없습니다. 타임라인에서 거리 감소를 확인하세요.']
+        : ['Negative cycle detected', 'A negative cycle is reachable from the start. Table values are tentative and cannot be treated as shortest distances. Inspect the repeated decreases on the timeline.'];
+      default: return ko ? ['최단 거리 계산 완료', '추가 완화가 없어 도달 가능한 음수 사이클이 없습니다. ∞는 도달 불가이며 이전 정점으로 경로를 복원할 수 있습니다.']
+        : ['Shortest distances complete', 'No further relaxation means no reachable negative cycle. ∞ marks unreachable vertices; use predecessors to reconstruct paths.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman];

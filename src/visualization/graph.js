@@ -1,3 +1,4 @@
+import bellmanFord from '../algorithms/graph/bellman-ford/bellmanFord';
 import dijkstra from '../algorithms/graph/dijkstra/dijkstra';
 import Graph from '../data-structures/graph/Graph';
 import GraphVertex from '../data-structures/graph/GraphVertex';
@@ -134,4 +135,8 @@ export function traceWeighted(nodes, start, edges, directed, algorithm) {
 export function traceDijkstra(nodes, start, edges, directed = false) {
   if (edges.some((edge) => edge[2] < 0)) throw new Error('negative-weight');
   return traceWeighted(nodes, start, edges, directed, dijkstra);
+}
+
+export function traceBellmanFord(nodes, start, edges, directed = true) {
+  return traceWeighted(nodes, start, edges, directed, bellmanFord);
 }
