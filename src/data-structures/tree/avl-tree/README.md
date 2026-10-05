@@ -15,6 +15,8 @@ nodes in the tree prior to the operation. Insertions and
 deletions may require the tree to be rebalanced by one or 
 more tree rotations.
 
+This repository computes subtree heights recursively instead of caching them. Search is `O(log n)`; insertion and deletion in this implementation can take `O(n)` for height checks. The visualizer records balance checks and each single rotation, including both stages of LR/RL repairs. Deletion rechecks the ancestors of the physically removed node.
+
 Animation showing the insertion of several elements into an AVL 
 tree. It includes left, right, left-right and right-left rotations.
 

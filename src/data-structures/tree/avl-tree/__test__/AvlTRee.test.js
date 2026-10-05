@@ -1,6 +1,50 @@
 import AvlTree from '../AvlTree';
 
 describe('AvlTree', () => {
+  it('preserves every subtree and parent link during insertion and deletion', () => {
+    const check = (tree, expected) => {
+      const visited = new Set();
+      const visit = (node, parent) => {
+        if (!node) return;
+        expect(visited.has(node)).toBe(false);
+        visited.add(node);
+        expect(node.parent).toBe(parent);
+        expect(Math.abs(node.balanceFactor)).toBeLessThanOrEqual(1);
+        visit(node.left, node);
+        visit(node.right, node);
+      };
+      visit(tree.root, null);
+      expect(tree.root.value === null ? [] : tree.root.traverseInOrder())
+        .toEqual([...expected].sort((a, b) => a - b));
+    };
+    const inputs = [
+      [4, 2, 6, 1, 3],
+      [50, 20, 80, 70, 90, 60, 55],
+      [30, 20, 40, 35, 50, 45, 42],
+      [12, 6, 16, 3, 9, 14, 18, 1, 4, 7, 10, 13, 15, 17, 19],
+    ];
+    inputs.forEach((values) => {
+      const tree = new AvlTree();
+      const remaining = new Set();
+      values.forEach((value) => {
+        tree.insert(value);
+        remaining.add(value);
+        check(tree, remaining);
+      });
+      [...values].reverse().forEach((value) => {
+        tree.remove(value);
+        remaining.delete(value);
+        check(tree, remaining);
+      });
+      tree.insert(0);
+      check(tree, new Set([0]));
+    });
+    const tree = new AvlTree();
+    [4, 2, 6, 1, 3].forEach((value) => tree.insert(value));
+    tree.remove(6);
+    check(tree, new Set([1, 2, 3, 4]));
+  });
+
   it('should do simple left-left rotation', () => {
     const tree = new AvlTree();
 

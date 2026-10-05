@@ -1,4 +1,5 @@
 import BinarySearchTree from '../data-structures/tree/binary-search-tree/BinarySearchTree';
+import AvlTree from '../data-structures/tree/avl-tree/AvlTree';
 import PriorityQueue from '../data-structures/priority-queue/PriorityQueue';
 import MinHeap from '../data-structures/heap/MinHeap';
 import LinkedList from '../data-structures/linked-list/LinkedList';
@@ -270,12 +271,12 @@ export function tracePriorityQueue(values, operations = '') {
   return steps;
 }
 
-export function traceBinarySearchTree(values, operations = '') {
+export function traceBinarySearchTree(values, operations = '', Tree = BinarySearchTree, structure = 'binary-search-tree') {
   const commands = parseOperations(operations, { insert: 1, find: 1, remove: 1 });
   // ponytail: 12 nodes keep an unbalanced tree readable; expand with a zoomable canvas if needed.
   if (values.length > MAX_VALUES) throw new Error('limit');
   if (new Set(values).size > 12) throw new Error('tree-limit');
-  const tree = new BinarySearchTree();
+  const tree = new Tree();
   const steps = [];
   const ids = new WeakMap();
   let nextId = 0;
@@ -305,13 +306,14 @@ export function traceBinarySearchTree(values, operations = '') {
         .filter((index) => index >= 0),
       variables: {
         ...context,
-        structure: 'binary-search-tree',
+        structure,
         tree: JSON.stringify(nodes.map(({ node, depth }) => ({
           id: identify(node),
           value: node.value,
           depth,
           left: identify(node.left),
           right: identify(node.right),
+          ...(structure === 'avl-tree' ? { balance: node.balanceFactor, height: node.height } : {}),
         }))),
         inorder: tree.root.value === null ? '' : tree.root.traverseInOrder().join(', '),
         ...variables,
@@ -320,14 +322,15 @@ export function traceBinarySearchTree(values, operations = '') {
   };
   const observe = (step) => {
     const node = step.array[0];
-    snapshot(step.type, step.code, { current: node.value === null ? '∅' : node.value }, node);
+    snapshot(step.type, step.code, { ...step.variables, current: node.value === null ? '∅' : node.value }, node);
   };
   snapshot('start', 'this.root = new BinarySearchTreeNode(null, nodeValueCompareFunction);');
   const run = ({ name, value }, phase) => {
     context = { operation: name, value, phase };
     if (name === 'insert') {
       if (tree.root.traverseInOrder().length >= 12 && !tree.contains(value)) throw new Error('tree-limit');
-      const result = tree.root.insert(value, observe);
+      tree.insert(value, observe);
+      const result = tree.root.find(value);
       snapshot('insert-done', 'insert(value, stepCallback) {', {}, result);
     } else {
       const result = tree.root.find(value, observe);
@@ -343,7 +346,7 @@ export function traceBinarySearchTree(values, operations = '') {
           code = result.parent ? 'parent.replaceChild(nodeToRemove, childNode);'
             : 'BinaryTreeNode.copyNode(childNode, nodeToRemove);';
         }
-        tree.remove(value);
+        tree.remove(value, observe);
         snapshot(name, code, { children });
       }
     }
@@ -354,4 +357,8 @@ export function traceBinarySearchTree(values, operations = '') {
   tree.toString();
   snapshot('done', 'return this.root.toString();');
   return steps;
+}
+
+export function traceAvlTree(values, operations = '') {
+  return traceBinarySearchTree(values, operations, AvlTree, 'avl-tree');
 }

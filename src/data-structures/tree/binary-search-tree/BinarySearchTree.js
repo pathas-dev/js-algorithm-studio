@@ -15,8 +15,8 @@ export default class BinarySearchTree {
    * @param {*} value
    * @return {BinarySearchTreeNode}
    */
-  insert(value) {
-    return this.root.insert(value);
+  insert(value, stepCallback) {
+    return this.root.insert(value, stepCallback);
   }
 
   /**

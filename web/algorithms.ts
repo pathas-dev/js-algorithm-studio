@@ -7,6 +7,7 @@ import trieSource from '../src/data-structures/trie/Trie.js?raw';
 import trieNodeSource from '../src/data-structures/trie/TrieNode.js?raw';
 import { traceTrie } from '../src/visualization/trie';
 import bstSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTree.js?raw';
+import avlSource from '../src/data-structures/tree/avl-tree/AvlTree.js?raw';
 import bstNodeSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTreeNode.js?raw';
 import priorityQueueSource from '../src/data-structures/priority-queue/PriorityQueue.js?raw';
 import heapClassSource from '../src/data-structures/heap/Heap.js?raw';
@@ -14,7 +15,7 @@ import minHeapSource from '../src/data-structures/heap/MinHeap.js?raw';
 import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -886,6 +887,34 @@ export const binarySearchTree: NumericAlgorithm = {
   },
 };
 
+export const avlTree: NumericAlgorithm = {
+  ...binarySearchTree,
+  id: 'avl-tree', name: { ko: 'AVL 트리', en: 'AVL tree' },
+  summary: { ko: '높이 차이를 검사하고 LL·LR·RR·RL 회전으로 균형을 복구합니다. 회전은 중위 순서를 보존합니다.', en: 'Check height differences and restore balance with LL, LR, RR and RL rotations. Rotations preserve inorder order.' },
+  source: algorithmCode(bstSource + '\n' + bstNodeSource + '\n' + avlSource),
+  example: [30, 20, 10, 25, 28], operations: 'insert 40, insert 50, find 28, remove 10',
+  operationHint: 'insert 40, find 28, remove 10',
+  time: { ko: '검색 O(log n) · 이 구현의 재귀 높이 계산으로 갱신 O(n)', en: 'Find O(log n) · updates O(n) with this implementation’s recursive heights' },
+  run: (values, _target, _edges, _directed, operations = avlTree.operations) => traceAvlTree(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'balance': return ko ? ['균형 인수 검사', `현재 노드 ${v.current}의 b는 ${v.balance}입니다. 왼쪽 높이 − 오른쪽 높이가 -1부터 1이면 유지하고, 범위를 벗어나면 자식의 기울기에 따라 회전을 선택합니다.`]
+        : ['Check balance factor', `Node ${v.current} has b=${v.balance}: left height minus right height. Keep -1 through 1; otherwise select a rotation from its child’s balance.`];
+      case 'rotation-start': return ko ? [`${v.rotation} 회전 선택`, `${v.current}에서 ${v.rotation} 경우를 복구합니다. LL은 오른쪽, RR은 왼쪽 단일 회전입니다. LR·RL은 자식과 부모를 차례로 회전하는 두 단계입니다.`]
+        : [`Select ${v.rotation} rotation`, `Repair the ${v.rotation} case at ${v.current}. LL rotates right; RR rotates left. LR and RL rotate the child and parent in two stages.`];
+      case 'rotation': return ko ? [`${v.rotation} 단일 회전 완료`, `부분 트리의 새 루트는 ${v.current}입니다. 가운데 가지를 옮겨 모든 값과 중위 순서를 보존하며, 상위 부모의 올바른 자식 위치에 연결합니다. 다음 균형 검사가 이어집니다.`]
+        : [`${v.rotation} single rotation complete`, `The subtree root is now ${v.current}. Move the middle branch without losing values or inorder order, and reconnect the correct parent side. Continue checking ancestors.`];
+      case 'remove-balance': return ko ? ['삭제 후 조상 복구 시작', `${v.value}을 삭제했습니다. 실제로 사라진 노드의 부모부터 루트까지 균형을 검사합니다. 삭제에서는 자식의 b가 0이어도 단일 회전이 필요할 수 있습니다.`]
+        : ['Repair ancestors after deletion', `Remove ${v.value}; check from the physically removed node’s parent up to the root. Deletion can require a single rotation even when the child has b=0.`];
+      case 'done': return ko ? ['균형 트리 연산 완료', '남은 각 노드의 |b|는 1 이하입니다. 중위 순회는 오름차순이며, 되감기로 불균형 상태와 회전 후의 연결을 비교할 수 있습니다.']
+        : ['Balanced tree operations complete', 'Every remaining node has |b| ≤ 1. Inorder output is ascending. Rewind to compare imbalance with connections after rotations.'];
+      default: return binarySearchTree.explain(step, language);
+    }
+  },
+};
+
 export const trie: WordAlgorithm = {
   id: 'trie', category: 'structure', inputMode: 'words', usesStart: false,
   name: { ko: '트라이', en: 'Trie' },
@@ -1025,4 +1054,4 @@ export const hashTable: WordAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie, fenwick, segment, hashTable];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, avlTree, trie, fenwick, segment, hashTable];

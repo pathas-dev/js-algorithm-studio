@@ -5,10 +5,39 @@ import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
 import {
   parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue,
-  traceBinarySearchTree,
+  traceBinarySearchTree, traceAvlTree,
 } from '../structures';
 
 describe('structure lessons', () => {
+  it('records all AVL rotations with stable identities, actual source and balanced operation results', () => {
+    const source = algorithmCode([
+      'tree/avl-tree/AvlTree.js', 'tree/binary-search-tree/BinarySearchTree.js',
+      'tree/binary-search-tree/BinarySearchTreeNode.js',
+    ].map((file) => fs.readFileSync(path.resolve(__dirname, '../../data-structures', file), 'utf8')).join('\n'));
+    [[3, 2, 1], [3, 1, 2], [1, 2, 3], [1, 3, 2]].forEach((values, index) => {
+      const steps = traceAvlTree(values, 'find 8, remove 1, remove 2, remove 3, insert 0');
+      const rotations = steps.filter((step) => step.type === 'rotation-start');
+      expect(rotations[0].variables.rotation).toBe(['LL', 'LR', 'RR', 'RL'][index]);
+      expect(steps.at(-1).array.map((item) => item.value)).toEqual([0]);
+      steps.forEach((step) => {
+        expect(source).toContain(step.code);
+        expect(step.indices.every((i) => i >= 0 && i < step.array.length)).toBe(true);
+        const nodes = JSON.parse(step.variables.tree);
+        expect(new Set(nodes.map((node) => node.id)).size).toBe(nodes.length);
+        if (['insert-done', 'remove', 'done'].includes(step.type)) {
+          expect(nodes.every((node) => Math.abs(node.balance) <= 1)).toBe(true);
+        }
+      });
+      const before = rotations[0].array.map((item) => item.id).sort();
+      const after = steps.find((step) => step.type === 'rotation').array.map((item) => item.id).sort();
+      expect(after).toEqual(before);
+    });
+    expect(traceAvlTree([]).at(-1).array).toEqual([]);
+    expect(traceAvlTree([1, 1]).at(-1).array).toHaveLength(1);
+    expect(() => traceAvlTree([], 'remove 1')).toThrow('missing-value');
+    expect(() => traceAvlTree(Array.from({ length: 13 }, (_, i) => i))).toThrow('tree-limit');
+  });
+
   it('validates operation names, arguments and bounds before execution', () => {
     const commands = { push: 1, pop: 0, peek: 0 };
     expect(parseOperations('', commands)).toEqual([]);
