@@ -3,6 +3,7 @@ import AvlTree from '../data-structures/tree/avl-tree/AvlTree';
 import RedBlackTree from '../data-structures/tree/red-black-tree/RedBlackTree';
 import PriorityQueue from '../data-structures/priority-queue/PriorityQueue';
 import MinHeap from '../data-structures/heap/MinHeap';
+import MaxHeap from '../data-structures/heap/MaxHeap';
 import LinkedList from '../data-structures/linked-list/LinkedList';
 import DoublyLinkedList from '../data-structures/doubly-linked-list/DoublyLinkedList';
 import Queue from '../data-structures/queue/Queue';
@@ -161,17 +162,18 @@ export function traceDoublyLinkedList(values, operations = '') {
   return traceLinkedList(values, operations, DoublyLinkedList);
 }
 
-export function traceHeap(values, operations = '') {
+export function traceHeap(values, operations = '', Heap = MinHeap) {
   const commands = parseOperations(operations, { add: 1, poll: 0, peek: 0 });
   if (values.length > MAX_VALUES) throw new Error('limit');
   const steps = [];
   let context = {};
   let nextId = 0;
-  const heap = new MinHeap((a, b) => a.value - b.value, (step) => {
+  const structure = Heap === MaxHeap ? 'max-heap' : 'heap';
+  const heap = new Heap((a, b) => a.value - b.value, (step) => {
     steps.push({
       ...step,
       variables: {
-        ...context, structure: 'heap', sortedCount: 0, heapSize: step.array.length, adjusting: true,
+        ...context, structure, sortedCount: 0, heapSize: step.array.length, adjusting: true,
       },
     });
   });
@@ -183,7 +185,7 @@ export function traceHeap(values, operations = '') {
       indices,
       variables: {
         ...context,
-        structure: 'heap',
+        structure,
         sortedCount: 0,
         heapSize: heap.heapContainer.length,
         adjusting: false,
@@ -211,6 +213,10 @@ export function traceHeap(values, operations = '') {
   heap.toString();
   snapshot('done', 'return this.heapContainer.toString();');
   return steps;
+}
+
+export function traceMaxHeap(values, operations = '') {
+  return traceHeap(values, operations, MaxHeap);
 }
 
 export function tracePriorityQueue(values, operations = '') {

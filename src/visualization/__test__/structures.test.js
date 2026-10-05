@@ -5,10 +5,32 @@ import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
 import {
   parseOperations, traceStack, traceQueue, traceLinkedList, traceHeap, tracePriorityQueue,
-  traceBinarySearchTree, traceAvlTree, traceRedBlackTree, traceDoublyLinkedList,
+  traceBinarySearchTree, traceAvlTree, traceRedBlackTree, traceDoublyLinkedList, traceMaxHeap,
 } from '../structures';
 
 describe('structure lessons', () => {
+  it('extracts actual max heap values in descending order with correct settled invariants', () => {
+    const values = [3, -2.5, 3, 0, 8];
+    const steps = traceMaxHeap(values, 'peek, poll, poll, poll, poll, poll, poll');
+    expect(steps.filter((step) => step.type === 'poll').map((step) => step.variables.result))
+      .toEqual([8, 3, 3, 0, -2.5, 'null']);
+    const source = algorithmCode(fs.readFileSync(path.resolve(
+      __dirname,
+      '../../data-structures/heap/Heap.js',
+    ), 'utf8'));
+    steps.forEach((step) => {
+      expect(source).toContain(step.code);
+      expect(step.variables.structure).toBe('max-heap');
+      if (step.variables.adjusting) return;
+      step.array.slice(1).forEach((node, index) => {
+        expect(step.array[Math.floor(index / 2)].value).toBeGreaterThanOrEqual(node.value);
+      });
+    });
+    expect(steps.at(-1).array).toEqual([]);
+    expect(values).toEqual([3, -2.5, 3, 0, 8]);
+    expect(traceMaxHeap([], 'peek, poll').at(-1).array).toEqual([]);
+  });
+
   it('records both actual doubly-linked pointers during reversal and after deletions', () => {
     const steps = traceDoublyLinkedList([3, 6, 3], 'prepend 9, reverse, delete 3, deleteTail, deleteHead, deleteHead, append 0');
     const reversed = steps.filter((step) => step.type === 'reverse-links');

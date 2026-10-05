@@ -13,11 +13,12 @@ import bstNodeSource from '../src/data-structures/tree/binary-search-tree/Binary
 import priorityQueueSource from '../src/data-structures/priority-queue/PriorityQueue.js?raw';
 import heapClassSource from '../src/data-structures/heap/Heap.js?raw';
 import minHeapSource from '../src/data-structures/heap/MinHeap.js?raw';
+import maxHeapSource from '../src/data-structures/heap/MaxHeap.js?raw';
 import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
 import doublyListSource from '../src/data-structures/doubly-linked-list/DoublyLinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList, traceDoublyLinkedList, traceHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList, traceDoublyLinkedList, traceHeap, traceMaxHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -837,6 +838,38 @@ export const minHeap: NumericAlgorithm = {
   },
 };
 
+export const maxHeap: NumericAlgorithm = {
+  ...minHeap,
+  id: 'max-heap', name: { ko: '최대 힙', en: 'Max heap' },
+  summary: { ko: '부모 ≥ 자식 순서를 유지해 루트에서 최댓값을 꺼냅니다. 삽입은 위로, 추출은 아래로 복구합니다.', en: 'Keep parent ≥ child to extract the maximum at the root. Repair upward on insert and downward on extraction.' },
+  source: algorithmCode(heapClassSource + '\n' + maxHeapSource),
+  operations: 'peek, add 9, poll, poll, peek', operationHint: 'add 9, poll, peek',
+  run: (values, _target, _edges, _directed, operations = maxHeap.operations) => traceMaxHeap(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 최대 힙 준비', '기존 MaxHeap의 비교 조건을 사용합니다. 배열 인덱스 i의 자식은 2i+1, 2i+2이며 부모는 floor((i-1)/2)입니다.']
+        : ['Create an empty max heap', 'Run the existing MaxHeap comparison. Children of index i are 2i+1 and 2i+2; its parent is floor((i-1)/2).'];
+      case 'add': return ko ? ['마지막 위치에 추가', `${v.value}을 배열 끝에 넣었습니다. 부모보다 클 수 있으므로 위로 올리며 복구합니다.`]
+        : ['Append at the last position', `Append ${v.value}. It may be greater than its parent; repair upward.`];
+      case 'compare-up': return ko ? ['부모와 비교', step.indices.length > 1 ? '부모 ≥ 자식인지 검사합니다. 자식이 더 크면 교환합니다.' : '루트에 도착했으므로 위로 올리기를 끝냅니다.']
+        : ['Compare with the parent', step.indices.length > 1 ? 'Check parent ≥ child. Swap if the child is greater.' : 'The root has no parent; stop moving upward.'];
+      case 'replace-root': return ko ? ['마지막 값을 루트로 이동', '최댓값을 빼고 마지막 값을 루트로 옮겼습니다. 더 큰 자식과 비교하며 아래로 내려갑니다.']
+        : ['Move the last value to the root', 'Extract the maximum and move the last value to the root. Repair downward against the larger child.'];
+      case 'compare-down': return ko ? ['더 큰 자식과 비교', '큰 자식을 선택했습니다. 부모가 그 자식 이상이면 멈추고, 작으면 교환합니다.']
+        : ['Compare with the larger child', 'Select the larger child. Stop if the parent is at least as large; otherwise swap.'];
+      case 'settled': return ko ? ['최대 힙 순서 복구', '모든 부모가 자식 이상이고 루트가 최댓값입니다. 배열 전체의 내림차순 정렬을 뜻하지는 않습니다.']
+        : ['Max heap order restored', 'Every parent is at least as large as its children; the root is maximum. The entire array need not be sorted.'];
+      case 'peek': case 'poll': return ko ? [step.type === 'peek' ? '최댓값 조회' : '최댓값 추출', v.result === 'null' ? '빈 힙이므로 null을 반환합니다.' : `${v.operation}()은 ${v.result}을 반환합니다. ${step.type === 'peek' ? '힙은 그대로입니다.' : '남은 힙의 순서를 복구했습니다.'}`]
+        : [step.type === 'peek' ? 'Peek at the maximum' : 'Extract the maximum', v.result === 'null' ? 'The heap is empty; return null.' : `${v.operation}() returns ${v.result}. ${step.type === 'peek' ? 'Leave the heap unchanged.' : 'Restore order in the remaining heap.'}`];
+      case 'swap': return minHeap.explain(step, language);
+      default: return ko ? ['연산 완료', '남은 최대 힙입니다. 되감기로 교환과 최댓값 추출을 비교하세요.']
+        : ['Operations complete', 'The remaining max heap is shown. Rewind to compare swaps and maximum extraction.'];
+    }
+  },
+};
+
 export const priorityQueue: NumericAlgorithm = {
   id: 'priority-queue', category: 'structure', usesStart: false,
   name: { ko: '우선순위 큐', en: 'Priority queue' },
@@ -1108,4 +1141,4 @@ export const hashTable: WordAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable];

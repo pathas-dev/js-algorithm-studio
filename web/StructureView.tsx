@@ -15,7 +15,7 @@ export default function StructureView({ step, language }: { step: Step; language
   if (step.variables.structure === 'trie') return <TrieView step={step} language={language} />;
   if ('tree' in step.variables) return <TreeView step={step} language={language} />;
   if ('links' in step.variables) return <LinkedListView step={step} language={language} />;
-  if (['heap', 'priority-queue'].includes(String(step.variables.structure))) return <><HeapView step={step} language={language} />{'result' in step.variables && <div className="frontier">{language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}</>;
+  if (['heap', 'max-heap', 'priority-queue'].includes(String(step.variables.structure))) return <><HeapView step={step} language={language} />{'result' in step.variables && <div className="frontier">{language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}</>;
   const ko = language === 'ko';
   const stack = step.variables.structure === 'stack';
   return <div className="structure-view">
