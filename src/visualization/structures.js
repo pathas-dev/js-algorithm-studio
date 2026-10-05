@@ -336,8 +336,15 @@ export function traceBinarySearchTree(values, operations = '') {
       } else {
         if (!result) throw new Error('missing-value');
         const children = Number(!!result.left) + Number(!!result.right);
+        let code = 'const nextBiggerNode = nodeToRemove.right.findMin();';
+        if (children === 0) {
+          code = result.parent ? 'parent.removeChild(nodeToRemove);' : 'nodeToRemove.setValue(null);';
+        } else if (children === 1) {
+          code = result.parent ? 'parent.replaceChild(nodeToRemove, childNode);'
+            : 'BinaryTreeNode.copyNode(childNode, nodeToRemove);';
+        }
         tree.remove(value);
-        snapshot(name, 'remove(value) {', { children });
+        snapshot(name, code, { children });
       }
     }
   };

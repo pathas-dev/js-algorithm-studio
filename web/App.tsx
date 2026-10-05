@@ -52,7 +52,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [playback.index, steps.length]);
 
-  function apply(text: string) {
+  function apply(text: string, operations = operationInput) {
     try {
       let target;
       if (algorithm.category !== 'sort' && algorithm.usesStart !== false) {
@@ -60,11 +60,11 @@ export default function App() {
       }
       let next;
       if (algorithm.inputMode === 'words') {
-        next = algorithm.run(parseWords(text), undefined, undefined, undefined, operationInput);
+        next = algorithm.run(parseWords(text), undefined, undefined, undefined, operations);
       } else {
-      const values = parseValues(text);
-      const edges = algorithm.category === 'graph' ? algorithm.graphWeighted ? parseWeightedEdges(edgeInput, values, directed) : parseEdges(edgeInput, values, directed) : undefined;
-      next = algorithm.run(values, target, edges, directed, operationInput);
+        const values = parseValues(text);
+        const edges = algorithm.category === 'graph' ? algorithm.graphWeighted ? parseWeightedEdges(edgeInput, values, directed) : parseEdges(edgeInput, values, directed) : undefined;
+        next = algorithm.run(values, target, edges, directed, operations);
       }
       setSteps(next);
       setInput(text);
@@ -89,9 +89,12 @@ export default function App() {
   }
 
   function randomize() {
-    const values = Array.from({ length: 8 }, () => Math.floor(Math.random() * (algorithm.randomMax ?? 90)) + 1);
+    const values = [...new Set(Array.from({ length: 8 }, () => Math.floor(Math.random() * (algorithm.randomMax ?? 90)) + 1))];
     if (algorithm.requiresSorted) values.sort((a, b) => a - b);
-    apply(values.join(', '));
+    if (algorithm.category === 'structure') {
+      setOperationInput('');
+      apply(values.join(', '), '');
+    } else apply(values.join(', '));
   }
 
   const errors: Record<string, string> = {
@@ -101,8 +104,8 @@ export default function App() {
     'tree-limit': t('이진 검색 트리는 최대 12개의 서로 다른 노드를 표시합니다.', 'The BST supports at most 12 distinct nodes.'),
     'duplicate-values': t('우선순위 큐의 값은 서로 달라야 합니다. 같은 값을 두 번 넣을 수 없습니다.', 'Priority queue values must be distinct; do not add the same value twice.'),
     'missing-value': t('변경·삭제할 값이 현재 자료 구조에 없습니다.', 'The item to update or remove is not in the current structure.'),
-    words: t('단어는 쉼표 또는 공백으로 구분하고, 각 단어는 최대 16글자까지 입력하세요. 빈 항목은 허용하지 않습니다.', 'Separate words with commas or spaces; use at most 16 code points per word, without empty entries.'),
-    'word-limit': t('현재 저장된 단어는 최대 12개까지 허용합니다.', 'Store at most 12 words.'),
+    words: algorithm.id === 'hash-table' ? t('키와 값은 각각 16글자 이내여야 합니다. 초기 키는 쉼표 또는 공백으로 구분하세요.', 'Keys and values must have at most 16 code points. Separate initial keys with commas or spaces.') : t('단어는 쉼표 또는 공백으로 구분하고, 각 단어는 최대 16글자까지 입력하세요. 빈 항목은 허용하지 않습니다.', 'Separate words with commas or spaces; use at most 16 code points per word, without empty entries.'),
+    'word-limit': algorithm.id === 'hash-table' ? t('최대 12개의 키를 저장할 수 있습니다.', 'Store at most 12 keys.') : t('현재 저장된 단어는 최대 12개까지 허용합니다.', 'Store at most 12 words.'),
     'trie-limit': t('트라이에는 최대 80개의 글자 노드를 표시합니다. 단어 수나 길이를 줄이세요.', 'The trie supports at most 80 character nodes. Use fewer or shorter words.'),
     operations: algorithm.id === 'hash-table' ? t('set 키 값, get 키, delete 키, has 키 형식을 사용하세요. 연산은 쉼표로 구분합니다.', 'Use set key value, get key, delete key or has key; separate commands with commas.') : algorithm.inputMode === 'words' ? t('add · delete · find · suggest 뒤에 단어 하나를 입력하세요. 연산은 쉼표로 구분합니다.', 'Use add, delete, find or suggest followed by one word; separate commands with commas.') : t('연산 형식이 잘못됐습니다. 아래 예시의 연산을 쉼표로 구분해 입력하세요. 값은 -999부터 999까지입니다.', 'Invalid operations. Separate the supported commands below with commas; values must be between -999 and 999.'),
     'operations-limit': t('연산은 최대 64개까지 입력할 수 있습니다.', 'Use at most 64 operations.'),
@@ -167,8 +170,8 @@ export default function App() {
                     {'buckets' in step.variables && <BucketView step={step} language={language} />}
                     {'heapSize' in step.variables && algorithm.category !== 'structure' && <HeapView step={step} language={language} />}
                     {algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : algorithm.category === 'structure' ? <StructureView step={step} language={language} /> : <ArrayView step={step} language={language} />}
-                    <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'structure' ? <><span><i className="dot comparing" />{t('추가·조회한 노드', 'Added / inspected node')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : ['heap-sort', 'counting-sort', 'radix-sort'].includes(algorithm.id) ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span><span><i className="dot settled" />{t('정렬된 결과', 'Sorted output')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
-                    <div className="array-state"><Text size="xs" c="dimmed">{distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : 'hashTable' in step.variables ? t('저장된 키', 'Stored keys') : 'trie' in step.variables ? t('저장된 단어', 'Stored words') : 'tree' in step.variables ? t('중위 순회 · 왼쪽 → 루트 → 오른쪽', 'Inorder · left → root → right') : algorithm.category === 'structure' ? t('현재 노드 · 앞 → 뒤', 'Current nodes · front → back') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : 'hashTable' in step.variables ? step.variables.keys : 'trie' in step.variables ? step.variables.words : 'tree' in step.variables ? step.variables.inorder : step.array.map((item) => item.value).join(', '))}]</output></div>
+                    <Group gap="lg" className="legend">{algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'structure' ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span></> : algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : ['heap-sort', 'counting-sort', 'radix-sort'].includes(algorithm.id) ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span><span><i className="dot settled" />{t('정렬된 결과', 'Sorted output')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
+                    <div className="array-state"><Text size="xs" c="dimmed">{distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : 'hashTable' in step.variables ? t('저장된 키', 'Stored keys') : 'trie' in step.variables ? t('저장된 단어', 'Stored words') : 'tree' in step.variables ? t('중위 순회 · 왼쪽 → 루트 → 오른쪽', 'Inorder · left → root → right') : step.variables.structure === 'stack' ? t('현재 노드 · TOP → 아래', 'Current nodes · TOP → bottom') : step.variables.structure === 'queue' ? t('현재 노드 · FRONT → REAR', 'Current nodes · FRONT → REAR') : step.variables.structure === 'linked-list' ? t('노드 표시 순서 · 연결은 화살표 참고', 'Displayed nodes · follow arrows for links') : algorithm.category === 'structure' ? t('현재 입력·저장 값', 'Current input / stored values') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : 'hashTable' in step.variables ? step.variables.keys : 'trie' in step.variables ? step.variables.words : 'tree' in step.variables ? step.variables.inorder : step.array.map((item) => item.value).join(', '))}]</output></div>
                   </Paper>
                   <Paper withBorder p="lg">
                     <form onSubmit={(event) => { event.preventDefault(); apply(input); }}>
@@ -188,7 +191,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'leftResult', 'rightResult', 'left', 'lowbit', 'sum', 'right', 'operation', 'word', 'character', 'charIndex', 'value', 'priority', 'result', 'weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'leftResult', 'rightResult', 'left', 'lowbit', 'sum', 'right', 'operation', 'word', 'character', 'charIndex', 'value', 'priority', 'result', 'weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent', 'previous'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>
