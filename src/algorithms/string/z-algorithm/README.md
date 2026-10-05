@@ -1,5 +1,7 @@
 # Z Algorithm
 
+This implementation uses a unique `Symbol` separator token, so input characters such as `$` cannot collide with it. It returns all occurrences including overlaps; an empty pattern matches every boundary from zero through text length. Indices use JavaScript UTF-16 code units.
+
 [English](README.md) | [한국어](README.ko-KR.md)
 
 The Z-algorithm finds occurrences of a "word" `W` 

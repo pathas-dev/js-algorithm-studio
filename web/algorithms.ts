@@ -9,7 +9,8 @@ import graphVertexSource from '../src/data-structures/graph/GraphVertex.js?raw';
 import traceGraphStructure from '../src/visualization/graph-structure';
 import naiveSource from '../src/algorithms/string/naive-search/naiveSearch.js?raw';
 import kmpSource from '../src/algorithms/string/knuth-morris-pratt/knuthMorrisPratt.js?raw';
-import { traceStringSearch, traceKmpSearch } from '../src/visualization/strings';
+import zSource from '../src/algorithms/string/z-algorithm/zAlgorithm.js?raw';
+import { traceStringSearch, traceKmpSearch, traceZSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -1303,4 +1304,26 @@ export const kmp: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp];
+export const zSearch: TextAlgorithm = {
+  ...naive, id: 'z-search', name: { ko: 'Z 검색', en: 'Z search' },
+  summary: { ko: '패턴·구분 토큰·텍스트를 연결해 Z 배열을 만듭니다. 접두사 일치 구간인 Z 상자를 재사용하여 겹치는 일치도 모두 찾습니다.', en: 'Join pattern, a unique separator token, and text. Reuse a matching-prefix Z box to find every occurrence, including overlaps.' },
+  source: algorithmCode(zSource), time: 'O(n + m)', example: ['ABABABCABABABC', 'ABABC'],
+  inputHint: { ko: '텍스트 48·패턴 16개 UTF-16 단위 · 빈 패턴은 모든 경계 위치 · $도 입력 가능', en: 'Up to 48 text / 16 pattern UTF-16 units · empty pattern matches every boundary · $ is allowed' },
+  run: ([text, pattern]) => traceZSearch(text, pattern),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['연결 문자열 준비', '패턴 뒤에 어떤 입력 문자와도 같지 않은 구분 토큰을 넣고 텍스트를 연결합니다. 빈 패턴은 0부터 텍스트 길이까지 모든 경계에 일치합니다.'] : ['Prepare the combined sequence', 'Place a unique separator token between pattern and text. An empty pattern matches every boundary from zero through text length.'];
+      case 'z-init': return ko ? ['Z 배열 초기화', '각 위치의 접두사 일치 길이를 0으로 초기화합니다. Z[0]은 이 구현에서 0으로 두고 사용하지 않습니다.'] : ['Initialize the Z array', 'Initialize prefix match lengths to zero. This implementation leaves Z[0] at zero and does not use it.'];
+      case 'z-open': return ko ? ['Z 상자 새로 시작', `위치 ${v.charIndex}가 기존 상자 밖이므로 새 비교 구간을 시작합니다. 일치 길이를 아직 확정하지 않았습니다.`] : ['Open a new Z box', `Position ${v.charIndex} lies outside the previous box. Start a fresh comparison; its match length is not known yet.`];
+      case 'z-compare': return ko ? ['접두사와 상자 끝 비교', `연결 배열[${v.prefixIndex}]와 [${v.zBoxRightIndex}]를 비교합니다. 같으면 오른쪽 경계를 늘리고 다르면 현재 일치 길이를 저장합니다. 비교 중 오른쪽 위치는 아직 확정된 상자 밖일 수 있습니다.`] : ['Compare the prefix with the box boundary', `Compare combined[${v.prefixIndex}] and combined[${v.zBoxRightIndex}]. Extend on equality; save the length on mismatch. The comparison boundary may lie outside the confirmed box.`];
+      case 'z-copy': return ko ? ['상자 안에서 기존 값 재사용', `Z[${v.lookup}]를 Z[${v.charIndex}]로 복사합니다. 이 일치는 상자 오른쪽 경계 안에서 끝나므로 추가 문자 비교가 필요하지 않습니다.`] : ['Reuse a value within the box', `Copy Z[${v.lookup}] to Z[${v.charIndex}]. This match ends within the box, so no further comparisons are needed.`];
+      case 'z-save': return ko ? ['일치 길이 확정', `Z[${v.charIndex}]를 저장했습니다. 확정된 상자는 [${v.zBoxLeftIndex}, ${v.zBoxRightIndex}]이며 오른쪽이 왼쪽보다 작으면 빈 구간입니다.`] : ['Save the prefix match length', `Save Z[${v.charIndex}]. The confirmed box is [${v.zBoxLeftIndex}, ${v.zBoxRightIndex}]; right below left means an empty interval.`];
+      case 'z-check': return ko ? ['텍스트 위치의 Z 값 검사', `Z[${v.charIndex}]가 패턴 길이와 같으면 텍스트 위치 ${v.alignment}에서 전체 패턴이 일치합니다. 패턴과 구분 토큰 영역은 결과에서 제외합니다.`] : ['Check a text position', `If Z[${v.charIndex}] equals pattern length, a full match starts at text index ${v.alignment}. Exclude the pattern and separator regions.`];
+      case 'z-match': return ko ? ['일치 위치 추가', `텍스트 시작 위치 ${v.alignment}를 결과에 추가했습니다. 현재 목록은 ${v.matches}이며 다음 위치도 계속 검사합니다.`] : ['Append a match', `Append text index ${v.alignment}. Current matches: ${v.matches}. Continue checking later positions.`];
+      default: return ko ? ['모든 위치 검색 완료', `일치 위치는 [${v.result}]입니다. 겹치는 일치도 포함하며 빈 목록이면 일치가 없습니다.`] : ['All positions searched', `Matching positions: [${v.result}], including overlaps. An empty list means no match.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch];

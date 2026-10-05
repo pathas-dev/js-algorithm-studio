@@ -1,10 +1,45 @@
 import fs from 'fs';
 import path from 'path';
 import naiveSearch from '../../algorithms/string/naive-search/naiveSearch';
-import { traceStringSearch, traceKmpSearch, requireStrings } from '../strings';
+import zAlgorithm from '../../algorithms/string/z-algorithm/zAlgorithm';
+import {
+  traceStringSearch, traceKmpSearch, traceZSearch, requireStrings,
+} from '../strings';
 import { algorithmCode } from '../playback';
 
 describe('string search lessons', () => {
+  it('finds all Z matches including overlaps, separator characters and empty-pattern boundaries', () => {
+    const source = algorithmCode(fs.readFileSync(path.resolve(
+      __dirname,
+      '../../algorithms/string/z-algorithm/zAlgorithm.js',
+    ), 'utf8'));
+    ['', 'aaaaaa', 'abababa', '$a$$a$', '가나가나', 'a😀집😀'].forEach((text) => {
+      ['', 'a', 'aa', 'aba', '$', '$a$', '가나', '😀', '집', 'not here'].forEach((pattern) => {
+        const expected = Array.from({ length: text.length + 1 }, (_, i) => i)
+          .filter((i) => text.startsWith(pattern, i));
+        expect(zAlgorithm(text, pattern)).toEqual(expected);
+        const steps = traceZSearch(text, pattern);
+        expect(JSON.parse(steps.at(-1).variables.matches)).toEqual(expected);
+        steps.forEach((s) => expect(source).toContain(s.code));
+        if (pattern.length) {
+          const tokens = [...pattern.split(''), null, ...text.split('')];
+          const expectedZ = tokens.map((_, i) => {
+            let length = 0;
+            if (i) {
+              while (i + length < tokens.length && tokens[length] === tokens[i + length]) {
+                length += 1;
+              }
+            }
+            return length;
+          });
+          expect(JSON.parse(steps.at(-1).variables.table)).toEqual(expectedZ);
+          expect(JSON.parse(steps.find((s) => s.type === 'z-init').variables.table))
+            .toEqual(Array(tokens.length).fill(0));
+        }
+      });
+    });
+    expect(traceZSearch('abababa', 'aba').some((s) => s.type === 'z-copy')).toBe(true);
+  });
   it('records KMP prefix fallback without revisiting text and preserves tables when rewinding', () => {
     const source = algorithmCode(fs.readFileSync(path.resolve(
       __dirname,
