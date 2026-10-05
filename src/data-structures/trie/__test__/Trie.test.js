@@ -91,4 +91,19 @@ describe('Trie', () => {
     expect(trie.doesWordExist('cap')).toBe(false);
     expect(trie.doesWordExist('call')).toBe(false);
   });
+  it('deletes complete Unicode code points while preserving shared paths', () => {
+    const trie = new Trie();
+    trie.addWord('😀');
+    trie.addWord('😀집');
+    trie.addWord('😀방');
+    trie.deleteWord('😀집');
+    expect(trie.doesWordExist('😀집')).toBe(false);
+    expect(trie.doesWordExist('😀')).toBe(true);
+    expect(trie.doesWordExist('😀방')).toBe(true);
+    trie.deleteWord('😀');
+    expect(trie.doesWordExist('😀')).toBe(false);
+    expect(trie.doesWordExist('😀방')).toBe(true);
+    trie.deleteWord('😀방');
+    expect(trie.head.suggestChildren()).toEqual([]);
+  });
 });

@@ -1,3 +1,6 @@
+import trieSource from '../src/data-structures/trie/Trie.js?raw';
+import trieNodeSource from '../src/data-structures/trie/TrieNode.js?raw';
+import { traceTrie } from '../src/visualization/trie';
 import bstSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTree.js?raw';
 import bstNodeSource from '../src/data-structures/tree/binary-search-tree/BinarySearchTreeNode.js?raw';
 import priorityQueueSource from '../src/data-structures/priority-queue/PriorityQueue.js?raw';
@@ -55,12 +58,11 @@ export type Step = {
 };
 
 
-export type Algorithm = {
+type AlgorithmConfig = {
   id: string;
   name: Record<Language, string>;
   summary: Record<Language, string>;
   source: string;
-  example: number[];
   time: string | Record<Language, string>;
   category: 'sort' | 'search' | 'graph' | 'structure';
   operations?: string;
@@ -74,9 +76,20 @@ export type Algorithm = {
   graphWeighted?: boolean;
   graphDirected?: boolean;
   fixedDirection?: boolean;
-  run(values: number[], target?: number, edges?: number[][], directed?: boolean, operations?: string): Step[];
   explain(step: Step, language: Language): [string, string];
 };
+
+export type NumericAlgorithm = AlgorithmConfig & {
+  inputMode?: 'numbers';
+  example: number[];
+  run(values: number[], target?: number, edges?: number[][], directed?: boolean, operations?: string): Step[];
+};
+export type WordAlgorithm = AlgorithmConfig & {
+  inputMode: 'words';
+  example: string[];
+  run(words: string[], target?: number, edges?: number[][], directed?: boolean, operations?: string): Step[];
+};
+export type Algorithm = NumericAlgorithm | WordAlgorithm;
 
 function runSort(Sorter: typeof BubbleSort, values: number[]): Step[] {
   const steps: Step[] = [];
@@ -88,7 +101,7 @@ function runSort(Sorter: typeof BubbleSort, values: number[]): Step[] {
   return steps;
 }
 
-export const bubble: Algorithm = {
+export const bubble: NumericAlgorithm = {
   category: 'sort',
   id: 'bubble-sort',
   name: { ko: '버블 정렬', en: 'Bubble sort' },
@@ -131,7 +144,7 @@ export const bubble: Algorithm = {
   },
 };
 
-export const selection: Algorithm = {
+export const selection: NumericAlgorithm = {
   category: 'sort',
   id: 'selection-sort',
   name: { ko: '선택 정렬', en: 'Selection sort' },
@@ -161,7 +174,7 @@ export const selection: Algorithm = {
   },
 };
 
-export const insertion: Algorithm = {
+export const insertion: NumericAlgorithm = {
   category: 'sort',
   id: 'insertion-sort',
   name: { ko: '삽입 정렬', en: 'Insertion sort' },
@@ -190,7 +203,7 @@ export const insertion: Algorithm = {
   },
 };
 
-export const merge: Algorithm = {
+export const merge: NumericAlgorithm = {
   category: 'sort',
   id: 'merge-sort',
   name: { ko: '병합 정렬', en: 'Merge sort' },
@@ -224,7 +237,7 @@ export const merge: Algorithm = {
   },
 };
 
-export const quick: Algorithm = {
+export const quick: NumericAlgorithm = {
   category: 'sort',
   id: 'quick-sort',
   name: { ko: '퀵 정렬', en: 'Quick sort' },
@@ -262,7 +275,7 @@ function runSearch(Search: typeof linearSearch | typeof binarySearch | typeof ju
   return steps;
 }
 
-export const linear: Algorithm = {
+export const linear: NumericAlgorithm = {
   id: 'linear-search', category: 'search', target: 3,
   name: { ko: '선형 검색', en: 'Linear search' },
   summary: { ko: '처음부터 끝까지 확인해 목표 값과 일치하는 모든 인덱스를 찾습니다.', en: 'Inspect every value and return all matching indices.' },
@@ -284,7 +297,7 @@ export const linear: Algorithm = {
   },
 };
 
-export const binary: Algorithm = {
+export const binary: NumericAlgorithm = {
   id: 'binary-search', category: 'search', target: 3, requiresSorted: true,
   name: { ko: '이진 검색', en: 'Binary search' },
   summary: { ko: '정렬된 배열의 중간 값을 비교해 탐색 범위를 절반씩 줄입니다. 중복 값은 일치 위치 하나를 반환합니다.', en: 'Halve the search range in a sorted array. Return one matching index when duplicates exist.' },
@@ -308,7 +321,7 @@ export const binary: Algorithm = {
   },
 };
 
-export const bfs: Algorithm = {
+export const bfs: NumericAlgorithm = {
   id: 'breadth-first-search', category: 'graph', target: 1,
   name: { ko: '너비 우선 탐색', en: 'Breadth-first search' },
   summary: { ko: '무방향 그래프를 큐로 탐색합니다. 발견한 정점을 기억해 순환에서도 한 번씩만 방문합니다.', en: 'Use a FIFO queue to traverse an undirected graph. Mark discoveries to avoid revisiting cycles.' },
@@ -338,7 +351,7 @@ export const bfs: Algorithm = {
   },
 };
 
-export const dfs: Algorithm = {
+export const dfs: NumericAlgorithm = {
   id: 'depth-first-search', category: 'graph', target: 1,
   name: { ko: '깊이 우선 탐색', en: 'Depth-first search' },
   summary: { ko: '한 경로를 깊이 탐색한 뒤 돌아옵니다. 재귀 스택과 발견·처리 상태를 확인할 수 있습니다.', en: 'Explore one path deeply, then backtrack. Inspect the recursion stack and discovery states.' },
@@ -365,7 +378,7 @@ export const dfs: Algorithm = {
   },
 };
 
-export const shell: Algorithm = {
+export const shell: NumericAlgorithm = {
   id: 'shell-sort', category: 'sort',
   name: { ko: '셸 정렬', en: 'Shell sort' },
   summary: { ko: '간격을 둔 값들을 비교하고, 간격을 절반씩 줄여 마지막에는 이웃한 값을 정렬합니다.', en: 'Compare distant values, halve the gap, then finish with neighboring values.' },
@@ -389,7 +402,7 @@ export const shell: Algorithm = {
   },
 };
 
-export const heap: Algorithm = {
+export const heap: NumericAlgorithm = {
   id: 'heap-sort', category: 'sort',
   name: { ko: '힙 정렬', en: 'Heap sort' },
   summary: { ko: '최소 힙에 값을 넣고, 루트의 최솟값을 하나씩 꺼내 결과 배열에 쌓습니다.', en: 'Build a min heap, then repeatedly extract its root into the sorted output.' },
@@ -415,7 +428,7 @@ function numericSteps(steps: (Omit<Step, 'array'> & { array: number[] })[]): Ste
   return steps.map((step) => ({ ...step, array: step.array.map((value, id) => ({ value, id })) }));
 }
 
-export const counting: Algorithm = {
+export const counting: NumericAlgorithm = {
   id: 'counting-sort', category: 'sort',
   name: { ko: '계수 정렬', en: 'Counting sort' },
   summary: { ko: '정수의 빈도를 세고 누적합으로 출력 위치를 계산합니다. 음수와 중복을 지원합니다.', en: 'Count integer frequencies, then use cumulative counts to place values. Supports negatives and duplicates.' },
@@ -443,7 +456,7 @@ export const counting: Algorithm = {
   },
 };
 
-export const radix: Algorithm = {
+export const radix: NumericAlgorithm = {
   id: 'radix-sort', category: 'sort',
   name: { ko: '기수 정렬', en: 'Radix sort' },
   summary: { ko: '일의 자리부터 각 자릿수로 버킷에 나누고 순서대로 모읍니다. 이전 자릿수의 순서를 유지합니다.', en: 'Distribute by digits from right to left, then gather buckets in order while preserving previous digit order.' },
@@ -467,7 +480,7 @@ export const radix: Algorithm = {
   },
 };
 
-export const jump: Algorithm = {
+export const jump: NumericAlgorithm = {
   id: 'jump-search', category: 'search', target: 21, requiresSorted: true,
   name: { ko: '점프 검색', en: 'Jump search' },
   summary: { ko: '√n 크기의 블록 끝을 확인해 점프하고, 후보 블록 안에서 순차 검색합니다.', en: 'Jump across block endpoints of size √n, then scan the candidate block.' },
@@ -491,7 +504,7 @@ export const jump: Algorithm = {
   },
 };
 
-export const interpolation: Algorithm = {
+export const interpolation: NumericAlgorithm = {
   id: 'interpolation-search', category: 'search', target: 40, requiresSorted: true,
   name: { ko: '보간 검색', en: 'Interpolation search' },
   summary: { ko: '값의 비율로 위치를 예상합니다. 균등 분포에서는 효율적이지만 치우친 분포에서는 느릴 수 있습니다.', en: 'Estimate a position from value ratios. Efficient for uniform values, potentially slow for skewed distributions.' },
@@ -523,7 +536,7 @@ export const interpolation: Algorithm = {
   },
 };
 
-export const dijkstra: Algorithm = {
+export const dijkstra: NumericAlgorithm = {
   id: 'dijkstra', category: 'graph', target: 1, graphWeighted: true,
   name: { ko: '다익스트라', en: 'Dijkstra' },
   summary: { ko: '가장 가까운 미처리 정점을 먼저 꺼내 이웃의 거리를 줄입니다. 음수 가중치는 허용하지 않습니다.', en: 'Process the closest unsettled vertex and relax neighbor distances. Requires nonnegative weights.' },
@@ -551,7 +564,7 @@ export const dijkstra: Algorithm = {
   },
 };
 
-export const bellman: Algorithm = {
+export const bellman: NumericAlgorithm = {
   id: 'bellman-ford', category: 'graph', target: 1, graphWeighted: true, graphDirected: true,
   name: { ko: '벨만–포드', en: 'Bellman–Ford' },
   summary: { ko: '음수 간선을 포함한 그래프에서 V−1회 완화한 뒤, 도달 가능한 음수 사이클을 검사합니다.', en: 'Relax edges V−1 times, including negative weights, then check for a reachable negative cycle.' },
@@ -581,7 +594,7 @@ export const bellman: Algorithm = {
   },
 };
 
-export const floyd: Algorithm = {
+export const floyd: NumericAlgorithm = {
   id: 'floyd-warshall', category: 'graph', graphWeighted: true, graphDirected: true, usesStart: false,
   name: { ko: '플로이드–워셜', en: 'Floyd–Warshall' },
   summary: { ko: '경유 정점을 하나씩 허용하며 모든 정점 쌍의 거리 행렬을 갱신합니다.', en: 'Allow intermediate vertices one at a time and update distances for every pair.' },
@@ -608,7 +621,7 @@ export const floyd: Algorithm = {
   },
 };
 
-export const prim: Algorithm = {
+export const prim: NumericAlgorithm = {
   id: 'prim', category: 'graph', graphWeighted: true, fixedDirection: true, usesStart: false,
   name: { ko: '프림', en: 'Prim' },
   summary: { ko: '첫 정점과 연결된 성분에서 가장 싼 경계 간선으로 최소 신장 트리를 확장합니다.', en: 'Grow a minimum spanning tree of the first vertex’s component using the cheapest frontier edge.' },
@@ -632,7 +645,7 @@ export const prim: Algorithm = {
   },
 };
 
-export const kruskal: Algorithm = {
+export const kruskal: NumericAlgorithm = {
   id: 'kruskal', category: 'graph', graphWeighted: true, fixedDirection: true, usesStart: false,
   name: { ko: '크루스칼', en: 'Kruskal' },
   summary: { ko: '가벼운 간선부터 확인하며 서로 다른 집합을 연결합니다. 미연결 그래프는 최소 신장 숲이 됩니다.', en: 'Consider edges by weight and connect different sets. Disconnected graphs produce a minimum spanning forest.' },
@@ -656,7 +669,7 @@ export const kruskal: Algorithm = {
   },
 };
 
-export const topological: Algorithm = {
+export const topological: NumericAlgorithm = {
   id: 'topological-sort', category: 'graph', graphDirected: true, fixedDirection: true, usesStart: false,
   name: { ko: '위상 정렬', en: 'Topological sort' },
   summary: { ko: '방향 비순환 그래프의 의존 순서를 구합니다. DFS 종료 시 스택에 쌓아 역순으로 읽습니다.', en: 'Order dependencies in a directed acyclic graph. Push on DFS completion and read in reverse finish order.' },
@@ -681,7 +694,7 @@ export const topological: Algorithm = {
   },
 };
 
-export const stack: Algorithm = {
+export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
   summary: { ko: '맨 위에 넣고 맨 위에서 꺼내는 LIFO 구조입니다. 초기 값도 순서대로 push합니다.', en: 'Push and pop at the top: last in, first out. Initial values are also pushed in order.' },
@@ -706,7 +719,7 @@ export const stack: Algorithm = {
   },
 };
 
-export const queue: Algorithm = {
+export const queue: NumericAlgorithm = {
   id: 'queue', category: 'structure', usesStart: false,
   name: { ko: '큐', en: 'Queue' },
   summary: { ko: '뒤로 넣고 앞에서 꺼내는 FIFO 구조입니다. 먼저 들어온 값이 먼저 나갑니다.', en: 'Enqueue at the rear and dequeue at the front: first in, first out.' },
@@ -731,7 +744,7 @@ export const queue: Algorithm = {
   },
 };
 
-export const linkedList: Algorithm = {
+export const linkedList: NumericAlgorithm = {
   id: 'linked-list', category: 'structure', usesStart: false,
   name: { ko: '연결 리스트', en: 'Linked list' },
   summary: { ko: '노드의 next 연결로 순서를 유지합니다. 검색과 역순 전환의 포인터 이동을 따라가 보세요.', en: 'Maintain order through next links. Follow pointer movement during search and reversal.' },
@@ -763,7 +776,7 @@ export const linkedList: Algorithm = {
   },
 };
 
-export const minHeap: Algorithm = {
+export const minHeap: NumericAlgorithm = {
   id: 'min-heap', category: 'structure', usesStart: false,
   name: { ko: '최소 힙', en: 'Min heap' },
   summary: { ko: '루트에서 최솟값을 꺼냅니다. 삽입 후 위로, 추출 후 아래로 교환하며 힙 순서를 복원합니다.', en: 'Extract the minimum at the root. Restore heap order upward after insertion and downward after extraction.' },
@@ -797,7 +810,7 @@ export const minHeap: Algorithm = {
   },
 };
 
-export const priorityQueue: Algorithm = {
+export const priorityQueue: NumericAlgorithm = {
   id: 'priority-queue', category: 'structure', usesStart: false,
   name: { ko: '우선순위 큐', en: 'Priority queue' },
   summary: { ko: '값과 별개인 우선순위로 처리 순서를 정합니다. 작은 우선순위 숫자가 먼저 나옵니다.', en: 'Order items by priority independently of their value. Smaller priority numbers come first.' },
@@ -837,7 +850,7 @@ export const priorityQueue: Algorithm = {
   },
 };
 
-export const binarySearchTree: Algorithm = {
+export const binarySearchTree: NumericAlgorithm = {
   id: 'binary-search-tree', category: 'structure', usesStart: false,
   name: { ko: '이진 검색 트리', en: 'Binary search tree' },
   summary: { ko: '왼쪽은 더 작은 값, 오른쪽은 더 큰 값입니다. 비교 경로를 따라 삽입·검색·삭제합니다.', en: 'Smaller values go left, larger values right. Follow comparisons to insert, find and remove.' },
@@ -868,4 +881,40 @@ export const binarySearchTree: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree];
+export const trie: WordAlgorithm = {
+  id: 'trie', category: 'structure', inputMode: 'words', usesStart: false,
+  name: { ko: '트라이', en: 'Trie' },
+  summary: { ko: '공유 접두사를 글자 경로로 저장합니다. 단어 종료 표시는 접두사와 완전한 단어를 구별합니다.', en: 'Store shared prefixes as character paths. Terminal markers distinguish complete words from prefixes.' },
+  source: algorithmCode(trieSource + '\n' + trieNodeSource), example: ['car', 'cat', 'cart', '가방', '가게'],
+  operations: 'find ca, suggest ca, add carpet, delete car, find car, find cart',
+  operationHint: 'add carpet, delete car, find cart, suggest ca',
+  inputHint: { ko: '최대 12단어 · 단어당 16글자 · 최대 80노드 · 대소문자 구분', en: 'Up to 12 words · 16 code points per word · 80 nodes · case-sensitive' },
+  time: { ko: '추가·검색·삭제 O(m) · m은 글자 수', en: 'add / find / delete O(m) · m is word length' },
+  run: (words, _target, _edges, _directed, operations = trie.operations) => traceTrie(words, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 트라이 준비', 'ROOT는 글자를 저장하는 경로의 시작입니다. 초록 테두리는 완전한 단어의 끝이며, 자식이 있어도 단어의 끝이 될 수 있습니다.']
+        : ['Create an empty trie', 'ROOT starts each character path. A green outline marks a complete word ending; a terminal node can still have children.'];
+      case 'add-character': return ko ? ['글자 경로 연결', `단어 ${v.word}의 ${Number(v.charIndex) + 1}번째 글자 “${v.character}”를 연결했습니다. 같은 접두사의 기존 노드는 재사용하고 마지막 글자는 단어 종료로 표시합니다.`]
+        : ['Link a character', `Link character “${v.character}” at position ${Number(v.charIndex) + 1} in ${v.word}. Reuse shared-prefix nodes and mark the last character as terminal.`];
+      case 'inspect-character': case 'delete-inspect': return ko ? ['다음 글자 확인', `“${v.word}”의 ${Number(v.charIndex) + 1}번째 글자 “${v.character}”로 가는 자식이 있는지 확인합니다. 없으면 이 경로의 탐색이 끝납니다.`]
+        : ['Inspect the next character', `Check for child “${v.character}” at position ${Number(v.charIndex) + 1} of “${v.word}”. A missing child ends the lookup.`];
+      case 'delete-prune': return ko ? ['불필요한 연결 정리', `“${v.character}” 자식이 다른 단어의 끝도 아니고 자식도 없을 때만 삭제합니다. 공유 접두사는 다른 단어에 필요하므로 남습니다.`]
+        : ['Prune unnecessary links', `Remove child “${v.character}” only if it is neither terminal nor has children. Preserve shared prefixes used by other words.`];
+      case 'add': return ko ? ['단어 저장 완료', `“${v.word}”의 경로와 단어 종료 표시를 저장했습니다. 중복 추가는 새로운 단어를 만들지 않습니다.`]
+        : ['Word stored', `Store the path and terminal marker for “${v.word}”. Duplicate additions create no new word.`];
+      case 'delete': return ko ? ['단어 삭제 완료', `“${v.word}”의 종료 표시를 해제하고 불필요한 가지를 정리했습니다. 다른 단어의 공유 경로는 보존됩니다. 없는 단어의 삭제는 구조를 바꾸지 않습니다.`]
+        : ['Deletion complete', `Unmark “${v.word}” and prune unused branches, preserving shared paths. Deleting an absent word leaves the trie unchanged.`];
+      case 'find': return ko ? ['완전한 단어 확인', v.result ? `“${v.word}”의 경로 끝에 단어 종료 표시가 있어 true입니다.` : `“${v.word}”는 저장된 완전한 단어가 아니므로 false입니다. 경로만 존재하는 접두사도 false입니다.`]
+        : ['Check for a complete word', v.result ? `“${v.word}” ends at a terminal marker: true.` : `“${v.word}” is not a stored complete word: false. A prefix path alone is insufficient.`];
+      case 'suggest': return ko ? ['다음 글자 제안', v.result === 'null' ? `접두사 “${v.word}”의 경로가 없어 null을 반환합니다.` : v.result === '∅' ? `접두사 “${v.word}”에는 다음 글자가 없습니다. 빈 배열을 반환합니다.` : `접두사 “${v.word}” 다음에 올 수 있는 글자는 ${v.result}입니다. 완성 단어 목록이 아니라 바로 다음 글자를 반환합니다.`]
+        : ['Suggest next characters', v.result === 'null' ? `Prefix “${v.word}” has no path: return null.` : v.result === '∅' ? `Prefix “${v.word}” has no next characters: return an empty array.` : `Next characters after “${v.word}”: ${v.result}. Return immediate characters, not complete word suggestions.`];
+      default: return ko ? ['연산 완료', '아래 목록은 종료 표시가 있는 완전한 단어입니다. 타임라인을 되돌려 접두사를 공유하는 노드와 삭제된 가지를 비교하세요.']
+        : ['Operations complete', 'The list below contains terminal words. Rewind to compare shared-prefix nodes and pruned branches.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie];

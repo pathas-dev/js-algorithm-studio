@@ -1,4 +1,5 @@
 import TrieNode from './TrieNode';
+import recordStep from '../../utils/trace/recordStep';
 
 // Character that we will use for trie tree root.
 const HEAD_CHARACTER = '*';
@@ -12,13 +13,14 @@ export default class Trie {
    * @param {string} word
    * @return {Trie}
    */
-  addWord(word) {
+  addWord(word, stepCallback) {
     const characters = Array.from(word);
     let currentNode = this.head;
 
     for (let charIndex = 0; charIndex < characters.length; charIndex += 1) {
       const isComplete = charIndex === characters.length - 1;
       currentNode = currentNode.addChild(characters[charIndex], isComplete);
+      recordStep(stepCallback, 'add-character', [currentNode], [], { charIndex, character: characters[charIndex] }, 'currentNode = currentNode.addChild(characters[charIndex], isComplete);');
     }
 
     return this;
@@ -28,14 +30,16 @@ export default class Trie {
    * @param {string} word
    * @return {Trie}
    */
-  deleteWord(word) {
+  deleteWord(word, stepCallback) {
+    const characters = Array.from(word);
     const depthFirstDelete = (currentNode, charIndex = 0) => {
-      if (charIndex >= word.length) {
+      if (charIndex >= characters.length) {
         // Return if we're trying to delete the character that is out of word's scope.
         return;
       }
 
-      const character = word[charIndex];
+      const character = characters[charIndex];
+      recordStep(stepCallback, 'delete-inspect', [currentNode], [], { charIndex, character }, 'const nextNode = currentNode.getChild(character);');
       const nextNode = currentNode.getChild(character);
 
       if (nextNode == null) {
@@ -47,7 +51,7 @@ export default class Trie {
       depthFirstDelete(nextNode, charIndex + 1);
 
       // Since we're going to delete a word let's un-mark its last character isCompleteWord flag.
-      if (charIndex === (word.length - 1)) {
+      if (charIndex === (characters.length - 1)) {
         nextNode.isCompleteWord = false;
       }
 
@@ -55,6 +59,7 @@ export default class Trie {
       // - childNode has NO children
       // - childNode.isCompleteWord === false
       currentNode.removeChild(character);
+      recordStep(stepCallback, 'delete-prune', [currentNode], [], { charIndex, character }, 'currentNode.removeChild(character);');
     };
 
     // Start depth-first deletion from the head node.
@@ -67,8 +72,8 @@ export default class Trie {
    * @param {string} word
    * @return {string[]}
    */
-  suggestNextCharacters(word) {
-    const lastCharacter = this.getLastCharacterNode(word);
+  suggestNextCharacters(word, stepCallback) {
+    const lastCharacter = this.getLastCharacterNode(word, stepCallback);
 
     if (!lastCharacter) {
       return null;
@@ -83,8 +88,8 @@ export default class Trie {
    * @param {string} word
    * @return {boolean}
    */
-  doesWordExist(word) {
-    const lastCharacter = this.getLastCharacterNode(word);
+  doesWordExist(word, stepCallback) {
+    const lastCharacter = this.getLastCharacterNode(word, stepCallback);
 
     return !!lastCharacter && lastCharacter.isCompleteWord;
   }
@@ -93,11 +98,12 @@ export default class Trie {
    * @param {string} word
    * @return {TrieNode}
    */
-  getLastCharacterNode(word) {
+  getLastCharacterNode(word, stepCallback) {
     const characters = Array.from(word);
     let currentNode = this.head;
 
     for (let charIndex = 0; charIndex < characters.length; charIndex += 1) {
+      recordStep(stepCallback, 'inspect-character', [currentNode], [], { charIndex, character: characters[charIndex] }, 'if (!currentNode.hasChild(characters[charIndex])) {');
       if (!currentNode.hasChild(characters[charIndex])) {
         return null;
       }

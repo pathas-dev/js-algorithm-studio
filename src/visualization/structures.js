@@ -6,7 +6,7 @@ import Queue from '../data-structures/queue/Queue';
 import Stack from '../data-structures/stack/Stack';
 import { MAX_VALUES, parseTarget } from './playback';
 
-export function parseOperations(text, commands) {
+export function parseOperations(text, commands, parseArgument = parseTarget) {
   if (!text.trim()) return [];
   // ponytail: 64 operations keep complete snapshots small; use deltas for longer programs.
   const entries = text.split(/[,;\n]/);
@@ -17,7 +17,7 @@ export function parseOperations(text, commands) {
       throw new Error('operations');
     }
     let parsed = [];
-    try { parsed = args.map((arg) => parseTarget(arg)); } catch (cause) { throw new Error('operations'); }
+    try { parsed = args.map((arg) => parseArgument(arg)); } catch (cause) { throw new Error('operations'); }
     return { name, value: parsed[0], ...(parsed.length > 1 ? { priority: parsed[1] } : {}) };
   });
 }
