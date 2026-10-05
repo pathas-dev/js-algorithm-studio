@@ -1,3 +1,5 @@
+import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
+import { traceFenwick } from '../src/visualization/range';
 import trieSource from '../src/data-structures/trie/Trie.js?raw';
 import trieNodeSource from '../src/data-structures/trie/TrieNode.js?raw';
 import { traceTrie } from '../src/visualization/trie';
@@ -917,4 +919,34 @@ export const trie: WordAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie];
+export const fenwick: NumericAlgorithm = {
+  id: 'fenwick-tree', category: 'structure', usesStart: false,
+  name: { ko: '펜윅 트리', en: 'Fenwick tree' },
+  summary: { ko: 'lowbit(i) = i & -i로 담당 구간과 이동 위치를 정해 값 증가와 구간 합을 계산합니다.', en: 'Use lowbit(i) = i & -i to determine stored ranges and jumps for increments and range sums.' },
+  source: algorithmCode(fenwickSource), example: [3, 2, -1, 6, 5, 4, -3, 3],
+  operations: 'query 7, increase 3 2, range 2 6', operationHint: 'query 7, increase 3 2, range 2 6',
+  inputHint: { ko: '인덱스는 1부터 · 최대 32값 · increase 위치 증가량 · range 왼쪽 오른쪽', en: '1-based indices · up to 32 values · increase position delta · range left right' },
+  time: { ko: '구성 O(n log n) · 증가·조회 O(log n)', en: 'Build O(n log n) · increment / query O(log n)' },
+  run: (values, _target, _edges, _directed, operations = fenwick.operations) => traceFenwick(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['0으로 트리 준비', 'tree[0]은 사용하지 않습니다. tree[i]는 i-lowbit(i)+1부터 i까지의 합을 저장합니다. 초기 값도 increase로 하나씩 반영합니다.']
+        : ['Initialize zeros', 'tree[0] is unused. tree[i] stores the sum from i-lowbit(i)+1 through i. Build by applying increase to each initial value.'];
+      case 'increase-node': return ko ? ['담당 구간 합 갱신', `tree[${v.i}]에 ${v.value}을 더했습니다. lowbit=${v.lowbit}이므로 다음 위치는 ${v.next}입니다. 이 위치가 배열 길이를 넘으면 갱신을 끝냅니다.`]
+        : ['Update a stored range', `Add ${v.value} to tree[${v.i}]. lowbit=${v.lowbit}, so the next index is ${v.next}. Stop beyond the array length.`];
+      case 'increased': return ko ? ['증가량 반영 완료', `원본 위치 ${v.position}에 ${v.value}을 더하고 관련 구간 합을 모두 갱신했습니다. 대입이 아니라 기존 값에 더하는 연산입니다.`]
+        : ['Increment complete', `Add ${v.value} at position ${v.position} and update every affected stored sum. This increments the value rather than replacing it.`];
+      case 'query-node': return ko ? ['접두 합 누적', `${v.position}까지의 합에 tree[${v.i}]를 더해 현재 합은 ${v.sum}입니다. 다음 위치 ${v.next}로 이동합니다. 0에 도달하면 겹치지 않는 구간 합을 모두 모았습니다.`]
+        : ['Accumulate a prefix sum', `Add tree[${v.i}] while querying through ${v.position}. Running sum: ${v.sum}. Move to ${v.next}; reaching 0 completes the disjoint ranges.`];
+      case 'query': return ko ? ['접두 합 결과', `1부터 ${v.position}까지의 합은 ${v.result}입니다.`] : ['Prefix sum result', `Sum from 1 through ${v.position}: ${v.result}.`];
+      case 'range': return ko ? ['구간 합 결과', `${v.position}부터 ${v.right}까지의 합은 ${v.result}입니다. 오른쪽 접두 합에서 왼쪽 직전 접두 합을 뺍니다. 왼쪽이 1이면 오른쪽 합만 사용합니다.`]
+        : ['Range sum result', `Sum from ${v.position} through ${v.right}: ${v.result}. Subtract the prefix before the left bound from the right prefix; if left is 1, use only the right prefix.`];
+      default: return ko ? ['연산 완료', '담당 구간 표와 현재 원본 값입니다. 뒤로 이동해 lowbit을 따라 갱신·누적한 위치를 비교하세요.']
+        : ['Operations complete', 'Inspect stored ranges and current input values. Rewind to compare lowbit update and query paths.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie, fenwick];

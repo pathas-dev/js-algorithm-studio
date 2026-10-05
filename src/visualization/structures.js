@@ -18,7 +18,7 @@ export function parseOperations(text, commands, parseArgument = parseTarget) {
     }
     let parsed = [];
     try { parsed = args.map((arg) => parseArgument(arg)); } catch (cause) { throw new Error('operations'); }
-    return { name, value: parsed[0], ...(parsed.length > 1 ? { priority: parsed[1] } : {}) };
+    return { name, value: parsed[0], ...(parsed.length > 1 ? { argument: parsed[1] } : {}) };
   });
 }
 
@@ -234,7 +234,7 @@ export function tracePriorityQueue(values, operations = '') {
     snapshot(step.type, step.code, step.indices, { adjusting: true }, step.array);
   };
   snapshot('start', 'this.priorities = new Map();');
-  const run = ({ name, value, priority }, phase) => {
+  const run = ({ name, value, argument: priority }, phase) => {
     context = { operation: name, phase };
     if (name === 'add') {
       if (queue.hasValue(value)) throw new Error('duplicate-values');
@@ -262,7 +262,7 @@ export function tracePriorityQueue(values, operations = '') {
       if (name === 'poll' && result !== null) ids.delete(result);
     }
   };
-  values.forEach((value) => run({ name: 'add', value, priority: value }, 'input'));
+  values.forEach((value) => run({ name: 'add', value, argument: value }, 'input'));
   commands.forEach((command) => run(command, 'commands'));
   context = {};
   queue.toString();

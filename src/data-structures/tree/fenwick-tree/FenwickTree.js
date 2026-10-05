@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 export default class FenwickTree {
   /**
    * Constructor creates empty fenwick tree of size 'arraySize',
@@ -5,8 +7,9 @@ export default class FenwickTree {
    *
    * @param  {number} arraySize
    */
-  constructor(arraySize) {
+  constructor(arraySize, stepCallback) {
     this.arraySize = arraySize;
+    this.stepCallback = stepCallback;
 
     // Fill tree array with zeros.
     this.treeArray = Array(this.arraySize + 1).fill(0);
@@ -20,12 +23,15 @@ export default class FenwickTree {
    * @return {FenwickTree}
    */
   increase(position, value) {
-    if (position < 1 || position > this.arraySize) {
+    if (!Number.isInteger(position) || position < 1 || position > this.arraySize) {
       throw new Error('Position is out of allowed range');
     }
 
     for (let i = position; i <= this.arraySize; i += (i & -i)) {
       this.treeArray[i] += value;
+      recordStep(this.stepCallback, 'increase-node', this.treeArray, [i], {
+        i, value, lowbit: i & -i, next: i + (i & -i),
+      }, 'this.treeArray[i] += value;');
     }
 
     return this;
@@ -38,7 +44,7 @@ export default class FenwickTree {
    * @return {number}
    */
   query(position) {
-    if (position < 1 || position > this.arraySize) {
+    if (!Number.isInteger(position) || position < 1 || position > this.arraySize) {
       throw new Error('Position is out of allowed range');
     }
 
@@ -46,6 +52,9 @@ export default class FenwickTree {
 
     for (let i = position; i > 0; i -= (i & -i)) {
       sum += this.treeArray[i];
+      recordStep(this.stepCallback, 'query-node', this.treeArray, [i], {
+        i, sum, position, lowbit: i & -i, next: i - (i & -i),
+      }, 'sum += this.treeArray[i];');
     }
 
     return sum;
