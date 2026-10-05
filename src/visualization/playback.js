@@ -1,7 +1,7 @@
 export const MAX_VALUES = 32;
 
 export function algorithmCode(source) {
-  return source.replace(/^\s*this\.recordStep\([\s\S]*?\);\n/gm, '');
+  return source.replace(/^import recordStep[^\n]*\n/gm, '').replace(/^\s*(?:this\.)?recordStep\([\s\S]*?\);\n/gm, '');
 }
 
 export function parseValues(text) {
@@ -48,4 +48,10 @@ export function playbackReducer(state, action) {
     default:
       return state;
   }
+}
+
+export function parseTarget(text) {
+  const values = parseValues(text);
+  if (values.length !== 1) throw new Error('target');
+  return values[0];
 }

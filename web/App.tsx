@@ -1,8 +1,8 @@
 import { useEffect, useReducer, useState } from 'react';
 import { Badge, Button, Group, NativeSelect, Paper, Text, TextInput, Title } from '@mantine/core';
 import { MotionConfig } from 'motion/react';
-import { MAX_VALUES, parseValues, playbackReducer } from '../src/visualization/playback';
-import { algorithms, bubble, type Language } from './algorithms';
+import { MAX_VALUES, parseTarget, parseValues, playbackReducer } from '../src/visualization/playback';
+import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
 import ArrayView from './ArrayView';
 import CodePanel from './CodePanel';
 
@@ -10,8 +10,9 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('ko');
   const ko = language === 'ko';
   const t = (korean: string, english: string) => ko ? korean : english;
-  const [algorithm, setAlgorithm] = useState(bubble);
+  const [algorithm, setAlgorithm] = useState<Algorithm>(bubble);
   const [input, setInput] = useState(bubble.example.join(', '));
+  const [targetInput, setTargetInput] = useState('3');
   const [error, setError] = useState('');
   const [steps, setSteps] = useState(() => bubble.run(bubble.example));
   const [playback, dispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
@@ -43,7 +44,7 @@ export default function App() {
 
   function apply(text: string) {
     try {
-      const next = algorithm.run(parseValues(text));
+      const next = algorithm.run(parseValues(text), algorithm.category === 'search' ? parseTarget(targetInput) : undefined);
       setSteps(next);
       setInput(text);
       setError('');
@@ -53,9 +54,10 @@ export default function App() {
     }
   }
 
-  function selectAlgorithm(next: typeof bubble) {
-    const trace = next.run(next.example);
+  function selectAlgorithm(next: Algorithm) {
+    const trace = next.run(next.example, next.target);
     setAlgorithm(next);
+    setTargetInput(String(next.target ?? 3));
     setInput(next.example.join(', '));
     setError('');
     setSteps(trace);
@@ -63,6 +65,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    target: t('목표 값으로 숫자 하나를 입력하세요.', 'Enter exactly one target number.'),
     invalid: t('쉼표 또는 공백으로 구분한 숫자를 입력하세요. 빈 항목은 허용하지 않습니다.', 'Enter numbers separated by commas or spaces, without empty entries.'),
     limit: t(`최대 ${MAX_VALUES}개까지 입력할 수 있습니다.`, `Use at most ${MAX_VALUES} values.`),
     range: t('각 값은 -999부터 999 사이여야 합니다.', 'Each value must be between -999 and 999.'),
@@ -85,15 +88,17 @@ export default function App() {
           </div>
           <div className="workspace">
             <nav className="catalog" aria-label={t('알고리즘 목록', 'Algorithms')}>
-              <Text size="xs" fw={700} c="dimmed" mb="md">{t('정렬', 'SORTING')}</Text>
-              {algorithms.map((entry) => <button key={entry.id} className={`algorithm-button ${entry.id === algorithm.id ? 'selected' : ''}`} aria-current={entry.id === algorithm.id ? 'page' : undefined} onClick={() => selectAlgorithm(entry)}>
-                <span>{entry.name[language]}</span><span className="algorithm-arrow">↗</span>
-              </button>)}
+              {(['sort', 'search'] as const).map((category) => <div key={category} className="catalog-group">
+                <Text size="xs" fw={700} c="dimmed" mb="sm" mt="md" className="catalog-label">{category === 'sort' ? t('정렬', 'SORTING') : t('검색', 'SEARCHING')}</Text>
+                {algorithms.filter((entry) => entry.category === category).map((entry) => <button key={entry.id} className={`algorithm-button ${entry.id === algorithm.id ? 'selected' : ''}`} aria-current={entry.id === algorithm.id ? 'page' : undefined} onClick={() => selectAlgorithm(entry)}>
+                  <span>{entry.name[language]}</span><span className="algorithm-arrow">↗</span>
+                </button>)}
+              </div>)}
               <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
             <div className="lesson">
               <div className="lesson-heading">
-                <div><Group gap="sm"><Title order={2}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{t('기초', 'BEGINNER')}</Badge></Group>
+                <div><Group gap="sm"><Title order={2}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : t('검색', 'SEARCHING')}</Badge></Group>
                   <Text size="sm" c="dimmed" mt={6}>{algorithm.summary[language]}</Text>
                 </div>
                 <Badge variant="outline" color="gray">{algorithm.time}</Badge>
@@ -104,11 +109,12 @@ export default function App() {
                     <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
                     {'depth' in step.variables && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
                     <ArrayView step={step} language={language} />
-                    <Group gap="lg" className="legend"><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></Group>
+                    <Group gap="lg" className="legend">{algorithm.category === 'search' ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
                     <div className="array-state"><Text size="xs" c="dimmed">{t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{step.array.map((item) => item.value).join(', ')}]</output></div>
                   </Paper>
                   <Paper withBorder p="lg">
                     <form onSubmit={(event) => { event.preventDefault(); apply(input); }}>
+                      {algorithm.category === 'search' && <TextInput label={t('목표 값', 'Target value')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} autoComplete="off" mb="sm" />}
                       <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={t('배열 입력', 'Array input')} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder="8, 3, 6, 1, 5, 2" error={errors[error]} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
                       {error && <span role="alert" className="sr-only">{errors[error]}</span>}
                     </form>
@@ -120,7 +126,7 @@ export default function App() {
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>

@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import linearSearch from '../../algorithms/search/linear-search/linearSearch';
 import QuickSortInPlace from '../../algorithms/sorting/quick-sort/QuickSortInPlace';
 import MergeSort from '../../algorithms/sorting/merge-sort/MergeSort';
 import InsertionSort from '../../algorithms/sorting/insertion-sort/InsertionSort';
 import SelectionSort from '../../algorithms/sorting/selection-sort/SelectionSort';
 import BubbleSort from '../../algorithms/sorting/bubble-sort/BubbleSort';
 import {
-  MAX_VALUES, algorithmCode, parseValues, playbackReducer,
+  MAX_VALUES, algorithmCode, parseTarget, parseValues, playbackReducer,
 } from '../playback';
 
 describe('visualizer execution and playback', () => {
@@ -46,8 +47,32 @@ describe('visualizer execution and playback', () => {
     expect(result.map((item) => item.id)).toEqual([1, 0, 2]);
   });
 
+  it('records linear search matches, misses and empty arrays without mutating input', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(__dirname, '../../algorithms/search/linear-search/linearSearch.js'), 'utf8'));
+    [[], [1], [2, 1, 2, -1], [1, 1, 1]].forEach((input) => {
+      [-1, 1, 2, 10].forEach((target) => {
+        const steps = [];
+        const original = [...input];
+        const result = linearSearch(input, target, undefined, (step) => steps.push(step));
+        expect(result).toEqual(linearSearch(input, target));
+        expect(input).toEqual(original);
+        expect(steps[0].type).toBe('start');
+        expect(steps[steps.length - 1].type).toBe('done');
+        expect(steps[steps.length - 1].indices).toEqual(result);
+        steps.forEach((step) => {
+          expect(source).toContain(step.code);
+          expect(step.array).toEqual(original);
+          expect(step.indices.every((index) => index >= 0 && index < input.length)).toBe(true);
+        });
+      });
+    });
+  });
+
   it('validates user values before recording bounded snapshots', () => {
     expect(parseValues('')).toEqual([]);
+    expect(parseTarget('-2.5')).toBe(-2.5);
+    expect(() => parseTarget('')).toThrow('target');
+    expect(() => parseTarget('1,2')).toThrow('target');
     expect(parseValues(' 1, -2  3.5, .5 ')).toEqual([1, -2, 3.5, 0.5]);
     ['1,,2', ',1', '1,', 'NaN', 'Infinity', '0x10', '1e2', '1+2'].forEach((text) => {
       expect(() => parseValues(text)).toThrow('invalid');

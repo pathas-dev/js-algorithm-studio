@@ -1,3 +1,5 @@
+import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
+import linearSource from '../src/algorithms/search/linear-search/linearSearch.js?raw';
 import QuickSortInPlace from '../src/algorithms/sorting/quick-sort/QuickSortInPlace';
 import quickSource from '../src/algorithms/sorting/quick-sort/QuickSortInPlace.js?raw';
 import MergeSort from '../src/algorithms/sorting/merge-sort/MergeSort';
@@ -21,6 +23,19 @@ export type Step = {
 };
 
 
+export type Algorithm = {
+  id: string;
+  name: Record<Language, string>;
+  summary: Record<Language, string>;
+  source: string;
+  example: number[];
+  time: string;
+  category: 'sort' | 'search';
+  target?: number;
+  run(values: number[], target?: number): Step[];
+  explain(step: Step, language: Language): [string, string];
+};
+
 function runSort(Sorter: typeof BubbleSort, values: number[]): Step[] {
   const steps: Step[] = [];
   // ponytail: full snapshots for at most 32 values; use deltas for larger lessons.
@@ -31,7 +46,8 @@ function runSort(Sorter: typeof BubbleSort, values: number[]): Step[] {
   return steps;
 }
 
-export const bubble = {
+export const bubble: Algorithm = {
+  category: 'sort',
   id: 'bubble-sort',
   name: { ko: '버블 정렬', en: 'Bubble sort' },
   summary: {
@@ -73,7 +89,8 @@ export const bubble = {
   },
 };
 
-export const selection = {
+export const selection: Algorithm = {
+  category: 'sort',
   id: 'selection-sort',
   name: { ko: '선택 정렬', en: 'Selection sort' },
   summary: { ko: '미정렬 구간의 최솟값을 찾아 앞쪽에 하나씩 확정합니다.', en: 'Find the minimum in the remaining range and settle it at the front.' },
@@ -102,7 +119,8 @@ export const selection = {
   },
 };
 
-export const insertion = {
+export const insertion: Algorithm = {
+  category: 'sort',
   id: 'insertion-sort',
   name: { ko: '삽입 정렬', en: 'Insertion sort' },
   summary: { ko: '다음 값을 앞의 정렬된 구간에 삽입합니다. 이 구간의 값은 이후에도 이동할 수 있습니다.', en: 'Insert the next value into the sorted prefix. Prefix values may still move later.' },
@@ -130,7 +148,8 @@ export const insertion = {
   },
 };
 
-export const merge = {
+export const merge: Algorithm = {
+  category: 'sort',
   id: 'merge-sort',
   name: { ko: '병합 정렬', en: 'Merge sort' },
   summary: { ko: '부분 배열을 반으로 나누고, 정렬된 두 배열의 앞쪽 값을 비교해 합칩니다.', en: 'Split into halves, then merge sorted halves by comparing their leading values.' },
@@ -163,7 +182,8 @@ export const merge = {
   },
 };
 
-export const quick = {
+export const quick: Algorithm = {
+  category: 'sort',
   id: 'quick-sort',
   name: { ko: '퀵 정렬', en: 'Quick sort' },
   summary: { ko: '입력을 복사하고 구간 내에서 교환합니다. 마지막 값을 피벗으로 삼아 작은 값들을 왼쪽에 모읍니다.', en: 'Copy the input, then partition each range in place using its last value as the pivot.' },
@@ -193,4 +213,33 @@ export const quick = {
   },
 };
 
-export const algorithms = [bubble, selection, insertion, merge, quick];
+function runSearch(Search: typeof linearSearch, values: number[], target = 3): Step[] {
+  const steps: Step[] = [];
+  const items = values.map((value, id) => ({ value, id }));
+  Search(values, target, (a: number, b: number) => a - b, (step: Omit<Step, 'array'>) => steps.push({ ...step, array: [...items] }));
+  return steps;
+}
+
+export const linear: Algorithm = {
+  id: 'linear-search', category: 'search', target: 3,
+  name: { ko: '선형 검색', en: 'Linear search' },
+  summary: { ko: '처음부터 끝까지 확인해 목표 값과 일치하는 모든 인덱스를 찾습니다.', en: 'Inspect every value and return all matching indices.' },
+  source: algorithmCode(linearSource), example: [8, 3, 6, 1, 3, 2], time: 'O(n)',
+  run: (values, target) => runSearch(linearSearch, values, target),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['검색 시작', `목표 값은 ${v.target}입니다. 일치하는 위치를 담을 빈 배열을 준비합니다.`]
+        : ['Begin searching', `The target is ${v.target}. Prepare an empty list of matching indices.`];
+      case 'compare': return ko ? ['값 확인', `인덱스 ${v.index}의 값(${step.array[Number(v.index)].value})과 목표 값(${v.target})이 같은지 확인합니다.`]
+        : ['Inspect a value', `Check whether value ${step.array[Number(v.index)].value} at index ${v.index} equals target ${v.target}.`];
+      case 'found': return ko ? ['일치 위치 기록', `인덱스 ${v.index}에서 목표 값을 찾았습니다. 중복 값도 모두 찾기 위해 검색을 계속합니다.`]
+        : ['Record a match', `Found the target at index ${v.index}. Continue searching to find every duplicate.`];
+      default: return ko ? ['검색 완료', v.matches ? `일치하는 인덱스: ${v.matches}. 반환 값은 일치 위치의 배열입니다.` : '목표 값이 없습니다. 빈 배열을 반환합니다.']
+        : ['Search complete', v.matches ? `Matching indices: ${v.matches}. Return the list of all matching positions.` : 'No matches. Return an empty list.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, linear];

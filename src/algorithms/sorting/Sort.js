@@ -1,3 +1,4 @@
+import recordStep from '../../utils/trace/recordStep';
 import Comparator from '../../utils/comparator/Comparator';
 
 /**
@@ -34,14 +35,6 @@ export default class Sort {
   }
 
   recordStep(type, array, indices = [], variables = {}, code = '') {
-    if (this.callbacks.stepCallback) {
-      this.callbacks.stepCallback({
-        type,
-        array: [...(typeof array === 'function' ? array() : array)],
-        indices: [...indices],
-        variables: { ...variables },
-        code,
-      });
-    }
+    recordStep(this.callbacks.stepCallback, type, array, indices, variables, code);
   }
 }
