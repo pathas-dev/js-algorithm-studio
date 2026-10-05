@@ -14,6 +14,16 @@ import CodePanel from './CodePanel';
 import StringView from './StringView';
 import DpView from './DpView';
 
+function PlaybackIcon({ name }: { name: 'first' | 'previous' | 'play' | 'pause' | 'replay' | 'next' | 'last' }) {
+  const paths = {
+    first: 'M5 5v14M18 5l-9 7 9 7Z', previous: 'M15 5l-9 7 9 7',
+    play: 'M8 5l11 7-11 7Z', pause: 'M8 5v14M16 5v14',
+    replay: 'M4 10a8 8 0 1 1 1 8M4 4v6h6',
+    next: 'M9 5l9 7-9 7', last: 'M19 5v14M6 5l9 7-9 7Z',
+  };
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;
+}
+
 export default function App() {
   const [language, setLanguage] = useState<Language>('ko');
   const ko = language === 'ko';
@@ -25,6 +35,7 @@ export default function App() {
   const [directed, setDirected] = useState(false);
   const [edgeInput, setEdgeInput] = useState('');
   const [error, setError] = useState('');
+  const [editingArray, setEditingArray] = useState(false);
   const [steps, setSteps] = useState(() => bubble.run(bubble.example));
   const [playback, dispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
   const step = steps[playback.index];
@@ -35,11 +46,12 @@ export default function App() {
   useEffect(() => { document.documentElement.lang = language; }, [language]);
   useEffect(() => {
     if (!playback.playing) return;
-    const timer = window.setTimeout(() => dispatch({ type: 'tick' }), 700 / playback.speed);
+    const timer = window.setTimeout(() => dispatch({ type: 'tick' }), 950 / playback.speed);
     return () => window.clearTimeout(timer);
   }, [playback.playing, playback.index, playback.speed]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (editingArray) return;
       if (event.altKey || event.ctrlKey || event.metaKey) return;
       if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, a, [role="combobox"]')) return;
       if (event.key === 'ArrowLeft') seek(playback.index - 1);
@@ -52,7 +64,7 @@ export default function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [playback.index, steps.length]);
+  }, [playback.index, steps.length, editingArray]);
 
   function apply(text: string, operations = operationInput) {
     try {
@@ -73,6 +85,7 @@ export default function App() {
       setSteps(next);
       setInput(text);
       setError('');
+      setEditingArray(false);
       dispatch({ type: 'reset', length: next.length });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'invalid');
@@ -82,6 +95,7 @@ export default function App() {
   function selectAlgorithm(next: Algorithm) {
     const trace = next.inputMode === 'text' || next.inputMode === 'words' ? next.run(next.example, undefined, undefined, undefined, next.operations) : next.run(next.example, next.target, next.graphEdges, next.graphDirected);
     setAlgorithm(next);
+    setEditingArray(false);
     setOperationInput(next.operations ?? '');
     setTargetInput(next.inputMode === 'text' ? next.example[1] : String(next.target ?? 3));
     setDirected(next.graphDirected ?? false);
@@ -138,21 +152,24 @@ export default function App() {
     range: t('각 값은 -999부터 999 사이여야 합니다.', 'Each value must be between -999 and 999.'),
   };
 
+  const inputLabel = algorithm.inputLabels?.[0][language] ?? (algorithm.inputMode === 'text' ? t('텍스트 입력', 'Text') : algorithm.category === 'graph' ? t('정점 입력', 'Vertices') : algorithm.id === 'hash-table' ? t('초기 키 입력', 'Initial keys') : algorithm.inputMode === 'words' ? t('초기 단어 입력', 'Initial words') : algorithm.category === 'structure' ? t('초기 값 입력', 'Initial values') : t('배열 입력', 'Array input'));
+
   return (
     <MotionConfig reducedMotion="user">
       <div className="studio">
         <header className="studio-header">
-          <a className="brand" href="/"><span className="brand-mark">◈</span> Algorithm Studio</a>
+          <a className="brand" href="/"><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" /> Algorithm Studio</a>
           <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('작은 단계가 만드는 큰 이해', 'Small steps. Clear understanding.')}</Text>
             <Button variant="default" size="xs" onClick={() => setLanguage(ko ? 'en' : 'ko')}>{ko ? 'English' : '한국어'}</Button>
           </Group>
         </header>
         <main>
-          <div className="intro">
-            <Text className="eyebrow">{t('알고리즘을 탐색하는 공간', 'YOUR ALGORITHM WORKSPACE')}</Text>
-            <Title order={1}>{t('움직임으로 보고, 코드로 이해하세요.', 'See the logic. Understand the why.')}</Title>
-            <Text c="dimmed" mt="sm">{t('시간을 앞뒤로 움직이며, 한 번의 비교부터 마지막 결과까지 살펴보세요.', 'Move through time, from the first comparison to the final result.')}</Text>
-          </div>
+          <section className="lesson-explanation" aria-label={t('단계 해설', 'Step explanation')}>
+            <div className="explanation-heading"><Text fw={600} size="sm" c="teal">{t('단계 해설', 'Step explanation')}</Text><Text fw={700} className="reason-title">{stepTitle}</Text></div>
+            <div className="explanation-content"><Text className="step-reason" data-testid="step-reason">{reason}</Text>
+              <Group gap="xs" mt="xs" className="step-variables">{Object.entries(step.variables).filter(([name]) => ['key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'leftResult', 'rightResult', 'left', 'lowbit', 'sum', 'right', 'operation', 'word', 'character', 'charIndex', 'value', 'priority', 'result', 'weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent', 'previous'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+            </div>
+          </section>
           <div className="workspace">
             <NativeSelect className="mobile-catalog" label={t('알고리즘 선택', 'Choose an algorithm')} value={algorithm.id} data={algorithms.map((entry) => ({ value: entry.id, label: entry.name[language] }))} onChange={(event) => {
               const next = algorithms.find((entry) => entry.id === event.currentTarget.value);
@@ -167,13 +184,29 @@ export default function App() {
               </div>)}
               <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
-            <div className="lesson">
+            <div className={`lesson ${algorithm.id === 'bubble-sort' ? 'bubble-lesson' : ''}`}>
               <div className="lesson-heading">
-                <div><Group gap="sm"><Title order={2}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : algorithm.category === 'search' ? t('검색', 'SEARCHING') : algorithm.category === 'graph' ? t('그래프', 'GRAPHS') : algorithm.category === 'string' ? t('문자열', 'STRINGS') : algorithm.category === 'dp' ? t('동적 계획', 'DYNAMIC PROGRAMMING') : t('자료 구조', 'DATA STRUCTURES')}</Badge></Group>
+                <div><Group gap="sm"><Title order={1}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : algorithm.category === 'search' ? t('검색', 'SEARCHING') : algorithm.category === 'graph' ? t('그래프', 'GRAPHS') : algorithm.category === 'string' ? t('문자열', 'STRINGS') : algorithm.category === 'dp' ? t('동적 계획', 'DYNAMIC PROGRAMMING') : t('자료 구조', 'DATA STRUCTURES')}</Badge></Group>
                   <Text size="sm" c="dimmed" mt={6}>{algorithm.summary[language]}</Text>
                 </div>
                 <Badge variant="outline" color="gray">{typeof algorithm.time === 'string' ? algorithm.time : algorithm.time[language]}</Badge>
               </div>
+              <Paper withBorder className="playback-card" aria-label={t('재생 컨트롤', 'Playback controls')}>
+                <fieldset className="playback-toolbar" disabled={editingArray}>
+                  <div className="transport">
+                    <Button variant="subtle" className="transport-button" aria-label={t('처음', 'First')} title={t('처음으로 · Home', 'First step · Home')} onClick={() => seek(0)} disabled={playback.index === 0}><PlaybackIcon name="first" /></Button>
+                    <Button variant="subtle" className="transport-button" aria-label={t('이전', 'Previous')} title={t('이전 단계 · ←', 'Previous step · ←')} onClick={() => seek(playback.index - 1)} disabled={playback.index === 0}><PlaybackIcon name="previous" /></Button>
+                    <Button className="play-button" onClick={() => dispatch({ type: 'toggle' })} title={t('재생 / 일시정지 · Space', 'Play / pause · Space')} leftSection={<PlaybackIcon name={playback.playing ? 'pause' : playback.index === steps.length - 1 ? 'replay' : 'play'} />}>{playback.playing ? t('일시정지', 'Pause') : playback.index === steps.length - 1 ? t('다시 재생', 'Replay') : t('재생', 'Play')}</Button>
+                    <Button variant="subtle" className="transport-button" aria-label={t('다음', 'Next')} title={t('다음 단계 · →', 'Next step · →')} onClick={() => seek(playback.index + 1)} disabled={playback.index === steps.length - 1}><PlaybackIcon name="next" /></Button>
+                    <Button variant="subtle" className="transport-button" aria-label={t('마지막', 'Last')} title={t('마지막으로 · End', 'Last step · End')} onClick={() => seek(steps.length - 1)} disabled={playback.index === steps.length - 1}><PlaybackIcon name="last" /></Button>
+                  </div>
+                  <input className="timeline" type="range" min={0} max={steps.length - 1} value={playback.index} onChange={(event) => seek(Number(event.currentTarget.value))} aria-label={t('단계 타임라인', 'Step timeline')} aria-valuetext={`${playback.index + 1} / ${steps.length}: ${stepTitle}`} />
+                  <div className="playback-meta">
+                    <Text size="sm" className="step-counter" data-testid="step-counter">{t('단계', 'Step')} <strong>{playback.index + 1}</strong><span> / {steps.length}</span></Text>
+                    <NativeSelect aria-label={t('재생 속도', 'Playback speed')} size="sm" value={String(playback.speed)} data={['0.5', '1', '2', '4'].map((value) => ({ value, label: `${value}×` }))} onChange={(event) => dispatch({ type: 'speed', speed: Number(event.currentTarget.value) })} />
+                  </div>
+                </fieldset>
+              </Paper>
               <div className="lesson-panels">
                 <div className="visual-column">
                   <Paper withBorder className="canvas-card">
@@ -183,42 +216,38 @@ export default function App() {
                     {'heapSize' in step.variables && algorithm.category !== 'structure' && <HeapView step={step} language={language} />}
                     {algorithm.category === 'dp' ? <DpView step={step} language={language} /> : algorithm.category === 'string' ? <StringView step={step} language={language} /> : algorithm.category === 'graph' ? <GraphView step={step} language={language} /> : algorithm.category === 'structure' ? <StructureView step={step} language={language} /> : <ArrayView step={step} language={language} />}
                     <Group gap="lg" className="legend">{algorithm.category === 'dp' ? <><span><i className="dot comparing" />{t('현재 셀', 'Current cell')}</span><span><i className="dot matched" />{t('참조 셀', 'Referenced cell')}</span></> : algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'structure' ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span></> : ['search', 'string'].includes(algorithm.category) ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : ['heap-sort', 'counting-sort', 'radix-sort'].includes(algorithm.id) ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span><span><i className="dot settled" />{t('정렬된 결과', 'Sorted output')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
-                    <div className="array-state"><Text size="xs" c="dimmed">{algorithm.category === 'dp' ? t('결과', 'Result') : algorithm.category === 'string' ? t('검색 결과', 'Search result') : distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : 'hashTable' in step.variables ? t('저장된 키', 'Stored keys') : 'trie' in step.variables ? t('저장된 단어', 'Stored words') : 'tree' in step.variables ? t('중위 순회 · 왼쪽 → 루트 → 오른쪽', 'Inorder · left → root → right') : step.variables.structure === 'stack' ? t('현재 노드 · TOP → 아래', 'Current nodes · TOP → bottom') : step.variables.structure === 'queue' ? t('현재 노드 · FRONT → REAR', 'Current nodes · FRONT → REAR') : step.variables.structure === 'linked-list' ? t('노드 표시 순서 · 연결은 화살표 참고', 'Displayed nodes · follow arrows for links') : algorithm.category === 'structure' ? t('현재 입력·저장 값', 'Current input / stored values') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{['string', 'dp'].includes(algorithm.category) ? step.variables.result ?? '—' : distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : 'hashTable' in step.variables ? step.variables.keys : 'trie' in step.variables ? step.variables.words : 'tree' in step.variables ? step.variables.inorder : step.array.map((item) => item.value).join(', '))}]</output></div>
+                    {algorithm.id === 'bubble-sort' ? <div className="inline-array-editor">
+                      <Group justify="space-between" gap="sm"><Text size="xs" c="dimmed">{t('현재 배열', 'Current array')}</Text><Button variant="subtle" size="compact-sm" onClick={randomize} disabled={editingArray}>{t('무작위', 'Randomize')}</Button></Group>
+                      {editingArray ? <form onSubmit={(event) => { event.preventDefault(); apply(input); }} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); setEditingArray(false); setError(''); } }}>
+                        <div className="input-row"><TextInput className="array-input" size="md" aria-label={t('현재 배열', 'Current array')} value={input} onChange={(event) => setInput(event.currentTarget.value)} error={error ? errors[error] : undefined} autoFocus autoComplete="off" /><div className="array-edit-actions"><Button type="submit" variant="light" className="apply-button">{t('적용', 'Apply')}</Button><Button variant="subtle" onClick={() => { setEditingArray(false); setError(''); }}>{t('취소', 'Cancel')}</Button></div></div>
+                        <Text size="xs" c="dimmed" mt="xs">{t(`최대 ${MAX_VALUES}개 · Enter 적용 · Esc 취소`, `Up to ${MAX_VALUES} values · Enter apply · Esc cancel`)}</Text>
+                        {error && <span role="alert" className="sr-only">{errors[error]}</span>}
+                      </form> : <button className="editable-array" aria-label={t('현재 배열 수정', 'Edit current array')} onClick={() => { seek(playback.index); setInput(step.array.map((item) => item.value).join(', ')); setError(''); setEditingArray(true); }}>
+                        <output data-testid="array-values">[{step.array.map((item) => item.value).join(', ')}]</output><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15Z" /></svg><span>{t('수정', 'Edit')}</span>
+                      </button>}
+                    </div> : <div className="array-state"><Text size="xs" c="dimmed">{algorithm.category === 'dp' ? t('결과', 'Result') : algorithm.category === 'string' ? t('검색 결과', 'Search result') : distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : 'hashTable' in step.variables ? t('저장된 키', 'Stored keys') : 'trie' in step.variables ? t('저장된 단어', 'Stored words') : 'tree' in step.variables ? t('중위 순회 · 왼쪽 → 루트 → 오른쪽', 'Inorder · left → root → right') : step.variables.structure === 'stack' ? t('현재 노드 · TOP → 아래', 'Current nodes · TOP → bottom') : step.variables.structure === 'queue' ? t('현재 노드 · FRONT → REAR', 'Current nodes · FRONT → REAR') : step.variables.structure === 'linked-list' ? t('노드 표시 순서 · 연결은 화살표 참고', 'Displayed nodes · follow arrows for links') : algorithm.category === 'structure' ? t('현재 입력·저장 값', 'Current input / stored values') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{['string', 'dp'].includes(algorithm.category) ? step.variables.result ?? '—' : distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : 'hashTable' in step.variables ? step.variables.keys : 'trie' in step.variables ? step.variables.words : 'tree' in step.variables ? step.variables.inorder : step.array.map((item) => item.value).join(', '))}]</output></div>}
                   </Paper>
-                  <Paper withBorder p="lg">
+                  {algorithm.id === 'bubble-sort' && <CodePanel source={algorithm.source} activeCode={step.code} language={language} />}
+                  {algorithm.id !== 'bubble-sort' && <Paper withBorder p="lg" className="input-card">
                     <form onSubmit={(event) => { event.preventDefault(); apply(input); }}>
                       {algorithm.inputMode === 'text' && <TextInput label={algorithm.inputLabels?.[1][language] ?? t('패턴 입력', 'Pattern')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} autoComplete="off" mb="sm" />}
                       {algorithm.category !== 'sort' && algorithm.usesStart !== false && <TextInput label={algorithm.category === 'graph' ? t('시작 정점', 'Start vertex') : t('목표 값', 'Target value')} value={targetInput} onChange={(event) => setTargetInput(event.currentTarget.value)} error={['target', 'start'].includes(error) ? errors[error] : undefined} autoComplete="off" mb="sm" />}
                       {algorithm.category === 'structure' && <TextInput label={t('연산 입력', 'Operations')} value={operationInput} onChange={(event) => setOperationInput(event.currentTarget.value)} description={algorithm.operationHint} error={['operations', 'operations-limit', 'capacity', 'duplicate-values', 'missing-value', 'positions', 'range-order'].includes(error) ? errors[error] : undefined} autoComplete="off" mb="sm" />}
                       {algorithm.graphWeighted && !algorithm.fixedDirection && <NativeSelect label={t('간선 방향', 'Edge direction')} value={directed ? 'directed' : 'undirected'} data={[{ value: 'undirected', label: t('무방향', 'Undirected') }, { value: 'directed', label: t('방향 · 첫 정점 → 두 번째 정점', 'Directed · first → second') }]} onChange={(event) => setDirected(event.currentTarget.value === 'directed')} mb="sm" />}
                       {algorithm.category === 'graph' && <TextInput label={t('간선 입력', 'Edges')} value={edgeInput} onChange={(event) => setEdgeInput(event.currentTarget.value)} error={['edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle', 'operations', 'operations-limit', 'capacity', 'duplicate-values', 'missing-value', 'positions', 'range-order'].includes(error) ? errors[error] : undefined} placeholder={algorithm.graphWeighted ? "1-2:7, 1-3:2" : "1-2, 1-3, 2-4"} autoComplete="off" mb="sm" />}
-                      <Group align="flex-end" wrap="nowrap"><TextInput className="array-input" label={algorithm.inputLabels?.[0][language] ?? (algorithm.inputMode === 'text' ? t('텍스트 입력', 'Text') : algorithm.category === 'graph' ? t('정점 입력', 'Vertices') : algorithm.id === 'hash-table' ? t('초기 키 입력', 'Initial keys') : algorithm.inputMode === 'words' ? t('초기 단어 입력', 'Initial words') : algorithm.category === 'structure' ? t('초기 값 입력', 'Initial values') : t('배열 입력', 'Array input'))} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder={algorithm.inputMode === 'text' ? algorithm.example[0] : algorithm.inputMode === 'words' ? 'car, cat, 가방, 가게' : '8, 3, 6, 1, 5, 2'} error={!['target', 'start', 'edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle', 'operations', 'operations-limit', 'capacity', 'duplicate-values', 'missing-value', 'positions', 'range-order'].includes(error) ? errors[error] : undefined} autoComplete="off" /><Button type="submit">{t('적용', 'Apply')}</Button></Group>
+                      <Group className="input-row" align="flex-end" wrap="nowrap"><TextInput className="array-input" size="sm" label={inputLabel} aria-label={inputLabel} value={input} onChange={(event) => setInput(event.currentTarget.value)} placeholder={algorithm.inputMode === 'text' ? algorithm.example[0] : algorithm.inputMode === 'words' ? 'car, cat, 가방, 가게' : '8, 3, 6, 1, 5, 2'} error={!['target', 'start', 'edges', 'weights', 'negative-weight', 'negative-cycle', 'cycle', 'operations', 'operations-limit', 'capacity', 'duplicate-values', 'missing-value', 'positions', 'range-order'].includes(error) ? errors[error] : undefined} autoComplete="off" /><Button type="submit" className="apply-button" variant="filled">{t('적용', 'Apply')}</Button></Group>
                       {error && <span role="alert" className="sr-only">{errors[error]}</span>}
                     </form>
                     {algorithm.requiresSorted && <Text size="xs" c="teal" mt="xs">{t('오름차순 배열이 필요합니다. 인덱스는 입력 배열 기준입니다.', 'Requires an ascending array. Indices refer to the input array.')}</Text>}
                     <Group justify="space-between" mt="sm"><Text size="xs" c="dimmed">{algorithm.category === 'graph' ? t(`${step.variables.directed ? '방향' : '무방향'} 그래프 · 1–12 정점 · 최대 24개 간선`, `${step.variables.directed ? 'Directed' : 'Undirected'} graph · 1–12 vertices · up to 24 edges`) : algorithm.inputHint?.[language] ?? t(`최대 ${MAX_VALUES}개 · 음수·중복·소수 지원`, `Up to ${MAX_VALUES} values · negatives, duplicates, decimals`)}</Text>{algorithm.category !== 'graph' && algorithm.inputMode !== 'words' && algorithm.inputMode !== 'text' && <Button variant="subtle" size="compact-xs" onClick={randomize}>{t('무작위', 'Randomize')}</Button>}</Group>
-                  </Paper>
+                  </Paper>}
                 </div>
                 <div className="detail-column">
-                  <CodePanel source={algorithm.source} activeCode={step.code} language={language} />
-                  <Paper withBorder p="lg" className="reason-card">
-                    <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
-                    <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'leftResult', 'rightResult', 'left', 'lowbit', 'sum', 'right', 'operation', 'word', 'character', 'charIndex', 'value', 'priority', 'result', 'weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent', 'previous'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
-                  </Paper>
+
+                  {algorithm.id !== 'bubble-sort' && <CodePanel source={algorithm.source} activeCode={step.code} language={language} />}
                 </div>
               </div>
-              <Paper withBorder className="playback-card">
-                <Group justify="space-between" mb="md"><Group gap="xs">
-                  <Button variant="default" size="compact-sm" onClick={() => seek(0)} disabled={playback.index === 0}>{t('처음', 'First')}</Button>
-                  <Button variant="default" size="compact-sm" onClick={() => seek(playback.index - 1)} disabled={playback.index === 0}>{t('이전', 'Previous')}</Button>
-                  <Button size="compact-sm" className="play-button" onClick={() => dispatch({ type: 'toggle' })}>{playback.playing ? t('일시정지', 'Pause') : playback.index === steps.length - 1 ? t('다시 재생', 'Replay') : t('재생', 'Play')}</Button>
-                  <Button variant="default" size="compact-sm" onClick={() => seek(playback.index + 1)} disabled={playback.index === steps.length - 1}>{t('다음', 'Next')}</Button>
-                  <Button variant="default" size="compact-sm" onClick={() => seek(steps.length - 1)} disabled={playback.index === steps.length - 1}>{t('마지막', 'Last')}</Button>
-                </Group><NativeSelect aria-label={t('재생 속도', 'Playback speed')} size="xs" value={String(playback.speed)} data={['0.5', '1', '2', '4'].map((value) => ({ value, label: `${value}×` }))} onChange={(event) => dispatch({ type: 'speed', speed: Number(event.currentTarget.value) })} /></Group>
-                <input className="timeline" type="range" min={0} max={steps.length - 1} value={playback.index} onChange={(event) => seek(Number(event.currentTarget.value))} aria-label={t('단계 타임라인', 'Step timeline')} aria-valuetext={`${playback.index + 1} / ${steps.length}: ${stepTitle}`} />
-                <Group justify="space-between" mt="xs"><Text size="xs" c="dimmed" data-testid="step-counter">{t('단계', 'Step')} {playback.index + 1} / {steps.length}</Text><Text size="xs" c="dimmed">{t('← → 단계 이동 · Space 재생', '← → step · Space play')}</Text></Group>
-              </Paper>
+
             </div>
           </div>
         </main>

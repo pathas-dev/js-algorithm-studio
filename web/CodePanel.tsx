@@ -24,9 +24,15 @@ export default function CodePanel({ source, activeCode, language }: { source: st
     return () => { cancelled = true; };
   }, [source]);
   useEffect(() => {
-    if (active.current && scroller.current) {
-      scroller.current.scrollTop = Math.max(0, active.current.offsetTop - scroller.current.clientHeight / 2);
-    }
+    const centerActiveLine = () => {
+      if (active.current && scroller.current) {
+        scroller.current.scrollTop = Math.max(0, active.current.offsetTop - scroller.current.clientHeight / 2);
+      }
+    };
+    centerActiveLine();
+    const observer = new ResizeObserver(centerActiveLine);
+    if (scroller.current) observer.observe(scroller.current);
+    return () => observer.disconnect();
   }, [lineIndex, tokens]);
   return (
     <section className="source-panel" aria-label={language === 'ko' ? '실행 코드' : 'Executing code'}>
@@ -35,7 +41,7 @@ export default function CodePanel({ source, activeCode, language }: { source: st
         <pre><code>{lines.map((line, index) => (
           <span className={`code-line ${index === lineIndex ? 'active-line' : ''}`} key={index} ref={index === lineIndex ? active : undefined} aria-current={index === lineIndex ? 'step' : undefined}>
             <span className="line-number" aria-hidden="true">{index + 1}</span>
-            <span>{tokens?.[index] ? tokens[index].map((token, tokenIndex) => <span key={tokenIndex} style={{ color: token.color }}>{token.content}</span>) : line || ' '}</span>
+            <span className="code-content">{tokens?.[index] ? tokens[index].map((token, tokenIndex) => <span key={tokenIndex} style={{ color: token.color?.toLowerCase() === '#6a737d' ? '#9db3a5' : token.color }}>{token.content}</span>) : line || ' '}</span>
           </span>
         ))}</code></pre>
       </div>
