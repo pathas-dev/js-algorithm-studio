@@ -1,3 +1,4 @@
+import SegmentTree from '../data-structures/tree/segment-tree/SegmentTree';
 import FenwickTree from '../data-structures/tree/fenwick-tree/FenwickTree';
 import { parseOperations } from './structures';
 import { MAX_VALUES } from './playback';
@@ -50,5 +51,44 @@ export function traceFenwick(values, operations = '') {
   commands.forEach((command) => run(command, 'commands'));
   const last = steps[steps.length - 1];
   snapshot('done', last.code, 'result' in last.variables ? { result: last.variables.result } : {});
+  return steps;
+}
+
+export function traceSegment(values, operations = '') {
+  if (!values.length) throw new Error('empty-array');
+  if (values.length > MAX_VALUES) throw new Error('limit');
+  const commands = parseOperations(operations, { range: 2 });
+  const steps = [];
+  const ranges = new Map();
+  let context = {};
+  const record = (type, code, data, variables = {}) => {
+    const nodes = Array.from(ranges, ([position, range]) => ({
+      position, ...range, value: data[position],
+    }));
+    steps.push({
+      type,
+      code,
+      array: values.map((value, id) => ({ value, id })),
+      indices: [],
+      variables: {
+        ...context, structure: 'segment-tree', segments: JSON.stringify(nodes), ...variables,
+      },
+    });
+  };
+  const tree = new SegmentTree([...values], (a, b) => a + b, 0, (step) => {
+    const { position, left, right } = step.variables;
+    if (position !== undefined) ranges.set(position, { left, right });
+    record(step.type, step.code, step.array, step.variables);
+  });
+  commands.forEach(({ value: left, argument: right }) => {
+    requirePosition(left, values.length, 0);
+    requirePosition(right, values.length, 0);
+    if (left > right) throw new Error('range-order');
+    context = { operation: 'range', queryLeft: left, queryRight: right };
+    const result = tree.rangeQuery(left, right);
+    record('range', 'rangeQuery(queryLeftIndex, queryRightIndex) {', tree.segmentTree, { result });
+  });
+  const last = steps[steps.length - 1];
+  record('done', last.code, tree.segmentTree, 'result' in last.variables ? { result: last.variables.result } : {});
   return steps;
 }

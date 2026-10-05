@@ -4,9 +4,11 @@ import HeapView from './HeapView';
 import TreeView from './TreeView';
 import TrieView from './TrieView';
 import FenwickView from './FenwickView';
+import SegmentView from './SegmentView';
 import LinkedListView from './LinkedListView';
 
 export default function StructureView({ step, language }: { step: Step; language: Language }) {
+  if (step.variables.structure === 'segment-tree') return <SegmentView step={step} language={language} />;
   if (step.variables.structure === 'fenwick') return <FenwickView step={step} language={language} />;
   if (step.variables.structure === 'trie') return <TrieView step={step} language={language} />;
   if (step.variables.structure === 'binary-search-tree') return <TreeView step={step} language={language} />;

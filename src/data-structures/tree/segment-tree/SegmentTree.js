@@ -1,4 +1,5 @@
 import isPowerOfTwo from '../../../algorithms/math/is-power-of-two/isPowerOfTwo';
+import recordStep from '../../../utils/trace/recordStep';
 
 export default class SegmentTree {
   /**
@@ -6,13 +7,15 @@ export default class SegmentTree {
    * @param {function} operation - binary function (i.e. sum, min)
    * @param {number} operationFallback - operation fallback value (i.e. 0 for sum, Infinity for min)
    */
-  constructor(inputArray, operation, operationFallback) {
+  constructor(inputArray, operation, operationFallback, stepCallback) {
     this.inputArray = inputArray;
     this.operation = operation;
     this.operationFallback = operationFallback;
+    this.stepCallback = stepCallback;
 
     // Init array representation of segment tree.
     this.segmentTree = this.initSegmentTree(this.inputArray);
+    recordStep(this.stepCallback, 'start', this.segmentTree, [], {}, 'this.segmentTree = this.initSegmentTree(this.inputArray);');
 
     this.buildSegmentTree();
   }
@@ -60,12 +63,14 @@ export default class SegmentTree {
    * @param {number} position
    */
   buildTreeRecursively(leftInputIndex, rightInputIndex, position) {
+    recordStep(this.stepCallback, 'build-enter', this.segmentTree, [position], { left: leftInputIndex, right: rightInputIndex, position }, 'if (leftInputIndex === rightInputIndex) {');
     // If low input index and high input index are equal that would mean
     // the we have finished splitting and we are already came to the leaf
     // of the segment tree. We need to copy this leaf value from input
     // array to segment tree.
     if (leftInputIndex === rightInputIndex) {
       this.segmentTree[position] = this.inputArray[leftInputIndex];
+      recordStep(this.stepCallback, 'leaf', this.segmentTree, [position], { left: leftInputIndex, right: rightInputIndex, position }, 'this.segmentTree[position] = this.inputArray[leftInputIndex];');
       return;
     }
 
@@ -82,6 +87,7 @@ export default class SegmentTree {
       this.segmentTree[this.getLeftChildIndex(position)],
       this.segmentTree[this.getRightChildIndex(position)],
     );
+    recordStep(this.stepCallback, 'build-combine', this.segmentTree, [position], { left: leftInputIndex, right: rightInputIndex, position }, 'this.segmentTree[position] = this.operation(');
   }
 
   /**
@@ -117,17 +123,26 @@ export default class SegmentTree {
    */
   rangeQueryRecursive(queryLeftIndex, queryRightIndex, leftIndex, rightIndex, position) {
     if (queryLeftIndex <= leftIndex && queryRightIndex >= rightIndex) {
+      recordStep(this.stepCallback, 'total', this.segmentTree, [position], {
+        left: leftIndex, right: rightIndex, position, value: this.segmentTree[position],
+      }, 'return this.segmentTree[position];');
       // Total overlap.
       return this.segmentTree[position];
     }
 
     if (queryLeftIndex > rightIndex || queryRightIndex < leftIndex) {
+      recordStep(this.stepCallback, 'none', this.segmentTree, [position], {
+        left: leftIndex, right: rightIndex, position, value: this.operationFallback,
+      }, 'return this.operationFallback;');
       // No overlap.
       return this.operationFallback;
     }
 
     // Partial overlap.
     const middleIndex = Math.floor((leftIndex + rightIndex) / 2);
+    recordStep(this.stepCallback, 'partial', this.segmentTree, [position], {
+      left: leftIndex, right: rightIndex, position, middleIndex,
+    }, 'const middleIndex = Math.floor((leftIndex + rightIndex) / 2);');
 
     const leftOperationResult = this.rangeQueryRecursive(
       queryLeftIndex,
@@ -145,7 +160,16 @@ export default class SegmentTree {
       this.getRightChildIndex(position),
     );
 
-    return this.operation(leftOperationResult, rightOperationResult);
+    const result = this.operation(leftOperationResult, rightOperationResult);
+    recordStep(this.stepCallback, 'query-combine', this.segmentTree, [position], {
+      left: leftIndex,
+      right: rightIndex,
+      position,
+      leftResult: leftOperationResult,
+      rightResult: rightOperationResult,
+      result,
+    }, 'return result;');
+    return result;
   }
 
   /**

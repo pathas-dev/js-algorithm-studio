@@ -1,5 +1,6 @@
+import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
-import { traceFenwick } from '../src/visualization/range';
+import { traceFenwick, traceSegment } from '../src/visualization/range';
 import trieSource from '../src/data-structures/trie/Trie.js?raw';
 import trieNodeSource from '../src/data-structures/trie/TrieNode.js?raw';
 import { traceTrie } from '../src/visualization/trie';
@@ -949,4 +950,41 @@ export const fenwick: NumericAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie, fenwick];
+export const segment: NumericAlgorithm = {
+  id: 'segment-tree', category: 'structure', usesStart: false,
+  name: { ko: '구간 트리', en: 'Segment tree' },
+  summary: { ko: '구간을 반으로 나누어 합을 저장하고, 전체·부분·불일치 구간을 구별해 조회합니다.', en: 'Split ranges in half and store sums. Query by distinguishing total, partial and no overlap.' },
+  source: algorithmCode(segmentSource), example: [3, 2, -1, 6, 5, 4],
+  operations: 'range 1 4, range 0 5, range 2 2', operationHint: 'range 1 4, range 0 5, range 2 2',
+  inputHint: { ko: '0부터 시작하는 인덱스 · 1–32값 · 구간 합 조회 · 값 변경은 배열 재적용', en: '0-based indices · 1–32 values · range sums · reapply input to change values' },
+  time: { ko: '구성 O(n) · 구간 합 O(log n)', en: 'Build O(n) · range sum O(log n)' },
+  run: (values, _target, _edges, _directed, operations = segment.operations) => traceSegment(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['저장 공간 준비', '기존 SegmentTree를 합 연산과 항등원 0으로 실행합니다. 각 노드는 담당 구간의 합이며, 잎부터 부모 방향으로 채웁니다.']
+        : ['Prepare storage', 'Run the existing SegmentTree with sum and identity 0. Each node stores its range sum, filled from leaves toward parents.'];
+      case 'build-enter': return ko ? ['구간 분할', `구간 [${v.left}, ${v.right}]에 진입했습니다. 한 원소면 잎이고, 두 개 이상이면 중간을 기준으로 반으로 나눕니다.`]
+        : ['Split a range', `Enter [${v.left}, ${v.right}]. A single element is a leaf; otherwise split at the midpoint.`];
+      case 'leaf': return ko ? ['잎의 값 저장', `입력 인덱스 ${v.left}의 값을 잎에 복사했습니다. 이 노드는 한 원소의 구간 합입니다.`]
+        : ['Store a leaf', `Copy input index ${v.left} into a leaf. This node sums a single-element range.`];
+      case 'build-combine': return ko ? ['두 자식 합치기', `두 자식의 합을 더해 구간 [${v.left}, ${v.right}]의 합을 저장했습니다.`]
+        : ['Combine child sums', `Add both child sums to store the sum of [${v.left}, ${v.right}].`];
+      case 'total': return ko ? ['전체 포함', `조회 [${v.queryLeft}, ${v.queryRight}]가 노드 구간 [${v.left}, ${v.right}]를 모두 포함합니다. 자식에 내려가지 않고 저장된 합 ${v.value}을 반환합니다.`]
+        : ['Total overlap', `Query [${v.queryLeft}, ${v.queryRight}] fully contains [${v.left}, ${v.right}]. Return stored sum ${v.value} without descending.`];
+      case 'none': return ko ? ['겹치지 않는 구간', `노드 구간 [${v.left}, ${v.right}]는 조회와 겹치지 않습니다. 합의 항등원인 0을 반환합니다.`]
+        : ['No overlap', `[${v.left}, ${v.right}] does not overlap the query. Return 0, the identity for addition.`];
+      case 'partial': return ko ? ['부분 포함', `일부만 겹치므로 중간 인덱스 ${v.middleIndex}에서 나누어 두 자식의 결과를 구합니다.`]
+        : ['Partial overlap', `Only part overlaps. Split at midpoint ${v.middleIndex} and query both children.`];
+      case 'query-combine': return ko ? ['조회 결과 합치기', `왼쪽 결과 ${v.leftResult}과 오른쪽 결과 ${v.rightResult}을 더하면 ${v.result}입니다.`]
+        : ['Combine query results', `${v.leftResult} from the left plus ${v.rightResult} from the right gives ${v.result}.`];
+      case 'range': return ko ? ['구간 합 결과', `[${v.queryLeft}, ${v.queryRight}]의 합은 ${v.result}입니다. 양 끝 인덱스를 모두 포함합니다.`]
+        : ['Range sum result', `Sum of inclusive range [${v.queryLeft}, ${v.queryRight}]: ${v.result}.`];
+      default: return ko ? ['연산 완료', '구간별 합과 입력 배열입니다. 되감기로 분할과 포함 관계에 따라 사용한 노드를 비교하세요.']
+        : ['Operations complete', 'Inspect range sums and input values. Rewind to compare nodes used for splits and overlaps.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, minHeap, priorityQueue, binarySearchTree, trie, fenwick, segment];
