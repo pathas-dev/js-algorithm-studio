@@ -1,18 +1,19 @@
 import fs from 'fs';
 import path from 'path';
+import SelectionSort from '../../algorithms/sorting/selection-sort/SelectionSort';
 import BubbleSort from '../../algorithms/sorting/bubble-sort/BubbleSort';
 import {
   MAX_VALUES, algorithmCode, parseValues, playbackReducer,
 } from '../playback';
 
 describe('visualizer execution and playback', () => {
-  it('records sorting results without changing inputs or past snapshots', () => {
-    const source = algorithmCode(fs.readFileSync(path.join(__dirname, '../../algorithms/sorting/bubble-sort/BubbleSort.js'), 'utf8'));
+  it.each([[BubbleSort, 'bubble-sort/BubbleSort'], [SelectionSort, 'selection-sort/SelectionSort']])('records %s results without changing inputs or past snapshots', (Sorter, file) => {
+    const source = algorithmCode(fs.readFileSync(path.join(__dirname, `../../algorithms/sorting/${file}.js`), 'utf8'));
     expect(source).not.toContain('this.recordStep(');
     [[], [1], [1, 2, 3], [3, 2, 1], [0, -2, -2, 4], Array(MAX_VALUES).fill(2)].forEach((input) => {
       const original = [...input];
       const steps = [];
-      const result = new BubbleSort({ stepCallback: (step) => steps.push(step) }).sort(input);
+      const result = new Sorter({ stepCallback: (step) => steps.push(step) }).sort(input);
       expect(input).toEqual(original);
       expect(result).toEqual([...input].sort((a, b) => a - b));
       expect(steps[0].array).toEqual(original);

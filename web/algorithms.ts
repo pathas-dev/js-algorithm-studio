@@ -1,3 +1,5 @@
+import SelectionSort from '../src/algorithms/sorting/selection-sort/SelectionSort';
+import selectionSource from '../src/algorithms/sorting/selection-sort/SelectionSort.js?raw';
 import BubbleSort from '../src/algorithms/sorting/bubble-sort/BubbleSort';
 import bubbleSource from '../src/algorithms/sorting/bubble-sort/BubbleSort.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
@@ -12,6 +14,17 @@ export type Step = {
   code: string;
 };
 
+
+function runSort(Sorter: typeof BubbleSort, values: number[]): Step[] {
+  const steps: Step[] = [];
+  // ponytail: full snapshots for at most 32 values; use deltas for larger lessons.
+  new Sorter({
+    compareCallback: (a: Item, b: Item) => a.value - b.value,
+    stepCallback: (step: Step) => steps.push(step),
+  }).sort(values.map((value, id) => ({ value, id })));
+  return steps;
+}
+
 export const bubble = {
   id: 'bubble-sort',
   name: { ko: '버블 정렬', en: 'Bubble sort' },
@@ -22,15 +35,7 @@ export const bubble = {
   source: algorithmCode(bubbleSource),
   example: [8, 3, 6, 1, 5, 2],
   time: 'O(n²)',
-  run(values: number[]) {
-    const steps: Step[] = [];
-    // ponytail: full snapshots for at most 32 values; use deltas for larger lessons.
-    new BubbleSort({
-      compareCallback: (a: Item, b: Item) => a.value - b.value,
-      stepCallback: (step: Step) => steps.push(step),
-    }).sort(values.map((value, id) => ({ value, id })));
-    return steps;
-  },
+  run: (values: number[]) => runSort(BubbleSort, values),
   explain(step: Step, language: Language): [string, string] {
     const ko = language === 'ko';
     switch (step.type) {
@@ -61,3 +66,34 @@ export const bubble = {
     }
   },
 };
+
+export const selection = {
+  id: 'selection-sort',
+  name: { ko: '선택 정렬', en: 'Selection sort' },
+  summary: { ko: '미정렬 구간의 최솟값을 찾아 앞쪽에 하나씩 확정합니다.', en: 'Find the minimum in the remaining range and settle it at the front.' },
+  source: algorithmCode(selectionSource),
+  example: [8, 3, 6, 1, 5, 2],
+  time: 'O(n²)',
+  run: (values: number[]) => runSort(SelectionSort, values),
+  explain(step: Step, language: Language): [string, string] {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return bubble.explain(step, language);
+      case 'compare': {
+        const [candidate, minimum] = step.indices.map((index) => step.array[index].value);
+        return ko ? ['최솟값 탐색', `후보 값(${candidate})과 현재 최솟값(${minimum})을 비교합니다. 더 작은 값을 찾으면 minIndex를 갱신합니다.`]
+          : ['Find the minimum', `Compare candidate ${candidate} with minimum ${minimum}. Update minIndex if the candidate is smaller.`];
+      }
+      case 'minimum': return ko ? ['최솟값 갱신', `인덱스 ${v.minIndex}의 값(${step.array[Number(v.minIndex)].value})이 지금까지 살펴본 구간의 최솟값입니다.`]
+        : ['New minimum', `Value ${step.array[Number(v.minIndex)].value} at index ${v.minIndex} is the smallest seen so far.`];
+      case 'swap': return ko ? ['최솟값 배치', `최솟값을 인덱스 ${v.i}로 옮겼습니다. 선택 정렬은 멀리 떨어진 값을 교환하므로 안정 정렬이 아닙니다.`]
+        : ['Place the minimum', `Move the minimum to index ${v.i}. Distant swaps mean selection sort is not stable.`];
+      case 'pass': return ko ? ['앞쪽 위치 확정', `앞의 ${v.sortedCount}개 위치가 확정됐습니다. 다음 탐색은 나머지 구간에서 시작합니다.`]
+        : ['Prefix settled', `The first ${v.sortedCount} positions are settled. Continue with the remaining range.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms = [bubble, selection];

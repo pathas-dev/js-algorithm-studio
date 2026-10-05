@@ -10,7 +10,7 @@ export default function ArrayView({ step, language }: { step: Step; language: 'k
         {step.array.map((item, index) => {
           const height = Math.max(3, Math.abs(item.value) / max * 90);
           const active = step.indices.includes(index);
-          const sorted = index >= Number(step.variables.sortedFrom ?? step.array.length);
+          const sorted = index < Number(step.variables.sortedCount ?? 0) || index >= Number(step.variables.sortedFrom ?? step.array.length);
           return (
             <motion.div layout="position" transition={{ duration: reducedMotion ? 0 : 0.24 }} key={item.id} className={`array-item ${active ? step.type === 'swap' ? 'swapping' : 'comparing' : sorted ? 'settled' : ''}`} role="listitem" aria-label={`${index}: ${item.value}`}>
               <span className="bar-label" style={{ top: item.value >= 0 ? 94 - height : 114 + height }}>{item.value}</span>

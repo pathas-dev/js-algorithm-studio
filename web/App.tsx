@@ -2,7 +2,7 @@ import { useEffect, useReducer, useState } from 'react';
 import { Badge, Button, Group, NativeSelect, Paper, Text, TextInput, Title } from '@mantine/core';
 import { MotionConfig } from 'motion/react';
 import { MAX_VALUES, parseValues, playbackReducer } from '../src/visualization/playback';
-import { bubble, type Language } from './algorithms';
+import { algorithms, bubble, type Language } from './algorithms';
 import ArrayView from './ArrayView';
 import CodePanel from './CodePanel';
 
@@ -10,12 +10,13 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('ko');
   const ko = language === 'ko';
   const t = (korean: string, english: string) => ko ? korean : english;
+  const [algorithm, setAlgorithm] = useState(bubble);
   const [input, setInput] = useState(bubble.example.join(', '));
   const [error, setError] = useState('');
   const [steps, setSteps] = useState(() => bubble.run(bubble.example));
   const [playback, dispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
   const step = steps[playback.index];
-  const [stepTitle, reason] = bubble.explain(step, language);
+  const [stepTitle, reason] = algorithm.explain(step, language);
   const seek = (index: number) => dispatch({ type: 'seek', index });
 
   useEffect(() => { document.documentElement.lang = language; }, [language]);
@@ -42,7 +43,7 @@ export default function App() {
 
   function apply(text: string) {
     try {
-      const next = bubble.run(parseValues(text));
+      const next = algorithm.run(parseValues(text));
       setSteps(next);
       setInput(text);
       setError('');
@@ -50,6 +51,15 @@ export default function App() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'invalid');
     }
+  }
+
+  function selectAlgorithm(next: typeof bubble) {
+    const trace = next.run(next.example);
+    setAlgorithm(next);
+    setInput(next.example.join(', '));
+    setError('');
+    setSteps(trace);
+    dispatch({ type: 'reset', length: trace.length });
   }
 
   const errors: Record<string, string> = {
@@ -76,17 +86,17 @@ export default function App() {
           <div className="workspace">
             <nav className="catalog" aria-label={t('알고리즘 목록', 'Algorithms')}>
               <Text size="xs" fw={700} c="dimmed" mb="md">{t('정렬', 'SORTING')}</Text>
-              <button className="algorithm-button selected" aria-current="page">
-                <span>{bubble.name[language]}</span><span className="algorithm-arrow">↗</span>
-              </button>
-              <Text size="xs" c="dimmed" mt="xl">{t('현재 지원: 1개 알고리즘', 'Available: 1 algorithm')}</Text>
+              {algorithms.map((entry) => <button key={entry.id} className={`algorithm-button ${entry.id === algorithm.id ? 'selected' : ''}`} aria-current={entry.id === algorithm.id ? 'page' : undefined} onClick={() => selectAlgorithm(entry)}>
+                <span>{entry.name[language]}</span><span className="algorithm-arrow">↗</span>
+              </button>)}
+              <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
             <div className="lesson">
               <div className="lesson-heading">
-                <div><Group gap="sm"><Title order={2}>{bubble.name[language]}</Title><Badge color="teal" variant="light">{t('기초', 'BEGINNER')}</Badge></Group>
-                  <Text size="sm" c="dimmed" mt={6}>{bubble.summary[language]}</Text>
+                <div><Group gap="sm"><Title order={2}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{t('기초', 'BEGINNER')}</Badge></Group>
+                  <Text size="sm" c="dimmed" mt={6}>{algorithm.summary[language]}</Text>
                 </div>
-                <Badge variant="outline" color="gray">{bubble.time}</Badge>
+                <Badge variant="outline" color="gray">{algorithm.time}</Badge>
               </div>
               <div className="lesson-panels">
                 <div className="visual-column">
@@ -105,11 +115,11 @@ export default function App() {
                   </Paper>
                 </div>
                 <div className="detail-column">
-                  <CodePanel source={bubble.source} activeCode={step.code} language={language} />
+                  <CodePanel source={algorithm.source} activeCode={step.code} language={language} />
                   <Paper withBorder p="lg" className="reason-card">
                     <Text size="xs" c="teal" fw={700} mb="xs">{t('왜 이 코드가 실행될까요?', 'WHY THIS CODE?')}</Text>
                     <Text fw={700} mb="xs">{stepTitle}</Text><Text size="sm" className="step-reason" data-testid="step-reason">{reason}</Text>
-                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'swapped'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
+                    <Group gap="xs" mt="md">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'minIndex', 'swapped'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
                   </Paper>
                 </div>
               </div>
