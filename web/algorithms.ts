@@ -1,6 +1,7 @@
+import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue } from '../src/visualization/structures';
+import { traceStack, traceQueue, traceLinkedList } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -725,4 +726,36 @@ export const queue: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue];
+export const linkedList: Algorithm = {
+  id: 'linked-list', category: 'structure', usesStart: false,
+  name: { ko: '연결 리스트', en: 'Linked list' },
+  summary: { ko: '노드의 next 연결로 순서를 유지합니다. 검색과 역순 전환의 포인터 이동을 따라가 보세요.', en: 'Maintain order through next links. Follow pointer movement during search and reversal.' },
+  source: algorithmCode(linkedListSource), example: [3, 6, 2], operations: 'prepend 9, find 6, reverse, delete 3, append 7',
+  operationHint: 'append 7, prepend 9, find 6, delete 3, reverse, deleteHead, deleteTail',
+  time: { ko: '앞·뒤 추가 O(1) · 검색·삭제·역순 O(n)', en: 'prepend / append O(1) · find / delete / reverse O(n)' },
+  run: (values, _target, _edges, _directed, operations = linkedList.operations) => traceLinkedList(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 연결 리스트 준비', 'HEAD와 TAIL이 null인 리스트를 만듭니다. N 번호는 값이 같아도 서로 다른 노드를 구별하는 식별자입니다.']
+        : ['Create an empty linked list', 'HEAD and TAIL begin as null. N identifiers distinguish nodes even when their values are equal.'];
+      case 'append': case 'prepend': return ko ? [step.type === 'append' ? '뒤에 연결' : '앞에 연결', `${v.operation}(${v.value})으로 새 노드를 ${step.type === 'append' ? 'TAIL 뒤' : 'HEAD 앞'}에 연결했습니다. 화살표는 각 노드의 실제 next 연결입니다.`]
+        : [step.type === 'append' ? 'Link at the tail' : 'Link at the head', `${v.operation}(${v.value}) links a new node ${step.type === 'append' ? 'after TAIL' : 'before HEAD'}. Arrows show each actual next link.`];
+      case 'inspect': return ko ? ['검색 포인터 이동', `인덱스 ${v.index}의 값과 목표 ${v.value}을 비교합니다. 일치하면 그 노드를 반환하고, 아니면 next를 따라 이동합니다.`]
+        : ['Move the search pointer', `Compare index ${v.index} with target ${v.value}. Return the node if it matches; otherwise follow next.`];
+      case 'find': return ko ? ['검색 결과', v.result === 'null' ? '끝까지 일치하는 노드가 없어 null을 반환합니다.' : `첫 일치 노드의 값 ${v.result}을 반환합니다. 리스트는 변경하지 않습니다.`]
+        : ['Search result', v.result === 'null' ? 'No matching node exists; return null.' : `Return the first matching node, with value ${v.result}. Leave the list unchanged.`];
+      case 'reverse-link': return ko ? ['next 연결 뒤집기', `N${v.current}의 next를 ${Number(v.previous) < 0 ? 'null' : `N${v.previous}`}로 바꿨습니다. 다음 처리 대상은 ${Number(v.next) < 0 ? '없음' : `N${v.next}`}입니다. 중간 단계에는 연결이 끊긴 노드도 계속 표시하며 HEAD·TAIL은 마지막에 갱신합니다.`]
+        : ['Reverse a next link', `Point N${v.current}.next to ${Number(v.previous) < 0 ? 'null' : `N${v.previous}`}. Next to process: ${Number(v.next) < 0 ? 'none' : `N${v.next}`}. Disconnected nodes remain visible; update HEAD and TAIL after the loop.`];
+      case 'reverse': return ko ? ['HEAD·TAIL 갱신', '모든 next 연결을 뒤집었습니다. 이전 HEAD가 새 TAIL이 되고, 마지막으로 처리한 노드가 새 HEAD가 됩니다.']
+        : ['Update HEAD and TAIL', 'All next links are reversed. The old HEAD becomes TAIL; the last processed node becomes HEAD.'];
+      case 'delete': case 'deleteHead': case 'deleteTail': return ko ? ['노드 삭제', v.result === 'null' ? '삭제할 노드가 없어 null을 반환합니다.' : `${v.operation}이 값 ${v.result}인 노드를 삭제했습니다.${step.type === 'delete' ? ' delete(value)는 같은 값의 모든 노드를 삭제하고 마지막 삭제 노드를 반환합니다.' : ''} 남은 노드의 연결과 HEAD·TAIL을 확인하세요.`]
+        : ['Remove nodes', v.result === 'null' ? 'No node can be removed; return null.' : `${v.operation} removes node value ${v.result}.${step.type === 'delete' ? ' delete(value) removes all matching nodes and returns the last removed node.' : ''} Inspect the remaining links, HEAD and TAIL.`];
+      default: return ko ? ['연산 완료', '남은 노드를 HEAD에서 next 방향으로 표시했습니다. 타임라인을 되돌려 각 연결이 바뀌는 순간을 살펴보세요.']
+        : ['Operations complete', 'Show remaining nodes from HEAD along next links. Rewind to inspect each link change.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList];

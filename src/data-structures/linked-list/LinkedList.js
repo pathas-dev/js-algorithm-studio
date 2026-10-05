@@ -1,5 +1,6 @@
 import LinkedListNode from './LinkedListNode';
 import Comparator from '../../utils/comparator/Comparator';
+import recordStep from '../../utils/trace/recordStep';
 
 export default class LinkedList {
   /**
@@ -244,9 +245,10 @@ export default class LinkedList {
 
   /**
    * Reverse a linked list.
+   * @param {function} [stepCallback] Synchronous observer of current/previous/next node references.
    * @returns {LinkedList}
    */
-  reverse() {
+  reverse(stepCallback) {
     let currNode = this.head;
     let prevNode = null;
     let nextNode = null;
@@ -257,6 +259,7 @@ export default class LinkedList {
 
       // Change next node of the current node so it would link to previous node.
       currNode.next = prevNode;
+      recordStep(stepCallback, 'reverse-link', [currNode, prevNode, nextNode], [], {}, 'currNode.next = prevNode;');
 
       // Move prevNode and currNode nodes one step forward.
       prevNode = currNode;

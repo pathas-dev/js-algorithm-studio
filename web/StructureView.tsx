@@ -1,7 +1,9 @@
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
+import LinkedListView from './LinkedListView';
 
 export default function StructureView({ step, language }: { step: Step; language: Language }) {
+  if (step.variables.structure === 'linked-list') return <LinkedListView step={step} language={language} />;
   const ko = language === 'ko';
   const stack = step.variables.structure === 'stack';
   return <div className="structure-view">

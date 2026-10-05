@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import LinkedList from '../../data-structures/linked-list/LinkedList';
+import { algorithmCode } from '../playback';
 import Stack from '../../data-structures/stack/Stack';
-import { parseOperations, traceStack, traceQueue } from '../structures';
+import {
+  parseOperations, traceStack, traceQueue, traceLinkedList,
+} from '../structures';
 
 describe('structure lessons', () => {
   it('validates operation names, arguments and bounds before execution', () => {
@@ -56,5 +60,32 @@ describe('structure lessons', () => {
     steps.forEach((step) => expect(source).toContain(step.code));
     expect(traceQueue([])).toHaveLength(2);
     expect(() => traceQueue(Array(32).fill(1), 'enqueue 2')).toThrow('capacity');
+  });
+  it('records actual next links during reversal, including disconnected nodes and duplicates', () => {
+    const steps = traceLinkedList([3, 3, -1.5], 'find 3, find 8, prepend 9, reverse, delete 3, deleteHead, deleteTail, deleteTail, find 0, reverse');
+    const reversed = steps.filter((step) => step.type === 'reverse-link');
+    expect(reversed).toHaveLength(4);
+    expect(JSON.parse(reversed[0].variables.links)).toEqual([[3, -1], [0, 1], [1, 2], [2, -1]]);
+    expect(JSON.parse(reversed[1].variables.links)).toEqual([[3, -1], [0, 3], [1, 2], [2, -1]]);
+    expect(reversed[0].array.map((item) => item.value)).toEqual([9, 3, 3, -1.5]);
+    expect(steps.filter((step) => step.type === 'reverse')[0].array.map((item) => item.id)).toEqual([2, 1, 0, 3]);
+    expect(steps.filter((step) => step.type === 'delete')[0].array.map((item) => item.value)).toEqual([-1.5, 9]);
+    expect(steps.at(-1).array).toEqual([]);
+    const source = algorithmCode(fs.readFileSync(path.resolve(__dirname, '../../data-structures/linked-list/LinkedList.js'), 'utf8'));
+    steps.forEach((step) => {
+      expect(source).toContain(step.code);
+      expect(step.indices.every((index) => index >= 0 && index < step.array.length)).toBe(true);
+    });
+    expect(traceLinkedList([])).toHaveLength(2);
+    expect(traceLinkedList([], 'delete 1, deleteHead, deleteTail, find 2').at(-1).array).toEqual([]);
+    expect(() => traceLinkedList(Array(33).fill(1))).toThrow('limit');
+    expect(() => traceLinkedList(Array(32).fill(1), 'prepend 2')).toThrow('capacity');
+    const real = new LinkedList().fromArray([2, 5, 8]);
+    real.reverse();
+    real.delete(5);
+    const trace = traceLinkedList([2, 5, 8], 'reverse, delete 5');
+    expect(trace.at(-1).array.map((item) => item.value))
+      .toEqual(real.toArray().map((node) => node.value));
+    expect(traceLinkedList([1], 'reverse').filter((step) => step.type === 'reverse-link')).toHaveLength(1);
   });
 });

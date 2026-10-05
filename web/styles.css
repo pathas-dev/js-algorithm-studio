@@ -127,3 +127,5 @@ button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offs
 .active-node { background: #fff0d8; border-color: #d8964a; }
 .stack-nodes { flex-direction: column; max-height: 310px; overflow-y: auto; }
 .stack-nodes .structure-node { flex: 0 0 auto; width: 120px; }
+.list-scroll { overflow-x: auto; }
+.list-scroll svg { display: block; min-width: 100%; }

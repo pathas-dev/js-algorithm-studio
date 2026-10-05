@@ -1,3 +1,4 @@
+import LinkedList from '../data-structures/linked-list/LinkedList';
 import Queue from '../data-structures/queue/Queue';
 import Stack from '../data-structures/stack/Stack';
 import { MAX_VALUES, parseTarget } from './playback';
@@ -69,4 +70,80 @@ export function traceStack(values, operations = '') {
 
 export function traceQueue(values, operations = '') {
   return traceLinear(values, operations, true);
+}
+
+export function traceLinkedList(values, operations = '') {
+  const commands = parseOperations(operations, {
+    append: 1, prepend: 1, delete: 1, find: 1, reverse: 0, deleteHead: 0, deleteTail: 0,
+  });
+  if (values.length > MAX_VALUES) throw new Error('limit');
+  const list = new LinkedList();
+  const steps = [];
+  const ids = new WeakMap();
+  let nextId = 0;
+  const identify = (node) => {
+    if (!node) return -1;
+    if (!ids.has(node)) {
+      ids.set(node, nextId);
+      nextId += 1;
+    }
+    return ids.get(node);
+  };
+  const snapshot = (type, code, variables = {}, active = [], nodes = list.toArray()) => {
+    const array = nodes.map((node) => ({ value: node.value, id: identify(node) }));
+    steps.push({
+      type,
+      code,
+      array,
+      indices: nodes.map((node, index) => (active.includes(node) ? index : -1))
+        .filter((index) => index >= 0),
+      variables: {
+        structure: 'linked-list',
+        head: identify(list.head),
+        tail: identify(list.tail),
+        links: JSON.stringify(nodes.map((node) => [identify(node), identify(node.next)])),
+        ...variables,
+      },
+    });
+  };
+  snapshot('start', 'this.head = null;');
+  const run = ({ name, value }, phase) => {
+    const variables = { operation: name, phase };
+    if (name === 'append' || name === 'prepend') {
+      if (list.toArray().length >= MAX_VALUES) throw new Error('capacity');
+      list[name](value);
+      snapshot(name, `${name}(value) {`, { ...variables, value }, [name === 'append' ? list.tail : list.head]);
+    } else if (name === 'find') {
+      let index = 0;
+      const nodes = list.toArray();
+      const result = list.find({
+        callback: (candidate) => {
+          snapshot('inspect', 'if (callback && callback(currentNode.value)) {', { ...variables, value, index }, [nodes[index]]);
+          index += 1;
+          return candidate === value;
+        },
+      });
+      snapshot(name, result ? 'return currentNode;' : 'find({ value = undefined, callback = undefined }) {', { ...variables, value, result: result ? result.value : 'null' }, [result]);
+    } else if (name === 'reverse') {
+      const nodes = list.toArray();
+      list.reverse((step) => {
+        const [current, previous, next] = step.array;
+        snapshot(step.type, step.code, {
+          ...variables,
+          current: identify(current),
+          previous: identify(previous),
+          next: identify(next),
+        }, [current], nodes);
+      });
+      snapshot(name, 'this.head = prevNode;', variables);
+    } else {
+      const result = list[name](value);
+      snapshot(name, `${name}(${name === 'delete' ? 'value' : ''}) {`, { ...variables, result: result ? result.value : 'null' });
+    }
+  };
+  values.forEach((value) => run({ name: 'append', value }, 'input'));
+  commands.forEach((command) => run(command, 'commands'));
+  list.toArray();
+  snapshot('done', 'toArray() {');
+  return steps;
 }
