@@ -1,8 +1,11 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * @param {Graph} graph
- * @return {{distances: number[][], nextVertices: GraphVertex[][]}}
+ * @param {function(step: Object): void} [stepCallback] - Optional execution snapshots.
+ * @return {{distances: number[][], nextVertices: GraphVertex[][], negativeCycle: boolean}}
  */
-export default function floydWarshall(graph) {
+export default function floydWarshall(graph, stepCallback) {
   // Get all graph vertices.
   const vertices = graph.getAllVertices();
 
@@ -41,12 +44,29 @@ export default function floydWarshall(graph) {
     });
   });
 
+  recordStep(
+    stepCallback,
+    'start',
+    () => vertices.map((vertex) => vertex.getKey()),
+    [],
+    () => ({ matrix: JSON.stringify(distances) }),
+    'vertices.forEach((startVertex, startIndex) => {',
+  );
+
   // Now let's go to the core of the algorithm.
   // Let's all pair of vertices (from start to end ones) and try to check if there
   // is a shorter path exists between them via middle vertex. Middle vertex may also
   // be one of the graph vertices. As you may see now we're going to have three
   // loops over all graph vertices: for start, end and middle vertices.
   vertices.forEach((middleVertex, middleIndex) => {
+    recordStep(
+      stepCallback,
+      'via',
+      () => vertices.map((vertex) => vertex.getKey()),
+      [],
+      () => ({ matrix: JSON.stringify(distances), via: middleVertex.getKey() }),
+      'vertices.forEach((middleVertex, middleIndex) => {',
+    );
     // Path starts from startVertex with startIndex.
     vertices.forEach((startVertex, startIndex) => {
       // Path ends to endVertex with endIndex.
@@ -57,10 +77,38 @@ export default function floydWarshall(graph) {
         // us to have this shortest distance.
         const distViaMiddle = distances[startIndex][middleIndex] + distances[middleIndex][endIndex];
 
+        recordStep(
+          stepCallback,
+          'compare',
+          () => vertices.map((vertex) => vertex.getKey()),
+          [],
+          () => ({
+            matrix: JSON.stringify(distances),
+            via: middleVertex.getKey(),
+            current: startVertex.getKey(),
+            next: endVertex.getKey(),
+            candidate: distViaMiddle,
+          }),
+          'if (distances[startIndex][endIndex] > distViaMiddle)',
+        );
         if (distances[startIndex][endIndex] > distViaMiddle) {
           // We've found a shortest pass via middle vertex.
           distances[startIndex][endIndex] = distViaMiddle;
           nextVertices[startIndex][endIndex] = middleVertex;
+          recordStep(
+            stepCallback,
+            'relax',
+            () => vertices.map((vertex) => vertex.getKey()),
+            [],
+            () => ({
+              matrix: JSON.stringify(distances),
+              via: middleVertex.getKey(),
+              current: startVertex.getKey(),
+              next: endVertex.getKey(),
+              candidate: distViaMiddle,
+            }),
+            'distances[startIndex][endIndex] = distViaMiddle;',
+          );
         }
       });
     });
@@ -68,5 +116,14 @@ export default function floydWarshall(graph) {
 
   // Shortest distance from x to y: distance[x][y].
   // Next vertex after x one in path from x to y: nextVertices[x][y].
-  return { distances, nextVertices };
+  const negativeCycle = distances.some((row, index) => row[index] < 0);
+  recordStep(
+    stepCallback,
+    negativeCycle ? 'negative-cycle' : 'done',
+    () => vertices.map((vertex) => vertex.getKey()),
+    [],
+    () => ({ matrix: JSON.stringify(distances), negativeCycle }),
+    'return { distances, nextVertices, negativeCycle };',
+  );
+  return { distances, nextVertices, negativeCycle };
 }

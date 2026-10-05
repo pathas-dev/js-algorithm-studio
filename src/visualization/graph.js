@@ -1,3 +1,4 @@
+import floydWarshall from '../algorithms/graph/floyd-warshall/floydWarshall';
 import bellmanFord from '../algorithms/graph/bellman-ford/bellmanFord';
 import dijkstra from '../algorithms/graph/dijkstra/dijkstra';
 import Graph from '../data-structures/graph/Graph';
@@ -125,7 +126,7 @@ export function traceWeighted(nodes, start, edges, directed, algorithm) {
   const steps = [];
   algorithm(graph, graph.getVertexByKey(start), (step) => steps.push({
     ...step,
-    array: [...items],
+    array: step.array.map((value) => items.find((item) => item.value === value)),
     edges: edges.map((edge) => [...edge]),
     variables: { ...step.variables, directed, mode: 'weighted' },
   }));
@@ -139,4 +140,10 @@ export function traceDijkstra(nodes, start, edges, directed = false) {
 
 export function traceBellmanFord(nodes, start, edges, directed = true) {
   return traceWeighted(nodes, start, edges, directed, bellmanFord);
+}
+
+export function traceFloydWarshall(nodes, edges, directed = true) {
+  return traceWeighted(nodes, nodes[0], edges, directed, (graph, start, callback) => {
+    return floydWarshall(graph, callback);
+  });
 }

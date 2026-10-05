@@ -1,9 +1,29 @@
 import fs from 'fs';
 import path from 'path';
-import { parseWeightedEdges, traceDijkstra, traceBellmanFord } from '../graph';
+import {
+  parseWeightedEdges, traceDijkstra, traceBellmanFord, traceFloydWarshall,
+} from '../graph';
 import { algorithmCode } from '../playback';
 
 describe('weighted graph lessons', () => {
+  it('traces every pair and detects negative diagonals without mutating earlier matrices', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(
+      __dirname,
+      '../../algorithms/graph/floyd-warshall/floydWarshall.js',
+    ), 'utf8'));
+    const steps = traceFloydWarshall([1, 2, 3, 4], [[1, 2, 3], [2, 3, -1], [3, 4, 2]]);
+    expect(JSON.parse(steps.at(-1).variables.matrix)).toEqual([
+      [0, 3, 2, 4], [null, 0, -1, 1], [null, null, 0, 2], [null, null, null, 0],
+    ]);
+    expect(JSON.parse(steps[0].variables.matrix)[0][3]).toBeNull();
+    steps.forEach((step) => expect(source).toContain(step.code));
+    expect(traceFloydWarshall([1, 2], [[1, 2, -1]], false).at(-1).type)
+      .toBe('negative-cycle');
+    expect(JSON.parse(traceFloydWarshall([1], []).at(-1).variables.matrix)).toEqual([[0]]);
+    const reordered = traceFloydWarshall([3, 1, 2], [[1, 2, 5], [2, 3, 2]]).at(-1);
+    expect(reordered.array.map((item) => item.value)).toEqual([1, 2, 3]);
+    expect(JSON.parse(reordered.variables.matrix)[0][2]).toBe(7);
+  });
   it('traces negative edges and distinguishes reachable from disconnected negative cycles', () => {
     const source = algorithmCode(fs.readFileSync(path.join(
       __dirname,

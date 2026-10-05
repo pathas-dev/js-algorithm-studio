@@ -1,3 +1,4 @@
+import floydSource from '../src/algorithms/graph/floyd-warshall/floydWarshall.js?raw';
 import bellmanSource from '../src/algorithms/graph/bellman-ford/bellmanFord.js?raw';
 import dijkstraSource from '../src/algorithms/graph/dijkstra/dijkstra.js?raw';
 import interpolationSearch from '../src/algorithms/search/interpolation-search/interpolationSearch';
@@ -13,7 +14,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord } from '../src/visualization/graph';
+import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -55,6 +56,7 @@ export type Algorithm = {
   inputHint?: Record<Language, string>;
   randomMax?: number;
   graphEdges?: number[][];
+  usesStart?: boolean;
   graphWeighted?: boolean;
   graphDirected?: boolean;
   run(values: number[], target?: number, edges?: number[][], directed?: boolean): Step[];
@@ -564,4 +566,31 @@ export const bellman: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman];
+export const floyd: Algorithm = {
+  id: 'floyd-warshall', category: 'graph', graphWeighted: true, graphDirected: true, usesStart: false,
+  name: { ko: '플로이드–워셜', en: 'Floyd–Warshall' },
+  summary: { ko: '경유 정점을 하나씩 허용하며 모든 정점 쌍의 거리 행렬을 갱신합니다.', en: 'Allow intermediate vertices one at a time and update distances for every pair.' },
+  source: algorithmCode(floydSource), example: [1, 2, 3, 4],
+  graphEdges: [[1, 2, 3], [1, 4, 10], [2, 3, -1], [3, 4, 2]], time: 'O(V³)',
+  run: (nodes, _start, edges = floyd.graphEdges!, directed = true) => traceFloydWarshall(nodes, edges, directed),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['거리 행렬 초기화', '대각선은 0, 직접 연결은 간선 가중치, 나머지는 ∞입니다. 행은 출발 정점, 열은 도착 정점입니다. 시작점 하나를 지정할 필요가 없습니다.']
+        : ['Initialize the distance matrix', 'Set the diagonal to 0, direct paths to edge weights, and other entries to ∞. Rows are sources; columns are destinations. No single start is needed.'];
+      case 'via': return ko ? ['경유 정점 선택', `정점 ${v.via}를 새로운 경유 정점으로 허용합니다. 이전까지 허용한 경유 정점들도 계속 사용할 수 있습니다.`]
+        : ['Allow an intermediate vertex', `Allow vertex ${v.via} as an intermediate. Previously allowed intermediates remain available.`];
+      case 'compare': return ko ? ['직접 거리와 경유 거리 비교', `${v.current} → ${v.next}의 기존 거리와 ${v.via}를 거치는 후보 거리 ${Number.isFinite(v.candidate) ? v.candidate : '∞'}를 비교합니다. 한쪽 구간이 도달 불가면 후보도 ∞입니다.`]
+        : ['Compare a path through the intermediate', `Compare ${v.current} → ${v.next} with candidate ${Number.isFinite(v.candidate) ? v.candidate : '∞'} through ${v.via}. An unreachable leg makes the candidate ∞.`];
+      case 'relax': return ko ? ['거리 행렬 갱신', `${v.current} → ${v.next}의 거리를 ${v.candidate}로 줄였습니다. 강조한 셀과 행·열의 정점을 함께 확인하세요.`]
+        : ['Update the distance matrix', `Reduce distance ${v.current} → ${v.next} to ${v.candidate}. Inspect the highlighted cell and its row and column vertices.`];
+      case 'negative-cycle': return ko ? ['음수 사이클 발견', '대각선에 음수가 있습니다. 자신으로 돌아오는 비용을 계속 줄일 수 있어 행렬 전체를 최단 거리 결과로 확정하지 않습니다.']
+        : ['Negative cycle detected', 'A negative diagonal shows a cycle that can repeatedly reduce cost. Do not treat the matrix as a finalized shortest-distance result.'];
+      default: return ko ? ['모든 쌍의 거리 계산 완료', '모든 정점을 경유 후보로 처리했습니다. ∞인 셀은 해당 출발점에서 도착점에 도달할 수 없음을 뜻합니다.']
+        : ['All-pairs distances complete', 'Every vertex has been considered as an intermediate. ∞ cells represent unreachable source–destination pairs.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd];
