@@ -4,6 +4,9 @@ import traceBloomFilter from '../src/visualization/bloom';
 import disjointSource from '../src/data-structures/disjoint-set/DisjointSet.js?raw';
 import disjointItemSource from '../src/data-structures/disjoint-set/DisjointSetItem.js?raw';
 import traceDisjointSet from '../src/visualization/sets';
+import graphSource from '../src/data-structures/graph/Graph.js?raw';
+import graphVertexSource from '../src/data-structures/graph/GraphVertex.js?raw';
+import traceGraphStructure from '../src/visualization/graph-structure';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -1214,4 +1217,36 @@ export const bloomFilter: WordAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter];
+export const graphStructure: NumericAlgorithm = {
+  id: 'graph-structure', category: 'structure', usesStart: false, randomMax: 12,
+  name: { ko: '그래프 구조', en: 'Graph structure' },
+  summary: { ko: '정점과 무방향 간선을 저장합니다. 실제 인접 목록·차수와 간선의 추가·삭제를 함께 확인합니다.', en: 'Store vertices and undirected edges. Inspect actual adjacency lists, degrees and edge insertion / deletion.' },
+  source: algorithmCode(graphSource + '\n' + graphVertexSource), example: [1, 2, 3, 4],
+  operations: 'addEdge 1 2, addEdge 2 3, neighbors 2, degree 2, deleteEdge 2 1, addVertex 5, addEdge 3 5, neighbors 1',
+  operationHint: 'addVertex 5, addEdge 1 2, deleteEdge 2 1, neighbors 2, degree 2',
+  inputHint: { ko: '정점: 1~12의 서로 다른 정수 · 간선 최대 24개 · 자기 연결·중복·정점 삭제 미지원', en: 'Distinct integer vertices 1–12 · at most 24 edges · no self-loops, duplicates or vertex deletion' },
+  time: { ko: '간선 추가·삭제·이웃 조회 O(d) · d는 관련 정점의 차수', en: 'Edge insertion / deletion and neighbor lookup O(d) · d is an endpoint degree' },
+  run: (values, _target, _edges, _directed, operations = graphStructure.operations) => traceGraphStructure(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 그래프 준비', '기존 Graph를 무방향으로 만듭니다. 정점과 간선의 저장소가 비어 있으며, 이후 각 정점을 추가합니다.']
+        : ['Create an empty graph', 'Create the existing Graph in undirected mode. Vertex and edge stores start empty; then add the initial vertices.'];
+      case 'addVertex': return ko ? ['정점 추가', `정점 ${v.value}을 추가했습니다. 연결된 간선이 없어 현재 차수는 0이며, 고립 정점도 화면과 인접 목록에 남습니다.`]
+        : ['Add a vertex', `Add vertex ${v.value}, initially with degree zero. Isolated vertices remain visible in the graph and adjacency lists.`];
+      case 'addEdge': return ko ? ['무방향 간선 추가', `${v.value}–${v.other}를 연결했습니다. 같은 간선 객체가 양 끝 정점의 연결 리스트에 저장되므로 두 방향의 이웃 목록이 함께 바뀝니다.`]
+        : ['Add an undirected edge', `Connect ${v.value}–${v.other}. Both endpoint lists store the same edge object, so both neighbor lists change.`];
+      case 'deleteEdge': return ko ? ['간선 삭제', `${v.value}–${v.other}를 간선 목록과 양 끝 정점의 목록에서 제거했습니다. 간선만 삭제하므로 고립된 정점도 유지됩니다.`]
+        : ['Delete an edge', `Remove ${v.value}–${v.other} from the graph and both endpoint lists. Keep vertices even when they become isolated.`];
+      case 'neighbors': return ko ? ['이웃 조회', `${v.value}의 연결 리스트에서 각 간선의 반대쪽 정점을 반환합니다. 현재 결과는 ${v.result}입니다.`]
+        : ['Read neighbors', `Read the opposite endpoint of each edge in ${v.value}’s list. Result: ${v.result}.`];
+      case 'degree': return ko ? ['차수 조회', `정점 ${v.value}의 실제 간선 목록 길이는 ${v.result}입니다. 무방향 단순 그래프에서는 이웃 수와 같습니다.`]
+        : ['Read degree', `Vertex ${v.value} has ${v.result} entries in its actual edge list, equal to its neighbor count in this simple undirected graph.`];
+      default: return ko ? ['그래프 구조 연산 완료', '현재 간선과 양방향 인접 목록입니다. 되감기로 간선 변경 전후와 고립 정점을 비교하세요.']
+        : ['Graph operations complete', 'Inspect current edges and reciprocal adjacency lists. Rewind to compare edge changes and isolated vertices.'];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure];

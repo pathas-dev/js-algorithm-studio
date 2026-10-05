@@ -12,6 +12,14 @@ import BloomView from './BloomView';
 
 export default function StructureView({ step, language }: { step: Step; language: Language }) {
   if (step.variables.structure === 'bloom-filter') return <BloomView step={step} language={language} />;
+  if (step.variables.structure === 'graph-structure') {
+    const nodes: { value: number; neighbors: number[]; degree: number }[] = JSON.parse(String(step.variables.adjacency));
+    const ko = language === 'ko';
+    return <div><p>{ko ? '무방향 단순 그래프 · 간선 추가·삭제 후 양 끝의 인접 목록 갱신' : 'Simple undirected graph · adding / deleting an edge updates both adjacency lists'}</p><GraphView step={step} language={language} />
+      <table className="graph-table" data-testid="adjacency-table"><caption>{ko ? '실제 인접 목록 · 간선 없는 정점도 유지' : 'Actual adjacency lists · isolated vertices remain'}</caption><thead><tr><th>{ko ? '정점' : 'Vertex'}</th><th>{ko ? '이웃' : 'Neighbors'}</th><th>{ko ? '차수' : 'Degree'}</th></tr></thead><tbody>{nodes.map((node, i) => <tr key={node.value} className={step.indices.includes(i) ? 'active-bucket' : undefined}><td>{node.value}</td><td>[{node.neighbors.join(', ')}]</td><td>{node.degree}</td></tr>)}</tbody></table>
+      {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
+    </div>;
+  }
   if (step.variables.structure === 'disjoint-set') {
     const nodes: { value: number; parent: number | null; root: number; size: number }[] = JSON.parse(String(step.variables.setNodes));
     const ko = language === 'ko';
