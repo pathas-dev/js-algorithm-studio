@@ -12,6 +12,9 @@ export default function GraphView({ step, language }: { step: Step; language: La
     return { ...item, x: 220 + Math.cos(angle) * 150, y: 155 + Math.sin(angle) * 116 };
   });
   const distances: Record<string, number | null> | undefined = step.variables.distances === undefined ? undefined : JSON.parse(String(step.variables.distances));
+  const groups: number[][] | undefined = step.variables.groups === undefined ? undefined : JSON.parse(String(step.variables.groups));
+  const groupMap = new Map<number, number[]>();
+  groups?.forEach(([node, root]) => groupMap.set(root, [...(groupMap.get(root) ?? []), node]));
   const chosen: number[][] = JSON.parse(String(step.variables.chosen ?? '[]'));
   const matrix: (number | null)[][] | undefined = step.variables.matrix === undefined ? undefined : JSON.parse(String(step.variables.matrix));
   const previous: Record<string, number | null> | undefined = step.variables.previous === undefined ? undefined : JSON.parse(String(step.variables.previous));
@@ -48,7 +51,8 @@ export default function GraphView({ step, language }: { step: Step; language: La
         </motion.g>;
       })}
     </svg>
-    {('queue' in step.variables || dfs) && <div className="frontier"><span>{distances ? ko ? '우선순위 큐 · 힙 배열' : 'Priority queue · heap storage' : dfs ? ko ? '재귀 스택 · 아래 → 위' : 'Recursion stack · bottom → top' : ko ? '큐 · 앞 → 뒤' : 'Queue · front → back'}</span><output data-testid="frontier">[{frontier.split(',').filter(Boolean).join(', ')}]</output></div>}
+    {('queue' in step.variables || dfs) && <div className="frontier"><span>{groups ? ko ? '남은 간선 · 가중치 오름차순' : 'Remaining edges · increasing weight' : distances ? ko ? '우선순위 큐 · 힙 배열' : 'Priority queue · heap storage' : dfs ? ko ? '재귀 스택 · 아래 → 위' : 'Recursion stack · bottom → top' : ko ? '큐 · 앞 → 뒤' : 'Queue · front → back'}</span><output data-testid="frontier">[{frontier.split(',').filter(Boolean).join(', ')}]</output></div>}
+    {groups && <div className="frontier"><span>{ko ? '분리 집합 · 대표: 구성원' : 'Disjoint sets · representative: members'}</span><output data-testid="disjoint-groups">{[...groupMap].map(([root, members]) => `${root}: [${members.join(', ')}]`).join(' · ')}</output></div>}
     {distances && <table className="graph-table" data-testid="distance-table"><caption>{step.variables.negativeCycle ? ko ? '음수 사이클 · 잠정 거리 (최단 거리 아님)' : 'Negative cycle · tentative distances (not shortest)' : ko ? '시작점에서의 거리 · ∞는 도달 불가' : 'Distance from start · ∞ means unreachable'}</caption><thead><tr><th>{ko ? '정점' : 'Vertex'}</th><th>{ko ? '거리' : 'Distance'}</th><th>{ko ? '이전 정점' : 'Previous'}</th></tr></thead><tbody>{step.array.map((item) => <tr key={item.id}><td>{item.value}</td><td>{distances[item.value] ?? '∞'}</td><td>{previous?.[item.value] ?? '—'}</td></tr>)}</tbody></table>}
     {matrix && <div className="matrix-scroll" id={statusId}><table className="graph-table" data-testid="distance-matrix"><caption>{step.variables.negativeCycle ? ko ? '음수 사이클 · 잠정 거리 행렬' : 'Negative cycle · tentative matrix' : ko ? '거리 행렬 · 행: 출발 / 열: 도착' : 'Distance matrix · row: source / column: destination'}</caption><thead><tr><th>→</th>{step.array.map((item) => <th key={item.id}>{item.value}</th>)}</tr></thead><tbody>{matrix.map((row, i) => <tr key={i}><th>{step.array[i].value}</th>{row.map((value, j) => <td key={j} className={step.variables.current === step.array[i].value && step.variables.next === step.array[j].value ? 'active-bucket' : undefined}>{value ?? '∞'}</td>)}</tr>)}</tbody></table></div>}
     {!matrix && <div className="graph-status" id={statusId} aria-live="polite">{ko ? '발견: ' : 'Discovered: '}{seen.join(', ')} · {ko ? '처리 완료: ' : 'Processed: '}{processed.filter(Boolean).join(', ') || '∅'}</div>}

@@ -4,6 +4,14 @@ import Graph from '../../../../data-structures/graph/Graph';
 import kruskal from '../kruskal';
 
 describe('kruskal', () => {
+  it('preserves isolated vertices in a minimum spanning forest', () => {
+    const graph = new Graph();
+    const vertex = new GraphVertex('isolated');
+    graph.addVertex(vertex);
+    const forest = kruskal(graph);
+    expect(forest.getVertexByKey('isolated')).toBe(vertex);
+    expect(forest.getAllEdges()).toEqual([]);
+  });
   it('should fire an error for directed graph', () => {
     function applyPrimToDirectedGraph() {
       const graph = new Graph(true);

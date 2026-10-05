@@ -43,8 +43,7 @@ export default function prim(graph, stepCallback) {
     () => ({
       current: startVertex.getKey(),
       seen: Object.keys(visitedVertices).join(','),
-      chosen: '[]',
-      weight: 0,
+      tree: minimumSpanningTree,
     }),
     'const startVertex = graph.getAllVertices()[0];',
   );
@@ -62,10 +61,7 @@ export default function prim(graph, stepCallback) {
         current: currentMinEdge.startVertex.getKey(),
         next: currentMinEdge.endVertex.getKey(),
         seen: Object.keys(visitedVertices).join(','),
-        weight: minimumSpanningTree.getWeight(),
-        chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
-          edge.startVertex.getKey(), edge.endVertex.getKey(),
-        ])),
+        tree: minimumSpanningTree,
       }),
       'const currentMinEdge = edgesQueue.poll();',
     );
@@ -94,10 +90,7 @@ export default function prim(graph, stepCallback) {
           current: currentMinEdge.startVertex.getKey(),
           next: currentMinEdge.endVertex.getKey(),
           seen: Object.keys(visitedVertices).join(','),
-          weight: minimumSpanningTree.getWeight(),
-          chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
-            edge.startVertex.getKey(), edge.endVertex.getKey(),
-          ])),
+          tree: minimumSpanningTree,
         }),
         'minimumSpanningTree.addEdge(currentMinEdge);',
       );
@@ -121,10 +114,7 @@ export default function prim(graph, stepCallback) {
           current: currentMinEdge.startVertex.getKey(),
           next: currentMinEdge.endVertex.getKey(),
           seen: Object.keys(visitedVertices).join(','),
-          weight: minimumSpanningTree.getWeight(),
-          chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
-            edge.startVertex.getKey(), edge.endVertex.getKey(),
-          ])),
+          tree: minimumSpanningTree,
         }),
         'if (nextMinVertex)',
       );
@@ -138,10 +128,7 @@ export default function prim(graph, stepCallback) {
     () => ({
       seen: Object.keys(visitedVertices).join(','),
       processed: Object.keys(visitedVertices).join(','),
-      weight: minimumSpanningTree.getWeight(),
-      chosen: JSON.stringify(minimumSpanningTree.getAllEdges().map((edge) => [
-        edge.startVertex.getKey(), edge.endVertex.getKey(),
-      ])),
+      tree: minimumSpanningTree,
     }),
     'return minimumSpanningTree;',
   );

@@ -1,11 +1,34 @@
 import fs from 'fs';
 import path from 'path';
 import {
-  tracePrim, parseWeightedEdges, traceDijkstra, traceBellmanFord, traceFloydWarshall,
+  traceKruskal, tracePrim, parseWeightedEdges, traceDijkstra, traceBellmanFord, traceFloydWarshall,
 } from '../graph';
 import { algorithmCode } from '../playback';
 
 describe('weighted graph lessons', () => {
+  it('traces Kruskal unions, skipped cycles and disconnected forests', () => {
+    const source = algorithmCode(fs.readFileSync(path.join(
+      __dirname,
+      '../../algorithms/graph/kruskal/kruskal.js',
+    ), 'utf8'));
+    const steps = traceKruskal(
+      [1, 2, 3, 4, 5, 6],
+      [[1, 2, 7], [1, 3, 2], [3, 2, 1], [2, 4, 3], [3, 5, 8], [4, 5, 1]],
+    );
+    expect(steps.at(-1).variables.weight).toBe(7);
+    expect(JSON.parse(steps.at(-1).variables.chosen)).toHaveLength(4);
+    const groups = JSON.parse(steps.at(-1).variables.groups);
+    expect(new Set(groups.slice(0, 5).map(([, root]) => root)).size).toBe(1);
+    expect(groups.at(-1)).toEqual([6, 6]);
+    expect(steps.some((step) => step.type === 'skip')).toBe(true);
+    steps.forEach((step) => expect(source).toContain(step.code));
+    expect(JSON.parse(steps[0].variables.groups)).toEqual([
+      [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6],
+    ]);
+    expect(traceKruskal([1], []).at(-1).variables.weight).toBe(0);
+    expect(traceKruskal([1, 2, 3, 4], [[1, 2, -1], [3, 4, 2]])
+      .at(-1).variables.weight).toBe(1);
+  });
   it('traces Prim choices and cycle rejection within the starting component', () => {
     const source = algorithmCode(fs.readFileSync(path.join(
       __dirname,

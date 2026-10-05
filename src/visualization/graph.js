@@ -1,3 +1,4 @@
+import kruskal from '../algorithms/graph/kruskal/kruskal';
 import prim from '../algorithms/graph/prim/prim';
 import floydWarshall from '../algorithms/graph/floyd-warshall/floydWarshall';
 import bellmanFord from '../algorithms/graph/bellman-ford/bellmanFord';
@@ -152,5 +153,11 @@ export function traceFloydWarshall(nodes, edges, directed = true) {
 export function tracePrim(nodes, edges) {
   return traceWeighted(nodes, nodes[0], edges, false, (graph, start, callback) => {
     return prim(graph, callback);
+  });
+}
+
+export function traceKruskal(nodes, edges) {
+  return traceWeighted(nodes, nodes[0], edges, false, (graph, start, callback) => {
+    return kruskal(graph, callback);
   });
 }

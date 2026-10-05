@@ -1,3 +1,4 @@
+import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
 import floydSource from '../src/algorithms/graph/floyd-warshall/floydWarshall.js?raw';
 import bellmanSource from '../src/algorithms/graph/bellman-ford/bellmanFord.js?raw';
@@ -15,7 +16,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim } from '../src/visualization/graph';
+import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -619,4 +620,28 @@ export const prim: Algorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim];
+export const kruskal: Algorithm = {
+  id: 'kruskal', category: 'graph', graphWeighted: true, fixedDirection: true, usesStart: false,
+  name: { ko: '크루스칼', en: 'Kruskal' },
+  summary: { ko: '가벼운 간선부터 확인하며 서로 다른 집합을 연결합니다. 미연결 그래프는 최소 신장 숲이 됩니다.', en: 'Consider edges by weight and connect different sets. Disconnected graphs produce a minimum spanning forest.' },
+  source: algorithmCode(kruskalSource), example: prim.example, graphEdges: prim.graphEdges,
+  time: { ko: '이 구현 최악 O(E² + V² + E log V)', en: 'This implementation worst O(E² + V² + E log V)' },
+  run: (nodes, _start, edges = kruskal.graphEdges!) => traceKruskal(nodes, edges),
+  explain(step, language) {
+    const ko = language === 'ko';
+    const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['간선 정렬과 집합 준비', '간선을 가중치 오름차순으로 정렬하고 각 정점의 독립 집합을 만듭니다. 집합 표시는 실제 분리 집합의 대표 정점입니다.']
+        : ['Sort edges and prepare sets', 'Sort edges by increasing weight and create one set per vertex. Group labels show actual disjoint-set representatives.'];
+      case 'edge': return ko ? ['다음 간선의 집합 비교', `간선 ${v.current}–${v.next}의 양 끝이 서로 다른 집합인지 확인합니다. 같은 집합이라면 기존 경로가 있어 사이클을 만들게 됩니다.`]
+        : ['Compare endpoint sets', `Check whether endpoints of ${v.current}–${v.next} belong to different sets. Same-set endpoints already have a path and would create a cycle.`];
+      case 'choose': return ko ? ['집합 병합과 간선 추가', `두 집합을 병합하고 간선 ${v.current}–${v.next}를 선택했습니다. 현재 가중치 합은 ${v.weight}입니다.`]
+        : ['Union sets and select the edge', `Unite the sets and select edge ${v.current}–${v.next}. Total weight: ${v.weight}.`];
+      case 'skip': return prim.explain(step, language);
+      default: return ko ? ['최소 신장 숲 완료', `선택한 간선의 가중치 합은 ${v.weight}입니다. 각 집합은 하나의 연결 성분이며, 고립 정점도 독립 집합으로 남습니다.`]
+        : ['Minimum spanning forest complete', `Selected edges total ${v.weight}. Each set is a connected component; isolated vertices remain singleton sets.`];
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal];
