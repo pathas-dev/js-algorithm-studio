@@ -10,6 +10,14 @@ import {
 import { algorithmCode } from '../playback';
 
 describe('string search lessons', () => {
+  it('does not serialize Z snapshots when tracing is disabled', () => {
+    const stringify = jest.spyOn(JSON, 'stringify');
+    const positions = zAlgorithm('a'.repeat(512), 'a');
+    const serialized = stringify.mock.calls.length;
+    stringify.mockRestore();
+    expect(positions).toHaveLength(512);
+    expect(serialized).toBe(0);
+  });
   it('records real rolling hashes, rejects collisions and rehashes surrogate windows', () => {
     const source = algorithmCode(fs.readFileSync(path.resolve(
       __dirname,

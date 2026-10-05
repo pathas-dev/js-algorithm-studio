@@ -145,9 +145,9 @@ export default function zAlgorithm(text, word, stepCallback) {
       // and separator lengths.
       const wordPosition = charIndex - word.length - 1;
       wordPositions.push(wordPosition);
-      recordStep(stepCallback, 'z-match', zArray, [], {
+      recordStep(stepCallback, 'z-match', zArray, [], () => ({
         charIndex, alignment: wordPosition, matches: JSON.stringify(wordPositions),
-      }, 'wordPositions.push(wordPosition);');
+      }), 'wordPositions.push(wordPosition);');
     }
   }
 
