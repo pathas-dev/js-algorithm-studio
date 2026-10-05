@@ -10,7 +10,8 @@ import traceGraphStructure from '../src/visualization/graph-structure';
 import naiveSource from '../src/algorithms/string/naive-search/naiveSearch.js?raw';
 import kmpSource from '../src/algorithms/string/knuth-morris-pratt/knuthMorrisPratt.js?raw';
 import zSource from '../src/algorithms/string/z-algorithm/zAlgorithm.js?raw';
-import { traceStringSearch, traceKmpSearch, traceZSearch } from '../src/visualization/strings';
+import rabinSource from '../src/algorithms/string/rabin-karp/rabinKarp.js?raw';
+import { traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -1326,4 +1327,23 @@ export const zSearch: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch];
+export const rabin: TextAlgorithm = {
+  ...naive, id: 'rabin-karp', name: { ko: '라빈–카프 검색', en: 'Rabin–Karp search' },
+  summary: { ko: '텍스트 창을 옮기며 다항식 해시를 비교합니다. 해시가 같아도 실제 문자열을 검사해 충돌을 걸러냅니다.', en: 'Move a text window and compare polynomial hashes. Verify the actual strings after hash equality to reject collisions.' },
+  source: algorithmCode(rabinSource), time: { ko: '현재 구현 O(nm) · 창 복사·해시 계수 계산', en: 'This implementation O(nm) · window copies and hash multiplier calculation' },
+  run: ([text, pattern]) => traceRabinSearch(text, pattern),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'word-hash': return ko ? ['패턴 해시 계산', `기존 PolynomialHash로 패턴 해시 ${v.wordHash}를 계산합니다. 밑은 37, 나머지는 101입니다.`] : ['Hash the pattern', `The existing PolynomialHash computes pattern hash ${v.wordHash}, using base 37 and modulus 101.`];
+      case 'frame-hash': return ko ? ['첫 창 해시 계산', `시작 위치 ${v.alignment}의 창 해시는 ${v.currentFrameHash}입니다. 이전 창이 없어 전체 창을 해싱합니다.`] : ['Hash the first window', `The window at ${v.alignment} hashes to ${v.currentFrameHash}. No previous window exists, so hash the entire window.`];
+      case 'frame-rehash': return ko ? ['서로게이트 창 해시 다시 계산', `UTF-16 창 이동이 이모지의 서로게이트 쌍을 나눌 수 있습니다. 해시의 코드 포인트와 창의 코드 단위 수가 달라 롤링 대신 전체 창 해시 ${v.currentFrameHash}를 다시 계산합니다.`] : ['Rehash a surrogate window', `A UTF-16 window shift can split an emoji surrogate pair. Hash code-point counts differ from window code-unit counts, so recompute the full hash ${v.currentFrameHash}.`];
+      case 'frame-roll': return ko ? ['이전 창에서 해시 갱신', `창을 ${v.alignment}로 이동했습니다. 나가는 문자를 빼고 들어오는 문자를 더해 해시 ${v.prevHash} → ${v.currentFrameHash}로 갱신합니다. 기존 roll은 최고차 계수를 반복 계산합니다.`] : ['Roll the previous hash', `Move the window to ${v.alignment}. Remove the outgoing character and add the incoming one: ${v.prevHash} → ${v.currentFrameHash}. The existing roll recalculates its leading multiplier.`];
+      case 'hash-compare': return ko ? ['두 해시 비교', `패턴 ${v.wordHash}와 창 ${v.currentFrameHash}를 비교합니다. 다르면 다음 창으로 이동하고, 같으면 실제 문자열 검증으로 넘어갑니다.`] : ['Compare hashes', `Compare pattern ${v.wordHash} with window ${v.currentFrameHash}. Move on if unequal; otherwise verify the strings.`];
+      case 'verify': return ko ? ['해시 충돌 검사', v.equal ? `위치 ${v.alignment}에서 해시와 문자열이 모두 같아 첫 일치를 반환합니다.` : `해시는 같지만 위치 ${v.alignment}의 문자열이 다릅니다. 충돌이므로 일치로 반환하지 않습니다.`] : ['Check for a hash collision', v.equal ? `Both hashes and strings match at ${v.alignment}; return the first occurrence.` : `Hashes match, but the string at ${v.alignment} differs. Reject this collision.`];
+      default: return naive.explain(step, language);
+    }
+  },
+};
+
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin];

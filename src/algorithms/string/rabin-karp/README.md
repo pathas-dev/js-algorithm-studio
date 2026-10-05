@@ -1,5 +1,7 @@
 # Rabin Karp Algorithm
 
+The current implementation copies window strings and recalculates the rolling multiplier, so its actual running time is `O(nm)`. It rehashes windows containing surrogate pairs to return correct UTF-16 indices for emoji. Equal hashes are always verified against the actual strings.
+
 [English](README.md) | [한국어](README.ko-KR.md)
 
 In computer science, the Rabin–Karp algorithm or Karp–Rabin algorithm 

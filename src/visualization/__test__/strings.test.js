@@ -2,12 +2,41 @@ import fs from 'fs';
 import path from 'path';
 import naiveSearch from '../../algorithms/string/naive-search/naiveSearch';
 import zAlgorithm from '../../algorithms/string/z-algorithm/zAlgorithm';
+import rabinKarp from '../../algorithms/string/rabin-karp/rabinKarp';
+import PolynomialHash from '../../algorithms/cryptography/polynomial-hash/PolynomialHash';
 import {
-  traceStringSearch, traceKmpSearch, traceZSearch, requireStrings,
+  traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch, requireStrings,
 } from '../strings';
 import { algorithmCode } from '../playback';
 
 describe('string search lessons', () => {
+  it('records real rolling hashes, rejects collisions and rehashes surrogate windows', () => {
+    const source = algorithmCode(fs.readFileSync(path.resolve(
+      __dirname,
+      '../../algorithms/string/rabin-karp/rabinKarp.js',
+    ), 'utf8'));
+    const hasher = new PolynomialHash();
+    ['', 'aaa', 'ABABABC', 'a b', '가나가나', 'a😀집😀', '😀집😀', '\u0000e'].forEach((text) => {
+      ['', 'a', 'ABABC', ' ', '가나', '😀', '집😀', '\ud83d', '\ude00', 'missing'].forEach((pattern) => {
+        expect(rabinKarp(text, pattern)).toBe(text.indexOf(pattern));
+        const steps = traceRabinSearch(text, pattern);
+        expect(steps.at(-1).variables.result).toBe(text.indexOf(pattern));
+        steps.forEach((s) => {
+          expect(source).toContain(s.code);
+          if (s.type.startsWith('frame-')) {
+            expect(s.variables.currentFrameHash).toBe(hasher.hash(s.variables.currentFrame));
+          }
+        });
+      });
+    });
+    const collision = traceRabinSearch('e\u0000', '\u0000');
+    expect(collision.find((s) => s.type === 'verify').variables.equal).toBe(false);
+    expect(collision.at(-1).variables.result).toBe(1);
+    expect(traceRabinSearch('a😀', '😀').some((s) => s.type === 'frame-rehash')).toBe(true);
+    const roll = traceRabinSearch('ab', 'b');
+    expect(roll.find((s) => s.type === 'frame-hash').variables.currentFrameHash).toBe(97);
+    expect(roll.find((s) => s.type === 'frame-roll').variables.currentFrameHash).toBe(98);
+  });
   it('finds all Z matches including overlaps, separator characters and empty-pattern boundaries', () => {
     const source = algorithmCode(fs.readFileSync(path.resolve(
       __dirname,

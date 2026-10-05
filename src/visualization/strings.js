@@ -1,6 +1,7 @@
 import naiveSearch from '../algorithms/string/naive-search/naiveSearch';
 import knuthMorrisPratt from '../algorithms/string/knuth-morris-pratt/knuthMorrisPratt';
 import zAlgorithm from '../algorithms/string/z-algorithm/zAlgorithm';
+import rabinKarp from '../algorithms/string/rabin-karp/rabinKarp';
 
 export function requireStrings(text, pattern) {
   if (typeof text !== 'string' || typeof pattern !== 'string'
@@ -12,8 +13,10 @@ export function traceStringSearch(text, pattern, search = naiveSearch) {
   const steps = [];
   const kmp = search === knuthMorrisPratt;
   const z = search === zAlgorithm;
+  const rabin = search === rabinKarp;
   let table = '[]';
   let matches = '[]';
+  let hashes = {};
   const items = text.split('').map((character, id) => ({ value: character.charCodeAt(0), id }));
   const snapshot = (type, code, variables = {}) => steps.push({
     type,
@@ -26,6 +29,7 @@ export function traceStringSearch(text, pattern, search = naiveSearch) {
       pattern,
       alignment: 0,
       ...(kmp ? { mode: 'kmp', table } : {}),
+      ...(rabin ? { mode: 'rabin', ...hashes } : {}),
       ...(z ? {
         mode: 'z', table, matches, combined: JSON.stringify([...pattern.split(''), null, ...text.split('')]),
       } : {}),
@@ -35,10 +39,12 @@ export function traceStringSearch(text, pattern, search = naiveSearch) {
   let startCode = 'if (!word.length) return 0;';
   if (kmp) startCode = 'if (word.length === 0) {';
   if (z) startCode = 'if (!word.length) return Array.from';
+  if (rabin) startCode = 'const hasher = new PolynomialHash();';
   snapshot('start', startCode);
   const result = search(text, pattern, (step) => {
     if (kmp || z) table = JSON.stringify(step.array);
     if (step.variables.matches) matches = step.variables.matches;
+    if (rabin) hashes = { ...hashes, ...step.variables };
     snapshot(step.type, step.code, step.variables);
   });
   if (z) {
@@ -50,6 +56,7 @@ export function traceStringSearch(text, pattern, search = naiveSearch) {
   let code = 'return -1;';
   if (result >= 0) code = kmp ? 'return (textIndex - word.length) + 1;' : 'if (wordIndex === word.length) return alignment;';
   if (!pattern.length) code = kmp ? 'return 0;' : 'if (!word.length) return 0;';
+  if (rabin && result >= 0) code = 'return charIndex;';
   snapshot('done', code, {
     result, alignment: Math.max(0, result), matchIndex: result,
   });
@@ -62,4 +69,8 @@ export function traceKmpSearch(text, pattern) {
 
 export function traceZSearch(text, pattern) {
   return traceStringSearch(text, pattern, zAlgorithm);
+}
+
+export function traceRabinSearch(text, pattern) {
+  return traceStringSearch(text, pattern, rabinKarp);
 }
