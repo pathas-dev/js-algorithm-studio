@@ -1,3 +1,5 @@
+import MergeSort from '../src/algorithms/sorting/merge-sort/MergeSort';
+import mergeSource from '../src/algorithms/sorting/merge-sort/MergeSort.js?raw';
 import InsertionSort from '../src/algorithms/sorting/insertion-sort/InsertionSort';
 import insertionSource from '../src/algorithms/sorting/insertion-sort/InsertionSort.js?raw';
 import SelectionSort from '../src/algorithms/sorting/selection-sort/SelectionSort';
@@ -126,4 +128,37 @@ export const insertion = {
   },
 };
 
-export const algorithms = [bubble, selection, insertion];
+export const merge = {
+  id: 'merge-sort',
+  name: { ko: '병합 정렬', en: 'Merge sort' },
+  summary: { ko: '부분 배열을 반으로 나누고, 정렬된 두 배열의 앞쪽 값을 비교해 합칩니다.', en: 'Split into halves, then merge sorted halves by comparing their leading values.' },
+  source: algorithmCode(mergeSource),
+  example: [8, 3, 6, 1, 5, 2],
+  time: 'O(n log n)',
+  run: (values: number[]) => runSort(MergeSort, values),
+  explain(step: Step, language: Language): [string, string] {
+    const ko = language === 'ko';
+    switch (step.type) {
+      case 'start': return ko ? ['분할 시작', '현재 부분 배열의 길이를 확인합니다. 0개 또는 1개면 이미 정렬됐고, 그렇지 않으면 반으로 나눕니다.']
+        : ['Begin dividing', 'Check the current subarray length. Zero or one value is already sorted; otherwise split it in half.'];
+      case 'focus': return ko ? ['부분 배열 진입', `재귀 깊이 ${step.variables.depth}의 부분 배열을 보고 있습니다. 인덱스는 이 부분 배열 기준입니다.`]
+        : ['Enter a subarray', `Viewing the subarray at recursion depth ${step.variables.depth}. Indices are local to this subarray.`];
+      case 'split': return ko ? ['반으로 나누기', `인덱스 ${step.variables.middleIndex}를 기준으로 왼쪽과 오른쪽을 나눕니다. 왼쪽부터 재귀적으로 정렬합니다.`]
+        : ['Split in half', `Split at index ${step.variables.middleIndex}, then recursively sort the left half before the right half.`];
+      case 'base': return ko ? ['재귀 종료 조건', '부분 배열의 길이가 1 이하이므로 비교 없이 반환합니다. 상위 호출에서 이 결과를 병합합니다.']
+        : ['Base case', 'Return this subarray without comparisons because it has at most one value. The parent call will merge it.'];
+      case 'compare': {
+        const [left, right] = step.indices.map((index) => step.array[index].value);
+        return ko ? ['두 구간의 앞쪽 비교', `왼쪽의 다음 값(${left})과 오른쪽의 다음 값(${right})을 비교합니다. 같은 값이면 왼쪽부터 선택해 안정성을 유지합니다. 초록색은 현재 병합 결과입니다.`]
+          : ['Compare the two heads', `Compare left head ${left} and right head ${right}. Choose the left on equality to preserve stability. Green shows the current merged output.`];
+      }
+      case 'take': return ko ? ['작은 값 추가', '더 작은 값을 병합 결과 뒤에 넣고 해당 포인터를 전진했습니다. 남은 두 구간의 앞쪽을 다시 비교합니다.']
+        : ['Append the smaller value', 'Append the smaller value and advance its pointer. Compare the heads of the remaining ranges next.'];
+      case 'merged': return ko ? ['부분 병합 완료', '한쪽 구간을 모두 사용하면 다른 구간의 남은 값을 이어 붙입니다. 정렬된 부분 배열을 상위 호출에 반환합니다.']
+        : ['Subarray merged', 'When one side is exhausted, append the remaining values from the other. Return this sorted subarray to its parent.'];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const algorithms = [bubble, selection, insertion, merge];
