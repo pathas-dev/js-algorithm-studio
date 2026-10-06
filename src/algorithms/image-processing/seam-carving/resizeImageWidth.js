@@ -1,3 +1,4 @@
+import recordStep from '../../../utils/trace/recordStep';
 import { getPixel, setPixel } from '../utils/imageData';
 
 /**
@@ -29,6 +30,7 @@ import { getPixel, setPixel } from '../utils/imageData';
 /**
  * @typedef {Object} ResizeImageWidthArgs
  * @property {ImageData} img - image data we want to resize.
+ * @property {function} [stepCallback]
  * @property {number} toWidth - final image width we want the image to shrink to.
  */
 
@@ -89,7 +91,7 @@ const getPixelEnergy = (left, middle, right) => {
  * @param {ImageSize} size
  * @returns {EnergyMap}
  */
-const calculateEnergyMap = (img, { w, h }) => {
+const calculateEnergyMap = (img, { w, h }, stepCallback) => {
   // Create an empty energy map where each pixel has infinitely high energy.
   // We will update the energy of each pixel.
   const energyMap = matrix(w, h, Infinity);
@@ -102,6 +104,13 @@ const calculateEnergyMap = (img, { w, h }) => {
       // Right pixel might not exist if we're on the very right edge of the image.
       const right = (x + 1) < w ? getPixel(img, { x: x + 1, y }) : null;
       energyMap[y][x] = getPixelEnergy(left, middle, right);
+      recordStep(stepCallback, 'energy', [], [], () => ({
+        w,
+        h,
+        x,
+        y,
+        energyMap: JSON.stringify(energyMap),
+      }), 'energyMap[y][x] = getPixelEnergy(left, middle, right)');
     }
   }
   return energyMap;
@@ -114,11 +123,21 @@ const calculateEnergyMap = (img, { w, h }) => {
  * @param {ImageSize} size
  * @returns {Seam}
  */
-const findLowEnergySeam = (energyMap, { w, h }) => {
+const findLowEnergySeam = (energyMap, { w, h }, stepCallback) => {
   // The 2D array of the size of w and h, where each pixel contains the
   // seam metadata (pixel energy, pixel coordinate and previous pixel from
   // the lowest energy seam at this point).
   const seamPixelsMap = matrix(w, h, null);
+
+  const state = (x, y) => ({
+    w,
+    h,
+    x,
+    y,
+    totals: JSON.stringify(seamPixelsMap.map((row) => (
+      row.map((pixel) => (pixel ? pixel.energy : null))
+    ))),
+  });
 
   // Populate the first row of the map by just copying the energies
   // from the energy map.
@@ -129,6 +148,7 @@ const findLowEnergySeam = (energyMap, { w, h }) => {
       coordinate: { x, y },
       previous: null,
     };
+    recordStep(stepCallback, 'first-row', [], [], () => state(x, y), 'energy: energyMap[y][x]');
   }
 
   // Populate the rest of the rows.
@@ -154,6 +174,14 @@ const findLowEnergySeam = (energyMap, { w, h }) => {
         coordinate: { x, y },
         previous: { x: minPrevX, y: y - 1 },
       };
+      recordStep(
+        stepCallback,
+        'cost',
+        [],
+        [],
+        () => ({ ...state(x, y), minPrevX }),
+        'energy: minPrevEnergy + energyMap[y][x]',
+      );
     }
   }
 
@@ -181,6 +209,12 @@ const findLowEnergySeam = (energyMap, { w, h }) => {
   let currentSeam = seamPixelsMap[lastMinY][lastMinX];
   while (currentSeam) {
     seam.push(currentSeam.coordinate);
+    recordStep(stepCallback, 'seam', [], [], () => ({
+      w,
+      h,
+      seam: JSON.stringify(seam),
+      minSeamEnergy,
+    }), 'seam.push(currentSeam.coordinate)');
     const prevMinCoordinates = currentSeam.previous;
     if (!prevMinCoordinates) {
       currentSeam = null;
@@ -214,7 +248,7 @@ const deleteSeam = (img, seam, { w }) => {
  * @param {ResizeImageWidthArgs} args
  * @returns {ResizeImageWidthResult}
  */
-const resizeImageWidth = ({ img, toWidth }) => {
+const resizeImageWidth = ({ img, toWidth, stepCallback }) => {
   /**
    * For performance reasons we want to avoid changing the img data array size.
    * Instead we'll just keep the record of the resized image width and height separately.
@@ -231,16 +265,24 @@ const resizeImageWidth = ({ img, toWidth }) => {
   // Removing the lowest energy seams one by one.
   for (let i = 0; i < pxToRemove; i += 1) {
     // 1. Calculate the energy map for the current version of the image.
-    energyMap = calculateEnergyMap(img, size);
+    energyMap = calculateEnergyMap(img, size, stepCallback);
 
     // 2. Find the seam with the lowest energy based on the energy map.
-    seam = findLowEnergySeam(energyMap, size);
+    seam = findLowEnergySeam(energyMap, size, stepCallback);
 
     // 3. Delete the seam with the lowest energy seam from the image.
     deleteSeam(img, seam, size);
 
     // Reduce the image width, and continue iterations.
     size.w -= 1;
+    recordStep(
+      stepCallback,
+      'remove',
+      [],
+      [],
+      { w: size.w, h: size.h, removed: i + 1 },
+      'size.w -= 1',
+    );
   }
 
   // Returning the resized image and its final size.
