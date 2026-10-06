@@ -1,3 +1,5 @@
+import LinkedList from '../data-structures/linked-list/LinkedList';
+import listTraversal from '../algorithms/linked-list/traversal/traversal';
 import breadthFirstSearch from '../algorithms/tree/breadth-first-search/breadthFirstSearch';
 import BinaryTreeNode from '../data-structures/tree/BinaryTreeNode';
 import depthFirstSearch from '../algorithms/tree/depth-first-search/depthFirstSearch';
@@ -84,4 +86,40 @@ export default function traceTreeDfs(values) {
 
 export function traceTreeBfs(values) {
   return traceTree(values, true);
+}
+
+export function traceListForward(values) {
+  if (values.length > 12 || !values.every(Number.isFinite)) throw new Error('traversal-list-input');
+  const list = new LinkedList();
+  values.forEach((value, id) => list.append({ value, id }));
+  const nodes = list.toArray();
+  const links = JSON.stringify(nodes.map((node) => (
+    [node.value.id, node.next ? node.next.value.id : -1]
+  )));
+  const steps = [];
+  const order = [];
+  const snapshot = (type, code, current = -1) => steps.push({
+    type,
+    code,
+    array: values.map((value, id) => ({ value, id })),
+    indices: current < 0 ? [] : [current],
+    variables: {
+      mode: 'list-forward',
+      structure: 'linked-list',
+      links,
+      head: nodes.length ? 0 : -1,
+      tail: nodes.length - 1,
+      current,
+      seenIds: JSON.stringify(order),
+      order: order.map((id) => values[id]).join(', '),
+      result: type === 'done' ? order.map((id) => values[id]).join(', ') || '∅' : '—',
+    },
+  });
+  snapshot('start', 'let currentNode = linkedList.head;');
+  listTraversal(list, (item) => {
+    order.push(item.id);
+    snapshot('visit', 'callback(currentNode.value);', item.id);
+  });
+  snapshot('done', 'currentNode = currentNode.next;');
+  return steps;
 }

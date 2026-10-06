@@ -1,7 +1,8 @@
+import listSource from '../src/algorithms/linked-list/traversal/traversal.js?raw';
 import bfsSource from '../src/algorithms/tree/breadth-first-search/breadthFirstSearch.js?raw';
 import type { Algorithm, NumericAlgorithm } from './algorithms';
 import dfsSource from '../src/algorithms/tree/depth-first-search/depthFirstSearch.js?raw';
-import traceTreeDfs, { traceTreeBfs } from '../src/visualization/traversals';
+import traceTreeDfs, { traceTreeBfs, traceListForward } from '../src/visualization/traversals';
 import { algorithmCode } from '../src/visualization/playback';
 
 export const treeDfsLesson: NumericAlgorithm = {
@@ -40,4 +41,20 @@ export const treeBfsLesson: NumericAlgorithm = {
   },
 };
 
-export const traversalAlgorithms: Algorithm[] = [treeDfsLesson, treeBfsLesson];
+export const listForwardLesson: NumericAlgorithm = {
+  ...treeDfsLesson, id: 'linked-list-traversal', category: 'linked-list',
+  name: { ko: '연결 리스트 순회', en: 'Linked list traversal' },
+  summary: { ko: 'HEAD에서 시작해 현재 노드의 값을 방문하고 next로 이동합니다. TAIL의 next가 null이면 종료하며 리스트의 연결은 바꾸지 않습니다.', en: 'Start at HEAD, visit the current value and follow next. Stop at the null link after TAIL without changing list connections.' },
+  source: algorithmCode(listSource), example: [10, 20, 30, 40], time: 'O(n)',
+  inputLabels: [{ ko: '노드 값 · HEAD부터', en: 'Node values · from HEAD' }, { ko: '', en: '' }],
+  inputHint: { ko: '숫자 최대 12개 · 중복·빈 입력 허용 · N 번호는 노드 식별자', en: 'At most twelve values · duplicates and empty input allowed · N labels identify nodes' },
+  run: (values) => traceListForward(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['현재 포인터를 HEAD에 두기', '입력 순서대로 실제 연결 리스트를 만듭니다. HEAD가 null인 빈 리스트라면 반복문에 들어가지 않습니다.'] : ['Initialize the current pointer to HEAD', 'Build an actual linked list in input order. A null HEAD skips the loop for empty input.'];
+    if (step.type === 'visit') return ko ? ['현재 노드 값 방문', `N${v.current} 값을 방문했습니다. 다음 반복에서 next를 따라 다음 노드로 이동합니다. 같은 값도 다른 노드면 각각 방문합니다.`] : ['Visit the current node value', `Visit N${v.current}. Follow next for the next iteration. Equal values in different nodes are visited separately.`];
+    return ko ? ['null에 도달 · 순회 완료', `방문 순서는 ${v.result}입니다. 원래 next 연결을 보존했고 추가 메모리는 포인터 하나만 필요합니다.`] : ['Reached null · traversal ready', `Visit order: ${v.result}. Original links remain intact; traversal itself needs only one pointer.`];
+  },
+};
+
+export const traversalAlgorithms: Algorithm[] = [treeDfsLesson, treeBfsLesson, listForwardLesson];

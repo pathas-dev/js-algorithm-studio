@@ -3,6 +3,8 @@ import type { Step, Language } from './algorithms';
 
 export default function LinkedListView({ step, language }: { step: Step; language: Language }) {
   const links: number[][] = JSON.parse(String(step.variables.links));
+  const traversal = step.variables.mode === 'list-forward' || step.variables.mode === 'list-reverse';
+  const seen: number[] = JSON.parse(String(step.variables.seenIds ?? '[]'));
   const deque = step.variables.structure === 'deque';
   const doubly = 'previousLinks' in step.variables;
   const previousLinks: number[][] = doubly ? JSON.parse(String(step.variables.previousLinks)) : [];
@@ -29,13 +31,13 @@ export default function LinkedListView({ step, language }: { step: Step; languag
         })}
         {nodes.map((node, index) => <motion.g key={node.id} animate={{ x: node.x }} transition={{ duration: .24 }}>
           <text y={21} textAnchor="middle" fontSize={10} fill="#617469">{[step.variables.head === node.id ? deque ? 'FRONT' : 'HEAD' : '', step.variables.tail === node.id ? deque ? 'BACK' : 'TAIL' : ''].filter(Boolean).join(' / ')}</text>
-          <rect x={-35} y={32} width={70} height={56} rx={8} fill={step.indices.includes(index) ? '#fff0d8' : '#eaf0e9'} stroke={step.indices.includes(index) ? '#d8964a' : '#cddbd1'} />
+          <rect x={-35} y={32} width={70} height={56} rx={8} fill={step.indices.includes(index) ? '#fff0d8' : traversal && seen.includes(node.id) ? '#d4e9dc' : '#eaf0e9'} stroke={step.indices.includes(index) ? '#d8964a' : '#cddbd1'} />
           <text y={50} textAnchor="middle" fontSize={10} fill="#617469">N{node.id}</text>
           <text y={74} textAnchor="middle" fontSize={13} fill="#305645">{node.value}</text>
         </motion.g>)}
         {!nodes.length && <text x={width / 2} y={72} textAnchor="middle" fill="#617469">{deque ? 'FRONT = BACK = ∅' : 'HEAD = TAIL = ∅'}</text>}
       </svg>
     </div>
-    {'result' in step.variables && <div className="frontier">{language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
+    {'result' in step.variables && <div className="frontier">{traversal ? language === 'ko' ? '방문 순서' : 'Visit order' : language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(traversal ? step.variables.order : step.variables.result) || '∅'}</output></div>}
   </div>;
 }

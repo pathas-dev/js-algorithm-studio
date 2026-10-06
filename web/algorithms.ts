@@ -109,7 +109,7 @@ type AlgorithmConfig = {
   summary: Record<Language, string>;
   source: string;
   time: string | Record<Language, string>;
-  category: 'sort' | 'search' | 'graph' | 'structure' | 'string' | 'dp' | 'math' | 'sets' | 'tree';
+  category: 'sort' | 'search' | 'graph' | 'structure' | 'string' | 'dp' | 'math' | 'sets' | 'tree' | 'linked-list';
   inputLabels?: [Record<Language, string>, Record<Language, string>];
   singleInput?: boolean;
   operations?: string;
