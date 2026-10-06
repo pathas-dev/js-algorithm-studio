@@ -1,6 +1,6 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
-  tracePascal, tracePartition,
+  tracePascal, tracePartition, traceLiuHui,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -98,4 +98,13 @@ it('counts unordered partitions with repeatable summands and the empty sum', () 
   expect(JSON.parse(steps[0].variables.dpMatrix)[1][1]).toBeNull();
   expect(steps.at(-1).variables.result).toBe(5);
   expect(() => tracePartition([-1])).toThrow('partition-input');
+});
+
+it('doubles inscribed polygon sides and converges toward pi from below', () => {
+  const steps = traceLiuHui([5]);
+  expect(steps.map((step) => step.variables.sides)).toEqual([6, 12, 24, 48, 96, 96]);
+  expect(steps.at(-1).variables.result).toBeCloseTo(96 * Math.sin(Math.PI / 96), 10);
+  expect(steps.at(-1).variables.result).toBeLessThan(Math.PI);
+  expect(traceLiuHui([1]).at(-1).variables.result).toBe(3);
+  expect(() => traceLiuHui([0])).toThrow('liu-input');
 });

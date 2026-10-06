@@ -1,3 +1,4 @@
+import liuHui from '../algorithms/math/liu-hui/liuHui';
 import integerPartition from '../algorithms/math/integer-partition/integerPartition';
 import pascalTriangleRecursive from '../algorithms/math/pascal-triangle/pascalTriangleRecursive';
 import isPowerOfTwo from '../algorithms/math/is-power-of-two/isPowerOfTwo';
@@ -166,5 +167,23 @@ export function tracePartition(values) {
   }
   const steps = [];
   integerPartition(number, (step) => steps.push(step));
+  return steps;
+}
+
+export function traceLiuHui(values) {
+  const [iterations] = values;
+  if (values.length !== 1 || !Number.isInteger(iterations) || iterations < 1 || iterations > 7) {
+    throw new Error('liu-input');
+  }
+  const steps = [];
+  liuHui(iterations, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables,
+      mode: 'liu',
+      cells: JSON.stringify([['sides', step.variables.sides],
+        ['side length', step.variables.sideLength], ['π error', Math.PI - step.variables.result]]),
+    },
+  }));
   return steps;
 }

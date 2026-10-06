@@ -1,3 +1,4 @@
+import liuSource from '../src/algorithms/math/liu-hui/liuHui.js?raw';
 import partitionSource from '../src/algorithms/math/integer-partition/integerPartition.js?raw';
 import pascalSource from '../src/algorithms/math/pascal-triangle/pascalTriangleRecursive.js?raw';
 import powerTwoSource from '../src/algorithms/math/is-power-of-two/isPowerOfTwo.js?raw';
@@ -9,7 +10,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -184,4 +185,20 @@ export const partitionLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson];
+export const liuLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'liu-hui',
+  name: { ko: '류휘 원주율 근사', en: "Liu Hui's π approximation" },
+  summary: { ko: '반지름 1인 원에 내접한 정육각형에서 시작합니다. 피타고라스 정리로 변을 나누고 둘레의 절반으로 π를 근사합니다.', en: 'Start with a regular hexagon inscribed in a unit circle. Bisect sides using Pythagoras and approximate π with half the perimeter.' },
+  source: algorithmCode(liuSource), example: [5], time: 'O(k)',
+  inputLabels: [{ ko: '근사 단계 · 1은 육각형', en: 'Approximation level · one is a hexagon' }, { ko: '', en: '' }],
+  inputHint: { ko: '정수 하나 · 1–7 · 6부터 384개 변', en: 'One integer · 1–7 · six to 384 sides' },
+  run: (values) => traceLiuHui(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['정육각형에서 시작', '반지름과 육각형의 변 길이는 모두 1입니다. 둘레 6의 절반인 3으로 시작하며 실제 π보다 작습니다.'] : ['Start with a regular hexagon', 'Radius and hexagon side length are one. Half its perimeter is three, below π.'];
+    if (step.type === 'split') return ko ? ['변 수를 두 배로 늘리기', `피타고라스 정리로 새 변 길이를 구했습니다. ${v.sides}개 변의 둘레를 2로 나누면 ${v.result}입니다.`] : ['Double the side count', `Pythagoras gives the new side length. Half the perimeter of ${v.sides} sides is ${v.result}.`];
+    return ko ? ['원주율 근사 완료', `${v.sides}개 변으로 π ≈ ${v.result}. 내접 다각형이므로 실제 π보다 작고, 변을 늘리면 오차가 줄어듭니다.`] : ['π approximation ready', `${v.sides} sides give π ≈ ${v.result}. The inscribed polygon gives a lower approximation; more sides reduce the error.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson];

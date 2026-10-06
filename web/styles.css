@@ -371,3 +371,5 @@ input { caret-color: #196d53; }
 .pascal-triangle { width: max-content; min-width: 100%; display: grid; gap: 5px; }
 .pascal-triangle .string-row { justify-content: center; }
 .pascal-triangle .string-cell { width: 46px; min-width: 46px; height: 34px; }
+
+.liu-circle { display: block; width: min(100%, 230px); height: 230px; margin: 0 auto; }
