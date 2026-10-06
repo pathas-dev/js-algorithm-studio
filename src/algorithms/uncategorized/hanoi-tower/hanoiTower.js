@@ -1,3 +1,4 @@
+import recordStep from '../../../utils/trace/recordStep';
 import Stack from '../../../data-structures/stack/Stack';
 
 /**
@@ -13,12 +14,14 @@ function hanoiTowerRecursive({
   withPole,
   toPole,
   moveCallback,
+  stepCallback,
 }) {
   if (numberOfDiscs === 1) {
     // Base case with just one disc.
     moveCallback(fromPole.peek(), fromPole.toArray(), toPole.toArray());
     const disc = fromPole.pop();
     toPole.push(disc);
+    recordStep(stepCallback, 'move', [], [], { disc }, 'toPole.push(disc)');
   } else {
     // In case if there are more discs then move them recursively.
 
@@ -29,6 +32,7 @@ function hanoiTowerRecursive({
       withPole: toPole,
       toPole: withPole,
       moveCallback,
+      stepCallback,
     });
 
     // Move the disc that was exposed to its final destination.
@@ -38,6 +42,7 @@ function hanoiTowerRecursive({
       withPole,
       toPole,
       moveCallback,
+      stepCallback,
     });
 
     // Move temporary tower from auxiliary pole to its final destination.
@@ -47,6 +52,7 @@ function hanoiTowerRecursive({
       withPole: fromPole,
       toPole,
       moveCallback,
+      stepCallback,
     });
   }
 }
@@ -56,15 +62,21 @@ function hanoiTowerRecursive({
  * @param {function(disc: number, fromPole: number[], toPole: number[])} moveCallback
  * @param {Stack} [fromPole]
  * @param {Stack} [withPole]
+ * @param {function} [stepCallback]
  * @param {Stack} [toPole]
  */
 export default function hanoiTower({
   numberOfDiscs,
   moveCallback,
+  stepCallback,
   fromPole = new Stack(),
   withPole = new Stack(),
   toPole = new Stack(),
 }) {
+  if (!Number.isInteger(numberOfDiscs) || numberOfDiscs < 0) {
+    throw new Error('Disc count must be a nonnegative integer');
+  }
+  if (numberOfDiscs === 0) return;
   // Each of three poles of Tower of Hanoi puzzle is represented as a stack
   // that might contain elements (discs). Each disc is represented as a number.
   // Larger discs have bigger number equivalent.
@@ -74,11 +86,13 @@ export default function hanoiTower({
     fromPole.push(discSize);
   }
 
+  recordStep(stepCallback, 'start', [], [], {}, 'fromPole.push(discSize)');
   hanoiTowerRecursive({
     numberOfDiscs,
     fromPole,
     withPole,
     toPole,
     moveCallback,
+    stepCallback,
   });
 }
