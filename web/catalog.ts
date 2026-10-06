@@ -137,7 +137,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-string-regular-expression-matching", "category": "string", "name": {"ko": "정규 표현식 매칭", "en": "Regular Expression Matching"}},
   {"id": "planned-algorithms-tree-depth-first-search", "category": "tree", "name": {"ko": "트리 깊이 우선 탐색", "en": "Tree Depth-First Search (DFS)"}},
   {"id": "planned-algorithms-tree-breadth-first-search", "category": "tree", "name": {"ko": "트리 너비 우선 탐색", "en": "Tree Breadth-First Search (BFS)"}},
-  {"id": "planned-algorithms-graph-hamiltonian-cycle", "category": "graph", "name": {"ko": "해밀턴 경로", "en": "Hamiltonian Path"}},
   {"id": "planned-algorithms-graph-strongly-connected-components", "category": "graph", "name": {"ko": "강결합 컴포넌트", "en": "Strongly Connected Component"}},
   {"id": "planned-algorithms-graph-travelling-salesman", "category": "graph", "name": {"ko": "외판원 문제", "en": "Travelling Salesman Problem"}},
   {"id": "planned-algorithms-uncategorized-hanoi-tower", "category": "other", "name": {"ko": "하노이 탑", "en": "Tower of Hanoi"}},

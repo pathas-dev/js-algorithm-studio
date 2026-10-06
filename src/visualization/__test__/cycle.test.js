@@ -1,5 +1,5 @@
 import {
-  traceCycle, traceArticulation, traceBridges, traceEulerian,
+  traceCycle, traceArticulation, traceBridges, traceEulerian, traceHamiltonian,
 } from '../graph';
 
 it('distinguishes directed cycles, parent edges and disconnected components', () => {
@@ -36,4 +36,13 @@ it('uses every Eulerian edge once and rejects disconnected edge components', () 
   expect(steps.at(-1).variables.order.split(',')).toHaveLength(4);
   expect(traceEulerian([1], []).at(-1).variables.result).toBe('1');
   expect(() => traceEulerian([1, 2, 3, 4], [[1, 2], [3, 4]])).toThrow('eulerian');
+});
+
+it('finds Hamiltonian paths without requiring a cycle and tries other starting vertices', () => {
+  const chain = traceHamiltonian([1, 2, 3], [[1, 2], [1, 3]]);
+  expect(chain.some((step) => step.type === 'backtrack')).toBe(true);
+  expect(chain.at(-1).variables.order).toBe('2,1,3');
+  expect(traceHamiltonian([1, 2, 3], [[1, 2]]).at(-1).variables.result).toBe('∅');
+  expect(traceHamiltonian([1, 2], [[2, 1]], true).at(-1).variables.order).toBe('2,1');
+  expect(() => traceHamiltonian([1, 2, 3, 4, 5, 6, 7, 8], [])).toThrow('graph-search-limit');
 });

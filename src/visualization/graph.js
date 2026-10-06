@@ -1,3 +1,4 @@
+import hamiltonianPath from '../algorithms/graph/hamiltonian-cycle/hamiltonianPath';
 import eulerianPath from '../algorithms/graph/eulerian-path/eulerianPath';
 import graphBridges from '../algorithms/graph/bridges/graphBridges';
 import articulationPoints from '../algorithms/graph/articulation-points/articulationPoints';
@@ -223,5 +224,19 @@ export function traceEulerian(nodes, edges) {
     edges.map(([a, b]) => [a, b, 0]),
     false,
     (graph, _start, callback) => eulerianPath(graph, callback),
+  );
+}
+
+export function traceHamiltonian(nodes, edges, directed = false) {
+  requireNodes(nodes);
+  // ponytail: exhaustive search for at most 7 vertices; use subset DP for larger lessons.
+  if (nodes.length > 7) throw new Error('graph-search-limit');
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    edges.map(([a, b]) => [a, b, 0]),
+    directed,
+    (graph, _start, callback) => hamiltonianPath(graph, callback),
+    'dfs',
   );
 }

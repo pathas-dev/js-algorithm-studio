@@ -1,3 +1,4 @@
+import hamiltonianSource from '../src/algorithms/graph/hamiltonian-cycle/hamiltonianPath.js?raw';
 import eulerianSource from '../src/algorithms/graph/eulerian-path/eulerianPath.js?raw';
 import bridgesSource from '../src/algorithms/graph/bridges/graphBridges.js?raw';
 import articulationSource from '../src/algorithms/graph/articulation-points/articulationPoints.js?raw';
@@ -62,7 +63,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceEulerian, traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
+import { traceHamiltonian, traceEulerian, traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -833,6 +834,27 @@ export const eulerian: NumericAlgorithm = {
   },
 };
 
+export const hamiltonian: NumericAlgorithm = {
+  id: 'hamiltonian-path', category: 'graph', usesStart: false,
+  name: { ko: '해밀턴 경로', en: 'Hamiltonian path' },
+  summary: { ko: '모든 정점을 정확히 한 번 방문하는 경로 하나를 찾습니다. 방문하지 않은 이웃을 선택하고 막히면 되돌아갑니다. 시작점으로 돌아갈 필요는 없습니다.', en: 'Find one path visiting every vertex exactly once. Try unvisited neighbors and backtrack at dead ends. No return to the start is required.' },
+  source: algorithmCode(hamiltonianSource), time: 'O(V!)', example: [1, 2, 3, 4, 5],
+  graphEdges: [[1, 2], [2, 3], [2, 4], [4, 5], [5, 3]],
+  inputHint: { ko: '1–7개 정점 · 방향·무방향 지원 · 처음 찾은 경로 하나 반환', en: '1–7 vertices · directed or undirected · returns the first path found' },
+  run: (nodes, _start, edges = hamiltonian.graphEdges!, directed = false) => traceHamiltonian(nodes, edges, directed),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['백트래킹 준비', '각 정점을 시작점 후보로 시도합니다. 모든 정점을 방문하면 경로 하나를 반환하고 탐색을 마칩니다.'] : ['Prepare backtracking', 'Try each vertex as a starting candidate. Stop after the first path visiting every vertex.'];
+      case 'enter': return ko ? ['경로에 정점 추가', `정점 ${v.current}를 경로에 추가했습니다. 같은 정점은 두 번 선택할 수 없습니다.`] : ['Add a vertex to the path', `Add ${v.current}. A vertex cannot be chosen twice.`];
+      case 'edge': return ko ? ['다음 정점 후보 검사', `${v.current} → ${v.next}를 검사합니다. 현재 경로에 없는 이웃만 선택합니다.`] : ['Inspect the next candidate', `Inspect ${v.current} → ${v.next}. Choose only neighbors absent from the current path.`];
+      case 'backtrack': return ko ? ['막힌 경로에서 되돌아가기', `정점 ${v.current} 이후에는 전체 경로를 만들 수 없어 경로에서 제거했습니다. 다른 이웃 또는 시작점을 시도합니다.`] : ['Backtrack from a dead end', `No full path continues from ${v.current}. Remove it and try another neighbor or starting vertex.`];
+      case 'found': return ko ? ['해밀턴 경로 발견', '모든 정점을 한 번씩 방문했습니다. 끝점에서 시작점으로 연결되는 간선은 필요하지 않습니다.'] : ['Hamiltonian path found', 'Every vertex was visited exactly once. A closing edge to the start is not required.'];
+      default: return v.result === '∅' ? ko ? ['해밀턴 경로 없음', '모든 시작점과 가능한 경로를 확인했으나 전체 정점을 잇는 경로는 없습니다.'] : ['No Hamiltonian path', 'All starting vertices and possible paths were checked; none visits every vertex.'] : ko ? ['해밀턴 경로 완료', `경로: ${v.result}.`] : ['Hamiltonian path ready', `Path: ${v.result}.`];
+    }
+  },
+};
+
 export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
@@ -1519,4 +1541,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

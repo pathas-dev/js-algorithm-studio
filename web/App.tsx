@@ -146,6 +146,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'graph-search-limit': t('전수 탐색 시각화는 최대 7개 정점까지 지원합니다. 정점 수를 줄이세요.', 'Exhaustive search visualization supports up to 7 vertices. Reduce the vertex count.'),
     eulerian: t('오일러 경로에는 간선이 있는 정점들이 연결되어야 하며, 홀수 차수 정점이 0개 또는 2개여야 합니다.', 'An Eulerian walk requires connected non-isolated vertices and zero or two odd-degree vertices.'),
     'knapsack-input': t('물건은 무게:가치 형식으로 쉼표로 구분하세요. 최대 8개 · 무게 1~24 · 가치 0~999 · 허용 무게는 정수 0~24입니다.', 'Separate up to 8 weight:value items with commas. Weight 1–24 · value 0–999 · capacity integer 0–24.'),
     'empty-array': t('구간 트리에는 값을 최소 1개 입력하세요.', 'The segment tree requires at least one input value.'),
