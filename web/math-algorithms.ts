@@ -1,3 +1,4 @@
+import powerSource from '../src/algorithms/math/fast-powering/fastPowering.js?raw';
 import degreeSource from '../src/algorithms/math/radian/degreeToRadian.js?raw';
 import radianSource from '../src/algorithms/math/radian/radianToDegree.js?raw';
 import complexSource from '../src/algorithms/math/complex-number/ComplexNumber.js?raw';
@@ -16,7 +17,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -280,4 +281,21 @@ export const radianLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson];
+export const powerLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'fast-powering',
+  name: { ko: '빠른 거듭제곱', en: 'Fast powering' },
+  summary: { ko: '지수를 절반으로 줄여 계산을 재사용합니다. 짝수 지수는 절반 결과의 제곱, 홀수 지수는 그 제곱에 밑을 한 번 더 곱합니다.', en: 'Halve the exponent and reuse the result. Even powers square the half-power; odd powers multiply that square by the base.' },
+  source: algorithmCode(powerSource), example: [3, 7], time: 'O(log p)',
+  inputLabels: [{ ko: '밑, 지수', en: 'Base, exponent' }, { ko: '', en: '' }],
+  inputHint: { ko: '정수 두 개 · 밑 -20–20 · 지수 0–12 · 이 구현은 0⁰=1', en: 'Two integers · base -20–20 · exponent 0–12 · this implementation defines 0⁰=1' },
+  run: (values) => tracePower(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start' || step.type === 'enter') return ko ? ['지수를 절반으로 줄이기', `${v.base}^${v.power}를 계산합니다. 지수가 0이면 1이고, 아니면 ⌊지수/2⌋ 결과를 재귀 호출로 얻습니다.`] : ['Halve the exponent', `Compute ${v.base}^${v.power}. Exponent zero returns one; otherwise recurse for the power ⌊p/2⌋.`];
+    if (step.type === 'base' || Number(v.power) === 0) return ko ? ['지수 0 · 재귀 종료', '밑의 0제곱은 이 구현에서 1입니다. 이 값을 이전 호출로 돌려줍니다.'] : ['Exponent zero · stop recursion', 'Power zero returns one in this implementation. Return it to the previous call.'];
+    const odd = Number(v.power) % 2 !== 0;
+    return ko ? [step.type === 'done' ? '거듭제곱 완료' : odd ? '제곱한 뒤 밑 한 번 더 곱하기' : '절반 결과 제곱하기', `${v.expression}. 절반 결과 ${v.multiplier}를 한 번 계산해 재사용${odd ? '하고 홀수 지수의 남은 밑을 곱합니다' : '합니다'}.`] : [step.type === 'done' ? 'Power ready' : odd ? 'Square, then multiply by the base' : 'Square the half-power', `${v.expression}. Reuse half-power ${v.multiplier}${odd ? ' and multiply by the base for the odd remainder' : ''}.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson];

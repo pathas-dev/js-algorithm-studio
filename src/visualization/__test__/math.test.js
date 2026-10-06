@@ -1,7 +1,7 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
-  traceComplex, traceRadian,
+  traceComplex, traceRadian, tracePower,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -141,4 +141,13 @@ it('converts degrees and restores negative and multi-turn angles', () => {
   expect(traceRadian([720]).at(-1).variables.result).toBeCloseTo(720);
   expect(traceRadian([0]).at(-1).variables.result).toBe(0);
   expect(() => traceRadian([1, 2])).toThrow('float-input');
+});
+
+it('reuses recursive half powers with odd, even and zero exponents', () => {
+  expect(tracePower([3, 7]).at(-1).variables.result).toBe(2187);
+  expect(tracePower([-2, 8]).at(-1).variables.result).toBe(256);
+  expect(tracePower([-2, 7]).at(-1).variables.result).toBe(-128);
+  expect(tracePower([0, 0]).at(-1).variables.result).toBe(1);
+  expect(tracePower([3, 7]).filter((step) => step.type === 'enter').length).toBe(3);
+  expect(() => tracePower([3, -1])).toThrow('power-input');
 });

@@ -1,3 +1,4 @@
+import fastPowering from '../algorithms/math/fast-powering/fastPowering';
 import degreeToRadian from '../algorithms/math/radian/degreeToRadian';
 import radianToDegree from '../algorithms/math/radian/radianToDegree';
 import ComplexNumber from '../algorithms/math/complex-number/ComplexNumber';
@@ -324,4 +325,25 @@ export function traceRadian(values) {
         ['turns', degree / 360], ['restored degrees', restored]]),
     },
   }));
+}
+
+export function tracePower(values) {
+  const [base, power] = values;
+  if (values.length !== 2 || !values.every(Number.isInteger)
+    || Math.abs(base) > 20 || power < 0 || power > 12) throw new Error('power-input');
+  const steps = [];
+  const stack = [];
+  fastPowering(base, power, (step) => {
+    if (step.type === 'enter') stack.push(step.variables.power);
+    steps.push({
+      ...step,
+      variables: {
+        ...step.variables, mode: 'power', stack: stack.join(' → '),
+      },
+    });
+    if (step.type !== 'enter') stack.pop();
+  });
+  steps[0].type = 'start';
+  steps[steps.length - 1].type = 'done';
+  return steps;
 }
