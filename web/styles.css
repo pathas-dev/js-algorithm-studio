@@ -394,3 +394,11 @@ input { caret-color: #196d53; }
 .fourier-charts figcaption { font-size: 11px; color: #657166; }
 .fourier-charts svg { display: block; width: 100%; }
 @media (max-width: 650px) { .fourier-charts { grid-template-columns: 1fr; } }
+
+.collection-inputs { display: flex; gap: 24px; flex-wrap: wrap; }
+.collection-inputs p { margin: 4px 0 8px; font-size: 12px; color: #657166; }
+.collection-inputs .string-row { flex-wrap: wrap; }
+.collection-inputs .string-cell { width: auto; min-width: 34px; padding: 6px; }
+.collection-results { display: flex; flex-wrap: wrap; gap: 8px; }
+.collection-results > div { padding: 8px 10px; background: #eaf0e9; border-radius: 5px; font: 13px monospace; }
+.collection-results .active-group { background: #f0dfbd; }
