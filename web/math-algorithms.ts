@@ -1,3 +1,4 @@
+import factorsSource from '../src/algorithms/math/prime-factors/primeFactors.js?raw';
 import floatSource from '../src/algorithms/math/binary-floating-point/floatAsBinaryString.js?raw';
 import decodeSource from '../src/algorithms/math/binary-floating-point/bitsToFloat.js?raw';
 import liuSource from '../src/algorithms/math/liu-hui/liuHui.js?raw';
@@ -12,7 +13,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -221,4 +222,21 @@ export const floatLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson];
+export const factorsLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'prime-factors',
+  name: { ko: '소인수분해', en: 'Prime factors' },
+  summary: { ko: '2부터 작은 인수로 반복해서 나눕니다. 남은 수의 제곱근까지만 검사하고, 마지막에 남은 소수도 목록에 추가합니다.', en: 'Repeatedly divide by small factors starting at two. Test through the square root of the remaining value, then append the final prime.' },
+  source: algorithmCode(factorsSource), example: [84], time: 'O(√n)',
+  inputHint: { ko: '양의 정수 하나 · 1–999 · 1에는 소인수가 없음', en: 'One positive integer · 1–999 · one has no prime factors' },
+  run: (values) => traceFactors(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['작은 인수부터 확인', '2부터 시작합니다. 입력 1은 소인수가 없어 빈 인수 목록을 반환합니다.'] : ['Start with small factors', 'Start at two. One has no prime factors and returns an empty list.'];
+    if (step.type === 'check') return ko ? ['남은 수를 나누는지 확인', `${v.remaining}을 ${v.factor}로 나눠봅니다. 나누어떨어지면 같은 인수로 다시 나누므로 중복 인수도 보존합니다.`] : ['Test divisibility', `Test ${v.remaining} with ${v.factor}. Repeated division by the same factor preserves multiplicity.`];
+    if (step.type === 'divide') return ko ? ['인수를 저장하고 몫으로 줄이기', `${v.factor}를 저장했습니다. ${v.expression}. 남은 수가 줄면 검사 범위도 줄어듭니다.`] : ['Save the factor and reduce', `Save ${v.factor}: ${v.expression}. Reducing the remaining value also reduces the search bound.`];
+    if (step.type === 'append') return ko ? ['마지막 소수 추가', `남은 ${v.remaining}에는 제곱근 이하의 약수가 없어 소수입니다. 이를 마지막 인수로 추가합니다.`] : ['Append the final prime', `The remaining ${v.remaining} has no divisor through its square root, so append it as a prime.`];
+    return ko ? ['소인수분해 완료', `${v.expression}. 입력 1의 인수 목록은 비어 있으며 빈 곱의 값은 1입니다.`] : ['Factorization ready', `${v.expression}. One has an empty factor list; the empty product equals one.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson];

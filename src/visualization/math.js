@@ -1,3 +1,4 @@
+import { primeFactors } from '../algorithms/math/prime-factors/primeFactors';
 import { floatAs32BinaryString } from '../algorithms/math/binary-floating-point/floatAsBinaryString';
 import { bitsToFloat32 } from '../algorithms/math/binary-floating-point/bitsToFloat';
 import liuHui from '../algorithms/math/liu-hui/liuHui';
@@ -227,4 +228,19 @@ export function traceFloat(values) {
         ['decoded float32', result], ['rounding error', decoded - number]]),
     },
   }));
+}
+
+export function traceFactors(values) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isInteger(number) || number < 1) {
+    throw new Error('factors-input');
+  }
+  const steps = [];
+  primeFactors(number, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'factors',
+    },
+  }));
+  return steps;
 }

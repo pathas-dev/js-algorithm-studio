@@ -1,6 +1,6 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
-  tracePascal, tracePartition, traceLiuHui, traceFloat,
+  tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -116,4 +116,11 @@ it('rounds float32 and decodes zeros and subnormals correctly', () => {
   expect(traceFloat([1e-40]).at(-1).variables.result).toBe(Math.fround(1e-40));
   expect(traceFloat([-2.5]).at(-1).variables.result).toBe(-2.5);
   expect(() => traceFloat([Infinity])).toThrow('float-input');
+});
+
+it('preserves repeated prime factors and the empty factorization of one', () => {
+  expect(JSON.parse(traceFactors([84]).at(-1).variables.sequence)).toEqual([2, 2, 3, 7]);
+  expect(JSON.parse(traceFactors([97]).at(-1).variables.sequence)).toEqual([97]);
+  expect(JSON.parse(traceFactors([1]).at(-1).variables.sequence)).toEqual([]);
+  expect(() => traceFactors([0])).toThrow('factors-input');
 });

@@ -130,7 +130,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-uncategorized-rain-terraces", "category": "other", "name": {"ko": "빗물 담기 문제", "en": "Rain Terraces (Trapping Rain Water) Problem"}},
   {"id": "planned-algorithms-uncategorized-n-queens", "category": "other", "name": {"ko": "N-Queens 문제", "en": "N-Queens Problem"}},
   {"id": "planned-algorithms-uncategorized-knight-tour", "category": "other", "name": {"ko": "기사의 여행 문제", "en": "Knight's Tour"}},
-  {"id": "planned-algorithms-math-prime-factors", "category": "math", "name": {"ko": "소인수분해", "en": "Prime Factors"}},
   {"id": "planned-algorithms-math-complex-number", "category": "math", "name": {"ko": "복소수", "en": "Complex Number"}},
   {"id": "planned-algorithms-math-radian", "category": "math", "name": {"ko": "라디안", "en": "Radian"}},
   {"id": "planned-algorithms-math-fast-powering", "category": "math", "name": {"ko": "빠른 거듭제곱", "en": "Fast Powering Algorithm"}},
