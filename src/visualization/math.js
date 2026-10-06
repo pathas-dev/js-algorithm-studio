@@ -1,3 +1,4 @@
+import euclideanDistance from '../algorithms/math/euclidean-distance/euclideanDistance';
 import { dot } from '../algorithms/math/matrix/Matrix';
 import hornerMethod from '../algorithms/math/horner-method/hornerMethod';
 import fastPowering from '../algorithms/math/fast-powering/fastPowering';
@@ -393,5 +394,31 @@ export function traceMatrix(inputs) {
       ...step.variables, mode: 'matrix-product',
     },
   }));
+  return steps;
+}
+
+export function traceDistance(values) {
+  if (values.length < 2 || values.length > 12 || values.length % 2 !== 0
+    || !values.every(Number.isFinite)) throw new Error('distance-input');
+  const dimensions = values.length / 2;
+  const first = values.slice(0, dimensions);
+  const second = values.slice(dimensions);
+  const scale = Math.max(1, ...values.map(Math.abs)) * 1.2;
+  const steps = [];
+  euclideanDistance([first], [second], (step) => {
+    steps.push({
+      ...step,
+      variables: {
+        ...step.variables,
+        mode: 'distance',
+        dimensions,
+        scale,
+        points: JSON.stringify(dimensions === 2
+          ? [[first[0], first[1], 'A'], [second[0], second[1], 'B']] : []),
+        cells: JSON.stringify([['A', first.join(', ')], ['B', second.join(', ')],
+          ['Σ squared differences', step.variables.sum]]),
+      },
+    });
+  });
   return steps;
 }

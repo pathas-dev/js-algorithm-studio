@@ -2,6 +2,7 @@ import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
   traceComplex, traceRadian, tracePower, traceHorner, traceMatrix,
+  traceDistance,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -169,4 +170,13 @@ it('traces rectangular matrix products and rejects ragged or incompatible inputs
   expect(traceMatrix(['[[-2]]', '[[3]]']).at(-1).variables.result).toBe('[[-6]]');
   expect(() => traceMatrix(['[[1,2],[3]]', '[[1],[2]]'])).toThrow('matrix-input');
   expect(() => traceMatrix(['[[1,2]]', '[[3,4]]'])).toThrow('matrix-shape');
+});
+
+it('sums squared coordinate differences before rounding the distance', () => {
+  expect(traceDistance([0, 0, 3, 4]).at(-1).variables.result).toBe(5);
+  expect(traceDistance([3, 4, 0, 0]).at(-1).variables.result).toBe(5);
+  expect(traceDistance([8, 2, 6, 3, 5, 7]).at(-1).variables.result).toBe(5.92);
+  expect(traceDistance([2, 2]).at(-1).variables.result).toBe(0);
+  expect(traceDistance([0, 0, 3, 4])[1].variables.sum).toBe(9);
+  expect(() => traceDistance([1, 2, 3])).toThrow('distance-input');
 });

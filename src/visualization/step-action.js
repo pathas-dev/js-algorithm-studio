@@ -52,6 +52,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
   } else if (algorithm.category === 'math') {
     evidence = typeof v.result === 'number' && Math.abs(v.result) >= 1e6
       ? `≈ ${v.result.toExponential(2)}` : `= ${v.result}`;
+    if (v.mode === 'distance' && v.result === '—') evidence = `Σ = ${v.sum}`;
     if (v.mode === 'matrix-product') evidence = type === 'done' ? 'C = A × B' : `C[${v.row < 0 ? '…' : v.row}, ${v.column < 0 ? '…' : v.column}]`;
     if (v.mode === 'power' && v.result === '—') evidence = `p = ${v.power}`;
     if (v.mode === 'complex') evidence = 'z₁, z₂';

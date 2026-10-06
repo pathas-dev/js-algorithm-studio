@@ -158,6 +158,7 @@ export default function App() {
     'horner-input': t('계수를 1–8개 입력하고 x는 -10–10으로 입력하세요.', 'Enter one to eight coefficients and x from -10 to 10.'),
     'matrix-input': t('행렬은 1–4행과 동일한 길이의 1–4열을 가진 JSON 숫자 배열로 입력하세요. 값은 -999–999입니다.', 'Enter JSON numeric matrices with one to four equal-length rows and columns; values -999–999.'),
     'matrix-shape': t('A의 열 수와 B의 행 수가 같아야 곱할 수 있습니다.', 'A columns must match B rows for multiplication.'),
+    'distance-input': t('두 점의 좌표를 같은 개수로 입력하세요. 총 2–12개의 실수가 필요합니다.', 'Enter two points with equal coordinate counts, totaling two to twelve real numbers.'),
     'integer-single': t('정수 하나를 입력하세요.', 'Enter one integer.'),
     'sieve-input': t('체의 상한 n으로 정수 하나를 0부터 120까지 입력하세요.', 'Enter one integer sieve upper bound n from 0 to 120.'),
     'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),

@@ -1,3 +1,4 @@
+import distanceSource from '../src/algorithms/math/euclidean-distance/euclideanDistance.js?raw';
 import matrixSource from '../src/algorithms/math/matrix/Matrix.js?raw';
 import hornerSource from '../src/algorithms/math/horner-method/hornerMethod.js?raw';
 import powerSource from '../src/algorithms/math/fast-powering/fastPowering.js?raw';
@@ -19,7 +20,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm, TextAlgorithm, Algorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner, traceMatrix } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner, traceMatrix, traceDistance } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -333,4 +334,20 @@ export const matrixLesson: TextAlgorithm = {
   },
 };
 
-export const mathAlgorithms: Algorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson, matrixLesson];
+export const distanceLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'euclidean-distance',
+  name: { ko: '유클리드 거리', en: 'Euclidean distance' },
+  summary: { ko: '두 점의 같은 차원 좌표 차이를 제곱해 더하고 제곱근을 구합니다. 이 구현은 최종 거리를 소수 둘째 자리까지 반올림합니다.', en: 'Sum squared differences between matching coordinates and take the square root. This implementation rounds the final distance to two decimal places.' },
+  source: algorithmCode(distanceSource), example: [0, 0, 3, 4], time: 'O(d)',
+  inputLabels: [{ ko: 'A 좌표 뒤에 B 좌표', en: 'A coordinates followed by B coordinates' }, { ko: '', en: '' }],
+  inputHint: { ko: '동일 차원의 두 점 · 각 1–6차원 · 예: 0, 0, 3, 4는 A(0,0), B(3,4)', en: 'Two points of equal dimension · one to six dimensions each · 0, 0, 3, 4 means A(0,0), B(3,4)' },
+  run: (values) => traceDistance(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['좌표 차이의 제곱합 준비', `${v.dimensions}차원 점 두 개를 비교합니다. 2차원 입력은 평면 위 선분으로 표시하고, 더 높은 차원은 좌표 표로 확인합니다.`] : ['Prepare the squared-distance sum', `Compare two ${v.dimensions}-dimensional points. Two-dimensional inputs have a plane diagram; higher dimensions use the coordinate table.`];
+    if (step.type === 'square-add') return ko ? ['좌표 차이를 제곱해 더하기', `${v.expression}. 차이를 제곱하므로 방향과 관계없이 양수이며, A와 B를 바꿔도 거리는 같습니다.`] : ['Square and accumulate a coordinate difference', `${v.expression}. Squaring removes direction; swapping A and B preserves distance.`];
+    return ko ? ['제곱근으로 거리 복원', `${v.expression}. 이 저장소의 함수는 결과를 소수 둘째 자리로 반올림하므로 작은 차이는 0으로 표시될 수 있습니다.`] : ['Recover distance with a square root', `${v.expression}. The repository function rounds to two decimals, so tiny distances can round to zero.`];
+  },
+};
+
+export const mathAlgorithms: Algorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson, matrixLesson, distanceLesson];
