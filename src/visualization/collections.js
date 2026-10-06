@@ -1,3 +1,4 @@
+import dpLongestIncreasingSubsequence from '../algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence';
 import combineWithoutRepetitions from '../algorithms/sets/combinations/combineWithoutRepetitions';
 import permutateWithoutRepetitions from '../algorithms/sets/permutations/permutateWithoutRepetitions';
 import bwPowerSet from '../algorithms/sets/power-set/bwPowerSet';
@@ -81,5 +82,16 @@ export function traceCombinations(values, k) {
   steps[0].type = 'start';
   const last = steps[steps.length - 1];
   steps.push({ ...last, type: 'done', variables: { ...last.variables, result: groups.length } });
+  return steps;
+}
+
+export function traceLis(values) {
+  if (values.length > 16 || !values.every(Number.isFinite)) throw new Error('lis-input');
+  const steps = [];
+  dpLongestIncreasingSubsequence(values, (step) => steps.push({
+    ...step,
+    array: step.array.map((value, id) => ({ value, id })),
+    variables: { ...step.variables, mode: 'lis' },
+  }));
   return steps;
 }

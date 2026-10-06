@@ -1,5 +1,5 @@
 import traceCartesian, {
-  traceShuffle, tracePowerSet, tracePermutations, traceCombinations,
+  traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis,
 } from '../collections';
 
 it('creates unique ordered pairs and handles an empty set', () => {
@@ -52,4 +52,14 @@ it('chooses unordered combinations without replacement including k=0 and k>n', (
   expect(traceCombinations([1], 2).at(-1).variables.result).toBe(0);
   expect(traceCombinations([1, 1, 2], 1).at(-1).variables.result).toBe(2);
   expect(() => traceCombinations([1], -1)).toThrow('combination-input');
+});
+
+it('computes strict LIS lengths while preserving duplicate input values', () => {
+  const steps = traceLis([3, 1, 2, 5, 4]);
+  expect(steps.at(-1).variables.result).toBe(3);
+  expect(JSON.parse(steps.at(-1).variables.lengths)).toEqual([1, 1, 2, 3, 3]);
+  expect(traceLis([2, 2, 2]).at(-1).variables.result).toBe(1);
+  expect(traceLis([3, 2, 1]).at(-1).variables.result).toBe(1);
+  expect(traceLis([]).at(-1).variables.result).toBe(0);
+  expect(JSON.parse(steps[0].variables.lengths)).toEqual([1, 1, 1, 1, 1]);
 });

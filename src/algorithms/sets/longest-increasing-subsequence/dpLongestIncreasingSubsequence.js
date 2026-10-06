@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * Dynamic programming approach to find longest increasing subsequence.
  * Complexity: O(n * n)
@@ -5,7 +7,7 @@
  * @param {number[]} sequence
  * @return {number}
  */
-export default function dpLongestIncreasingSubsequence(sequence) {
+export default function dpLongestIncreasingSubsequence(sequence, stepCallback) {
   // Create array with longest increasing substrings length and
   // fill it with 1-s that would mean that each element of the sequence
   // is itself a minimum increasing subsequence.
@@ -14,7 +16,23 @@ export default function dpLongestIncreasingSubsequence(sequence) {
   let previousElementIndex = 0;
   let currentElementIndex = 1;
 
+  const state = (result = '—') => ({
+    previousElementIndex,
+    currentElementIndex,
+    result,
+    lengths: JSON.stringify(lengthsArray),
+  });
+  recordStep(stepCallback, 'start', sequence, [], () => state(), 'const lengthsArray = Array(sequence.length).fill(1);');
+
   while (currentElementIndex < sequence.length) {
+    recordStep(
+      stepCallback,
+      'compare',
+      sequence,
+      [previousElementIndex, currentElementIndex],
+      () => state(),
+      'if (sequence[previousElementIndex] < sequence[currentElementIndex]) {',
+    );
     if (sequence[previousElementIndex] < sequence[currentElementIndex]) {
       // If current element is bigger then the previous one then
       // current element is a part of increasing subsequence which
@@ -25,6 +43,14 @@ export default function dpLongestIncreasingSubsequence(sequence) {
         // Increase only if previous element would give us bigger subsequence length
         // then we already have for current element.
         lengthsArray[currentElementIndex] = newLength;
+        recordStep(
+          stepCallback,
+          'update',
+          sequence,
+          [previousElementIndex, currentElementIndex],
+          () => state(),
+          'lengthsArray[currentElementIndex] = newLength;',
+        );
       }
     }
 
@@ -46,8 +72,12 @@ export default function dpLongestIncreasingSubsequence(sequence) {
   for (let i = 0; i < lengthsArray.length; i += 1) {
     if (lengthsArray[i] > longestIncreasingLength) {
       longestIncreasingLength = lengthsArray[i];
+      recordStep(stepCallback, 'best', sequence, [i], () => ({
+        ...state(), best: longestIncreasingLength,
+      }), 'longestIncreasingLength = lengthsArray[i];');
     }
   }
 
+  recordStep(stepCallback, 'done', sequence, [], () => state(longestIncreasingLength), 'return longestIncreasingLength;');
   return longestIncreasingLength;
 }

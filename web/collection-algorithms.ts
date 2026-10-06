@@ -1,3 +1,4 @@
+import lisSource from '../src/algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence.js?raw';
 import combinationSource from '../src/algorithms/sets/combinations/combineWithoutRepetitions.js?raw';
 import permutationSource from '../src/algorithms/sets/permutations/permutateWithoutRepetitions.js?raw';
 import powerSetSource from '../src/algorithms/sets/power-set/bwPowerSet.js?raw';
@@ -5,7 +6,7 @@ import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?ra
 import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations } from '../src/visualization/collections';
+import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -88,4 +89,21 @@ export const combinationLesson: NumericAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson];
+export const lisLesson: NumericAlgorithm = {
+  ...shuffleLesson, id: 'longest-increasing-subsequence',
+  name: { ko: '최장 증가 수열', en: 'Longest increasing subsequence' },
+  summary: { ko: '각 위치에서 끝나는 엄격히 증가하는 부분 수열의 최대 길이를 계산합니다. 원소를 건너뛸 수 있지만 원래 순서는 유지하며 같은 값은 증가로 보지 않습니다.', en: 'Compute the longest strictly increasing subsequence ending at each position. Items may be skipped but retain their order; equal values are not increasing.' },
+  source: algorithmCode(lisSource), example: [3, 1, 2, 5, 4], time: 'O(n²)',
+  inputHint: { ko: '숫자 최대 16개 · 중복 유지 · 함수는 수열 자체가 아니라 최대 길이를 반환', en: 'At most sixteen numbers · duplicates preserved · the function returns the length, not the subsequence' },
+  run: (values) => traceLis(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['각 원소 하나로 길이 1', '각 원소는 길이 1의 수열이 됩니다. 빈 입력에는 원소가 없어 최대 길이가 0입니다.'] : ['Each item starts with length one', 'Each item forms a length-one subsequence. Empty input has length zero.'];
+    if (step.type === 'compare') return ko ? ['앞선 값으로 이어갈 수 있는지 확인', `${v.previousElementIndex}번과 ${v.currentElementIndex}번을 비교합니다. 앞선 값이 더 작을 때만 앞선 길이+1을 후보로 만들며, 현재 길이보다 큰 경우에만 갱신합니다.`] : ['Check whether an earlier sequence can extend', `Compare positions ${v.previousElementIndex} and ${v.currentElementIndex}. Only a smaller earlier value can extend its length by one, and only an improvement updates the current length.`];
+    if (step.type === 'update') return ko ? ['현재 위치의 길이 갱신', `앞선 ${v.previousElementIndex}번 위치의 수열에 현재 ${v.currentElementIndex}번 값을 붙이면 더 긴 수열이 됩니다. 표의 현재 길이를 갱신했습니다.`] : ['Update the length ending here', `Appending position ${v.currentElementIndex} to the sequence ending at ${v.previousElementIndex} improves its length. Update the table.`];
+    if (step.type === 'best') return ko ? ['모든 끝 위치 중 최댓값', `지금까지 확인한 최대 길이는 ${v.best}입니다. 최장 수열이 마지막 원소에서 끝난다는 보장은 없어 모두 검사합니다.`] : ['Find the maximum over all endpoints', `Best length so far: ${v.best}. The longest subsequence need not end at the final item, so inspect every endpoint.`];
+    return ko ? ['최장 증가 수열 길이 완료', `최대 길이는 ${v.result}입니다. 이 함수는 길이만 계산하며 실제 원소 목록을 역추적하지는 않습니다.`] : ['LIS length ready', `The maximum length is ${v.result}. This function computes length without tracing back the actual item list.`];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson, lisLesson];

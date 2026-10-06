@@ -51,6 +51,15 @@ export default function stepAction(algorithm, step, language, title, index, leng
     }
   } else if (algorithm.category === 'sets') {
     evidence = `count = ${v.count === undefined ? array.length : v.count}`;
+    if (v.mode === 'lis') {
+      evidence = `n = ${array.length}`;
+      if (type === 'done') evidence = `length = ${v.result}`;
+      else if (type === 'compare' || type === 'update') {
+        const previous = array[Number(v.previousElementIndex)].value;
+        const current = array[Number(v.currentElementIndex)].value;
+        evidence = `${previous} ${relation(previous, current)} ${current}`;
+      }
+    }
     if (v.mode === 'shuffle' && v.i !== undefined) evidence = type === 'select' ? `[0, ${v.i}] → ${v.randomIndex}` : `${v.i} ↔ ${v.randomIndex}`;
   } else if (algorithm.category === 'math') {
     evidence = typeof v.result === 'number' && Math.abs(v.result) >= 1e6
