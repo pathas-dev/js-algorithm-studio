@@ -1,8 +1,9 @@
+import primeSource from '../src/algorithms/math/primality-test/trialDivision.js?raw';
 import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?raw';
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -65,4 +66,19 @@ export const fibonacciLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson];
+export const primalityLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'primality-test',
+  name: { ko: '소수 판별', en: 'Primality test' },
+  summary: { ko: '2를 먼저 확인하고 √n 이하의 홀수 약수만 검사합니다. 나누어떨어지는 수가 있으면 합성수이고, 없으면 소수입니다.', en: 'Check two first, then odd divisors through √n. A divisor rejects primality; no divisor proves it.' },
+  source: algorithmCode(primeSource), example: [97], time: 'O(√n)',
+  inputHint: { ko: '정수 하나 · -999부터 999까지 · 1 이하의 수는 소수가 아님', en: 'One integer · -999 to 999 · numbers at most one are not prime' },
+  run: (values) => tracePrimality(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['소수 조건 확인', '소수는 1보다 큰 정수입니다. 2와 3은 바로 소수로 판단하고, 더 큰 짝수는 제외합니다.'] : ['Check prime conditions', 'Primes are integers greater than one. Accept two and three immediately; reject larger even numbers.'];
+    if (step.type === 'check-divisor') return ko ? ['약수와 나머지 확인', `${v.expression}. 0이면 약수이며 소수가 아닙니다. 약수 쌍 중 하나는 √n 이하이므로 그 범위까지만 검사합니다.`] : ['Check a divisor and remainder', `${v.expression}. Zero means a divisor. One member of a divisor pair is at most √n, so checking through that bound suffices.`];
+    return ko ? [v.result ? '소수입니다' : '소수가 아닙니다', v.result ? '√n 이하에서 나누어떨어지는 약수를 찾지 못했습니다. 더 큰 약수도 있을 수 없습니다.' : Number(v.number) <= 1 ? '1 이하의 수는 소수가 아닙니다.' : `약수 ${v.divider}로 나누어떨어집니다.`] : [v.result ? 'It is prime' : 'It is not prime', v.result ? 'No divisor was found through √n, so no larger factor pair is possible.' : Number(v.number) <= 1 ? 'Numbers at most one are not prime.' : `Divisible by ${v.divider}.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson];

@@ -1,4 +1,4 @@
-import traceBits, { traceFactorial, traceFibonacci } from '../math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
   const steps = traceBits([13, 2, 0]);
@@ -31,4 +31,15 @@ it('starts Fibonacci at zero and accumulates exact values through F(78)', () => 
   expect(JSON.parse(steps[0].variables.sequence)).toEqual([0, 1]);
   expect(Number.isSafeInteger(traceFibonacci([78]).at(-1).variables.result)).toBe(true);
   expect(() => traceFibonacci([79])).toThrow('fibonacci-input');
+});
+
+it('checks only necessary primality divisors and rejects nonintegers', () => {
+  expect(tracePrimality([1]).at(-1).variables.result).toBe(false);
+  expect(tracePrimality([2]).at(-1).variables.result).toBe(true);
+  expect(tracePrimality([49]).at(-1).variables.result).toBe(false);
+  const prime = tracePrimality([97]);
+  expect(prime.at(-1).variables.result).toBe(true);
+  expect(JSON.parse(prime.at(-1).variables.checks).map(([divider]) => divider))
+    .toEqual([2, 3, 5, 7, 9]);
+  expect(() => tracePrimality([1.5])).toThrow('primality-input');
 });

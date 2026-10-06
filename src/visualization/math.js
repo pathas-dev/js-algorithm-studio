@@ -1,3 +1,4 @@
+import trialDivision from '../algorithms/math/primality-test/trialDivision';
 import fibonacciNth from '../algorithms/math/fibonacci/fibonacciNth';
 import factorial from '../algorithms/math/factorial/factorial';
 import getBit from '../algorithms/math/bits/getBit';
@@ -57,6 +58,18 @@ export function traceFibonacci(values) {
   fibonacciNth(number, (step) => {
     if (step.type === 'add') sequence.push(step.variables.result);
     steps.push({ ...step, variables: { ...step.variables, mode: 'fibonacci', sequence: JSON.stringify(sequence) } });
+  });
+  return steps;
+}
+
+export function tracePrimality(values) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isInteger(number)) throw new Error('primality-input');
+  const checks = [];
+  const steps = [];
+  trialDivision(number, (step) => {
+    if (step.type === 'check-divisor') checks.push([step.variables.divider, step.variables.remainder]);
+    steps.push({ ...step, variables: { ...step.variables, mode: 'primality', checks: JSON.stringify(checks) } });
   });
   return steps;
 }

@@ -148,6 +148,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'primality-input': t('소수 판별에는 정수 하나를 입력하세요.', 'Enter one integer for primality testing.'),
     'fibonacci-input': t('피보나치 인덱스로 정수 하나를 0부터 78까지 입력하세요.', 'Enter one Fibonacci index integer from 0 to 78.'),
     'factorial-input': t('팩토리얼에는 정수 하나를 0부터 18까지 입력하세요.', 'Enter one factorial input integer from 0 to 18.'),
     'bits-input': t('숫자(정수 0–255), 비트 위치(0–7), 비트 값(0 또는 1) 세 값을 입력하세요.', 'Enter three integers: number 0–255, bit position 0–7, bit value 0 or 1.'),
