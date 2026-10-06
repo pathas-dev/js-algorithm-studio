@@ -1,3 +1,4 @@
+import lruSource from '../src/data-structures/lru-cache/LRUCacheOnMap.js?raw';
 import dequeSource from '../src/data-structures/deque/Deque.js?raw';
 import salesmanSource from '../src/algorithms/graph/travelling-salesman/bfTravellingSalesman.js?raw';
 import sccSource from '../src/algorithms/graph/strongly-connected-components/stronglyConnectedComponents.js?raw';
@@ -46,7 +47,7 @@ import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?r
 import doublyListSource from '../src/data-structures/doubly-linked-list/DoublyLinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceDeque, traceStack, traceQueue, traceLinkedList, traceDoublyLinkedList, traceHeap, traceMaxHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
+import { traceLru, traceDeque, traceStack, traceQueue, traceLinkedList, traceDoublyLinkedList, traceHeap, traceMaxHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -106,6 +107,7 @@ type AlgorithmConfig = {
   operations?: string;
   operationHint?: string;
   target?: number;
+  targetLabel?: Record<Language, string>;
   requiresSorted?: boolean;
   inputHint?: Record<Language, string>;
   randomMax?: number;
@@ -973,6 +975,27 @@ export const deque: NumericAlgorithm = {
   },
 };
 
+export const lru: NumericAlgorithm = {
+  id: 'lru-cache', category: 'structure', target: 3,
+  targetLabel: { ko: '저장 용량', en: 'Cache capacity' },
+  name: { ko: 'LRU 캐시', en: 'LRU cache' },
+  summary: { ko: '최근 사용한 항목을 뒤로 옮깁니다. 용량을 넘으면 가장 오래 사용하지 않은 앞쪽 항목을 제거합니다. Map의 삽입 순서를 활용합니다.', en: 'Move recently used entries to the end. Evict the least recently used front entry when full. Uses Map insertion order.' },
+  source: algorithmCode(lruSource), example: [1, 2, 3], time: { ko: '평균 O(1)', en: 'Average O(1)' },
+  operations: 'get 1, set 4 40, get 2, set 1 10, get 1',
+  operationHint: 'set 1 10, get 1, set 2 20',
+  inputHint: { ko: '초기 숫자는 키와 값으로 함께 저장 · 용량 정수 1–12 · set 키 값 / get 키', en: 'Initial numbers are both key and value · capacity integer 1–12 · set key value / get key' },
+  run: (values, capacity = 3, _edges, _directed, operations = lru.operations!) => traceLru(values, capacity, operations),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 캐시 준비', `용량 ${v.capacity}인 캐시를 준비합니다. 왼쪽은 가장 오래된 사용(LRU), 오른쪽은 가장 최근 사용(MRU)입니다.`] : ['Prepare an empty cache', `Capacity: ${v.capacity}. Left is least recently used (LRU), right is most recently used (MRU).`];
+      case 'set': return ko ? ['항목 저장·최근 위치 갱신', `키 ${v.key}에 ${v.value}를 저장하고 MRU로 옮겼습니다.${v.evicted !== undefined ? ` 용량 초과로 LRU 키 ${v.evicted}를 제거했습니다.` : ''}`] : ['Store and promote an entry', `Store ${v.value} at key ${v.key} and move it to MRU.${v.evicted !== undefined ? ` Evict LRU key ${v.evicted} because capacity was exceeded.` : ''}`];
+      case 'get': return v.result === 'undefined' ? ko ? ['캐시 미스', `키 ${v.key}가 없어 undefined를 반환합니다. 캐시 순서는 바뀌지 않습니다.`] : ['Cache miss', `Key ${v.key} is absent: return undefined without changing order.`] : ko ? ['캐시 히트·최근 위치 갱신', `키 ${v.key}의 값 ${v.result}를 반환하고 MRU로 옮겼습니다.`] : ['Cache hit and promotion', `Return ${v.result} for key ${v.key} and move it to MRU.`];
+      default: return ko ? ['캐시 연산 완료', `현재 ${step.array.length}/${v.capacity}개 저장 중입니다. 삭제는 사용 빈도가 아니라 사용 시점에 따라 결정합니다.`] : ['Cache operations complete', `Stored ${step.array.length}/${v.capacity}. Eviction follows recency, not frequency.`];
+    }
+  },
+};
+
 export const linkedList: NumericAlgorithm = {
   id: 'linked-list', category: 'structure', usesStart: false,
   name: { ko: '연결 리스트', en: 'Linked list' },
@@ -1609,4 +1632,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

@@ -1,3 +1,4 @@
+import LRUCacheOnMap from '../data-structures/lru-cache/LRUCacheOnMap';
 import Deque from '../data-structures/deque/Deque';
 import BinarySearchTree from '../data-structures/tree/binary-search-tree/BinarySearchTree';
 import AvlTree from '../data-structures/tree/avl-tree/AvlTree';
@@ -453,5 +454,48 @@ export function traceDeque(values, operations = '') {
   values.forEach((value) => run({ name: 'addBack', value }, 'input'));
   commands.forEach((command) => run(command, 'commands'));
   snapshot('done', 'toArray() {');
+  return steps;
+}
+
+export function traceLru(values, capacity = 3, operations = '') {
+  if (!Number.isInteger(capacity) || capacity < 1 || capacity > 12) throw new Error('cache-capacity');
+  const commands = parseOperations(operations, { set: 2, get: 1 });
+  if (values.length > MAX_VALUES) throw new Error('limit');
+  const cache = new LRUCacheOnMap(capacity);
+  const ids = new Map();
+  const steps = [];
+  const snapshot = (type, code, variables = {}) => {
+    const entries = [...cache.items];
+    entries.forEach(([key]) => { if (!ids.has(key)) ids.set(key, ids.size); });
+    steps.push({
+      type,
+      code,
+      array: entries.map(([key, value]) => ({ value, id: ids.get(key) })),
+      indices: variables.key === undefined ? [] : entries.flatMap(
+        ([key], index) => (key === variables.key ? [index] : []),
+      ),
+      variables: {
+        structure: 'lru-cache', entries: JSON.stringify(entries), capacity, ...variables,
+      },
+    });
+  };
+  snapshot('start', 'this.items = new Map();');
+  const run = ({ name, value, argument }, phase) => {
+    const key = String(value);
+    if (name === 'set') {
+      const before = [...cache.items.keys()];
+      cache.set(key, argument);
+      const evicted = before.find((old) => !cache.items.has(old));
+      snapshot('set', 'set(key, val) {', {
+        key, value: argument, phase, ...(evicted === undefined ? {} : { evicted }),
+      });
+    } else {
+      const result = cache.get(key);
+      snapshot('get', 'get(key) {', { key, phase, result: result === undefined ? 'undefined' : result });
+    }
+  };
+  values.forEach((value) => run({ name: 'set', value, argument: value }, 'input'));
+  commands.forEach((command) => run(command, 'commands'));
+  snapshot('done', 'class LRUCacheOnMap {');
   return steps;
 }

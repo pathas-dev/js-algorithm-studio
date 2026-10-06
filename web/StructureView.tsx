@@ -17,7 +17,8 @@ export default function StructureView({ step, language }: { step: Step; language
     const ko = language === 'ko';
     return <div><p>{ko ? '무방향 단순 그래프 · 간선 추가·삭제 후 양 끝의 인접 목록 갱신' : 'Simple undirected graph · adding / deleting an edge updates both adjacency lists'}</p><GraphView step={step} language={language} />
       <table className="graph-table" data-testid="adjacency-table"><caption>{ko ? '실제 인접 목록 · 간선 없는 정점도 유지' : 'Actual adjacency lists · isolated vertices remain'}</caption><thead><tr><th>{ko ? '정점' : 'Vertex'}</th><th>{ko ? '이웃' : 'Neighbors'}</th><th>{ko ? '차수' : 'Degree'}</th></tr></thead><tbody>{nodes.map((node, i) => <tr key={node.value} className={step.indices.includes(i) ? 'active-bucket' : undefined}><td>{node.value}</td><td>[{node.neighbors.join(', ')}]</td><td>{node.degree}</td></tr>)}</tbody></table>
-      {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
+      {'evicted' in step.variables && <div className="frontier">{ko ? '제거된 LRU 키' : 'Evicted LRU key'} <output>{step.variables.evicted}</output></div>}
+    {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
     </div>;
   }
   if (step.variables.structure === 'disjoint-set') {
@@ -25,7 +26,8 @@ export default function StructureView({ step, language }: { step: Step; language
     const ko = language === 'ko';
     return <div><p>{ko ? '자식 → 부모 연결 · 초록: 대표 · 파랑: 구성원 · 주황: 검사 중' : 'Child → parent links · green: representative · blue: member · orange: current'}</p><GraphView step={step} language={language} />
       <table className="graph-table" data-testid="set-table"><caption>{ko ? '실제 부모와 대표 · size는 해당 노드 아래 원소 수' : 'Actual parent and representative · size counts the node’s subtree'}</caption><thead><tr><th>{ko ? '값' : 'Value'}</th><th>{ko ? '부모' : 'Parent'}</th><th>{ko ? '대표' : 'Root'}</th><th>size</th></tr></thead><tbody>{nodes.map((node, i) => <tr key={node.value} className={step.indices.includes(i) ? 'active-bucket' : undefined}><td>{node.value}</td><td>{node.parent ?? '∅'}</td><td>{node.root}</td><td>{node.size}</td></tr>)}</tbody></table>
-      {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
+      {'evicted' in step.variables && <div className="frontier">{ko ? '제거된 LRU 키' : 'Evicted LRU key'} <output>{step.variables.evicted}</output></div>}
+    {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
     </div>;
   }
   if (step.variables.structure === 'hash-table') return <HashView step={step} language={language} />;
@@ -37,14 +39,17 @@ export default function StructureView({ step, language }: { step: Step; language
   if (['heap', 'max-heap', 'priority-queue'].includes(String(step.variables.structure))) return <><HeapView step={step} language={language} />{'result' in step.variables && <div className="frontier">{language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}</>;
   const ko = language === 'ko';
   const stack = step.variables.structure === 'stack';
+  const lru = step.variables.structure === 'lru-cache';
+  const entries: [string, number][] = lru ? JSON.parse(String(step.variables.entries)) : [];
   return <div className="structure-view">
-    <p>{stack ? ko ? 'TOP · 위 → 아래 · 마지막에 넣은 값부터 꺼냅니다' : 'TOP · top → bottom · last in, first out' : ko ? 'FRONT → REAR · 먼저 넣은 값부터 꺼냅니다' : 'FRONT → REAR · first in, first out'}</p>
+    <p>{lru ? ko ? `LRU → MRU · 저장 ${step.array.length}/${step.variables.capacity}개 · 최근 조회·저장 순서` : `LRU → MRU · stored ${step.array.length}/${step.variables.capacity} · latest read / write order` : stack ? ko ? 'TOP · 위 → 아래 · 마지막에 넣은 값부터 꺼냅니다' : 'TOP · top → bottom · last in, first out' : ko ? 'FRONT → REAR · 먼저 넣은 값부터 꺼냅니다' : 'FRONT → REAR · first in, first out'}</p>
     <div className={`structure-nodes ${stack ? 'stack-nodes' : ''}`} role="list" aria-label={ko ? '현재 자료 구조' : 'Current data structure'}>
       {step.array.map((item, index) => <motion.div layout="position" key={item.id} className={`structure-node ${step.indices.includes(index) ? 'active-node' : ''}`} role="listitem">
-        <span>{index === 0 ? stack ? 'TOP' : step.array.length === 1 ? 'FRONT / REAR' : 'FRONT' : !stack && index === step.array.length - 1 ? 'REAR' : index}</span><strong>{item.value}</strong>
+        <span>{lru ? `${step.array.length === 1 ? 'LRU / MRU · ' : index === 0 ? 'LRU · ' : index === step.array.length - 1 ? 'MRU · ' : ''}${ko ? '키' : 'Key'} ${entries[index][0]}` : index === 0 ? stack ? 'TOP' : step.array.length === 1 ? 'FRONT / REAR' : 'FRONT' : !stack && index === step.array.length - 1 ? 'REAR' : index}</span><strong>{item.value}</strong>
       </motion.div>)}
-      {!step.array.length && <div className="empty-array">{ko ? '비어 있음 · 조회·삭제 결과는 null' : 'Empty · peek / removal returns null'}</div>}
+      {!step.array.length && <div className="empty-array">{lru ? ko ? '빈 캐시 · 조회 결과는 undefined' : 'Empty cache · reads return undefined' : ko ? '비어 있음 · 조회·삭제 결과는 null' : 'Empty · peek / removal returns null'}</div>}
     </div>
+    {'evicted' in step.variables && <div className="frontier">{ko ? '제거된 LRU 키' : 'Evicted LRU key'} <output>{step.variables.evicted}</output></div>}
     {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
   </div>;
 }

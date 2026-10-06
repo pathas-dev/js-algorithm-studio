@@ -144,7 +144,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-uncategorized-rain-terraces", "category": "other", "name": {"ko": "빗물 담기 문제", "en": "Rain Terraces (Trapping Rain Water) Problem"}},
   {"id": "planned-algorithms-uncategorized-n-queens", "category": "other", "name": {"ko": "N-Queens 문제", "en": "N-Queens Problem"}},
   {"id": "planned-algorithms-uncategorized-knight-tour", "category": "other", "name": {"ko": "기사의 여행 문제", "en": "Knight's Tour"}},
-  {"id": "planned-data-structures-lru-cache", "category": "structure", "name": {"ko": "LRU 캐시 알고리즘", "en": "Least Recently Used (LRU) Cache"}},
   {"id": "planned-algorithms-math-binary-floating-point", "category": "math", "name": {"ko": "부동소수점 수의 이진 표현", "en": "Binary representation of floating-point numbers"}},
   {"id": "planned-algorithms-math-prime-factors", "category": "math", "name": {"ko": "소인수분해", "en": "Prime Factors"}},
   {"id": "planned-algorithms-math-complex-number", "category": "math", "name": {"ko": "복소수", "en": "Complex Number"}},
