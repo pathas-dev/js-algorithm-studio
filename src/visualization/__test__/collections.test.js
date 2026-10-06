@@ -1,4 +1,4 @@
-import traceCartesian, { traceShuffle } from '../collections';
+import traceCartesian, { traceShuffle, tracePowerSet } from '../collections';
 
 it('creates unique ordered pairs and handles an empty set', () => {
   const steps = traceCartesian(['1, 2, 1', 'a b']);
@@ -19,4 +19,15 @@ it('shuffles stable identities in bounded ranges without changing the input', ()
     .toEqual([3, 2, 1]);
   expect(traceShuffle([2, 2], () => 0).at(-1).array.map((item) => item.id)).toEqual([1, 0]);
   expect(traceShuffle([]).at(-1).variables.result).toBe('∅');
+});
+
+it('enumerates each subset once including the empty set', () => {
+  const steps = tracePowerSet([1, 2, 2, 3]);
+  const subsets = JSON.parse(steps.at(-1).variables.groups);
+  expect(subsets).toHaveLength(8);
+  expect(subsets[0]).toEqual([]);
+  expect(subsets.at(-1)).toEqual([1, 2, 3]);
+  expect(new Set(subsets.map(JSON.stringify)).size).toBe(8);
+  expect(tracePowerSet([]).at(-1).variables.count).toBe(1);
+  expect(() => tracePowerSet([1, 2, 3, 4, 5, 6, 7])).toThrow('powerset-input');
 });

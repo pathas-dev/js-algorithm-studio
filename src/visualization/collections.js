@@ -1,3 +1,4 @@
+import bwPowerSet from '../algorithms/sets/power-set/bwPowerSet';
 import fisherYates from '../algorithms/sets/fisher-yates/fisherYates';
 import cartesianProduct from '../algorithms/sets/cartesian-product/cartesianProduct';
 
@@ -26,5 +27,18 @@ export function traceShuffle(values, random = Math.random) {
       result: step.type === 'done' ? step.array.map((item) => item.value).join(', ') || '∅' : '—',
     },
   }), random);
+  return steps;
+}
+
+export function tracePowerSet(values) {
+  const items = [...new Set(values)];
+  if (items.length > 6 || !items.every(Number.isFinite)) throw new Error('powerset-input');
+  const steps = [];
+  bwPowerSet(items, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'power-set', inputs: JSON.stringify([items]),
+    },
+  }));
   return steps;
 }

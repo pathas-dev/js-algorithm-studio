@@ -1,16 +1,28 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * Find power-set of a set using BITWISE approach.
  *
  * @param {*[]} originalSet
  * @return {*[][]}
  */
-export default function bwPowerSet(originalSet) {
+export default function bwPowerSet(originalSet, stepCallback) {
   const subSets = [];
 
   // We will have 2^n possible combinations (where n is a length of original set).
   // It is because for every element of original set we will decide whether to include
   // it or not (2 options for each set element).
   const numberOfCombinations = 2 ** originalSet.length;
+
+  const state = (mask = 0, indexA = -1, selection = []) => ({
+    mask,
+    indexA,
+    selection: JSON.stringify(selection),
+    groups: JSON.stringify(subSets),
+    count: subSets.length,
+    result: '—',
+  });
+  recordStep(stepCallback, 'start', [], [], () => state(), 'const numberOfCombinations = 2 ** originalSet.length;');
 
   // Each number in binary representation in a range from 0 to 2^n does exactly what we need:
   // it shows by its bits (0 or 1) whether to include related element from the set or not.
@@ -24,11 +36,28 @@ export default function bwPowerSet(originalSet) {
       if (combinationIndex & (1 << setElementIndex)) {
         subSet.push(originalSet[setElementIndex]);
       }
+      recordStep(
+        stepCallback,
+        'check-bit',
+        [],
+        [],
+        () => state(combinationIndex, setElementIndex, subSet),
+        'if (combinationIndex & (1 << setElementIndex)) {',
+      );
     }
 
     // Add current subset to the list of all subsets.
     subSets.push(subSet);
+    recordStep(
+      stepCallback,
+      'append-subset',
+      [],
+      [],
+      () => state(combinationIndex, -1, subSet),
+      'subSets.push(subSet);',
+    );
   }
 
+  recordStep(stepCallback, 'done', [], [], () => ({ ...state(), result: subSets.length }), 'return subSets;');
   return subSets;
 }

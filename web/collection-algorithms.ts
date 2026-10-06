@@ -1,8 +1,9 @@
+import powerSetSource from '../src/algorithms/sets/power-set/bwPowerSet.js?raw';
 import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?raw';
 import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian, { traceShuffle } from '../src/visualization/collections';
+import traceCartesian, { traceShuffle, tracePowerSet } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -36,4 +37,20 @@ export const shuffleLesson: NumericAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson];
+export const powerSetLesson: NumericAlgorithm = {
+  ...shuffleLesson, id: 'power-set',
+  name: { ko: '멱집합', en: 'Power set' },
+  summary: { ko: 'n개 원소는 각각 포함·제외 두 가지 선택이 있어 총 2ⁿ개 부분집합을 만듭니다. 비트 0은 첫 원소이며 빈 집합과 전체 집합도 포함합니다.', en: 'Each of n items is included or excluded, producing 2ⁿ subsets. Bit zero represents the first item; include both the empty and full sets.' },
+  source: algorithmCode(powerSetSource), example: [1, 2, 3], time: 'O(n × 2ⁿ)',
+  inputHint: { ko: '서로 다른 숫자 최대 6개 · 중복 제거 · 빈 집합도 가능', en: 'At most six distinct numbers · duplicates removed · empty input allowed' },
+  run: (values) => tracePowerSet(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['모든 비트 마스크 준비', '0부터 2ⁿ−1까지 마스크를 확인합니다. 각 비트는 한 원소의 포함 여부이며 모두 0인 마스크는 빈 집합입니다.'] : ['Prepare every bit mask', 'Check masks from zero through 2ⁿ−1. Each bit selects one item; the all-zero mask is the empty set.'];
+    if (step.type === 'check-bit') return ko ? ['비트로 원소 포함 여부 확인', `마스크 ${v.mask}의 ${v.indexA}번 비트가 ${Number(v.mask) & (1 << Number(v.indexA)) ? '1이라 원소를 포함합니다' : '0이라 원소를 제외합니다'}. 초록색은 현재 선택된 원소입니다.`] : ['Check the item selection bit', `Mask ${v.mask}, bit ${v.indexA}: ${Number(v.mask) & (1 << Number(v.indexA)) ? 'one includes the item' : 'zero excludes the item'}. Green items are selected.`];
+    if (step.type === 'append-subset') return ko ? ['부분집합 저장', `마스크 ${v.mask}의 선택을 저장했습니다. 지금까지 ${v.count}개 부분집합을 만들었습니다.`] : ['Save the subset', `Save the selection for mask ${v.mask}; ${v.count} subsets created so far.`];
+    return ko ? ['멱집합 완성', `총 ${v.count}개 부분집합입니다. 빈 입력도 빈 집합 하나를 원소로 가지므로 멱집합 크기는 1입니다.`] : ['Power set ready', `${v.count} subsets. Empty input still has one subset, the empty set itself.`];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson];

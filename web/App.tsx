@@ -163,6 +163,7 @@ export default function App() {
     'root-input': t('0 또는 0.000001–999의 실수 하나와 소수 자릿수 0–6을 입력하세요.', 'Enter zero or a real number from 0.000001 to 999, and zero to six decimal places.'),
     'fourier-input': t('실수 샘플을 1–12개 입력하세요.', 'Enter one to twelve real samples.'),
     'cartesian-input': t('각 집합은 최대 6개 원소, 원소당 12글자까지 입력하세요.', 'Each set supports six items, with at most twelve characters each.'),
+    'powerset-input': t('멱집합은 서로 다른 숫자 최대 6개까지 입력하세요.', 'Enter at most six distinct numbers for a power set.'),
     'integer-single': t('정수 하나를 입력하세요.', 'Enter one integer.'),
     'sieve-input': t('체의 상한 n으로 정수 하나를 0부터 120까지 입력하세요.', 'Enter one integer sieve upper bound n from 0 to 120.'),
     'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),
