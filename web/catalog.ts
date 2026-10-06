@@ -119,7 +119,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-uncategorized-rain-terraces", "category": "other", "name": {"ko": "빗물 담기 문제", "en": "Rain Terraces (Trapping Rain Water) Problem"}},
   {"id": "planned-algorithms-uncategorized-n-queens", "category": "other", "name": {"ko": "N-Queens 문제", "en": "N-Queens Problem"}},
   {"id": "planned-algorithms-uncategorized-knight-tour", "category": "other", "name": {"ko": "기사의 여행 문제", "en": "Knight's Tour"}},
-  {"id": "planned-algorithms-statistics-weighted-random", "category": "statistics", "name": {"ko": "가중 무작위 선택", "en": "Weighted Random"}},
   {"id": "planned-algorithms-uncategorized-recursive-staircase", "category": "other", "name": {"ko": "계단 오르기 경우의 수", "en": "Recursive Staircase Problem"}},
   {"id": "planned-algorithms-uncategorized-best-time-to-buy-sell-stocks", "category": "other", "name": {"ko": "주식 매매 최대 이익", "en": "Best Time to Buy and Sell Stock"}},
   {"id": "planned-algorithms-stack-valid-parentheses", "category": "other", "name": {"ko": "올바른 괄호 검사", "en": "Valid Parentheses Problem"}},

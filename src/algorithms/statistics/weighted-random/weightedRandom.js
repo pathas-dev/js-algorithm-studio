@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * Picks the random item based on its weight.
  * The items with higher weight will be picked more often (with a higher probability).
@@ -10,16 +12,28 @@
  *
  * @param {any[]} items
  * @param {number[]} weights
+ * @param {function} [stepCallback]
+ * @param {function} [random]
  * @returns {{item: any, index: number}}
  */
 /* eslint-disable consistent-return */
-export default function weightedRandom(items, weights) {
+export default function weightedRandom(
+  items,
+  weights,
+  stepCallback = undefined,
+  random = Math.random,
+) {
   if (items.length !== weights.length) {
     throw new Error('Items and weights must be of the same size');
   }
 
   if (!items.length) {
     throw new Error('Items must not be empty');
+  }
+
+  if (!weights.every((weight) => Number.isFinite(weight) && weight >= 0)
+    || weights.reduce((sum, weight) => sum + weight, 0) <= 0) {
+    throw new Error('Weights must be finite, nonnegative, and have a positive sum');
   }
 
   // Preparing the cumulative weights array.
@@ -29,6 +43,10 @@ export default function weightedRandom(items, weights) {
   const cumulativeWeights = [];
   for (let i = 0; i < weights.length; i += 1) {
     cumulativeWeights[i] = weights[i] + (cumulativeWeights[i - 1] || 0);
+    recordStep(stepCallback, 'prefix', [], [], {
+      current: i,
+      cumulative: JSON.stringify(cumulativeWeights),
+    }, 'cumulativeWeights[i] = weights[i] + (cumulativeWeights[i - 1] || 0)');
   }
 
   // Getting the random number in a range of [0...sum(weights)]
@@ -37,12 +55,18 @@ export default function weightedRandom(items, weights) {
   // - maxCumulativeWeight = 8
   // - range for the random number is [0...8]
   const maxCumulativeWeight = cumulativeWeights[cumulativeWeights.length - 1];
-  const randomNumber = maxCumulativeWeight * Math.random();
+  const randomNumber = maxCumulativeWeight * random();
+  recordStep(stepCallback, 'draw', [], [], { randomNumber }, 'const randomNumber = maxCumulativeWeight * random()');
 
   // Picking the random item based on its weight.
   // The items with higher weight will be picked more often.
   for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
-    if (cumulativeWeights[itemIndex] >= randomNumber) {
+    recordStep(stepCallback, 'check', [], [], {
+      current: itemIndex,
+      randomNumber,
+      boundary: cumulativeWeights[itemIndex],
+    }, 'if (cumulativeWeights[itemIndex] > randomNumber)');
+    if (cumulativeWeights[itemIndex] > randomNumber) {
       return {
         item: items[itemIndex],
         index: itemIndex,

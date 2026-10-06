@@ -410,3 +410,5 @@ input { caret-color: #196d53; }
 .learning-view svg { display: block; width: 100%; max-height: 220px; }
 
 .seam-view svg { display: block; width: 100%; max-height: 220px; margin: 12px auto; }
+
+.weight-intervals { display: block; width: 100%; max-height: 160px; }
