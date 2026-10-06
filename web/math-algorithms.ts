@@ -1,3 +1,5 @@
+import floatSource from '../src/algorithms/math/binary-floating-point/floatAsBinaryString.js?raw';
+import decodeSource from '../src/algorithms/math/binary-floating-point/bitsToFloat.js?raw';
 import liuSource from '../src/algorithms/math/liu-hui/liuHui.js?raw';
 import partitionSource from '../src/algorithms/math/integer-partition/integerPartition.js?raw';
 import pascalSource from '../src/algorithms/math/pascal-triangle/pascalTriangleRecursive.js?raw';
@@ -10,7 +12,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -201,4 +203,22 @@ export const liuLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson];
+export const floatLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'binary-floating-point',
+  name: { ko: '부동소수점 수의 이진 표현', en: 'Binary floating-point representation' },
+  summary: { ko: '입력을 IEEE 754 단정밀도 32비트로 저장한 뒤 다시 해석합니다. 부호 1비트, 지수 8비트, 가수 23비트와 반올림 오차를 확인합니다.', en: 'Store an input as IEEE 754 float32, then decode it. Inspect one sign bit, eight exponent bits, 23 fraction bits and rounding error.' },
+  source: algorithmCode(floatSource + '\n' + decodeSource), example: [0.1], time: 'O(32)',
+  inputLabels: [{ ko: '실수 하나', en: 'One real number' }, { ko: '', en: '' }],
+  inputHint: { ko: '유한한 실수 하나 · -999부터 999까지 · 0.1처럼 반올림을 확인해 보세요', en: 'One finite real number · -999 to 999 · try 0.1 to inspect rounding' },
+  run: (values) => traceFloat(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['32비트로 저장', 'DataView로 입력을 단정밀도로 반올림해 저장합니다. JavaScript의 원래 숫자는 64비트이므로 저장 후 값이 달라질 수 있습니다.'] : ['Store in 32 bits', 'DataView rounds the input to single precision. JavaScript numbers are originally 64-bit, so the stored value may differ.'];
+    if (step.type === 'sign') return ko ? ['부호 비트 읽기', '첫 비트 0은 양수, 1은 음수입니다. 음의 0도 부호 비트를 유지합니다.'] : ['Read the sign bit', 'Zero means positive; one means negative. Negative zero keeps its sign bit.'];
+    if (step.type === 'exponent') return ko ? ['지수 편향 빼기', `저장된 지수는 ${v.exponent}입니다. 일반 값은 편향 127을 빼며, 지수 0은 0 또는 비정규화 수를 나타냅니다.`] : ['Subtract the exponent bias', `Stored exponent: ${v.exponent}. Normal values subtract bias 127; zero indicates zero or a subnormal.`];
+    if (step.type === 'fraction') return ko ? ['가수 비트 더하기', `각 비트를 2⁻¹, 2⁻², …에 곱해 더하면 ${v.fraction}입니다. 일반 값은 앞의 숨겨진 1을 더합니다.`] : ['Sum the fraction bits', `Weight bits by 2⁻¹, 2⁻², … to obtain ${v.fraction}. Normal values add an implicit leading one.`];
+    return ko ? ['저장된 값 복원', `float32 값은 ${v.result}입니다. 0과 비정규화 수는 숨겨진 1이 없으며 지수 -126을 씁니다. 표의 오차는 저장 값에서 입력을 뺀 값입니다.`] : ['Recover the stored value', `The float32 value is ${v.result}. Zero and subnormals have no implicit one and use exponent −126. Error is stored value minus input.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson];

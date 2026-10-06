@@ -1,3 +1,5 @@
+import { floatAs32BinaryString } from '../algorithms/math/binary-floating-point/floatAsBinaryString';
+import { bitsToFloat32 } from '../algorithms/math/binary-floating-point/bitsToFloat';
 import liuHui from '../algorithms/math/liu-hui/liuHui';
 import integerPartition from '../algorithms/math/integer-partition/integerPartition';
 import pascalTriangleRecursive from '../algorithms/math/pascal-triangle/pascalTriangleRecursive';
@@ -186,4 +188,43 @@ export function traceLiuHui(values) {
     },
   }));
   return steps;
+}
+
+export function traceFloat(values) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isFinite(number)) throw new Error('float-input');
+  const binary = floatAs32BinaryString(number);
+  const bits = binary.split('').map(Number);
+  const exponentBits = bits.slice(1, 9);
+  const exponent = parseInt(exponentBits.join(''), 2);
+  const fraction = bits.slice(9).reduce((sum, bit, i) => sum + bit * (2 ** -(i + 1)), 0);
+  const decoded = bitsToFloat32(bits);
+  const result = Object.is(decoded, -0) ? '-0' : decoded;
+  const phases = [
+    ['start', 'dataView.setFloat32', 'IEEE 754 · float32', '—'],
+    ['sign', 'const sign = (-1) ** bits[0]', `sign = ${bits[0] ? -1 : 1}`, '—'],
+    ['exponent', 'const exponent = exponentUnbiased - exponentBias;',
+      `exponent = ${exponent} − 127 = ${exponent - 127}`, '—'],
+    ['fraction', 'const bitPowerOfTwo = 2 ** -(bitIndex + 1);', `fraction = ${fraction}`, '—'],
+    ['done', exponent === 0 ? 'return sign * (2 ** (1 - exponentBias)) * fraction;'
+      : 'return sign * (2 ** exponent) * (1 + fraction);',
+    exponent === 0 ? 'sign × 2⁻¹²⁶ × fraction' : 'sign × 2^exponent × (1 + fraction)', result],
+  ];
+  return phases.map(([type, code, expression, value]) => ({
+    type: String(type),
+    array: [],
+    indices: [],
+    code: String(code),
+    variables: {
+      mode: 'float',
+      binary,
+      exponent,
+      fraction,
+      result: value,
+      expression,
+      cells: JSON.stringify([['input', Object.is(number, -0) ? '-0' : number],
+        ['encoded exponent', exponent], ['bias', 127],
+        ['decoded float32', result], ['rounding error', decoded - number]]),
+    },
+  }));
 }

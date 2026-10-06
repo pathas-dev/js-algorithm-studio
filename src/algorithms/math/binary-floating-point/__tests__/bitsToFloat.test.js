@@ -30,3 +30,13 @@ describe('bitsToFloat64', () => {
     }
   });
 });
+
+it('handles IEEE 754 reserved exponent encodings', () => {
+  const decode = (binary) => bitsToFloat32(binary.split('').map(Number));
+  expect(decode('00000000000000000000000000000000')).toBe(0);
+  expect(Object.is(decode('10000000000000000000000000000000'), -0)).toBe(true);
+  expect(decode('00000000000000000000000000000001')).toBe(2 ** -149);
+  expect(decode('01111111100000000000000000000000')).toBe(Infinity);
+  expect(decode('11111111100000000000000000000000')).toBe(-Infinity);
+  expect(decode('01111111110000000000000000000000')).toBeNaN();
+});

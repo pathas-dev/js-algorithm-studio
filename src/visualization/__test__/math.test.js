@@ -1,6 +1,6 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
-  tracePascal, tracePartition, traceLiuHui,
+  tracePascal, tracePartition, traceLiuHui, traceFloat,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -107,4 +107,13 @@ it('doubles inscribed polygon sides and converges toward pi from below', () => {
   expect(steps.at(-1).variables.result).toBeLessThan(Math.PI);
   expect(traceLiuHui([1]).at(-1).variables.result).toBe(3);
   expect(() => traceLiuHui([0])).toThrow('liu-input');
+});
+
+it('rounds float32 and decodes zeros and subnormals correctly', () => {
+  expect(traceFloat([0.1]).at(-1).variables.result).toBe(Math.fround(0.1));
+  expect(traceFloat([0]).at(-1).variables.result).toBe(0);
+  expect(traceFloat([-0]).at(-1).variables.result).toBe('-0');
+  expect(traceFloat([1e-40]).at(-1).variables.result).toBe(Math.fround(1e-40));
+  expect(traceFloat([-2.5]).at(-1).variables.result).toBe(-2.5);
+  expect(() => traceFloat([Infinity])).toThrow('float-input');
 });

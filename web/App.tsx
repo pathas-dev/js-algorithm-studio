@@ -151,6 +151,7 @@ export default function App() {
     'pascal-input': t('행 번호는 0–12의 정수 하나로 입력하세요.', 'Enter one integer row index from 0 to 12.'),
     'partition-input': t('정수 하나를 0–12 범위로 입력하세요.', 'Enter one integer from 0 to 12.'),
     'liu-input': t('근사 단계는 1–7의 정수 하나로 입력하세요.', 'Enter one integer approximation level from 1 to 7.'),
+    'float-input': t('유한한 실수 하나를 입력하세요.', 'Enter one finite real number.'),
     'integer-single': t('정수 하나를 입력하세요.', 'Enter one integer.'),
     'sieve-input': t('체의 상한 n으로 정수 하나를 0부터 120까지 입력하세요.', 'Enter one integer sieve upper bound n from 0 to 120.'),
     'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),

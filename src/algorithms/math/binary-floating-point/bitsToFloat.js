@@ -84,6 +84,14 @@ function bitsToFloat(bits, precisionConfig) {
     0,
   );
 
+  // IEEE 754 reserves the all-zero and all-one exponent encodings.
+  if (exponentUnbiased === 0) {
+    return sign * (2 ** (1 - exponentBias)) * fraction;
+  }
+  if (exponentUnbiased === (2 ** exponentBitsCount) - 1) {
+    return fraction === 0 ? sign * Infinity : NaN;
+  }
+
   // Putting all parts together to calculate the final number.
   return sign * (2 ** exponent) * (1 + fraction);
 }
