@@ -1,3 +1,4 @@
+import sieveOfEratosthenes from '../algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes';
 import leastCommonMultiple from '../algorithms/math/least-common-multiple/leastCommonMultiple';
 import euclideanAlgorithm from '../algorithms/math/euclidean-algorithm/euclideanAlgorithm';
 import trialDivision from '../algorithms/math/primality-test/trialDivision';
@@ -92,6 +93,18 @@ export function traceLcm(values) {
   const steps = [];
   leastCommonMultiple(...values, (step) => steps.push({
     ...step, variables: { ...step.variables, mode: step.variables.phase === 'gcd' ? 'gcd' : 'lcm' },
+  }));
+  return steps;
+}
+
+export function traceSieve(values) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isInteger(number) || number < 0 || number > 120) {
+    throw new Error('sieve-input');
+  }
+  const steps = [];
+  sieveOfEratosthenes(number, (step) => steps.push({
+    ...step, variables: { ...step.variables, mode: 'sieve' },
   }));
   return steps;
 }

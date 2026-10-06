@@ -52,6 +52,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
   } else if (algorithm.category === 'math') {
     evidence = typeof v.result === 'number' && Math.abs(v.result) >= 1e6
       ? `≈ ${v.result.toExponential(2)}` : `= ${v.result}`;
+    if (v.mode === 'sieve') evidence = type === 'done' ? `count = ${v.count}` : `n = ${v.maxNumber}`;
     if (v.mode === 'gcd' && v.result === '—') evidence = `gcd(${v.a}, ${v.b})`;
   } else if (algorithm.category === 'search') {
     let position = v.middleIndex;

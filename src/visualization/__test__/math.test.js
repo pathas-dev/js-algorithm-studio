@@ -1,5 +1,5 @@
 import traceBits, {
-  traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm,
+  traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -62,4 +62,13 @@ it('derives LCM from GCD with zero and signed inputs', () => {
   expect(steps.some((step) => step.variables.phase === 'gcd')).toBe(true);
   expect(traceLcm([0, 4]).at(-1).variables.result).toBe(0);
   expect(traceLcm([-9, 18]).at(-1).variables.result).toBe(18);
+});
+
+it('sieves composites starting at each prime square and handles tiny limits', () => {
+  const steps = traceSieve([10]);
+  expect(JSON.parse(steps.at(-1).variables.primes)).toEqual([2, 3, 5, 7]);
+  expect(steps.find((step) => step.type === 'mark-composite').variables.current).toBe(4);
+  expect(JSON.parse(steps[0].variables.isPrime)[4]).toBe(true);
+  expect(traceSieve([0]).at(-1).variables.count).toBe(0);
+  expect(() => traceSieve([121])).toThrow('sieve-input');
 });

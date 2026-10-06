@@ -1,3 +1,4 @@
+import sieveSource from '../src/algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes.js?raw';
 import lcmSource from '../src/algorithms/math/least-common-multiple/leastCommonMultiple.js?raw';
 import gcdSource from '../src/algorithms/math/euclidean-algorithm/euclideanAlgorithm.js?raw';
 import primeSource from '../src/algorithms/math/primality-test/trialDivision.js?raw';
@@ -5,7 +6,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -116,4 +117,20 @@ export const lcmLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson];
+export const sieveLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'sieve-of-eratosthenes',
+  name: { ko: '에라토스테네스의 체', en: 'Sieve of Eratosthenes' },
+  summary: { ko: '작은 소수부터 배수를 지워 n 이하의 모든 소수를 찾습니다. 흰 칸은 후보, 초록은 확정한 소수, 지운 칸은 소수가 아닙니다.', en: 'Remove multiples of small primes to find all primes through n. White means candidate; green means confirmed prime; crossed-out means not prime.' },
+  source: algorithmCode(sieveSource), example: [30], time: 'O(n log log n)',
+  inputHint: { ko: '정수 하나 · n은 0–120 · 0과 1은 소수가 아님', en: 'One integer n · 0–120 · zero and one are not prime' },
+  run: (values) => traceSieve(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['소수 후보 준비', '0과 1을 제외합니다. 나머지 숫자는 아직 소수 후보이며, 확인 전에는 초록색으로 확정하지 않습니다.'] : ['Prepare prime candidates', 'Exclude zero and one. The remaining numbers are candidates, not confirmed primes yet.'];
+    if (step.type === 'choose-prime') return ko ? ['남은 후보를 소수로 확정', `${v.current}는 더 작은 소수의 배수로 지워지지 않았으므로 소수입니다. ${v.current}²부터 배수를 지웁니다.`] : ['Confirm a surviving prime', `${v.current} was not removed by a smaller prime, so it is prime. Mark its multiples starting at ${v.current}².`];
+    if (step.type === 'mark-composite') return ko ? ['소수의 배수 지우기', `${v.current} = ${v.prime} × ${Number(v.current) / Number(v.prime)}이므로 합성수입니다. p²보다 작은 배수는 더 작은 소수에서 이미 처리했습니다.`] : ['Remove a prime multiple', `${v.current} = ${v.prime} × ${Number(v.current) / Number(v.prime)} is composite. Multiples below p² were already handled by smaller primes.`];
+    return ko ? ['소수 목록 완료', `${v.maxNumber} 이하 소수 ${v.count}개: ${v.result || '∅'}.`] : ['Prime list ready', `${v.count} primes through ${v.maxNumber}: ${v.result || '∅'}.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson];
