@@ -1,3 +1,4 @@
+import hammingDistance from '../algorithms/string/hamming-distance/hammingDistance';
 import naiveSearch from '../algorithms/string/naive-search/naiveSearch';
 import knuthMorrisPratt from '../algorithms/string/knuth-morris-pratt/knuthMorrisPratt';
 import zAlgorithm from '../algorithms/string/z-algorithm/zAlgorithm';
@@ -73,4 +74,28 @@ export function traceZSearch(text, pattern) {
 
 export function traceRabinSearch(text, pattern) {
   return traceStringSearch(text, pattern, rabinKarp);
+}
+
+export function traceHamming(text, pattern) {
+  requireStrings(text, pattern);
+  if (text.length !== pattern.length) throw new Error('hamming-length');
+  const steps = [];
+  const differences = [];
+  hammingDistance(text, pattern, (step) => {
+    if (step.type === 'mismatch') differences.push(step.variables.textIndex);
+    steps.push({
+      ...step,
+      array: text.split('').map((char, id) => ({ value: char.charCodeAt(0), id })),
+      indices: step.variables.textIndex === undefined ? [] : [step.variables.textIndex],
+      variables: {
+        ...step.variables,
+        text,
+        pattern,
+        alignment: 0,
+        mode: 'hamming',
+        differences: JSON.stringify(differences),
+      },
+    });
+  });
+  return steps;
 }

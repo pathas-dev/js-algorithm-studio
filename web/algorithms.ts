@@ -1,3 +1,4 @@
+import hammingSource from '../src/algorithms/string/hamming-distance/hammingDistance.js?raw';
 import lruSource from '../src/data-structures/lru-cache/LRUCacheOnMap.js?raw';
 import dequeSource from '../src/data-structures/deque/Deque.js?raw';
 import salesmanSource from '../src/algorithms/graph/travelling-salesman/bfTravellingSalesman.js?raw';
@@ -27,7 +28,7 @@ import lcsSource from '../src/algorithms/sets/longest-common-subsequence/longest
 import editSource from '../src/algorithms/string/levenshtein-distance/levenshteinDistance.js?raw';
 import knapsackSource from '../src/algorithms/sets/knapsack-problem/Knapsack.js?raw';
 import { traceLcs, traceEditDistance, traceKnapsack } from '../src/visualization/dynamic';
-import { traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
+import { traceHamming, traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -1571,6 +1572,25 @@ export const rabin: TextAlgorithm = {
   },
 };
 
+export const hamming: TextAlgorithm = {
+  ...naive, id: 'hamming-distance',
+  name: { ko: '해밍 거리', en: 'Hamming distance' },
+  summary: { ko: '길이가 같은 두 문자열에서 서로 다른 위치의 개수를 셉니다. 같은 위치끼리 비교하며 삽입·삭제는 허용하지 않습니다.', en: 'Count differing positions in equal-length strings. Compare aligned positions without insertions or deletions.' },
+  source: algorithmCode(hammingSource), example: ['karolin', 'kathrin'], time: 'O(n)',
+  inputLabels: [{ ko: '첫 문자열', en: 'First string' }, { ko: '둘째 문자열', en: 'Second string' }],
+  inputHint: { ko: '동일한 길이 · 각 문자열 최대 16 UTF-16 코드 단위 · 보라색은 다른 위치', en: 'Equal lengths · up to 16 UTF-16 units each · purple marks differing positions' },
+  run: ([text, pattern]) => traceHamming(text, pattern),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['거리 0에서 시작', '두 문자열의 길이가 같은지 확인했습니다. 같은 인덱스의 문자를 차례로 비교합니다.'] : ['Start at distance zero', 'Verified equal lengths. Compare characters at the same index in order.'];
+      case 'compare': return ko ? ['같은 위치의 문자 비교', `인덱스 ${v.textIndex}에서 두 문자를 비교합니다. 다르면 거리를 1 늘리고, 같으면 유지합니다. 현재 거리: ${v.distance}.`] : ['Compare aligned characters', `Compare both characters at index ${v.textIndex}. Add one if different; otherwise keep the distance. Current distance: ${v.distance}.`];
+      case 'mismatch': return ko ? ['다른 위치를 거리에 반영', `서로 다른 위치를 발견해 거리가 ${v.distance}로 늘었습니다.`] : ['Count a differing position', `A mismatch increases the distance to ${v.distance}.`];
+      default: return ko ? ['해밍 거리 완료', `다른 위치는 총 ${v.result}개입니다. 빈 문자열 두 개의 거리는 0입니다.`] : ['Hamming distance ready', `${v.result} differing positions. Two empty strings have distance zero.`];
+    }
+  },
+};
+
 export const lcs: TextAlgorithm = {
   ...naive, id: 'lcs', category: 'dp', name: { ko: '최장 공통 부분 수열', en: 'Longest common subsequence' },
   summary: { ko: '두 문자열에서 순서를 유지하며 공통으로 선택할 수 있는 가장 긴 수열을 찾습니다. 셀을 채우고 역추적으로 수열을 복원합니다.', en: 'Find the longest shared subsequence while preserving order. Fill prefix cells and recover a sequence by traceback.' },
@@ -1632,4 +1652,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, lcs, editDistance, knapsack];

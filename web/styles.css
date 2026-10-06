@@ -358,3 +358,5 @@ input { caret-color: #196d53; }
   .input-preview output { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .input-preview-detail { max-width: 45%; }
 }
+
+.string-cell.different-character { background: #eee5f1; color: #61486f; border-color: #d7c7df; }

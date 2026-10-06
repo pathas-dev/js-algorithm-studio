@@ -115,6 +115,10 @@ export default function stepAction(algorithm, step, language, title, index, leng
     else if (v.textIndex !== undefined && v.wordIndex !== undefined) evidence = `[${v.textIndex}, ${v.wordIndex}]`;
     else if (typeof v.result === 'number') evidence = `index = ${v.result}`;
     else evidence = `offset = ${v.alignment}`;
+    if (algorithm.id === 'hamming-distance') {
+      evidence = `distance = ${v.distance}`;
+      if (type === 'compare') decision = String(v.text)[Number(v.textIndex)] === String(v.pattern)[Number(v.wordIndex)] ? t('같은 문자 · 거리를 유지합니다', 'Equal characters · keep distance') : t('다른 문자 · 거리를 1 늘립니다', 'Different characters · add one');
+    }
     if (type === 'done' && algorithm.id === 'z-search') evidence = `matches = ${String(v.result).split(',').filter(Boolean).length}`;
     if (type === 'verify') decision = v.equal ? t('문자열도 일치 · 검색 완료', 'Strings match · found') : t('해시 충돌 · 일치에서 제외', 'Hash collision · reject');
   } else {
