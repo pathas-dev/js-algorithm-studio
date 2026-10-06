@@ -167,6 +167,7 @@ export default function App() {
     'permutation-input': t('순열은 서로 다른 숫자 최대 5개까지 입력하세요.', 'Enter at most five distinct numbers for permutations.'),
     'combination-input': t('서로 다른 숫자 최대 6개와 선택 개수 k(0–6)를 입력하세요.', 'Enter at most six distinct numbers and selection count k from zero to six.'),
     'lis-input': t('최장 증가 수열은 숫자 최대 16개까지 입력하세요.', 'Enter at most sixteen numbers for LIS.'),
+    'scs-input': t('각 문자열은 유니코드 코드 포인트 기준 최대 12글자까지 입력하세요.', 'Enter at most twelve Unicode code points per string.'),
     'integer-single': t('정수 하나를 입력하세요.', 'Enter one integer.'),
     'sieve-input': t('체의 상한 n으로 정수 하나를 0부터 120까지 입력하세요.', 'Enter one integer sieve upper bound n from 0 to 120.'),
     'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),

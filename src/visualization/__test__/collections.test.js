@@ -1,5 +1,5 @@
 import traceCartesian, {
-  traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis,
+  traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence,
 } from '../collections';
 
 it('creates unique ordered pairs and handles an empty set', () => {
@@ -62,4 +62,13 @@ it('computes strict LIS lengths while preserving duplicate input values', () => 
   expect(traceLis([3, 2, 1]).at(-1).variables.result).toBe(1);
   expect(traceLis([]).at(-1).variables.result).toBe(0);
   expect(JSON.parse(steps[0].variables.lengths)).toEqual([1, 1, 1, 1, 1]);
+});
+
+it('merges around the LCS preserving repeated and Unicode characters', () => {
+  expect(traceSupersequence(['GEEK', 'EKE']).at(-1).variables.result).toBe('GEKEK');
+  expect(traceSupersequence(['abc', 'def']).at(-1).variables.result).toBe('abcdef');
+  expect(traceSupersequence(['', 'abc']).at(-1).variables.result).toBe('abc');
+  expect(traceSupersequence(['', '']).at(-1).variables.count).toBe(0);
+  expect(traceSupersequence(['😀a', '😀b']).at(-1).variables.count).toBe(3);
+  expect(traceSupersequence(['aaa', 'aa']).at(-1).variables.result).toBe('aaa');
 });

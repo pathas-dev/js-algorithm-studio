@@ -1,3 +1,4 @@
+import scsSource from '../src/algorithms/sets/shortest-common-supersequence/shortestCommonSupersequence.js?raw';
 import lisSource from '../src/algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence.js?raw';
 import combinationSource from '../src/algorithms/sets/combinations/combineWithoutRepetitions.js?raw';
 import permutationSource from '../src/algorithms/sets/permutations/permutateWithoutRepetitions.js?raw';
@@ -6,7 +7,7 @@ import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?ra
 import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis } from '../src/visualization/collections';
+import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -106,4 +107,22 @@ export const lisLesson: NumericAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson, lisLesson];
+export const supersequenceLesson: TextAlgorithm = {
+  ...cartesianLesson, id: 'shortest-common-supersequence',
+  name: { ko: '최단 공통 상위 수열', en: 'Shortest common supersequence' },
+  summary: { ko: '최장 공통 부분 수열을 기준으로 두 문자열을 합칩니다. 공통 문자는 한 번만 넣고 다른 문자는 각 문자열의 순서대로 넣어 가장 짧은 상위 수열을 만듭니다.', en: 'Merge two strings around their longest common subsequence. Include shared characters once and other characters in their original order to form a shortest supersequence.' },
+  source: algorithmCode(scsSource), example: ['GEEK', 'EKE'], time: 'O(mn)',
+  inputLabels: [{ ko: '문자열 A', en: 'String A' }, { ko: '문자열 B', en: 'String B' }],
+  inputHint: { ko: '각 문자열 최대 12글자 · 유니코드 코드 포인트 · 공백·중복 문자 유지', en: 'Up to twelve Unicode code points per string · spaces and repeated characters preserved' },
+  run: (inputs) => traceSupersequence(inputs),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['공통 부분 수열을 기준으로 준비', '먼저 최장 공통 부분 수열(LCS)을 계산합니다. 두 문자열을 이 순서에 맞춰 진행하고 공통 문자는 한 번만 넣습니다. LCS가 없으면 단순 연결도 최단입니다.'] : ['Prepare around the common subsequence', 'First compute the longest common subsequence (LCS). Merge around its order, including shared characters once. Without an LCS, concatenation is already shortest.'];
+    if (step.type === 'append-shared') return ko ? ['공통 문자를 한 번만 추가', '두 입력이 같은 다음 LCS 문자에 도달했습니다. 출력에 한 번만 넣고 두 입력 위치를 함께 이동합니다.'] : ['Append the shared character once', 'Both inputs reached the next LCS character. Append it once and advance both inputs.'];
+    if (step.type.startsWith('append-')) return ko ? ['공통 문자 앞의 문자 보존', `${step.type === 'append-first' ? 'A' : 'B'}의 현재 문자를 추가했습니다. 다른 입력은 필요할 때까지 기다려 각 입력의 순서를 보존합니다.`] : ['Preserve the character before the common one', `Append the current character from ${step.type === 'append-first' ? 'A' : 'B'}. The other input waits as needed to retain both orders.`];
+    if (step.type.startsWith('tail-')) return ko ? ['공통 수열 뒤의 나머지 붙이기', '공통 문자를 모두 처리했으므로 남아 있는 입력 접미사를 순서대로 한 번에 붙입니다.'] : ['Append the remaining suffix', 'All shared characters are processed. Append the remaining input suffix in order.'];
+    return ko ? ['최단 공통 상위 수열 완성', `결과는 ${v.result || '∅'}, 길이는 ${v.count}입니다. 최단 길이는 |A|+|B|−|LCS|이며 같은 길이의 다른 정답이 있을 수도 있습니다.`] : ['Shortest common supersequence ready', `Result: ${v.result || '∅'}; length ${v.count}. The minimum is |A|+|B|−|LCS|; other equally short answers may exist.`];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson, lisLesson, supersequenceLesson];

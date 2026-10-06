@@ -51,6 +51,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
     }
   } else if (algorithm.category === 'sets') {
     evidence = `count = ${v.count === undefined ? array.length : v.count}`;
+    if (v.mode === 'scs') evidence = `length = ${v.count}`;
     if (v.mode === 'lis') {
       evidence = `n = ${array.length}`;
       if (type === 'done') evidence = `length = ${v.result}`;

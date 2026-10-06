@@ -1,3 +1,4 @@
+import shortestCommonSupersequence from '../algorithms/sets/shortest-common-supersequence/shortestCommonSupersequence';
 import dpLongestIncreasingSubsequence from '../algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence';
 import combineWithoutRepetitions from '../algorithms/sets/combinations/combineWithoutRepetitions';
 import permutateWithoutRepetitions from '../algorithms/sets/permutations/permutateWithoutRepetitions';
@@ -92,6 +93,19 @@ export function traceLis(values) {
     ...step,
     array: step.array.map((value, id) => ({ value, id })),
     variables: { ...step.variables, mode: 'lis' },
+  }));
+  return steps;
+}
+
+export function traceSupersequence(inputs) {
+  const sets = inputs.map((input) => Array.from(input));
+  if (sets.length !== 2 || sets.some((set) => set.length > 12)) throw new Error('scs-input');
+  const steps = [];
+  shortestCommonSupersequence(...sets, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'scs', inputs: JSON.stringify(sets),
+    },
   }));
   return steps;
 }

@@ -1,3 +1,4 @@
+import recordStep from '../../../utils/trace/recordStep';
 import longestCommonSubsequence from '../longest-common-subsequence/longestCommonSubsequence';
 
 /**
@@ -6,13 +7,26 @@ import longestCommonSubsequence from '../longest-common-subsequence/longestCommo
  * @return {string[]}
  */
 
-export default function shortestCommonSupersequence(set1, set2) {
+export default function shortestCommonSupersequence(set1, set2, stepCallback) {
   // Let's first find the longest common subsequence of two sets.
   const lcs = longestCommonSubsequence(set1, set2);
+
+  const state = (output = [], indexA = -1, indexB = -1) => ({
+    indexA,
+    indexB,
+    lcs: JSON.stringify(lcs.filter((item) => item !== '')),
+    groups: JSON.stringify([output]),
+    count: output.length,
+    result: '—',
+  });
+  recordStep(stepCallback, 'start', [], [], () => state(), 'const lcs = longestCommonSubsequence(set1, set2);');
 
   // If LCS is empty then the shortest common supersequence would be just
   // concatenation of two sequences.
   if (lcs.length === 1 && lcs[0] === '') {
+    recordStep(stepCallback, 'done', [], [], () => ({
+      ...state(set1.concat(set2)), result: set1.concat(set2).join(''),
+    }), 'return set1.concat(set2);');
     return set1.concat(set2);
   }
 
@@ -30,6 +44,14 @@ export default function shortestCommonSupersequence(set1, set2) {
     if (setIndex1 < set1.length) {
       if (!setOnHold1 && set1[setIndex1] !== lcs[lcsIndex]) {
         supersequence.push(set1[setIndex1]);
+        recordStep(
+          stepCallback,
+          'append-first',
+          [],
+          [],
+          () => state(supersequence, setIndex1),
+          'supersequence.push(set1[setIndex1]);',
+        );
         setIndex1 += 1;
       } else {
         setOnHold1 = true;
@@ -40,6 +62,14 @@ export default function shortestCommonSupersequence(set1, set2) {
     if (setIndex2 < set2.length) {
       if (!setOnHold2 && set2[setIndex2] !== lcs[lcsIndex]) {
         supersequence.push(set2[setIndex2]);
+        recordStep(
+          stepCallback,
+          'append-second',
+          [],
+          [],
+          () => state(supersequence, -1, setIndex2),
+          'supersequence.push(set2[setIndex2]);',
+        );
         setIndex2 += 1;
       } else {
         setOnHold2 = true;
@@ -49,6 +79,14 @@ export default function shortestCommonSupersequence(set1, set2) {
     // Add LCS element to the supersequence in correct order.
     if (setOnHold1 && setOnHold2) {
       supersequence.push(lcs[lcsIndex]);
+      recordStep(
+        stepCallback,
+        'append-shared',
+        [],
+        [],
+        () => state(supersequence, setIndex1, setIndex2),
+        'supersequence.push(lcs[lcsIndex]);',
+      );
       lcsIndex += 1;
       setIndex1 += 1;
       setIndex2 += 1;
@@ -60,12 +98,31 @@ export default function shortestCommonSupersequence(set1, set2) {
   // Attach set1 leftovers.
   if (setIndex1 < set1.length) {
     supersequence = supersequence.concat(set1.slice(setIndex1));
+    recordStep(
+      stepCallback,
+      'tail-first',
+      [],
+      [],
+      () => state(supersequence, setIndex1),
+      'supersequence = supersequence.concat(set1.slice(setIndex1));',
+    );
   }
 
   // Attach set2 leftovers.
   if (setIndex2 < set2.length) {
     supersequence = supersequence.concat(set2.slice(setIndex2));
+    recordStep(
+      stepCallback,
+      'tail-second',
+      [],
+      [],
+      () => state(supersequence, -1, setIndex2),
+      'supersequence = supersequence.concat(set2.slice(setIndex2));',
+    );
   }
 
+  recordStep(stepCallback, 'done', [], [], () => ({
+    ...state(supersequence), result: supersequence.join(''),
+  }), 'return supersequence;');
   return supersequence;
 }
