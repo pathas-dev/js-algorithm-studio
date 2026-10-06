@@ -1,0 +1,7 @@
+import type { Language, Step } from './algorithms';
+
+export default function ParenthesesView({ step, language }: { step: Step; language: Language }) {
+  const v = step.variables; const ko = language === 'ko';
+  const stack: string[] = JSON.parse(String(v.stack));
+  return <div className="cipher-view"><p className="frontier">{ko ? '현재 검사 위치' : 'Current position'}: {Number(v.current) >= 0 ? v.current : '—'}<strong data-testid="puzzle-result">{step.type === 'done' ? String(v.result) : ko ? '검사 중' : 'Checking'}</strong></p><div className="string-row" aria-label={ko ? '괄호 입력' : 'Bracket input'}>{Array.from(String(v.text)).map((character, index) => <div key={index} className={`string-cell ${index === Number(v.current) ? 'current-character' : ''}`}><small>{index}</small><strong>{character}</strong></div>)}{!String(v.text).length && <span>∅</span>}</div><p className="frontier">{ko ? '기대하는 닫는 괄호 · TOP → 바닥' : 'Expected closing brackets · TOP → bottom'}</p><div className="string-row" style={{ minHeight: 78 }} aria-label={ko ? '기대 괄호 스택' : 'Expected bracket stack'}>{stack.map((character, index) => <div className={`string-cell ${index === 0 ? 'matched-character' : ''}`} key={index}><small>{index === 0 ? 'TOP' : index}</small><strong>{character}</strong></div>)}{!stack.length && <span>{ko ? '스택 비어 있음' : 'Stack empty'}</span>}</div>{step.type === 'match-check' && <p className="frontier">{v.expected || '∅'} {v.valid ? '=' : '≠'} {v.currentCharacter}</p>}</div>;
+}

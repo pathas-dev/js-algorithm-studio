@@ -1,3 +1,4 @@
+import validParentheses from '../algorithms/stack/valid-parentheses/validParentheses';
 import accumulatorStocks from '../algorithms/uncategorized/best-time-to-buy-sell-stocks/accumulatorBestTimeToBuySellStocks';
 import recursiveStaircaseDP from '../algorithms/uncategorized/recursive-staircase/recursiveStaircaseDP';
 import knightTour from '../algorithms/uncategorized/knight-tour/knightTour';
@@ -230,5 +231,16 @@ export function traceStocks(values) {
       variables: { ...step.variables, mode: 'stocks', history: JSON.stringify(history) },
     });
   });
+  return steps;
+}
+
+export function traceParentheses(values) {
+  const text = values[0];
+  if (text.length > 36 || !Array.from(text).every((character) => '()[]{}'.includes(character))) throw new Error('parentheses-input');
+  const steps = [];
+  validParentheses(text, (step) => steps.push({
+    ...step,
+    variables: { ...step.variables, mode: 'parentheses', text },
+  }));
   return steps;
 }

@@ -156,6 +156,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'parentheses-input': t('괄호 () [] {}만 최대 36글자 입력하세요.', 'Enter only () [] {} brackets, at most 36 characters.'),
     'stocks-input': t('가격은 정수 최대 20개, 각 값 0–999로 입력하세요.', 'Enter at most twenty integer prices from 0 to 999.'),
     'stairs-input': t('계단 수는 정수 하나, 0–20으로 입력하세요.', 'Enter a single integer stair count from 0 to 20.'),
     'knight-input': t('보드 크기는 정수 하나, 1–5로 입력하세요.', 'Enter a single integer board size from 1 to 5.'),

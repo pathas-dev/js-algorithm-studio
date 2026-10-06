@@ -1,3 +1,4 @@
+import parenthesesSource from '../src/algorithms/stack/valid-parentheses/validParentheses.js?raw';
 import stocksSource from '../src/algorithms/uncategorized/best-time-to-buy-sell-stocks/accumulatorBestTimeToBuySellStocks.js?raw';
 import stairsSource from '../src/algorithms/uncategorized/recursive-staircase/recursiveStaircaseDP.js?raw';
 import knightSource from '../src/algorithms/uncategorized/knight-tour/knightTour.js?raw';
@@ -7,7 +8,7 @@ import pathsSource from '../src/algorithms/uncategorized/unique-paths/dpUniquePa
 import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight, traceStairs, traceStocks } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight, traceStairs, traceStocks, traceParentheses } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -158,4 +159,22 @@ const stocks: NumericAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens, knight, stairs, stocks];
+const parentheses: TextAlgorithm = {
+  id: 'valid-parentheses', category: 'other', inputMode: 'text', singleInput: true,
+  example: ['({[]})', ''], name: { ko: '올바른 괄호 검사', en: 'Valid parentheses' }, time: 'O(n)',
+  summary: { ko: '여는 괄호를 만나면 기다리는 닫는 괄호를 스택에 넣습니다. 닫는 괄호는 가장 최근의 기대 값과 같아야 하며, 입력이 끝나면 스택도 비어야 합니다.', en: 'For each opening bracket, push its expected closing bracket. A closing bracket must match the most recent expectation, and the stack must be empty at the end.' },
+  inputLabels: [{ ko: '괄호 문자열', en: 'Bracket string' }, { ko: '', en: '' }],
+  inputHint: { ko: '괄호 () [] {}만 최대 36글자 · 원본 규약상 빈 문자열은 false', en: 'Only () [] {} · at most 36 characters · the original function defines empty input as false' },
+  source: algorithmCode(parenthesesSource), run: traceParentheses,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['닫는 괄호의 기대 순서를 스택으로 기억', '안쪽 괄호가 먼저 닫혀야 하므로 마지막에 넣은 기대 값을 먼저 꺼냅니다. 스택에는 여는 괄호 대신 닫는 괄호를 저장합니다.'] : ['Remember closing order in a stack', 'Inner brackets close first, so pop the most recently pushed expectation. Store closing brackets rather than opening brackets.'];
+    if (step.type === 'push') return ko ? ['여는 괄호에 대응하는 닫는 괄호 저장', `“${v.currentCharacter}”를 만났습니다. 대응하는 닫는 괄호를 TOP에 추가하고 다음 문자를 확인합니다.`] : ['Push the matching closing bracket', `Read “${v.currentCharacter}”. Push its expected closing bracket onto TOP, then inspect the next character.`];
+    if (step.type === 'match-check') return ko ? [v.valid ? '스택의 기대 괄호와 일치' : '기대 괄호와 불일치', `기대: ${v.expected || '없음'}, 현재: ${v.currentCharacter}. ${v.valid ? '짝 하나를 닫고 계속 검사합니다.' : '짝이 없거나 닫는 순서가 틀렸습니다.'}`] : [v.valid ? 'Matches the expected closing bracket' : 'Does not match the expectation', `Expected: ${v.expected || 'none'}, read: ${v.currentCharacter}. ${v.valid ? 'Close this pair and continue.' : 'No matching opener or incorrect nesting order.'}`];
+    if (v.reason === 'empty') return ko ? ['빈 문자열 · 원본 규약상 false', '이 저장소의 원본 함수는 빈 문자열을 올바른 괄호 입력으로 처리하지 않습니다.'] : ['Empty input · false by original convention', 'The original repository function does not consider empty input valid.'];
+    if (v.reason === 'mismatch') return ko ? ['닫는 순서 불일치로 검사 종료', `기대 ${v.expected || '없음'}와 현재 ${v.currentCharacter}가 달라 false입니다. 남은 문자를 볼 필요 없이 즉시 종료합니다.`] : ['Stop on a closing-order mismatch', `Expected ${v.expected || 'none'}, read ${v.currentCharacter}: false. Stop immediately without inspecting the remaining characters.`];
+    return ko ? [v.result ? '모든 괄호가 순서대로 닫힘' : '닫히지 않은 괄호가 남음', v.result ? '문자열을 모두 처리했고 스택이 비었습니다. true입니다.' : '문자열은 끝났지만 기대하는 닫는 괄호가 스택에 남아 false입니다.'] : [v.result ? 'All brackets closed in order' : 'Unclosed brackets remain', v.result ? 'All characters processed and the stack is empty: true.' : 'Input ended with expected closing brackets still on the stack: false.'];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens, knight, stairs, stocks, parentheses];

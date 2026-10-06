@@ -1,6 +1,6 @@
 import traceHanoi, {
   traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight,
-  traceStairs, traceStocks,
+  traceStairs, traceStocks, traceParentheses,
 } from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
@@ -101,4 +101,16 @@ it('accumulates unlimited-trading gains without counting losses', () => {
   expect(traceStocks([5, 4, 3]).at(-1).variables.result).toBe(0);
   expect(traceStocks([]).at(-1).variables.result).toBe(0);
   expect(() => traceStocks([-1])).toThrow('stocks-input');
+});
+
+it('matches nested parentheses with expected closing brackets on the stack', () => {
+  const steps = traceParentheses(['({[]})']);
+  expect(steps.at(-1).variables.result).toBe(true);
+  expect(steps.at(-1).variables.stack).toBe('[]');
+  expect(steps.find((step) => step.type === 'push').variables.stack).toBe('[")"]');
+  expect(traceParentheses(['([)]']).at(-1).variables.reason).toBe('mismatch');
+  expect(traceParentheses(['(()']).at(-1).variables.reason).toBe('unclosed');
+  expect(traceParentheses([')']).at(-1).variables.result).toBe(false);
+  expect(traceParentheses(['']).at(-1).variables.result).toBe(false);
+  expect(() => traceParentheses(['abc'])).toThrow('parentheses-input');
 });

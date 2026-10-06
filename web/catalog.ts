@@ -112,5 +112,4 @@ type CatalogCategory = typeof catalogCategories[number]['id'];
 
 // Planned visualizations from README.ko-KR.md; these entries have no runnable lesson.
 export const plannedAlgorithms: { id: string; category: CatalogCategory; name: Record<Language, string> }[] = [
-  {"id": "planned-algorithms-stack-valid-parentheses", "category": "other", "name": {"ko": "올바른 괄호 검사", "en": "Valid Parentheses Problem"}},
 ];
