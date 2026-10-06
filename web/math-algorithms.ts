@@ -1,3 +1,5 @@
+import degreeSource from '../src/algorithms/math/radian/degreeToRadian.js?raw';
+import radianSource from '../src/algorithms/math/radian/radianToDegree.js?raw';
 import complexSource from '../src/algorithms/math/complex-number/ComplexNumber.js?raw';
 import factorsSource from '../src/algorithms/math/prime-factors/primeFactors.js?raw';
 import floatSource from '../src/algorithms/math/binary-floating-point/floatAsBinaryString.js?raw';
@@ -14,7 +16,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -262,4 +264,20 @@ export const complexLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson];
+export const radianLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'radian',
+  name: { ko: '라디안', en: 'Radian' },
+  summary: { ko: '반지름과 같은 길이의 호가 만드는 각이 1라디안입니다. 한 바퀴는 360°=2π 라디안이며 도 단위 입력을 변환하고 복원합니다.', en: 'One radian subtends an arc equal to the radius. A full turn is 360°=2π radians; convert a degree input and restore it.' },
+  source: algorithmCode(degreeSource + '\n' + radianSource), example: [135], time: 'O(1)',
+  inputLabels: [{ ko: '각도 · 도(°)', en: 'Angle · degrees (°)' }, { ko: '', en: '' }],
+  inputHint: { ko: '실수 하나 · -999°부터 999°까지 · 음수는 시계 방향', en: 'One real angle · -999° to 999° · negative angles rotate clockwise' },
+  run: (values) => traceRadian(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['도 단위 각도 준비', `${v.degree}°입니다. 양수는 반시계 방향, 음수는 시계 방향이며 360°마다 같은 방향으로 돌아옵니다.`] : ['Prepare the angle in degrees', `${v.degree}°. Positive angles are counterclockwise; negative are clockwise. Every 360° returns to the same direction.`];
+    if (step.type === 'convert') return ko ? ['도에서 라디안으로 변환', '180°=π 라디안이므로 π/180을 곱합니다. 원 위의 호는 한 바퀴 안에서의 방향을 나타내고 표에는 전체 회전 수를 표시합니다.'] : ['Convert degrees to radians', 'Multiply by π/180 because 180° equals π radians. The arc shows direction within one turn; the table retains total turns.'];
+    return ko ? ['라디안에서 도로 복원', '180/π를 곱해 원래 도 단위로 돌아옵니다. 실수 계산의 반올림 때문에 아주 작은 오차가 생길 수 있습니다.'] : ['Restore degrees from radians', 'Multiply by 180/π to restore degrees. Floating-point rounding can cause a tiny error.'];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson];

@@ -1,3 +1,5 @@
+import degreeToRadian from '../algorithms/math/radian/degreeToRadian';
+import radianToDegree from '../algorithms/math/radian/radianToDegree';
 import ComplexNumber from '../algorithms/math/complex-number/ComplexNumber';
 import { primeFactors } from '../algorithms/math/prime-factors/primeFactors';
 import { floatAs32BinaryString } from '../algorithms/math/binary-floating-point/floatAsBinaryString';
@@ -294,4 +296,32 @@ export function traceComplex(values) {
   done.variables.expression = `z₁ = ${polar.radius.toPrecision(6)} × e^(i × ${polar.phase.toPrecision(6)})`;
   steps.push(done);
   return steps;
+}
+
+export function traceRadian(values) {
+  const [degree] = values;
+  if (values.length !== 1 || !Number.isFinite(degree)) throw new Error('float-input');
+  const radian = degreeToRadian(degree);
+  const restored = radianToDegree(radian);
+  return [
+    ['start', 'return degree * (Math.PI / 180);', `${degree}°`, '—'],
+    ['convert', 'return degree * (Math.PI / 180);',
+      `${degree} × π ÷ 180 = ${radian.toPrecision(7)} rad`, radian],
+    ['done', 'return radian * (180 / Math.PI);',
+      `${radian.toPrecision(7)} × 180 ÷ π = ${restored.toPrecision(7)}°`, restored],
+  ].map(([type, code, expression, result]) => ({
+    type: String(type),
+    code: String(code),
+    array: [],
+    indices: [],
+    variables: {
+      mode: 'radian',
+      degree,
+      radian,
+      expression,
+      result,
+      cells: JSON.stringify([['degrees', degree], ['radians', radian],
+        ['turns', degree / 360], ['restored degrees', restored]]),
+    },
+  }));
 }

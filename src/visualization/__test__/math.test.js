@@ -1,7 +1,7 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
-  traceComplex,
+  traceComplex, traceRadian,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -133,4 +133,12 @@ it('computes independent complex operations and rejects a zero divisor', () => {
   expect(steps.find((step) => step.type === 'conjugate').variables.result).toBe('3 − 2i');
   expect(JSON.parse(traceComplex([0, 0, 1, 1]).at(-1).variables.cells).at(-1)[1]).toBe(0);
   expect(() => traceComplex([1, 2, 0, 0])).toThrow('complex-input');
+});
+
+it('converts degrees and restores negative and multi-turn angles', () => {
+  expect(traceRadian([180])[1].variables.result).toBe(Math.PI);
+  expect(traceRadian([-90])[1].variables.result).toBe(-Math.PI / 2);
+  expect(traceRadian([720]).at(-1).variables.result).toBeCloseTo(720);
+  expect(traceRadian([0]).at(-1).variables.result).toBe(0);
+  expect(() => traceRadian([1, 2])).toThrow('float-input');
 });
