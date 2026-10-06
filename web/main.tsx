@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import './styles.css';
+import Landing from './Landing';
 
 const App = lazy(() => import('./App'));
 
@@ -52,7 +53,7 @@ const theme = createTheme({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <MantineProvider theme={theme}>
-      <Suspense fallback={<LoadingScreen />}><App /></Suspense>
+      <Suspense fallback={<LoadingScreen />}>{new URLSearchParams(location.search).has('lesson') ? <App /> : <Landing />}</Suspense>
     </MantineProvider>
   </React.StrictMode>,
 );

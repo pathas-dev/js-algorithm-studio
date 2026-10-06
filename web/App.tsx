@@ -36,19 +36,23 @@ function PlaybackIcon({ name }: { name: 'first' | 'previous' | 'play' | 'pause' 
 }
 
 export default function App() {
-  const [language, setLanguage] = useState<Language>('ko');
+  const [initial] = useState(() => {
+    const id = new URLSearchParams(location.search).get('lesson');
+    return algorithms.find((entry) => entry.id === id) ?? bubble;
+  });
+  const [language, setLanguage] = useState<Language>(new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ko');
   const ko = language === 'ko';
   const t = (korean: string, english: string) => ko ? korean : english;
-  const [algorithm, setAlgorithm] = useState<Algorithm>(bubble);
-  const [input, setInput] = useState(bubble.example.join(', '));
-  const [operationInput, setOperationInput] = useState('');
-  const [targetInput, setTargetInput] = useState('3');
-  const [directed, setDirected] = useState(false);
-  const [edgeInput, setEdgeInput] = useState('');
+  const [algorithm, setAlgorithm] = useState<Algorithm>(initial);
+  const [input, setInput] = useState(initial.inputMode === 'text' ? initial.example[0] : initial.example.join(', '));
+  const [operationInput, setOperationInput] = useState(initial.operations ?? '');
+  const [targetInput, setTargetInput] = useState(initial.inputMode === 'text' ? initial.example[1] : String(initial.target ?? 3));
+  const [directed, setDirected] = useState(initial.graphDirected ?? false);
+  const [edgeInput, setEdgeInput] = useState(initial.graphEdges?.map((edge) => `${edge[0]}-${edge[1]}${edge.length > 2 ? `:${edge[2]}` : ''}`).join(', ') ?? '');
   const [error, setError] = useState('');
   const [editingInput, setEditingInput] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
-  const [steps, setSteps] = useState(() => bubble.run(bubble.example));
+  const [steps, setSteps] = useState(() => initial.inputMode === 'text' || initial.inputMode === 'words' ? initial.run(initial.example, undefined, undefined, undefined, initial.operations) : initial.run(initial.example, initial.target, initial.graphEdges, initial.graphDirected, initial.operations));
   const [playback, dispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
   const step = steps[playback.index];
   const isSort = algorithm.category === 'sort';
@@ -62,7 +66,14 @@ export default function App() {
   const seek = (index: number) => { setWhyOpen(false); dispatch({ type: 'seek', index }); };
   const togglePlayback = () => { setWhyOpen(false); dispatch({ type: 'toggle' }); };
 
-  useEffect(() => { document.documentElement.lang = language; }, [language]);
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.title = `${algorithm.name[language]} · Algorithm Studio`;
+    const url = new URL(location.href);
+    url.searchParams.set('lesson', algorithm.id);
+    url.searchParams.set('lang', language);
+    history.replaceState(null, '', url);
+  }, [language, algorithm]);
   useEffect(() => {
     if (!playback.playing) return;
     const timer = window.setTimeout(() => dispatch({ type: 'tick' }), 950 / playback.speed);
@@ -253,7 +264,7 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <div className="studio">
         <header className="studio-header">
-          <a className="brand" href="/"><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" /> Algorithm Studio</a>
+          <a className="brand" href={ko ? "/" : "?lang=en"}><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" /> Algorithm Studio</a>
           <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('작은 단계가 만드는 큰 이해', 'Small steps. Clear understanding.')}</Text>
             <Button variant="default" size="xs" onClick={() => { setWhyOpen(false); setLanguage(ko ? 'en' : 'ko'); }}>{ko ? 'English' : '한국어'}</Button>
           </Group>

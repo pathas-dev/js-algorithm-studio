@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T05:26:06.320168+00:00",
+  "title": "Design System: Algorithm Studio",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Action Green"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm Paper"
+      },
+      "sage-surface": {
+        "role": "neutral",
+        "displayName": "Sage Surface"
+      },
+      "comparison": {
+        "role": "secondary",
+        "displayName": "Comparison Orange"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Landing Display",
+        "purpose": "Opening headline."
+      },
+      "code": {
+        "displayName": "Source Code",
+        "purpose": "Readable JavaScript and line evidence."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "meter-growth",
+        "value": "transform .3s cubic-bezier(.16,1,.3,1)",
+        "purpose": "Complexity meter growth; disabled for reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "landing-compact",
+        "value": "900px"
+      },
+      {
+        "name": "lesson-stacked",
+        "value": "1050px"
+      },
+      {
+        "name": "mobile",
+        "value": "650px"
+      }
+    ],
+    "focusRings": [
+      {
+        "name": "focus-outline",
+        "value": "3px solid #087f5b; outline-offset: 3px",
+        "purpose": "Visible keyboard focus on buttons and links."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Landing entry into the visualizer.",
+      "html": "<a class=\"ds-primary\" href=\"#lesson\">Open visualizer <span aria-hidden=\"true\">→</span></a>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;gap:18px;background:#196d53;color:white;border-radius:9px;padding:14px 19px;text-decoration:none;font:650 14px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif;transition:background .2s}.ds-primary:hover{background:#12533f}.ds-primary:focus-visible{outline:3px solid #087f5b;outline-offset:3px;}"
+    },
+    {
+      "name": "Language control",
+      "kind": "button",
+      "description": "Outlined landing language switch.",
+      "html": "<button class=\"ds-language\">English</button>",
+      "css": ".ds-language{background:transparent;border:1px solid #bdcbbf;border-radius:8px;padding:8px 12px;color:#254c3a;cursor:pointer;font-family:\"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-language:focus-visible{outline:3px solid #087f5b;outline-offset:3px;}"
+    },
+    {
+      "name": "Header navigation",
+      "kind": "nav",
+      "description": "Quiet anchor navigation.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#complexity\">Big O</a><a href=\"#examples\">Use cases</a></nav>",
+      "css": ".ds-nav{display:flex;gap:28px;font:13px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-nav a{color:#365442;text-decoration:none;text-underline-offset:5px}.ds-nav a:hover{text-decoration:underline}.ds-nav a:focus-visible{outline:3px solid #087f5b;outline-offset:3px;}"
+    },
+    {
+      "name": "Complexity input",
+      "kind": "input",
+      "description": "Native range with green accent and readable count.",
+      "html": "<label class=\"ds-range\">Input size <strong>16</strong><input type=\"range\" min=\"2\" max=\"32\" value=\"16\" aria-label=\"Input size\"></label>",
+      "css": ".ds-range{display:flex;align-items:center;gap:20px;font:13px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif;color:#1a3028}.ds-range strong{font:16px ui-monospace,monospace;font-variant-numeric:tabular-nums}.ds-range input{accent-color:#196d53;min-width:0;cursor:pointer}"
+    },
+    {
+      "name": "Complexity lab surface",
+      "kind": "card",
+      "refersTo": "landing-lab",
+      "description": "White bordered model comparison surface.",
+      "html": "<section class=\"ds-lab\"><strong>O(n)</strong><p>Growth model, not measured runtime.</p></section>",
+      "css": ".ds-lab{background:#fff;border:1px solid #d5dfd6;border-radius:16px;padding:28px 32px 20px;color:#1a3028;font-family:\"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-lab strong{font:16px ui-monospace,monospace}.ds-lab p{color:#526459;font-size:12px;line-height:1.8;margin:20px 0 0}"
+    },
+    {
+      "name": "Code panel",
+      "kind": "custom",
+      "refersTo": "code-panel",
+      "description": "Dark JavaScript surface with active-line evidence.",
+      "html": "<section class=\"ds-code\"><div>JavaScript</div><pre><span class=\"ds-active\">  4  compare(array[i], array[j]);</span></pre></section>",
+      "css": ".ds-code{background:#17241f;color:#e6eee8;border-radius:12px;overflow:hidden}.ds-code>div{background:#21312a;color:#acc3b4;padding:15px 18px;font:12px ui-monospace,monospace}.ds-code pre{margin:0;padding:14px 0;font:13px/1.9 ui-monospace,SFMono-Regular,Consolas,monospace;overflow:auto}.ds-active{display:block;background:#304f40;border-left:1px solid #a7d7b6}"
+    }
+  ],
+  "narrative": {
+    "overview": "The implemented system uses green accents, warm off-white backgrounds, restrained borders, and readable Korean/English typography. The landing carries these incumbent visualizer choices into a more spacious introduction; the lesson workspace keeps execution and code close together.",
+    "keyCharacteristics": [
+      "Green actions and sage surfaces.",
+      "Monospaced values and source code.",
+      "Clear text explanations beside visual evidence."
+    ],
+    "rules": [],
+    "dos": [
+      "Do preserve the Algorithm Studio name and existing favicon.",
+      "Do keep Korean and English copy readable at narrow widths.",
+      "Do pair execution colors with textual or numeric evidence."
+    ],
+    "donts": [
+      "Don't present the Big O growth model as measured runtime.",
+      "Don't collapse comparison, swap, settled, and matched lesson states into one accent."
+    ]
+  }
+}
