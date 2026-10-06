@@ -1,4 +1,4 @@
-import traceTreeDfs, { traceTreeBfs, traceListForward } from '../traversals';
+import traceTreeDfs, { traceTreeBfs, traceListForward, traceListReverse } from '../traversals';
 
 it('traverses the level-order binary tree in preorder and empties the call stack', () => {
   const steps = traceTreeDfs([1, 2, 3, 4, 5, 6, 7]);
@@ -28,4 +28,15 @@ it('visits linked nodes forward without changing next links', () => {
   expect(steps[0].variables.links).toBe(steps.at(-1).variables.links);
   expect(traceListForward([]).at(-1).variables.result).toBe('∅');
   expect(traceListForward([5]).at(-1).variables.result).toBe('5');
+});
+
+it('visits linked nodes on recursive return while preserving next links', () => {
+  const steps = traceListReverse([10, 20, 30]);
+  expect(steps.at(-1).variables.result).toBe('30, 20, 10');
+  expect(steps.find((step) => step.type === 'base').variables.order).toBe('');
+  expect(steps.find((step) => step.type === 'base').variables.stack).toBe('10 → 20 → 30');
+  expect(steps.at(-1).variables.stack).toBe('');
+  expect(steps[0].variables.links).toBe(steps.at(-1).variables.links);
+  expect(traceListReverse([1, 1]).at(-1).variables.result).toBe('1, 1');
+  expect(traceListReverse([]).at(-1).variables.result).toBe('∅');
 });

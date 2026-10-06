@@ -1,3 +1,4 @@
+import reverseTraversal from '../algorithms/linked-list/reverse-traversal/reverseTraversal';
 import LinkedList from '../data-structures/linked-list/LinkedList';
 import listTraversal from '../algorithms/linked-list/traversal/traversal';
 import breadthFirstSearch from '../algorithms/tree/breadth-first-search/breadthFirstSearch';
@@ -88,7 +89,7 @@ export function traceTreeBfs(values) {
   return traceTree(values, true);
 }
 
-export function traceListForward(values) {
+function traceList(values, reverse) {
   if (values.length > 12 || !values.every(Number.isFinite)) throw new Error('traversal-list-input');
   const list = new LinkedList();
   values.forEach((value, id) => list.append({ value, id }));
@@ -98,13 +99,15 @@ export function traceListForward(values) {
   )));
   const steps = [];
   const order = [];
+  const stack = [];
   const snapshot = (type, code, current = -1) => steps.push({
     type,
     code,
     array: values.map((value, id) => ({ value, id })),
     indices: current < 0 ? [] : [current],
     variables: {
-      mode: 'list-forward',
+      mode: reverse ? 'list-reverse' : 'list-forward',
+      stack: stack.map((id) => values[id]).join(' → '),
       structure: 'linked-list',
       links,
       head: nodes.length ? 0 : -1,
@@ -115,11 +118,31 @@ export function traceListForward(values) {
       result: type === 'done' ? order.map((id) => values[id]).join(', ') || '∅' : '—',
     },
   });
-  snapshot('start', 'let currentNode = linkedList.head;');
-  listTraversal(list, (item) => {
+  const entryCode = reverse
+    ? 'reverseTraversalRecursive(linkedList.head, callback, stepCallback);'
+    : 'let currentNode = linkedList.head;';
+  snapshot('start', entryCode);
+  const visit = (item) => {
     order.push(item.id);
-    snapshot('visit', 'callback(currentNode.value);', item.id);
-  });
-  snapshot('done', 'currentNode = currentNode.next;');
+    snapshot('visit', reverse ? 'callback(node.value);' : 'callback(currentNode.value);', item.id);
+  };
+  if (reverse) {
+    reverseTraversal(list, visit, (step) => {
+      const item = step.array[0];
+      const id = item ? item.id : -1;
+      if (step.type === 'enter') stack.push(id);
+      if (step.type === 'leave') stack.pop();
+      snapshot(step.type, step.code, id);
+    });
+  } else listTraversal(list, visit);
+  snapshot('done', reverse ? entryCode : 'currentNode = currentNode.next;');
   return steps;
+}
+
+export function traceListForward(values) {
+  return traceList(values, false);
+}
+
+export function traceListReverse(values) {
+  return traceList(values, true);
 }

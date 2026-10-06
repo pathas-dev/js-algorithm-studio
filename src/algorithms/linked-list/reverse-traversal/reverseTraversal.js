@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * Traversal callback function.
  * @callback traversalCallback
@@ -8,10 +10,22 @@
  * @param {LinkedListNode} node
  * @param {traversalCallback} callback
  */
-function reverseTraversalRecursive(node, callback) {
+function reverseTraversalRecursive(node, callback, stepCallback) {
+  if (!node) {
+    recordStep(stepCallback, 'base', [], [], {}, 'if (node) {');
+  }
   if (node) {
-    reverseTraversalRecursive(node.next, callback);
+    recordStep(
+      stepCallback,
+      'enter',
+      [node.value],
+      [],
+      {},
+      'reverseTraversalRecursive(node.next, callback, stepCallback);',
+    );
+    reverseTraversalRecursive(node.next, callback, stepCallback);
     callback(node.value);
+    recordStep(stepCallback, 'leave', [node.value], [], {}, 'callback(node.value);');
   }
 }
 
@@ -19,6 +33,6 @@ function reverseTraversalRecursive(node, callback) {
  * @param {LinkedList} linkedList
  * @param {traversalCallback} callback
  */
-export default function reverseTraversal(linkedList, callback) {
-  reverseTraversalRecursive(linkedList.head, callback);
+export default function reverseTraversal(linkedList, callback, stepCallback) {
+  reverseTraversalRecursive(linkedList.head, callback, stepCallback);
 }

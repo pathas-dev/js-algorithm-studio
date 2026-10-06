@@ -38,6 +38,7 @@ export default function LinkedListView({ step, language }: { step: Step; languag
         {!nodes.length && <text x={width / 2} y={72} textAnchor="middle" fill="#617469">{deque ? 'FRONT = BACK = ∅' : 'HEAD = TAIL = ∅'}</text>}
       </svg>
     </div>
+    {step.variables.mode === 'list-reverse' && <div className="frontier">{language === 'ko' ? '호출 스택 · HEAD → 현재' : 'Call stack · HEAD → current'} <strong>{String(step.variables.stack) || '∅'}</strong></div>}
     {'result' in step.variables && <div className="frontier">{traversal ? language === 'ko' ? '방문 순서' : 'Visit order' : language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(traversal ? step.variables.order : step.variables.result) || '∅'}</output></div>}
   </div>;
 }

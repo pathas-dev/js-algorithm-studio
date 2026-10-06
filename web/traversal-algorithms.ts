@@ -1,8 +1,9 @@
+import reverseSource from '../src/algorithms/linked-list/reverse-traversal/reverseTraversal.js?raw';
 import listSource from '../src/algorithms/linked-list/traversal/traversal.js?raw';
 import bfsSource from '../src/algorithms/tree/breadth-first-search/breadthFirstSearch.js?raw';
 import type { Algorithm, NumericAlgorithm } from './algorithms';
 import dfsSource from '../src/algorithms/tree/depth-first-search/depthFirstSearch.js?raw';
-import traceTreeDfs, { traceTreeBfs, traceListForward } from '../src/visualization/traversals';
+import traceTreeDfs, { traceTreeBfs, traceListForward, traceListReverse } from '../src/visualization/traversals';
 import { algorithmCode } from '../src/visualization/playback';
 
 export const treeDfsLesson: NumericAlgorithm = {
@@ -57,4 +58,22 @@ export const listForwardLesson: NumericAlgorithm = {
   },
 };
 
-export const traversalAlgorithms: Algorithm[] = [treeDfsLesson, treeBfsLesson, listForwardLesson];
+export const listReverseLesson: NumericAlgorithm = {
+  ...listForwardLesson, id: 'linked-list-reverse-traversal',
+  name: { ko: '연결 리스트 역순 순회', en: 'Reversed linked list traversal' },
+  summary: { ko: 'next를 따라 끝까지 재귀 호출한 뒤, 돌아오며 값을 방문합니다. 연결은 그대로 유지하고 방문 순서만 TAIL에서 HEAD 방향으로 기록합니다.', en: 'Recurse through next to the end, then visit on return. Preserve the links and record visits from TAIL toward HEAD.' },
+  source: algorithmCode(reverseSource),
+  inputHint: { ko: '숫자 최대 12개 · 중복·빈 입력 허용 · 재귀 스택 O(n)', en: 'At most twelve values · duplicates and empty input allowed · recursion stack O(n)' },
+  run: (values) => traceListReverse(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['HEAD에서 재귀 순회 시작', '다음 노드를 먼저 탐색하고 그 호출이 끝나면 현재 값을 방문하는 순서입니다. 호출마다 현재 노드를 기억하는 스택이 필요합니다.'] : ['Begin recursion from HEAD', 'Explore the next node first, then visit the current value when that call returns. Each call remembers its node on the stack.'];
+    if (step.type === 'enter') return ko ? ['현재 노드를 기억하고 next로 내려가기', `N${v.current}를 호출 스택에 넣었습니다. 아직 값을 방문하지 않고 다음 노드로 재귀 호출합니다.`] : ['Remember this node and descend through next', `Push N${v.current} onto the call stack. Recurse into the next node before visiting this value.`];
+    if (step.type === 'base') return ko ? ['null 도달 · 재귀 종료', '마지막 next가 null이므로 더 내려갈 수 없습니다. 대기 중인 마지막 노드 호출로 돌아가며 역순 방문을 시작합니다.'] : ['Reached null · stop recursion', 'The final next is null. Return to the last waiting node call and start visiting in reverse order.'];
+    if (step.type === 'visit') return ko ? ['돌아오면서 현재 값 방문', `다음 노드의 호출이 끝나 N${v.current} 값을 방문했습니다. TAIL부터 HEAD까지 거꾸로 기록되지만 next 연결은 유지합니다.`] : ['Visit the value on return', `The next-node call finished, so visit N${v.current}. Record TAIL to HEAD while preserving next links.`];
+    if (step.type === 'leave') return ko ? ['현재 호출을 끝내고 이전 호출로 복귀', `N${v.current}를 스택에서 제거했습니다. 이전 호출이 기다리던 값의 방문을 이어갑니다.`] : ['Finish this call and return to the previous one', `Pop N${v.current}. Continue with the value waiting in the previous call.`];
+    return ko ? ['역순 방문 완료', `방문 순서는 ${v.result}이며 호출 스택은 비었습니다. 재귀 스택을 제외한 원래 리스트 연결은 유지됩니다.`] : ['Reverse traversal ready', `Visit order: ${v.result}; the stack is empty. Original list connections are preserved.`];
+  },
+};
+
+export const traversalAlgorithms: Algorithm[] = [treeDfsLesson, treeBfsLesson, listForwardLesson, listReverseLesson];
