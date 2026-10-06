@@ -1,3 +1,5 @@
+import BucketSort from '../src/algorithms/sorting/bucket-sort/BucketSort';
+import bucketSource from '../src/algorithms/sorting/bucket-sort/BucketSort.js?raw';
 import hashTableSource from '../src/data-structures/hash-table/HashTable.js?raw';
 import bloomSource from '../src/data-structures/bloom-filter/BloomFilter.js?raw';
 import traceBloomFilter from '../src/visualization/bloom';
@@ -507,6 +509,29 @@ export const radix: NumericAlgorithm = {
         : ['Gather buckets in order', 'Concatenate buckets 0 through 9. Preserving order within each bucket retains the order of previously processed lower digits.'];
       case 'pass': return ko ? ['한 자릿수 완료', `오른쪽 ${v.digit}개 자릿수를 기준으로 정렬됐습니다. 더 높은 자릿수가 남았다면 다음 반복에서 처리합니다.`]
         : ['Digit pass complete', `Sorted by the rightmost ${v.digit} digits. Process the next higher digit if one remains.`];
+      default: return bubble.explain(step, language);
+    }
+  },
+};
+
+export const bucket: NumericAlgorithm = {
+  id: 'bucket-sort', category: 'sort',
+  name: { ko: '버킷 정렬', en: 'Bucket sort' },
+  summary: { ko: '값 범위로 버킷을 나누고 각 버킷을 정렬한 뒤 차례대로 합칩니다. 음수·중복·소수를 지원합니다.', en: 'Distribute by value range, sort each bucket, then concatenate in order. Supports negatives, duplicates and decimals.' },
+  source: algorithmCode(bucketSource), example: [29, 4, 18, 7, 25, 13, 4, 1], time: 'O(n + k + Σ bᵢ log bᵢ)',
+  inputHint: { ko: '최대 32개 · 버킷 수는 √n을 올림한 값 · 각 버킷은 숫자 비교로 정렬', en: 'Up to 32 values · ceil(√n) buckets · numeric comparison within each bucket' },
+  run(values) {
+    const steps: (Omit<Step, 'array'> & { array: number[] })[] = [];
+    BucketSort(values, Math.max(1, Math.ceil(Math.sqrt(values.length))), (step: Omit<Step, 'array'> & { array: number[] }) => steps.push(step));
+    return numericSteps(steps);
+  },
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['값 범위별 버킷 준비', '입력의 최솟값과 최댓값 사이를 같은 폭으로 나눕니다. 빈 입력도 안전하게 완료합니다.'] : ['Prepare range buckets', 'Divide the input range into equal-width buckets. Empty input also finishes safely.'];
+      case 'bucket': return ko ? ['값을 버킷에 배치', `${v.value}를 버킷 ${v.bucket}에 넣습니다. 인덱스는 ⌊(값 − ${v.minValue}) / ${v.bucketSize}⌋이며 최댓값은 마지막 버킷에 넣습니다.`] : ['Distribute a value', `Place ${v.value} in bucket ${v.bucket}: floor((value − ${v.minValue}) / ${v.bucketSize}). Clamp the maximum to the last bucket.`];
+      case 'sort-bucket': return ko ? ['버킷 내부 정렬', `버킷 ${v.bucket} 안의 값을 숫자 오름차순으로 정렬합니다. 다른 버킷과 비교할 필요는 없습니다.`] : ['Sort within a bucket', `Sort bucket ${v.bucket} numerically. Values in different buckets need no comparison.`];
+      case 'gather': return ko ? ['버킷을 결과에 연결', `버킷 ${v.bucket}을 출력 뒤에 연결합니다. 낮은 범위부터 모으므로 전체 결과도 오름차순입니다.`] : ['Concatenate a bucket', `Append bucket ${v.bucket} to the output. Gathering lower ranges first yields global ascending order.`];
       default: return bubble.explain(step, language);
     }
   },
@@ -1412,4 +1437,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

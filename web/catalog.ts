@@ -164,7 +164,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-math-square-root", "category": "math", "name": {"ko": "뉴턴 방법으로 제곱근 구하기", "en": "Square Root (Newton's Method)"}},
   {"id": "planned-algorithms-math-fourier-transform", "category": "math", "name": {"ko": "푸리에 변환", "en": "Fourier Transform"}},
   {"id": "planned-algorithms-string-palindrome", "category": "string", "name": {"ko": "회문 검사", "en": "Palindrome Check"}},
-  {"id": "planned-algorithms-sorting-bucket-sort", "category": "sort", "name": {"ko": "버킷 정렬", "en": "Bucket Sort"}},
   {"id": "planned-algorithms-linked-list-traversal", "category": "linked-list", "name": {"ko": "연결 리스트 순회", "en": "Linked List Traversal"}},
   {"id": "planned-algorithms-linked-list-reverse-traversal", "category": "linked-list", "name": {"ko": "연결 리스트 역순 순회", "en": "Reversed Linked List Traversal"}},
   {"id": "planned-algorithms-cryptography-polynomial-hash", "category": "cryptography", "name": {"ko": "다항식 롤링 해시", "en": "Polynomial Rolling Hash"}},

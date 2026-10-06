@@ -1,46 +1,35 @@
-import RadixSort from '../radix-sort/RadixSort';
+import recordStep from '../../../utils/trace/recordStep';
 
-/**
- * Bucket Sort
- *
- * @param {number[]} arr
- * @param {number} bucketsNum
- * @return {number[]}
- */
-export default function BucketSort(arr, bucketsNum = 1) {
+/** Sort finite numbers by range, then sort and concatenate each bucket. */
+export default function BucketSort(arr, bucketsNum = 1, stepCallback = undefined) {
+  if (!Number.isInteger(bucketsNum) || bucketsNum < 1) throw new Error('buckets');
+  if (arr.some((value) => !Number.isFinite(value))) throw new Error('range');
   const buckets = new Array(bucketsNum).fill(null).map(() => []);
+  recordStep(stepCallback, 'start', arr, [], () => ({ buckets: JSON.stringify(buckets) }), 'const buckets = new Array(bucketsNum).fill(null).map(() => []);');
+  const minValue = arr.length ? Math.min(...arr) : 0;
+  const maxValue = arr.length ? Math.max(...arr) : 0;
+  const bucketSize = Math.max(1, Math.ceil((maxValue - minValue) / bucketsNum));
 
-  const minValue = Math.min(...arr);
-  const maxValue = Math.max(...arr);
-
-  const bucketSize = Math.ceil(Math.max(1, (maxValue - minValue) / bucketsNum));
-
-  // Place elements into buckets.
   for (let i = 0; i < arr.length; i += 1) {
     const currValue = arr[i];
-    const bucketIndex = Math.floor((currValue - minValue) / bucketSize);
-
-    // Edge case for max value.
-    if (bucketIndex === bucketsNum) {
-      buckets[bucketsNum - 1].push(currValue);
-    } else {
-      buckets[bucketIndex].push(currValue);
-    }
+    const bucketIndex = Math.min(bucketsNum - 1, Math.floor((currValue - minValue) / bucketSize));
+    buckets[bucketIndex].push(currValue);
+    recordStep(stepCallback, 'bucket', arr, [i], () => ({
+      bucket: bucketIndex, value: currValue, bucketSize, minValue, buckets: JSON.stringify(buckets),
+    }), 'buckets[bucketIndex].push(currValue);');
   }
 
-  // Sort individual buckets.
+  // Numeric comparison also supports negative and fractional values.
   for (let i = 0; i < buckets.length; i += 1) {
-    // Let's use the Radix Sorter here. This may give us
-    // the average O(n + k) time complexity to sort one bucket
-    // (where k is a number of digits in the longest number).
-    buckets[i] = new RadixSort().sort(buckets[i]);
+    buckets[i].sort((a, b) => a - b);
+    recordStep(stepCallback, 'sort-bucket', arr, [], () => ({ bucket: i, buckets: JSON.stringify(buckets) }), 'buckets[i].sort((a, b) => a - b);');
   }
 
-  // Merge sorted buckets into final output.
   const sortedArr = [];
   for (let i = 0; i < buckets.length; i += 1) {
     sortedArr.push(...buckets[i]);
+    recordStep(stepCallback, 'gather', arr, [], () => ({ bucket: i, buckets: JSON.stringify(buckets), output: JSON.stringify(sortedArr) }), 'sortedArr.push(...buckets[i]);');
   }
-
+  recordStep(stepCallback, 'done', sortedArr, [], { sortedCount: sortedArr.length }, 'return sortedArr;');
   return sortedArr;
 }
