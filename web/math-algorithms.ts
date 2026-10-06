@@ -1,3 +1,4 @@
+import complexSource from '../src/algorithms/math/complex-number/ComplexNumber.js?raw';
 import factorsSource from '../src/algorithms/math/prime-factors/primeFactors.js?raw';
 import floatSource from '../src/algorithms/math/binary-floating-point/floatAsBinaryString.js?raw';
 import decodeSource from '../src/algorithms/math/binary-floating-point/bitsToFloat.js?raw';
@@ -13,7 +14,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -239,4 +240,26 @@ export const factorsLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson];
+export const complexLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'complex-number',
+  name: { ko: '복소수', en: 'Complex number' },
+  summary: { ko: 'z₁=a+bi와 z₂=c+di의 사칙연산을 독립적으로 비교합니다. 실수부는 가로축, 허수부는 세로축이며 켤레와 극형식도 확인합니다.', en: 'Compare independent arithmetic operations on z₁=a+bi and z₂=c+di. Real parts lie on the horizontal axis, imaginary parts on the vertical; inspect conjugation and polar form too.' },
+  source: algorithmCode(complexSource), example: [3, 2, 1, -1], time: 'O(1)',
+  inputLabels: [{ ko: 'a, b, c, d · 두 복소수', en: 'a, b, c, d · two complex numbers' }, { ko: '', en: '' }],
+  inputHint: { ko: '실수 네 개 · z₁=a+bi, z₂=c+di · 나눗셈을 위해 z₂≠0', en: 'Four real numbers · z₁=a+bi, z₂=c+di · z₂ must be nonzero for division' },
+  run: (values) => traceComplex(values),
+  explain(step, language) {
+    const ko = language === 'ko';
+    switch (step.type) {
+      case 'start': return ko ? ['두 복소수 준비', '모든 연산은 같은 원래 입력에 독립적으로 적용합니다. 초록 점은 두 입력, 주황 점은 현재 결과입니다.'] : ['Prepare two complex numbers', 'Apply every operation independently to the original inputs. Green points are inputs; orange is the current result.'];
+      case 'add': return ko ? ['실수부와 허수부 각각 더하기', '(a+bi)+(c+di)=(a+c)+(b+d)i입니다. 평면에서는 두 벡터를 더합니다.'] : ['Add components', '(a+bi)+(c+di)=(a+c)+(b+d)i. Add the two vectors in the plane.'];
+      case 'subtract': return ko ? ['실수부와 허수부 각각 빼기', '(a+bi)−(c+di)=(a−c)+(b−d)i입니다.'] : ['Subtract components', '(a+bi)−(c+di)=(a−c)+(b−d)i.'];
+      case 'multiply': return ko ? ['i²=−1을 적용해 곱하기', '(a+bi)(c+di)=(ac−bd)+(ad+bc)i입니다. 크기를 곱하고 각도를 더하는 연산이기도 합니다.'] : ['Multiply using i²=−1', '(a+bi)(c+di)=(ac−bd)+(ad+bc)i. This also multiplies radii and adds angles.'];
+      case 'divide': return ko ? ['분모의 켤레로 나누기', '분자와 분모에 c−di를 곱하면 분모가 c²+d²인 실수가 됩니다. 0으로 나누기는 허용하지 않습니다.'] : ['Divide using the conjugate', 'Multiply numerator and denominator by c−di. The denominator becomes the real value c²+d²; division by zero is rejected.'];
+      case 'conjugate': return ko ? ['첫 복소수의 켤레', '허수부 부호를 반전합니다. 복소평면에서는 실수축을 기준으로 반사한 점입니다.'] : ['Conjugate the first input', 'Negate the imaginary part. This reflects the point across the real axis.'];
+      default: return ko ? ['첫 복소수의 극형식', '크기는 √(a²+b²), 위상은 양의 실수축에서 잰 라디안 각도입니다. 이 구현에서는 0의 위상을 0으로 둡니다. 표시 숫자는 가독성을 위해 6자리로 줄였습니다.'] : ['Polar form of the first input', 'Radius is √(a²+b²); phase is the angle from the positive real axis in radians. This implementation assigns zero phase to zero. Display values use six significant digits.'];
+    }
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson];

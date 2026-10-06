@@ -1,6 +1,7 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
+  traceComplex,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -123,4 +124,13 @@ it('preserves repeated prime factors and the empty factorization of one', () => 
   expect(JSON.parse(traceFactors([97]).at(-1).variables.sequence)).toEqual([97]);
   expect(JSON.parse(traceFactors([1]).at(-1).variables.sequence)).toEqual([]);
   expect(() => traceFactors([0])).toThrow('factors-input');
+});
+
+it('computes independent complex operations and rejects a zero divisor', () => {
+  const steps = traceComplex([3, 2, 1, -1]);
+  expect(steps.find((step) => step.type === 'multiply').variables.result).toBe('5 − 1i');
+  expect(steps.find((step) => step.type === 'divide').variables.result).toBe('0.5 + 2.5i');
+  expect(steps.find((step) => step.type === 'conjugate').variables.result).toBe('3 − 2i');
+  expect(JSON.parse(traceComplex([0, 0, 1, 1]).at(-1).variables.cells).at(-1)[1]).toBe(0);
+  expect(() => traceComplex([1, 2, 0, 0])).toThrow('complex-input');
 });

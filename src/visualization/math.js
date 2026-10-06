@@ -1,3 +1,4 @@
+import ComplexNumber from '../algorithms/math/complex-number/ComplexNumber';
 import { primeFactors } from '../algorithms/math/prime-factors/primeFactors';
 import { floatAs32BinaryString } from '../algorithms/math/binary-floating-point/floatAsBinaryString';
 import { bitsToFloat32 } from '../algorithms/math/binary-floating-point/bitsToFloat';
@@ -242,5 +243,55 @@ export function traceFactors(values) {
       ...step.variables, mode: 'factors',
     },
   }));
+  return steps;
+}
+
+export function traceComplex(values) {
+  if (values.length !== 4 || !values.every(Number.isFinite)
+    || (values[2] === 0 && values[3] === 0)) throw new Error('complex-input');
+  const [a, b, c, d] = values;
+  const first = new ComplexNumber({ re: a, im: b });
+  const second = new ComplexNumber({ re: c, im: d });
+  const format = (z) => `${Number(z.re.toPrecision(6))} ${z.im < 0 ? '−' : '+'} ${Number(Math.abs(z.im).toPrecision(6))}i`;
+  const operations = [
+    ['add', first.add(second), 're: this.re + complexAddend.re,'],
+    ['subtract', first.subtract(second), 're: this.re - complexSubtrahend.re,'],
+    ['multiply', first.multiply(second), 're: this.re * complexMultiplicand.re - this.im * complexMultiplicand.im,'],
+    ['divide', first.divide(second), 're: finalDivident.re / finalDivider,'],
+    ['conjugate', first.conjugate(first), 'im: -1 * complexNumber.im,'],
+  ];
+  const points = [first, second, ...operations.map(([, z]) => z)];
+  const scale = Math.max(1, ...points.map((z) => Math.max(Math.abs(z.re), Math.abs(z.im)))) * 1.2;
+  const cells = [['z₁', format(first)], ['z₂', format(second)]];
+  const snapshot = (type, z, code) => ({
+    type: String(type),
+    array: [],
+    indices: [],
+    code: String(code),
+    variables: {
+      mode: 'complex',
+      scale,
+      operation: String(type),
+      result: format(z),
+      expression: `${type === 'start' ? 'z₁' : `z₁ ${{
+        add: '+', subtract: '−', multiply: '×', divide: '÷',
+      }[type] || type} z₂`} = ${format(z)}`,
+      points: JSON.stringify([[first.re, first.im, 'z₁'], [second.re, second.im, 'z₂'],
+        [z.re, z.im, 'result']]),
+      cells: JSON.stringify(cells),
+    },
+  });
+  const steps = [snapshot('start', first, 'constructor({ re = 0, im = 0 } = {}) {')];
+  operations.forEach(([type, z, code]) => {
+    cells.push([type, format(z)]);
+    const step = snapshot(type, z, code);
+    if (type === 'conjugate') step.variables.expression = `conjugate(z₁) = ${format(z)}`;
+    steps.push(step);
+  });
+  const polar = first.getPolarForm();
+  cells.push(['|z₁|', polar.radius], ['arg(z₁) · radians', polar.phase]);
+  const done = snapshot('done', first, 'radius: this.getRadius(),');
+  done.variables.expression = `z₁ = ${polar.radius.toPrecision(6)} × e^(i × ${polar.phase.toPrecision(6)})`;
+  steps.push(done);
   return steps;
 }
