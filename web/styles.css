@@ -402,3 +402,6 @@ input { caret-color: #196d53; }
 .collection-results { display: flex; flex-wrap: wrap; gap: 8px; }
 .collection-results > div { padding: 8px 10px; background: #eaf0e9; border-radius: 5px; font: 13px monospace; }
 .collection-results .active-group { background: #f0dfbd; }
+
+.cipher-view .string-row { flex-wrap: wrap; }
+.cipher-view { min-width: 0; }

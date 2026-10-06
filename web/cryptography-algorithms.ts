@@ -1,6 +1,7 @@
+import caesarSource from '../src/algorithms/cryptography/caesar-cipher/caesarCipher.js?raw';
 import railSource from '../src/algorithms/cryptography/rail-fence-cipher/railFenceCipher.js?raw';
 import source from '../src/algorithms/cryptography/polynomial-hash/PolynomialHash.js?raw';
-import tracePolynomialHash, { traceRailFence } from '../src/visualization/cryptography';
+import tracePolynomialHash, { traceRailFence, traceCaesar } from '../src/visualization/cryptography';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, TextAlgorithm } from './algorithms';
 
@@ -39,4 +40,19 @@ const railFence: TextAlgorithm = {
   },
 };
 
-export const cryptographyAlgorithms: Algorithm[] = [polynomialHash, railFence];
+const caesar: TextAlgorithm = {
+  id: 'caesar-cipher', category: 'cryptography', inputMode: 'text', example: ['Hello, xyz!', '3'],
+  name: { ko: '시저 암호', en: 'Caesar cipher' }, time: 'O(n + 26)',
+  summary: { ko: '영문자를 소문자로 바꾼 뒤 알파벳에서 지정한 칸만큼 이동합니다. z를 넘으면 a로 돌아오며 알파벳 밖의 문자는 그대로 보존합니다.', en: 'Lowercase the input and shift English letters along the alphabet. Wrap past z to a and preserve characters outside the alphabet.' },
+  inputLabels: [{ ko: '평문', en: 'Plaintext' }, { ko: '이동 칸 수', en: 'Shift' }],
+  inputHint: { ko: '최대 24 UTF-16 칸 · 정수 이동 −100–100 · 출력 소문자 · 음수 이동 가능', en: 'At most 24 UTF-16 units · integer shift −100–100 · lowercase output · negative shifts allowed' },
+  source: algorithmCode(caesarSource), run: traceCaesar,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['알파벳 치환표 준비', `각 영문자를 ${v.shift}칸 이동하는 표를 만듭니다. 원본 함수는 입력을 소문자로 정규화합니다.`] : ['Prepare the substitution alphabet', `Build a mapping that shifts each letter by ${v.shift}. The original function lowercases the input.`];
+    if (step.type === 'substitute') return ko ? ['현재 문자를 치환', `“${v.char}” → “${v.encrypted}”. 영문자는 (위치 + 이동) mod 26으로 바꾸고, 공백·숫자·기호 등은 그대로 둡니다.`] : ['Substitute this character', `“${v.char}” → “${v.encrypted}”. English letters use (index + shift) mod 26; spaces, digits and symbols stay unchanged.`];
+    return ko ? ['치환 완료 · 반대 이동으로 복원', `암호문은 “${v.result}”, 반대 방향으로 이동한 복원 결과는 “${v.restored}”입니다. 소문자 정규화로 원래 대소문자는 복원되지 않습니다.`] : ['Substitution ready · reverse shift restores text', `Ciphertext: “${v.result}”; reverse shift gives “${v.restored}”. Lowercasing means original letter case is not recovered.`];
+  },
+};
+
+export const cryptographyAlgorithms: Algorithm[] = [polynomialHash, railFence, caesar];

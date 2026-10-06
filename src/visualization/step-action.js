@@ -50,7 +50,8 @@ export default function stepAction(algorithm, step, language, title, index, leng
       else if (algorithm.id === 'quick-sort') decision = a < b ? t('왼쪽 분할 구간에 넣습니다', 'Add to the left partition') : t('오른쪽 구간에 남깁니다', 'Keep in the right partition');
     }
   } else if (algorithm.category === 'cryptography') {
-    evidence = v.mode === 'rail-fence' ? `rail = ${v.currentRail === undefined ? 1 : Number(v.currentRail) + 1}` : `hash = ${v.hash}`;
+    if (v.mode === 'caesar') evidence = `shift = ${v.shift}`;
+    else evidence = v.mode === 'rail-fence' ? `rail = ${v.currentRail === undefined ? 1 : Number(v.currentRail) + 1}` : `hash = ${v.hash}`;
   } else if (algorithm.category === 'linked-list') {
     evidence = ['visit', 'enter', 'leave'].includes(type) ? `N${v.current}` : `n = ${array.length}`;
     if (type === 'visit') label = t('방문', 'Visit');

@@ -1,3 +1,4 @@
+import { caesarCipherEncrypt, caesarCipherDecrypt } from '../algorithms/cryptography/caesar-cipher/caesarCipher';
 import { encodeRailFenceCipher, decodeRailFenceCipher } from '../algorithms/cryptography/rail-fence-cipher/railFenceCipher';
 import PolynomialHash from '../algorithms/cryptography/polynomial-hash/PolynomialHash';
 
@@ -86,5 +87,30 @@ export function traceRailFence(values) {
     { output: result, result, restored: decodeRailFenceCipher(result, rails) },
     "return filledFence.flat().join('')",
   );
+  return steps;
+}
+
+export function traceCaesar(values) {
+  const text = values[0];
+  const shift = Number(values[1]);
+  if (!text.length || text.length > 24 || !Number.isInteger(shift)
+    || Math.abs(shift) > 100) throw new Error('caesar-input');
+  const steps = [];
+  let output = '';
+  const save = (type, variables, code) => steps.push({
+    type,
+    array: [],
+    indices: [],
+    code,
+    variables: {
+      mode: 'caesar', text: text.toLowerCase(), shift, output, ...variables,
+    },
+  });
+  save('start', {}, 'const cipherMap = getCipherMap(alphabet, shift)');
+  const result = caesarCipherEncrypt(text, shift, undefined, (step) => {
+    output += step.variables.encrypted;
+    save(step.type, step.variables, step.code);
+  });
+  save('done', { result, restored: caesarCipherDecrypt(result, shift) }, 'return encrypted');
   return steps;
 }

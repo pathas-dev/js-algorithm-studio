@@ -1,4 +1,4 @@
-import tracePolynomialHash, { traceRailFence } from '../cryptography';
+import tracePolynomialHash, { traceRailFence, traceCaesar } from '../cryptography';
 import PolynomialHash from '../../algorithms/cryptography/polynomial-hash/PolynomialHash';
 
 it('rolls each Unicode window to the same hash as a fresh calculation', () => {
@@ -27,4 +27,14 @@ it('places rail characters on the actual zigzag and restores Unicode plaintext',
   expect(steps.at(-1).variables.restored).toBe('WEAREDISCOVERED');
   expect(traceRailFence(['a😀 집', '6']).at(-1).variables.restored).toBe('a😀 집');
   expect(() => traceRailFence(['abc', '1'])).toThrow('rail-input');
+});
+
+it('shows Caesar substitutions with wrapping, negative shifts and unchanged symbols', () => {
+  const steps = traceCaesar(['Hello, xyz!', '3']);
+  expect(steps.at(-1).variables.result).toBe('khoor, abc!');
+  expect(steps.at(-1).variables.restored).toBe('hello, xyz!');
+  expect(steps.filter((step) => step.type === 'substitute')).toHaveLength(11);
+  expect(traceCaesar(['ab 집😀', '-1']).at(-1).variables.result).toBe('za 집😀');
+  expect(traceCaesar(['abc', '26']).at(-1).variables.result).toBe('abc');
+  expect(() => traceCaesar(['abc', '0.5'])).toThrow('caesar-input');
 });

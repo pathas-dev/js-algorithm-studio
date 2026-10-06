@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 // Create alphabet array: ['a', 'b', 'c', ..., 'z'].
 const englishAlphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -29,15 +31,32 @@ const getCipherMap = (alphabet, shift) => {
  * @param {string} str
  * @param {number} shift
  * @param {string[]} alphabet
+ * @param {function} [stepCallback]
  * @return {string}
  */
-export const caesarCipherEncrypt = (str, shift, alphabet = englishAlphabet) => {
+export const caesarCipherEncrypt = (
+  str,
+  shift,
+  alphabet = englishAlphabet,
+  stepCallback = undefined,
+) => {
   // Create a cipher map:
   const cipherMap = getCipherMap(alphabet, shift);
   return str
     .toLowerCase()
     .split('')
-    .map((char) => cipherMap[char] || char)
+    .map((char, index) => {
+      const encrypted = cipherMap[char] || char;
+      recordStep(
+        stepCallback,
+        'substitute',
+        [],
+        [],
+        { char, encrypted, index },
+        'const encrypted = cipherMap[char] || char',
+      );
+      return encrypted;
+    })
     .join('');
 };
 
