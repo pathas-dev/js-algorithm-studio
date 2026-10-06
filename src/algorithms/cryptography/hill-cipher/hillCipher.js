@@ -1,3 +1,4 @@
+import recordStep from '../../../utils/trace/recordStep';
 import * as mtrx from '../../math/matrix/Matrix';
 
 // The code of an 'A' character (equals to 65).
@@ -54,9 +55,10 @@ const generateMessageVector = (message) => {
  *
  * @param {string} message plaintext
  * @param {string} keyString
+ * @param {function} [stepCallback]
  * @return {string} cipherString
  */
-export function hillCipherEncrypt(message, keyString) {
+export function hillCipherEncrypt(message, keyString, stepCallback = undefined) {
   // The keyString and message can only contain letters.
   const onlyLettersRegExp = /^[a-zA-Z]+$/;
   if (!onlyLettersRegExp.test(message) || !onlyLettersRegExp.test(keyString)) {
@@ -71,11 +73,21 @@ export function hillCipherEncrypt(message, keyString) {
     throw new Error('Invalid key string length. The key length must be a square of message length');
   }
 
-  const cipherVector = mtrx.dot(keyMatrix, messageVector);
+  const cipherVector = mtrx.dot(keyMatrix, messageVector, stepCallback);
   let cipherString = '';
   for (let row = 0; row < cipherVector.length; row += 1) {
-    const item = cipherVector[row];
+    const item = cipherVector[row][0];
     cipherString += String.fromCharCode((item % englishAlphabetSize) + alphabetCodeShift);
+    recordStep(
+      stepCallback,
+      'encode',
+      [],
+      [],
+      {
+        row, item, remainder: item % 26, cipherString,
+      },
+      'cipherString += String.fromCharCode((item % englishAlphabetSize) + alphabetCodeShift)',
+    );
   }
 
   return cipherString;

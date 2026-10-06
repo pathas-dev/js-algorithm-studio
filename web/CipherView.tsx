@@ -1,9 +1,11 @@
+import MathView from './MathView';
 import type { Language, Step } from './algorithms';
 
 export default function CipherView({ step, language }: { step: Step; language: Language }) {
   const v = step.variables;
   const ko = language === 'ko';
   const characters = Array.from(String(v.text));
+  if (v.mode === 'hill') return <div className="cipher-view"><MathView step={{ ...step, variables: { ...v, mode: 'matrix-product', result: '—' } }} language={language} /><p className="fourier-expression">{ko ? '암호문' : 'Ciphertext'}: <output data-testid="cipher-output">{v.outputText || '—'}</output></p><p className="frontier">A = 0 · Z = 25 · mod 26 {step.type === 'encode' && <strong>{v.item} → {v.remainder}</strong>}</p></div>;
   if (v.mode === 'caesar') {
     const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz');
     return <div className="collection-view cipher-view"><p className="frontier">{ko ? '이동 칸 수' : 'Shift'}: <strong>{v.shift}</strong> · mod 26</p><div className="matrix-scroll"><table className="graph-table"><caption>{ko ? '알파벳 치환표' : 'Alphabet substitution'}</caption><tbody><tr><th>A</th>{alphabet.map((letter) => <td key={letter} className={letter === v.char && step.type !== 'done' ? 'active-cell' : ''}>{letter}</td>)}</tr><tr><th>B</th>{alphabet.map((letter, index) => <td key={letter} className={letter === v.char && step.type !== 'done' ? 'dependency-cell' : ''}>{alphabet[((index + Number(v.shift)) % 26 + 26) % 26]}</td>)}</tr></tbody></table></div><div className="string-row">{String(v.text).split('').map((character, index) => <div key={index} className={`string-cell ${index === Number(v.index) && step.type !== 'done' ? 'current-character' : ''}`}><small>{index}</small><strong>{character === ' ' ? '␣' : character}</strong></div>)}</div><p className="fourier-expression">{ko ? '암호문' : 'Ciphertext'}: <output data-testid="cipher-output">{v.output || '—'}</output></p>{step.type === 'done' && <p className="frontier">{ko ? '복원 · 소문자' : 'Restored · lowercase'}: {v.restored}</p>}</div>;

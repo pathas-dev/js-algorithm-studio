@@ -1,7 +1,9 @@
+import hillSource from '../src/algorithms/cryptography/hill-cipher/hillCipher.js?raw';
+import matrixSource from '../src/algorithms/math/matrix/Matrix.js?raw';
 import caesarSource from '../src/algorithms/cryptography/caesar-cipher/caesarCipher.js?raw';
 import railSource from '../src/algorithms/cryptography/rail-fence-cipher/railFenceCipher.js?raw';
 import source from '../src/algorithms/cryptography/polynomial-hash/PolynomialHash.js?raw';
-import tracePolynomialHash, { traceRailFence, traceCaesar } from '../src/visualization/cryptography';
+import tracePolynomialHash, { traceRailFence, traceCaesar, traceHill } from '../src/visualization/cryptography';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, TextAlgorithm } from './algorithms';
 
@@ -55,4 +57,21 @@ const caesar: TextAlgorithm = {
   },
 };
 
-export const cryptographyAlgorithms: Algorithm[] = [polynomialHash, railFence, caesar];
+const hill: TextAlgorithm = {
+  id: 'hill-cipher', category: 'cryptography', inputMode: 'text', example: ['ACT', 'GYBNQKURP'],
+  name: { ko: '힐 암호', en: 'Hill cipher' }, time: 'O(m²)',
+  summary: { ko: '영문자 A–Z를 0–25로 바꾸고 키 행렬과 평문 벡터를 곱합니다. 각 행의 결과를 26으로 나눈 나머지를 다시 문자로 바꿉니다. 한 블록 암호화를 보여줍니다.', en: 'Map A–Z to 0–25, multiply the key matrix by the plaintext vector, then turn each row remainder modulo 26 back into a letter. Visualizes single-block encryption.' },
+  inputLabels: [{ ko: '평문 블록', en: 'Plaintext block' }, { ko: '키 · 행 우선', en: 'Key · row order' }],
+  inputHint: { ko: '영문 평문 1–4글자 · 키 길이 = 평문 길이² · 대문자 변환 · 복호화는 제공하지 않음', en: '1–4 English letters · key length = block length² · uppercased · encryption only' },
+  source: algorithmCode(hillSource + '\n' + matrixSource), run: traceHill,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['키 행렬과 평문 벡터 준비', 'A=0, B=1, …, Z=25로 변환합니다. 키를 행 우선으로 채우고 평문은 세로 벡터로 배치합니다.'] : ['Prepare the key matrix and plaintext vector', 'Convert A=0, B=1, …, Z=25. Fill the key in row order and place the plaintext in a column vector.'];
+    if (step.type === 'multiply-add') return ko ? ['현재 행의 곱을 누적', `${v.expression}. 이 행의 모든 키 값과 평문 값을 곱해 더합니다. 아직 26으로 나누지 않습니다.`] : ['Accumulate products for this row', `${v.expression}. Add every key–plaintext product in this row before reducing modulo 26.`];
+    if (step.type === 'encode') return ko ? ['행의 합을 문자로 변환', `${v.item} mod 26 = ${v.remainder}. A=0 규칙으로 변환해 “${v.cipherString}”까지 만들었습니다.`] : ['Convert the row sum into a letter', `${v.item} mod 26 = ${v.remainder}. Convert with A=0; ciphertext so far: “${v.cipherString}”.`];
+    if (step.type === 'product') return ko ? ['행렬 곱 계산 완료', '이제 각 행의 합을 26으로 나눈 나머지에 A의 문자 코드를 더합니다.'] : ['Matrix product ready', 'Reduce each row sum modulo 26 and add the character code for A.'];
+    return ko ? ['평문 한 블록 암호화 완료', `“${v.text}” → “${v.result}”. 이 화면은 원본 암호화 함수를 추적하며, 키 역행렬을 사용하는 복호화는 다루지 않습니다.`] : ['Single-block encryption ready', `“${v.text}” → “${v.result}”. This lesson traces the original encryption function; inverse-key decryption is outside this view.`];
+  },
+};
+
+export const cryptographyAlgorithms: Algorithm[] = [polynomialHash, railFence, caesar, hill];

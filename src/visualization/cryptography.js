@@ -1,3 +1,4 @@
+import { hillCipherEncrypt } from '../algorithms/cryptography/hill-cipher/hillCipher';
 import { caesarCipherEncrypt, caesarCipherDecrypt } from '../algorithms/cryptography/caesar-cipher/caesarCipher';
 import { encodeRailFenceCipher, decodeRailFenceCipher } from '../algorithms/cryptography/rail-fence-cipher/railFenceCipher';
 import PolynomialHash from '../algorithms/cryptography/polynomial-hash/PolynomialHash';
@@ -112,5 +113,36 @@ export function traceCaesar(values) {
     save(step.type, step.variables, step.code);
   });
   save('done', { result, restored: caesarCipherDecrypt(result, shift) }, 'return encrypted');
+  return steps;
+}
+
+export function traceHill(values) {
+  const text = values[0].toUpperCase();
+  const key = values[1].toUpperCase();
+  if (!/^[A-Z]{1,4}$/.test(text) || !/^[A-Z]+$/.test(key)
+    || key.length !== text.length ** 2) throw new Error('hill-input');
+  const steps = [];
+  let matrix = {};
+  let outputText = '';
+  const result = hillCipherEncrypt(text, key, (step) => {
+    if (step.type !== 'encode') matrix = step.variables;
+    else outputText = step.variables.cipherString;
+    steps.push({
+      ...step,
+      type: step.type === 'done' ? 'product' : step.type,
+      variables: {
+        ...matrix, ...step.variables, mode: 'hill', text, key, outputText,
+      },
+    });
+  });
+  steps.push({
+    type: 'done',
+    array: [],
+    indices: [],
+    code: 'return cipherString',
+    variables: {
+      ...matrix, mode: 'hill', text, key, outputText: result, result,
+    },
+  });
   return steps;
 }

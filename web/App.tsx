@@ -152,6 +152,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'hill-input': t('영문 평문 1–4글자, 키는 평문 길이²개의 영문자로 입력하세요.', 'Enter 1–4 English plaintext letters and exactly length² key letters.'),
     'caesar-input': t('문자 1–24칸과 정수 이동 −100–100을 입력하세요.', 'Enter 1–24 character units and an integer shift from −100 to 100.'),
     'rail-input': t('문자 1–24개와 레일 수 2–6을 입력하세요.', 'Enter 1–24 characters and 2–6 rails.'),
     'hash-input': t('문자 1–24개와 창 길이 1–12(문자열 길이 이하)를 입력하세요.', 'Enter 1–24 characters and a window length of 1–12, no longer than the text.'),
