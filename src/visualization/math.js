@@ -1,0 +1,36 @@
+import getBit from '../algorithms/math/bits/getBit';
+import setBit from '../algorithms/math/bits/setBit';
+import clearBit from '../algorithms/math/bits/clearBit';
+import updateBit from '../algorithms/math/bits/updateBit';
+import multiplyByTwo from '../algorithms/math/bits/multiplyByTwo';
+import divideByTwo from '../algorithms/math/bits/divideByTwo';
+
+export default function traceBits(values) {
+  const [number, position, bitValue] = values;
+  if (values.length !== 3 || !values.every(Number.isInteger)
+    || number < 0 || number > 255 || position < 0 || position > 7
+    || ![0, 1].includes(bitValue)) throw new Error('bits-input');
+  const steps = [];
+  const results = {};
+  const snapshot = (type, result, code) => {
+    if (type !== 'start' && type !== 'done') results[type] = result;
+    steps.push({
+      type,
+      array: [],
+      indices: [],
+      code,
+      variables: {
+        mode: 'bits', number, position, bitValue, result, results: JSON.stringify(results),
+      },
+    });
+  };
+  snapshot('start', number, 'return (number >> bitPosition) & 1;');
+  snapshot('getBit', getBit(number, position), 'return (number >> bitPosition) & 1;');
+  snapshot('setBit', setBit(number, position), 'return number | (1 << bitPosition);');
+  snapshot('clearBit', clearBit(number, position), 'return number & mask;');
+  snapshot('updateBit', updateBit(number, position, bitValue), 'return (number & clearMask) | (bitValueNormalized << bitPosition);');
+  snapshot('multiplyByTwo', multiplyByTwo(number), 'return number << 1;');
+  snapshot('divideByTwo', divideByTwo(number), 'return number >> 1;');
+  snapshot('done', divideByTwo(number), 'return number >> 1;');
+  return steps;
+}
