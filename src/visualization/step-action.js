@@ -52,6 +52,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
   } else if (algorithm.category === 'math') {
     evidence = typeof v.result === 'number' && Math.abs(v.result) >= 1e6
       ? `≈ ${v.result.toExponential(2)}` : `= ${v.result}`;
+    if (v.mode === 'fourier') evidence = v.frequency < 0 ? `N = ${v.N}` : `k = ${v.frequency}`;
     if (v.mode === 'root' && v.result === '—') evidence = `x ≈ ${Number(v.root).toPrecision(5)}`;
     if (v.mode === 'distance' && v.result === '—') evidence = `Σ = ${v.sum}`;
     if (v.mode === 'matrix-product') evidence = type === 'done' ? 'C = A × B' : `C[${v.row < 0 ? '…' : v.row}, ${v.column < 0 ? '…' : v.column}]`;

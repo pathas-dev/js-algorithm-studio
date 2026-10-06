@@ -130,7 +130,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-uncategorized-rain-terraces", "category": "other", "name": {"ko": "빗물 담기 문제", "en": "Rain Terraces (Trapping Rain Water) Problem"}},
   {"id": "planned-algorithms-uncategorized-n-queens", "category": "other", "name": {"ko": "N-Queens 문제", "en": "N-Queens Problem"}},
   {"id": "planned-algorithms-uncategorized-knight-tour", "category": "other", "name": {"ko": "기사의 여행 문제", "en": "Knight's Tour"}},
-  {"id": "planned-algorithms-math-fourier-transform", "category": "math", "name": {"ko": "푸리에 변환", "en": "Fourier Transform"}},
   {"id": "planned-algorithms-linked-list-traversal", "category": "linked-list", "name": {"ko": "연결 리스트 순회", "en": "Linked List Traversal"}},
   {"id": "planned-algorithms-linked-list-reverse-traversal", "category": "linked-list", "name": {"ko": "연결 리스트 역순 순회", "en": "Reversed Linked List Traversal"}},
   {"id": "planned-algorithms-cryptography-polynomial-hash", "category": "cryptography", "name": {"ko": "다항식 롤링 해시", "en": "Polynomial Rolling Hash"}},

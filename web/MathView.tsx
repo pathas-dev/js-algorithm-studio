@@ -1,8 +1,10 @@
+import FourierView from './FourierView';
 import type { Language, Step } from './algorithms';
 
 export default function MathView({ step, language }: { step: Step; language: Language }) {
   const ko = language === 'ko';
   const v = step.variables;
+  if (v.mode === 'fourier') return <FourierView step={step} language={language} />;
   if (v.mode !== 'bits') return <div className="math-view">
     {['complex', 'liu', 'radian', 'distance'].includes(String(v.mode)) && <p className="math-expression">{String(v.expression ?? '')}</p>}
     {v.mode === 'matrix-product' && <div><p className="math-expression">{String(v.expression)}</p><div className="matrix-product">{[['A', v.inputA], ['B', v.inputB], [ko ? 'C · 누적 합' : 'C · cumulative sums', v.output]].map(([label, serialized], matrixIndex) => <table className="graph-table" key={String(label)}><caption>{String(label)}</caption><tbody>{(JSON.parse(String(serialized)) as number[][]).map((row, i) => <tr key={i}>{row.map((value, j) => <td key={j} className={matrixIndex === 0 && i === Number(v.row) && j === Number(v.k) || matrixIndex === 1 && i === Number(v.k) && j === Number(v.column) ? 'dependency-cell' : matrixIndex === 2 && i === Number(v.row) && j === Number(v.column) ? 'active-cell' : ''}>{value}</td>)}</tr>)}</tbody></table>)}</div></div>}

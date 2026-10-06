@@ -160,6 +160,7 @@ export default function App() {
     'matrix-shape': t('A의 열 수와 B의 행 수가 같아야 곱할 수 있습니다.', 'A columns must match B rows for multiplication.'),
     'distance-input': t('두 점의 좌표를 같은 개수로 입력하세요. 총 2–12개의 실수가 필요합니다.', 'Enter two points with equal coordinate counts, totaling two to twelve real numbers.'),
     'root-input': t('0 또는 0.000001–999의 실수 하나와 소수 자릿수 0–6을 입력하세요.', 'Enter zero or a real number from 0.000001 to 999, and zero to six decimal places.'),
+    'fourier-input': t('실수 샘플을 1–12개 입력하세요.', 'Enter one to twelve real samples.'),
     'integer-single': t('정수 하나를 입력하세요.', 'Enter one integer.'),
     'sieve-input': t('체의 상한 n으로 정수 하나를 0부터 120까지 입력하세요.', 'Enter one integer sieve upper bound n from 0 to 120.'),
     'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),

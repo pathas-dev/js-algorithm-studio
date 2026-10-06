@@ -1,3 +1,5 @@
+import dftSource from '../src/algorithms/math/fourier-transform/discreteFourierTransform.js?raw';
+import inverseSource from '../src/algorithms/math/fourier-transform/inverseDiscreteFourierTransform.js?raw';
 import rootSource from '../src/algorithms/math/square-root/squareRoot.js?raw';
 import distanceSource from '../src/algorithms/math/euclidean-distance/euclideanDistance.js?raw';
 import matrixSource from '../src/algorithms/math/matrix/Matrix.js?raw';
@@ -21,7 +23,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm, TextAlgorithm, Algorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner, traceMatrix, traceDistance, traceRoot } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner, traceMatrix, traceDistance, traceRoot, traceFourier } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -367,4 +369,22 @@ export const rootLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: Algorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson, matrixLesson, distanceLesson, rootLesson];
+export const fourierLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'fourier-transform',
+  name: { ko: '푸리에 변환', en: 'Fourier transform' },
+  summary: { ko: '이산 푸리에 변환(DFT)으로 샘플 신호를 복소 주파수 성분으로 나눕니다. 이 구현은 순변환에서 N으로 나누며 역변환으로 신호를 복원합니다.', en: 'Use the discrete Fourier transform (DFT) to decompose samples into complex frequency coefficients. This implementation normalizes the forward transform by N and reconstructs the signal with the inverse.' },
+  source: algorithmCode('// discreteFourierTransform.js\n' + dftSource + '\n// inverseDiscreteFourierTransform.js\n' + inverseSource), example: [0, 1, 0, -1, 0, 1, 0, -1], time: 'O(N²)',
+  inputLabels: [{ ko: '신호 샘플 · 시간 순서', en: 'Signal samples · time order' }, { ko: '', en: '' }],
+  inputHint: { ko: '실수 샘플 1–12개 · k는 한 샘플 구간 안의 주기 수 · DFT 사용', en: 'One to twelve real samples · k is cycles per sample window · uses DFT' },
+  run: (values) => traceFourier(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['신호 샘플 준비', `${v.N}개의 시간 샘플을 ${v.N}개의 주파수 빈으로 변환합니다. k=0은 신호의 평균이며 샘플링 간격이 없어 Hz 단위는 사용하지 않습니다.`] : ['Prepare the signal samples', `Transform ${v.N} time samples into ${v.N} frequency bins. k=0 is the mean; without a sample interval we do not label bins in Hz.`];
+    if (step.type === 'contribution') return ko ? ['샘플의 회전 벡터 더하기', `${v.timer}번 샘플을 주파수 ${v.frequency}의 회전 각도로 옮겨 복소 합에 더합니다. 주황 막대는 현재 합을 N으로 나눈 임시 크기입니다.`] : ['Accumulate the rotated sample', `Rotate sample ${v.timer} for bin ${v.frequency} and add its complex contribution. The orange bar shows the provisional magnitude divided by N.`];
+    if (step.type === 'frequency') return ko ? ['주파수 성분 평균', `모든 샘플의 합을 ${v.N}으로 나눠 F[${v.frequency}]를 완성합니다. 막대는 복소 계수의 크기이며 실수부와 허수부는 표에 표시합니다.`] : ['Normalize the frequency coefficient', `Divide the sample sum by ${v.N} to finish F[${v.frequency}]. Bars show coefficient magnitudes; the table shows real and imaginary parts.`];
+    if (step.type === 'inverse') return ko ? ['역변환으로 입력 복원', '정규화된 주파수 성분에 반대 방향 회전을 곱해 더했습니다. 복원 값은 원래 샘플과 같으며 작은 부동소수점 오차가 있을 수 있습니다.'] : ['Reconstruct with the inverse transform', 'Sum normalized coefficients with reverse rotations. Reconstructed values equal the input up to small floating-point errors.'];
+    return ko ? ['주파수 성분 분해 완료', '실수 신호의 양·음 주파수 성분은 켤레 쌍입니다. 막대는 양쪽 빈을 모두 표시하므로 단측 스펙트럼 진폭으로 해석하지 않습니다. 다음 단계에서 신호를 복원합니다.'] : ['Frequency decomposition ready', 'Real signals have conjugate positive and negative frequency pairs. Bars include both sides, so they are not single-sided amplitudes. Reconstruct the signal next.'];
+  },
+};
+
+export const mathAlgorithms: Algorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson, matrixLesson, distanceLesson, rootLesson, fourierLesson];

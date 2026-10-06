@@ -387,3 +387,10 @@ input { caret-color: #196d53; }
 .matrix-product td { text-align: center; min-width: 34px; padding: 5px 7px; }
 .matrix-product .active-cell { background: #fff0d8; }
 .matrix-product .dependency-cell { background: #d4e9dc; }
+
+.fourier-expression { font: 14px monospace; color: #305645; overflow-wrap: anywhere; }
+.fourier-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.fourier-charts figure { margin: 0; }
+.fourier-charts figcaption { font-size: 11px; color: #657166; }
+.fourier-charts svg { display: block; width: 100%; }
+@media (max-width: 650px) { .fourier-charts { grid-template-columns: 1fr; } }

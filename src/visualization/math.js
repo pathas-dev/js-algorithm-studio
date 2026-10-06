@@ -1,3 +1,5 @@
+import dft from '../algorithms/math/fourier-transform/discreteFourierTransform';
+import inverseDft from '../algorithms/math/fourier-transform/inverseDiscreteFourierTransform';
 import squareRoot from '../algorithms/math/square-root/squareRoot';
 import euclideanDistance from '../algorithms/math/euclidean-distance/euclideanDistance';
 import { dot } from '../algorithms/math/matrix/Matrix';
@@ -439,6 +441,33 @@ export function traceRoot(values, tolerance) {
         ...step.variables, mode: 'root', sequence: JSON.stringify(sequence),
       },
     });
+  });
+  return steps;
+}
+
+export function traceFourier(values) {
+  if (!values.length || values.length > 12 || !values.every(Number.isFinite)) {
+    throw new Error('fourier-input');
+  }
+  const steps = [];
+  const coefficients = dft(values, 1e-10, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'fourier',
+    },
+  }));
+  const restored = inverseDft(coefficients);
+  const last = steps[steps.length - 1];
+  steps.push({
+    ...last,
+    type: 'inverse',
+    code: 'return amplitudes;',
+    variables: {
+      ...last.variables,
+      restored: JSON.stringify(restored),
+      result: restored.map((value) => Number(value.toPrecision(6))).join(', '),
+      expression: 'x[t] = Σ F[k] × e^(i2πkt/N)',
+    },
   });
   return steps;
 }

@@ -2,7 +2,7 @@ import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
   traceComplex, traceRadian, tracePower, traceHorner, traceMatrix,
-  traceDistance, traceRoot,
+  traceDistance, traceRoot, traceFourier,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -188,4 +188,14 @@ it('converges Newton estimates before rounding and handles small positive inputs
   expect(traceRoot([0], 6).at(-1).variables.result).toBe(0);
   expect(() => traceRoot([-1], 6)).toThrow('root-input');
   expect(() => traceRoot([2], 7)).toThrow('root-input');
+});
+
+it('normalizes DFT bins and reconstructs real samples with the inverse', () => {
+  const steps = traceFourier([0, 1, 0, -1]);
+  const coefficients = JSON.parse(steps.at(-1).variables.coefficients);
+  expect(coefficients).toEqual([[0, 0], [0, -0.5], [0, 0], [0, 0.5]]);
+  const restored = JSON.parse(steps.at(-1).variables.restored);
+  restored.forEach((value, index) => expect(value).toBeCloseTo([0, 1, 0, -1][index], 10));
+  expect(JSON.parse(traceFourier([3]).at(-1).variables.coefficients)).toEqual([[3, 0]]);
+  expect(() => traceFourier([])).toThrow('fourier-input');
 });
