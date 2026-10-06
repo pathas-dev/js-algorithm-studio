@@ -119,7 +119,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-uncategorized-rain-terraces", "category": "other", "name": {"ko": "빗물 담기 문제", "en": "Rain Terraces (Trapping Rain Water) Problem"}},
   {"id": "planned-algorithms-uncategorized-n-queens", "category": "other", "name": {"ko": "N-Queens 문제", "en": "N-Queens Problem"}},
   {"id": "planned-algorithms-uncategorized-knight-tour", "category": "other", "name": {"ko": "기사의 여행 문제", "en": "Knight's Tour"}},
-  {"id": "planned-algorithms-cryptography-polynomial-hash", "category": "cryptography", "name": {"ko": "다항식 롤링 해시", "en": "Polynomial Rolling Hash"}},
   {"id": "planned-algorithms-cryptography-rail-fence-cipher", "category": "cryptography", "name": {"ko": "레일 펜스 암호", "en": "Rail Fence Cipher"}},
   {"id": "planned-algorithms-cryptography-caesar-cipher", "category": "cryptography", "name": {"ko": "시저 암호", "en": "Caesar Cipher Algorithm"}},
   {"id": "planned-algorithms-cryptography-hill-cipher", "category": "cryptography", "name": {"ko": "힐 암호", "en": "Hill Cipher"}},
