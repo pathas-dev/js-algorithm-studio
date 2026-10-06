@@ -3,7 +3,7 @@ import { Badge, Button, Group, NativeSelect, Paper, Popover, Text, Textarea, Tex
 import { MotionConfig } from 'motion/react';
 import { MAX_VALUES, parseTarget, parseValues, playbackReducer } from '../src/visualization/playback';
 import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
-import bubbleAction from '../src/visualization/bubble-action';
+import stepAction from '../src/visualization/step-action';
 import { catalogCategories, plannedAlgorithms } from './catalog';
 import { parseWords } from '../src/visualization/trie';
 import { parseEdges, parseWeightedEdges } from '../src/visualization/graph';
@@ -47,7 +47,7 @@ export default function App() {
   const partialArray = isSort && 'depth' in step.variables;
   const [savedInput, setSavedInput] = useState<{ input: string; target: string; operations: string; edges: string; directed: boolean } | null>(null);
   const [stepTitle, reason] = algorithm.explain(step, language);
-  const action = algorithm.id === bubble.id ? bubbleAction(step, language) : null;
+  const action = stepAction(algorithm, step, language, stepTitle, playback.index, steps.length);
   const distanceSummary = 'distances' in step.variables ? Object.entries(JSON.parse(String(step.variables.distances))).map(([node, distance]) => `${node}: ${distance ?? '∞'}`).join(', ') : undefined;
   const seek = (index: number) => { setWhyOpen(false); dispatch({ type: 'seek', index }); };
   const togglePlayback = () => { setWhyOpen(false); dispatch({ type: 'toggle' }); };
@@ -186,7 +186,7 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className={`studio${action ? ' studio--bubble' : ''}`}>
+      <div className="studio">
         <header className="studio-header">
           <a className="brand" href="/"><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" /> Algorithm Studio</a>
           <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('작은 단계가 만드는 큰 이해', 'Small steps. Clear understanding.')}</Text>
@@ -194,12 +194,6 @@ export default function App() {
           </Group>
         </header>
         <main>
-          {!action && <section className="lesson-explanation" aria-label={t('단계 해설', 'Step explanation')}>
-            <div className="explanation-heading"><Text fw={600} size="sm" c="teal">{t('단계 해설', 'Step explanation')}</Text><Text fw={700} className="reason-title">{stepTitle}</Text></div>
-            <div className="explanation-content"><Text className="step-reason" data-testid="step-reason">{reason}</Text>
-              <Group gap="xs" mt="xs" className="step-variables">{Object.entries(step.variables).filter(([name]) => ['key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'leftResult', 'rightResult', 'left', 'lowbit', 'sum', 'right', 'operation', 'word', 'character', 'charIndex', 'value', 'priority', 'result', 'weight', 'via', 'candidate', 'iteration', 'rangeDelta', 'valueDelta', 'indexDelta', 'jumpSize', 'digit', 'bucket', 'position', 'minimum', 'heapSize', 'gap', 'gapShiftedIndex', 'i', 'j', 'minIndex', 'currentIndex', 'swapped', 'depth', 'middleIndex', 'leftIndex', 'rightIndex', 'lowIndex', 'highIndex', 'partitionIndex', 'pivotIndex', 'target', 'index', 'matches', 'low', 'high', 'current', 'next', 'parent', 'previous'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="gray">{name} = {String(value)}</Badge>)}</Group>
-            </div>
-          </section>}
           <div className="workspace">
             <NativeSelect className="mobile-catalog" label={t('알고리즘 선택', 'Choose an algorithm')} value={algorithm.id} data={catalogCategories.map((category) => ({ group: category.name[language], items: [...algorithms.filter((entry) => entry.category === category.id).map((entry) => ({ value: entry.id, label: entry.name[language] })), ...plannedAlgorithms.filter((entry) => entry.category === category.id).map((entry) => ({ value: entry.id, label: `${entry.name[language]} · ${t('준비 중', 'Coming soon')}`, disabled: true }))] }))} onChange={(event) => {
               const next = algorithms.find((entry) => entry.id === event.currentTarget.value);
@@ -238,19 +232,19 @@ export default function App() {
                   </div>
                 </fieldset>
               </Paper>
-              {action && <section className="bubble-action" data-step={step.type} aria-label={t('단계 해설', 'Step explanation')}>
+              <section className="step-action" data-step={step.type} aria-label={t('단계 해설', 'Step explanation')}>
             <Text className="action-name" fw={700}>{action[0]}</Text>
             <output className="action-evidence">{action[1]}</output>
             <div className="action-decision"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg><Text data-testid="step-action">{action[2]}</Text></div>
             <Popover opened={whyOpen} onChange={setWhyOpen} position="bottom-end" width={380} trapFocus returnFocus withArrow shadow="md">
               <Popover.Target><Button className="why-button" variant="subtle" aria-expanded={whyOpen} aria-label={t('왜? 단계 해설 열기', 'Why? Open step explanation')} onClick={() => { dispatch({ type: 'seek', index: playback.index }); setWhyOpen(!whyOpen); }}>{t('왜?', 'Why?')}</Button></Popover.Target>
-              <Popover.Dropdown className="bubble-why" role="dialog" aria-label={t('상세 단계 해설', 'Detailed step explanation')}>
+              <Popover.Dropdown className="step-why" role="dialog" aria-label={t('상세 단계 해설', 'Detailed step explanation')}>
                 <Group justify="space-between"><Text fw={700}>{stepTitle}</Text><Button variant="subtle" size="xs" onClick={() => setWhyOpen(false)}>{t('닫기', 'Close')}</Button></Group>
                 <Text className="step-reason" data-testid="step-reason">{reason}</Text>
-                <Group gap="xs" mt="sm">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'swapped'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="teal">{name} = {String(value)}</Badge>)}</Group>
+                <Group gap="xs" mt="sm">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'swapped', 'index', 'position', 'current', 'next', 'value', 'target', 'result', 'priority', 'gap', 'depth', 'bucket', 'digit', 'minIndex', 'middleIndex', 'low', 'high', 'lowIndex', 'highIndex', 'pivotIndex', 'candidate', 'weight', 'via', 'iteration', 'operation', 'word', 'character', 'charIndex', 'key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'left', 'right', 'sum', 'lowbit', 'row', 'column', 'textIndex', 'wordIndex', 'alignment', 'prefixIndex', 'suffixIndex', 'balance', 'rotation'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="teal">{name} = {String(value)}</Badge>)}</Group>
               </Popover.Dropdown>
             </Popover>
-          </section>}
+              </section>
               <div className="lesson-panels">
                   <Paper withBorder className="canvas-card">
                     <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
