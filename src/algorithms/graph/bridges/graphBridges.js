@@ -1,95 +1,60 @@
-import depthFirstSearch from '../depth-first-search/depthFirstSearch';
+import recordGraphStep from '../../../utils/trace/recordGraphStep';
 
-/**
- * Helper class for visited vertex metadata.
- */
-class VisitMetadata {
-  constructor({ discoveryTime, lowDiscoveryTime }) {
-    this.discoveryTime = discoveryTime;
-    this.lowDiscoveryTime = lowDiscoveryTime;
-  }
-}
-
-/**
- * @param {Graph} graph
- * @return {Object}
- */
-export default function graphBridges(graph) {
-  // Set of vertices we've already visited during DFS.
-  const visitedSet = {};
-
-  // Set of bridges.
+/** Tarjan bridges, including disconnected components. */
+export default function graphBridges(graph, stepCallback) {
+  const discovery = {};
+  const low = {};
   const bridges = {};
-
-  // Time needed to discover to the current vertex.
-  let discoveryTime = 0;
-
-  // Peek the start vertex for DFS traversal.
-  const startVertex = graph.getAllVertices()[0];
-
-  const dfsCallbacks = {
-    /**
-     * @param {GraphVertex} currentVertex
-     */
-    enterVertex: ({ currentVertex }) => {
-      // Tick discovery time.
-      discoveryTime += 1;
-
-      // Put current vertex to visited set.
-      visitedSet[currentVertex.getKey()] = new VisitMetadata({
-        discoveryTime,
-        lowDiscoveryTime: discoveryTime,
-      });
-    },
-    /**
-     * @param {GraphVertex} currentVertex
-     * @param {GraphVertex} previousVertex
-     */
-    leaveVertex: ({ currentVertex, previousVertex }) => {
-      if (previousVertex === null) {
-        // Don't do anything for the root vertex if it is already current (not previous one).
-        return;
+  const stack = [];
+  const processed = [];
+  let time = 0;
+  const state = (vertex, next) => ({
+    current: vertex ? vertex.getKey() : '',
+    next: next ? next.getKey() : '',
+    seen: Object.keys(discovery).join(','),
+    processed: processed.join(','),
+    stack: stack.join(','),
+    order: Object.keys(bridges).join(','),
+    discovery: JSON.stringify(discovery),
+    low: JSON.stringify(low),
+    result: Object.values(bridges).map((edge) => `${edge.startVertex.getKey()}–${edge.endVertex.getKey()}`).join(',') || '∅',
+    chosen: JSON.stringify(Object.values(bridges).map(
+      (edge) => [edge.startVertex.getKey(), edge.endVertex.getKey()],
+    )),
+  });
+  recordGraphStep(stepCallback, graph, 'start', () => state(), 'const discovery = {};');
+  function visit(vertex, parent = null) {
+    const key = vertex.getKey();
+    time += 1;
+    discovery[key] = time;
+    low[key] = time;
+    stack.push(key);
+    recordGraphStep(stepCallback, graph, 'enter', () => state(vertex), 'discovery[key] = time;');
+    vertex.getNeighbors().forEach((next) => {
+      const nextKey = next.getKey();
+      if (next === parent) return;
+      recordGraphStep(stepCallback, graph, 'edge', () => state(vertex, next), 'if (next === parent) return;');
+      if (!discovery[nextKey]) {
+        visit(next, vertex);
+        low[key] = Math.min(low[key], low[nextKey]);
+        recordGraphStep(stepCallback, graph, 'low', () => state(vertex, next), 'low[key] = Math.min(low[key], low[nextKey]);');
+        if (low[nextKey] > discovery[key]) {
+          const edge = graph.findEdge(vertex, next);
+          bridges[edge.getKey()] = edge;
+          recordGraphStep(stepCallback, graph, 'bridge', () => state(vertex, next), 'bridges[edge.getKey()] = edge;');
+        }
+      } else {
+        low[key] = Math.min(low[key], discovery[nextKey]);
+        recordGraphStep(stepCallback, graph, 'back-edge', () => state(vertex, next), 'low[key] = Math.min(low[key], discovery[nextKey]);');
       }
-
-      // Check if current node is connected to any early node other then previous one.
-      visitedSet[currentVertex.getKey()].lowDiscoveryTime = currentVertex.getNeighbors()
-        .filter((earlyNeighbor) => earlyNeighbor.getKey() !== previousVertex.getKey())
-        .reduce(
-          /**
-           * @param {number} lowestDiscoveryTime
-           * @param {GraphVertex} neighbor
-           */
-          (lowestDiscoveryTime, neighbor) => {
-            const neighborLowTime = visitedSet[neighbor.getKey()].lowDiscoveryTime;
-            return neighborLowTime < lowestDiscoveryTime ? neighborLowTime : lowestDiscoveryTime;
-          },
-          visitedSet[currentVertex.getKey()].lowDiscoveryTime,
-        );
-
-      // Compare low discovery times. In case if current low discovery time is less than the one
-      // in previous vertex then update previous vertex low time.
-      const currentLowDiscoveryTime = visitedSet[currentVertex.getKey()].lowDiscoveryTime;
-      const previousLowDiscoveryTime = visitedSet[previousVertex.getKey()].lowDiscoveryTime;
-      if (currentLowDiscoveryTime < previousLowDiscoveryTime) {
-        visitedSet[previousVertex.getKey()].lowDiscoveryTime = currentLowDiscoveryTime;
-      }
-
-      // Compare current vertex low discovery time with parent discovery time. Check if there
-      // are any short path (back edge) exists. If we can't get to current vertex other then
-      // via parent then the parent vertex is articulation point for current one.
-      const parentDiscoveryTime = visitedSet[previousVertex.getKey()].discoveryTime;
-      if (parentDiscoveryTime < currentLowDiscoveryTime) {
-        const bridge = graph.findEdge(previousVertex, currentVertex);
-        bridges[bridge.getKey()] = bridge;
-      }
-    },
-    allowTraversal: ({ nextVertex }) => {
-      return !visitedSet[nextVertex.getKey()];
-    },
-  };
-
-  // Do Depth First Search traversal over submitted graph.
-  depthFirstSearch(graph, startVertex, dfsCallbacks);
-
+    });
+    stack.pop();
+    processed.push(key);
+    recordGraphStep(stepCallback, graph, 'leave', () => state(vertex), 'processed.push(key);');
+  }
+  graph.getAllVertices().forEach((vertex) => {
+    if (!discovery[vertex.getKey()]) visit(vertex);
+  });
+  recordGraphStep(stepCallback, graph, 'done', () => state(), 'return bridges;');
   return bridges;
 }

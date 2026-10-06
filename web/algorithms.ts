@@ -1,3 +1,4 @@
+import bridgesSource from '../src/algorithms/graph/bridges/graphBridges.js?raw';
 import articulationSource from '../src/algorithms/graph/articulation-points/articulationPoints.js?raw';
 import directedCycleSource from '../src/algorithms/graph/detect-cycle/detectDirectedCycle.js?raw';
 import undirectedCycleSource from '../src/algorithms/graph/detect-cycle/detectUndirectedCycle.js?raw';
@@ -60,7 +61,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
+import { traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -796,6 +797,21 @@ export const articulation: NumericAlgorithm = {
   },
 };
 
+export const bridges: NumericAlgorithm = {
+  ...articulation, id: 'bridges',
+  name: { ko: '단절선', en: 'Bridges' },
+  summary: { ko: '간선을 제거했을 때 연결 성분이 늘어나는 지점을 찾습니다. 자식의 low가 부모 방문 시각보다 크면 우회 경로가 없는 단절선입니다.', en: 'Find edges whose removal increases the component count. A child low greater than the parent discovery time means no alternate route.' },
+  source: algorithmCode(bridgesSource),
+  run: (nodes, _start, edges = bridges.graphEdges!) => traceBridges(nodes, edges),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['단절선 검사 준비', '모든 연결 성분을 DFS로 검사합니다. 부모 간선은 제외하고 역방향 간선으로 돌아갈 수 있는 가장 이른 시각을 기록합니다.'] : ['Prepare bridge detection', 'Run DFS over all components. Exclude parent edges and record the earliest reachable discovery time.'];
+    if (step.type === 'bridge') return ko ? ['단절선 발견', `${v.current}–${v.next}는 low[자식] > discovery[부모]입니다. 이 간선을 제거하면 자식 쪽이 분리됩니다.`] : ['Bridge found', `${v.current}–${v.next} satisfies low[child] > discovery[parent]. Removing it separates the child side.`];
+    if (step.type === 'done') return ko ? ['단절선 검사 완료', `단절선: ${v.result}. ∅는 단절선이 없다는 뜻입니다.`] : ['Bridges ready', `Bridges: ${v.result}. ∅ means none.`];
+    return articulation.explain(step, language);
+  },
+};
+
 export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
@@ -1482,4 +1498,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

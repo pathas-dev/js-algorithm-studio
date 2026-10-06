@@ -1,4 +1,4 @@
-import { traceCycle, traceArticulation } from '../graph';
+import { traceCycle, traceArticulation, traceBridges } from '../graph';
 
 it('distinguishes directed cycles, parent edges and disconnected components', () => {
   const nodes = [1, 2, 3, 4, 5];
@@ -17,4 +17,11 @@ it('finds cut vertices in every component and treats DFS roots correctly', () =>
   expect(steps.at(-1).variables.result).toBe('4');
   expect(steps[0].variables.discovery).toBe('{}');
   expect(traceArticulation([1, 2, 3], [[1, 2], [1, 3]]).at(-1).variables.result).toBe('1');
+});
+
+it('finds bridges in disconnected graphs and excludes cycle edges', () => {
+  const steps = traceBridges([1, 2, 3, 4, 5], [[1, 2], [3, 4], [4, 5], [5, 3]]);
+  expect(steps.at(-1).variables.result).toBe('1–2');
+  expect(JSON.parse(steps.at(-1).variables.chosen)).toEqual([[1, 2]]);
+  expect(traceBridges([1, 2, 3], [[1, 2], [2, 3]]).at(-1).variables.result).toContain('2–3');
 });

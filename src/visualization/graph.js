@@ -1,3 +1,4 @@
+import graphBridges from '../algorithms/graph/bridges/graphBridges';
 import articulationPoints from '../algorithms/graph/articulation-points/articulationPoints';
 import detectDirectedCycle from '../algorithms/graph/detect-cycle/detectDirectedCycle';
 import detectUndirectedCycle from '../algorithms/graph/detect-cycle/detectUndirectedCycle';
@@ -199,6 +200,17 @@ export function traceArticulation(nodes, edges) {
     edges.map(([a, b]) => [a, b, 0]),
     false,
     (graph, _start, callback) => articulationPoints(graph, callback),
+    'dfs',
+  );
+}
+
+export function traceBridges(nodes, edges) {
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    edges.map(([a, b]) => [a, b, 0]),
+    false,
+    (graph, _start, callback) => graphBridges(graph, callback),
     'dfs',
   );
 }
