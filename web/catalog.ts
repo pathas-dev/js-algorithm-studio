@@ -119,7 +119,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-uncategorized-rain-terraces", "category": "other", "name": {"ko": "빗물 담기 문제", "en": "Rain Terraces (Trapping Rain Water) Problem"}},
   {"id": "planned-algorithms-uncategorized-n-queens", "category": "other", "name": {"ko": "N-Queens 문제", "en": "N-Queens Problem"}},
   {"id": "planned-algorithms-uncategorized-knight-tour", "category": "other", "name": {"ko": "기사의 여행 문제", "en": "Knight's Tour"}},
-  {"id": "planned-algorithms-ml-knn", "category": "ml", "name": {"ko": "K 최근접 이웃 (K-NN)", "en": "k-Nearest Neighbors Algorithm"}},
   {"id": "planned-algorithms-ml-k-means", "category": "ml", "name": {"ko": "K 평균 군집화", "en": "k-Means Algorithm"}},
   {"id": "planned-algorithms-image-processing-seam-carving", "category": "image-processing", "name": {"ko": "내용을 보존하는 이미지 크기 조절 (심 카빙)", "en": "Content-aware image resizing in JavaScript"}},
   {"id": "planned-algorithms-statistics-weighted-random", "category": "statistics", "name": {"ko": "가중 무작위 선택", "en": "Weighted Random"}},

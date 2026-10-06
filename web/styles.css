@@ -405,3 +405,6 @@ input { caret-color: #196d53; }
 
 .cipher-view .string-row { flex-wrap: wrap; }
 .cipher-view { min-width: 0; }
+
+.learning-view { min-width: 0; }
+.learning-view svg { display: block; width: 100%; max-height: 220px; }

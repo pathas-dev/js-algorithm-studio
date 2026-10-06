@@ -49,6 +49,8 @@ export default function stepAction(algorithm, step, language, title, index, leng
       else if (['insertion-sort', 'shell-sort'].includes(algorithm.id)) decision = a > b ? t('작은 값을 왼쪽으로 옮깁니다', 'Move the smaller value left') : t('현재 순서를 유지합니다', 'Keep the current order');
       else if (algorithm.id === 'quick-sort') decision = a < b ? t('왼쪽 분할 구간에 넣습니다', 'Add to the left partition') : t('오른쪽 구간에 남깁니다', 'Keep in the right partition');
     }
+  } else if (algorithm.category === 'ml') {
+    evidence = `k = ${v.k}`;
   } else if (algorithm.category === 'cryptography') {
     if (v.mode === 'hill') evidence = type === 'encode' ? `${v.item} mod 26 = ${v.remainder}` : 'C = K × P';
     else if (v.mode === 'caesar') evidence = `shift = ${v.shift}`;

@@ -1,3 +1,4 @@
+import { machineLearningAlgorithms } from './machine-learning-algorithms';
 import { cryptographyAlgorithms } from './cryptography-algorithms';
 import { traversalAlgorithms } from './traversal-algorithms';
 import { collectionAlgorithms } from './collection-algorithms';
@@ -110,7 +111,7 @@ type AlgorithmConfig = {
   summary: Record<Language, string>;
   source: string;
   time: string | Record<Language, string>;
-  category: 'sort' | 'search' | 'graph' | 'structure' | 'string' | 'dp' | 'math' | 'sets' | 'tree' | 'linked-list' | 'cryptography';
+  category: 'sort' | 'search' | 'graph' | 'structure' | 'string' | 'dp' | 'math' | 'sets' | 'tree' | 'linked-list' | 'cryptography' | 'ml';
   inputLabels?: [Record<Language, string>, Record<Language, string>];
   singleInput?: boolean;
   operations?: string;
@@ -1720,4 +1721,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, substring, regexMatching, palindrome, lcs, editDistance, knapsack, ...mathAlgorithms, ...collectionAlgorithms, ...traversalAlgorithms, ...cryptographyAlgorithms];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, substring, regexMatching, palindrome, lcs, editDistance, knapsack, ...mathAlgorithms, ...collectionAlgorithms, ...traversalAlgorithms, ...cryptographyAlgorithms, ...machineLearningAlgorithms];
