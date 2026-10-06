@@ -1,10 +1,11 @@
+import combinationSource from '../src/algorithms/sets/combinations/combineWithoutRepetitions.js?raw';
 import permutationSource from '../src/algorithms/sets/permutations/permutateWithoutRepetitions.js?raw';
 import powerSetSource from '../src/algorithms/sets/power-set/bwPowerSet.js?raw';
 import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?raw';
 import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations } from '../src/visualization/collections';
+import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -70,4 +71,21 @@ export const permutationLesson: NumericAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson];
+export const combinationLesson: NumericAlgorithm = {
+  ...shuffleLesson, id: 'combinations', usesStart: true, singleInput: false, target: 2,
+  name: { ko: '조합', en: 'Combinations' },
+  summary: { ko: '원소를 반복 사용하지 않고 k개를 선택합니다. 고른 원소 뒤의 원소만 재귀적으로 선택해 순서만 다른 중복 결과를 만들지 않습니다.', en: 'Choose k items without repetition. Recursively choose only items after the current one, avoiding duplicate results caused by reordered selections.' },
+  source: algorithmCode(combinationSource), example: [1, 2, 3, 4], time: 'O(k × C(n,k))',
+  targetLabel: { ko: '선택할 개수 k', en: 'Selection count k' },
+  inputHint: { ko: '서로 다른 숫자 최대 6개 · k는 0–6 · 중복 제거 · 순서 무관', en: 'At most six distinct numbers · k zero to six · duplicates removed · order ignored' },
+  run: (values, k) => traceCombinations(values, k),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start' || step.type === 'enter') return ko ? ['남은 원소에서 k개 선택', `현재 ${v.size}개 중 ${v.k}개를 고르는 하위 문제입니다. 한 원소를 고르면 그 뒤의 원소들에서 나머지를 고릅니다.`] : ['Choose k from the remaining items', `This subproblem chooses ${v.k} from ${v.size} items. After choosing an item, choose the rest only from its suffix.`];
+    if (step.type === 'base') return ko ? ['가장 작은 조합 문제', Number(v.k) === 0 ? '0개를 선택하는 방법은 빈 조합 하나입니다.' : '1개를 선택한다면 남은 각 원소가 하나씩 조합이 됩니다. 남은 원소가 없으면 결과도 없습니다.'] : ['The smallest combination problem', Number(v.k) === 0 ? 'There is one way to choose zero items: the empty combination.' : 'To choose one item, each remaining item forms a singleton. No remaining items means no results.'];
+    if (step.type === 'append-combination') return ko ? ['첫 선택과 작은 조합 합치기', `${v.currentOption}에 작은 조합 (${v.smaller})을 붙였습니다. 이후 원소만 고르므로 같은 원소 집합은 한 번만 나옵니다.`] : ['Join the choice with the smaller combination', `Prefix (${v.smaller}) with ${v.currentOption}. Restricting choices to later items produces each selection once.`];
+    return ko ? [step.type === 'done' ? '전체 조합 완성' : '작은 조합 반환', `${v.size}개 중 ${v.k}개를 선택하는 방법은 ${v.count}가지입니다. k가 n보다 크면 고를 수 없어 0가지입니다.`] : [step.type === 'done' ? 'All combinations ready' : 'Return the smaller combinations', `${v.count} ways to choose ${v.k} from ${v.size}. If k exceeds n, there are zero ways.`];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson];

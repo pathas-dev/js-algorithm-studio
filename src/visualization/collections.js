@@ -1,3 +1,4 @@
+import combineWithoutRepetitions from '../algorithms/sets/combinations/combineWithoutRepetitions';
 import permutateWithoutRepetitions from '../algorithms/sets/permutations/permutateWithoutRepetitions';
 import bwPowerSet from '../algorithms/sets/power-set/bwPowerSet';
 import fisherYates from '../algorithms/sets/fisher-yates/fisherYates';
@@ -63,5 +64,22 @@ export function tracePermutations(values) {
       ...last.variables, result: groups.length,
     },
   });
+  return steps;
+}
+
+export function traceCombinations(values, k) {
+  const items = [...new Set(values)];
+  if (items.length > 6 || !items.every(Number.isFinite) || !Number.isInteger(k)
+    || k < 0 || k > 6) throw new Error('combination-input');
+  const steps = [];
+  const groups = combineWithoutRepetitions(items, k, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'combination', originalSize: items.length, originalK: k,
+    },
+  }));
+  steps[0].type = 'start';
+  const last = steps[steps.length - 1];
+  steps.push({ ...last, type: 'done', variables: { ...last.variables, result: groups.length } });
   return steps;
 }
