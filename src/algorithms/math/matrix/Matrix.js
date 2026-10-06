@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * @typedef {number} Cell
  * @typedef {Cell[][]|Cell[][][]} Matrix
@@ -123,7 +125,7 @@ export const zeros = (mShape) => {
  * @return Matrix
  * @throws {Error}
  */
-export const dot = (a, b) => {
+export const dot = (a, b, stepCallback) => {
   // Validate inputs.
   validate2D(a);
   validate2D(b);
@@ -139,16 +141,43 @@ export const dot = (a, b) => {
   const outputShape = [aShape[0], bShape[1]];
   const c = zeros(outputShape);
 
+  const state = (row = -1, column = -1, k = -1, sum = 0) => ({
+    row,
+    column,
+    k,
+    sum,
+    inputA: JSON.stringify(a),
+    inputB: JSON.stringify(b),
+    output: JSON.stringify(c.map((line, i) => line.map((value, j) => (
+      i === row && j === column ? sum : value
+    )))),
+    result: '—',
+    expression: k < 0 ? 'C = A × B'
+      : `C[${row}, ${column}] += ${a[row][k]} × ${b[k][column]} → ${sum}`,
+  });
+  recordStep(stepCallback, 'start', [], [], () => state(), 'const c = zeros(outputShape);');
+
   for (let bCol = 0; bCol < b[0].length; bCol += 1) {
     for (let aRow = 0; aRow < a.length; aRow += 1) {
       let cellSum = 0;
       for (let aCol = 0; aCol < a[aRow].length; aCol += 1) {
         cellSum += a[aRow][aCol] * b[aCol][bCol];
+        recordStep(
+          stepCallback,
+          'multiply-add',
+          [],
+          [],
+          () => state(aRow, bCol, aCol, cellSum),
+          'cellSum += a[aRow][aCol] * b[aCol][bCol];',
+        );
       }
       c[aRow][bCol] = cellSum;
     }
   }
 
+  recordStep(stepCallback, 'done', [], [], () => ({
+    ...state(), result: JSON.stringify(c),
+  }), 'return c;');
   return c;
 };
 

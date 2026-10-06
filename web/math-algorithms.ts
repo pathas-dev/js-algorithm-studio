@@ -1,3 +1,4 @@
+import matrixSource from '../src/algorithms/math/matrix/Matrix.js?raw';
 import hornerSource from '../src/algorithms/math/horner-method/hornerMethod.js?raw';
 import powerSource from '../src/algorithms/math/fast-powering/fastPowering.js?raw';
 import degreeSource from '../src/algorithms/math/radian/degreeToRadian.js?raw';
@@ -16,9 +17,9 @@ import gcdSource from '../src/algorithms/math/euclidean-algorithm/euclideanAlgor
 import primeSource from '../src/algorithms/math/primality-test/trialDivision.js?raw';
 import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?raw';
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
-import type { NumericAlgorithm } from './algorithms';
+import type { NumericAlgorithm, TextAlgorithm, Algorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner, traceMatrix } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -316,4 +317,20 @@ export const hornerLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson];
+export const matrixLesson: TextAlgorithm = {
+  id: 'matrix', category: 'math', inputMode: 'text',
+  name: { ko: '행렬', en: 'Matrix multiplication' },
+  summary: { ko: 'A의 한 행과 B의 한 열을 곱해 더하면 C의 한 칸이 됩니다. 직사각형 행렬도 곱할 수 있으며 A의 열 수와 B의 행 수가 같아야 합니다.', en: 'Dot a row of A with a column of B to fill one cell of C. Rectangular matrices work too; A columns must match B rows.' },
+  source: algorithmCode(matrixSource), example: ['[[1,2],[3,4]]', '[[5,6],[7,8]]'], time: 'O(mnk)',
+  inputLabels: [{ ko: '행렬 A · JSON', en: 'Matrix A · JSON' }, { ko: '행렬 B · JSON', en: 'Matrix B · JSON' }],
+  inputHint: { ko: '각 행렬 1–4행, 1–4열 · 숫자 -999–999 · 예: [[1,2],[3,4]]', en: 'Each matrix: one to four rows and columns · values -999–999 · e.g. [[1,2],[3,4]]' },
+  run: (inputs) => traceMatrix(inputs),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['결과 행렬을 0으로 준비', '결과 크기는 A의 행 수 × B의 열 수입니다. C의 값은 누적 합이며 아직 처리하지 않은 칸은 0입니다.'] : ['Initialize the result to zero', 'C has A rows and B columns. Its cells show cumulative sums; unprocessed cells are zero.'];
+    if (step.type === 'multiply-add') return ko ? ['행과 열의 같은 위치 곱하기', `${v.expression}. 초록색 두 입력 칸의 곱을 주황색 결과 칸에 더합니다. 해당 행과 열의 모든 위치를 처리하면 한 칸이 완성됩니다.`] : ['Multiply matching row and column positions', `${v.expression}. Add the product of the two green input cells into the orange result cell. Processing the complete row and column finishes the cell.`];
+    return ko ? ['행렬 곱 완성', '모든 행·열 쌍의 내적을 계산했습니다. 일반적으로 A×B와 B×A는 같지 않으며 B×A는 차원이 맞지 않을 수도 있습니다.'] : ['Matrix product ready', 'Computed every row-column dot product. In general A×B differs from B×A; B×A may even have incompatible dimensions.'];
+  },
+};
+
+export const mathAlgorithms: Algorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson, matrixLesson];

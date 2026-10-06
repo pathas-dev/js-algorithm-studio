@@ -156,6 +156,8 @@ export default function App() {
     'complex-input': t('실수 네 개 a, b, c, d를 입력하고 두 번째 복소수는 0이 아니어야 합니다.', 'Enter four real numbers a, b, c, d; the second complex number must be nonzero.'),
     'power-input': t('정수 두 개: 밑은 -20–20, 지수는 0–12로 입력하세요.', 'Enter two integers: base -20–20 and exponent 0–12.'),
     'horner-input': t('계수를 1–8개 입력하고 x는 -10–10으로 입력하세요.', 'Enter one to eight coefficients and x from -10 to 10.'),
+    'matrix-input': t('행렬은 1–4행과 동일한 길이의 1–4열을 가진 JSON 숫자 배열로 입력하세요. 값은 -999–999입니다.', 'Enter JSON numeric matrices with one to four equal-length rows and columns; values -999–999.'),
+    'matrix-shape': t('A의 열 수와 B의 행 수가 같아야 곱할 수 있습니다.', 'A columns must match B rows for multiplication.'),
     'integer-single': t('정수 하나를 입력하세요.', 'Enter one integer.'),
     'sieve-input': t('체의 상한 n으로 정수 하나를 0부터 120까지 입력하세요.', 'Enter one integer sieve upper bound n from 0 to 120.'),
     'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),
@@ -300,7 +302,7 @@ export default function App() {
                         <div className="input-actions"><Text size="xs" c="dimmed">{t('Esc 취소', 'Esc to cancel')}</Text><Button variant="subtle" onClick={cancelInput}>{t('취소', 'Cancel')}</Button><Button type="submit" variant="light" className="apply-button">{t('적용', 'Apply')}</Button></div>
                       </form> : <button className="editable-array" aria-label={arrayLesson ? t('현재 배열 수정', 'Edit current array') : t('입력 수정', 'Edit input')} onClick={editInput}>
                         <div className="input-preview"><output data-testid={arrayLesson ? 'array-values' : undefined}>{arrayLesson ? `[${step.array.map((item) => item.value).join(', ')}]` : input || '∅'}</output>
-                          {!isSort && algorithm.category !== 'math' && !algorithm.singleInput && <span className="input-preview-detail">{algorithm.inputMode === 'text' ? `${algorithm.inputLabels?.[1][language] ?? t('패턴', 'Pattern')}: ${targetInput || '∅'}` : algorithm.category === 'structure' ? `${algorithm.targetLabel ? `${algorithm.targetLabel[language]}: ${targetInput} · ` : ''}${t('연산', 'Operations')}: ${operationInput || '∅'}` : algorithm.category === 'graph' ? `${t('간선', 'Edges')}: ${edgeInput || '∅'}${algorithm.usesStart !== false ? ` · ${t('시작', 'Start')}: ${targetInput}` : ''}` : `${t('목표', 'Target')}: ${targetInput}`}</span>}
+                          {!isSort && (algorithm.category !== 'math' || algorithm.inputMode === 'text' || algorithm.usesStart === true) && !algorithm.singleInput && <span className="input-preview-detail">{algorithm.inputMode === 'text' ? `${algorithm.inputLabels?.[1][language] ?? t('패턴', 'Pattern')}: ${targetInput || '∅'}` : algorithm.category === 'structure' ? `${algorithm.targetLabel ? `${algorithm.targetLabel[language]}: ${targetInput} · ` : ''}${t('연산', 'Operations')}: ${operationInput || '∅'}` : algorithm.category === 'graph' ? `${t('간선', 'Edges')}: ${edgeInput || '∅'}${algorithm.usesStart !== false ? ` · ${t('시작', 'Start')}: ${targetInput}` : ''}` : `${algorithm.targetLabel?.[language] ?? t('목표', 'Target')}: ${targetInput}`}</span>}
                         </div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15Z" /></svg><span>{t('수정', 'Edit')}</span>
                       </button>}
                     </div>

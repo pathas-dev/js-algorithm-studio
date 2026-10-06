@@ -1,7 +1,7 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
-  traceComplex, traceRadian, tracePower, traceHorner,
+  traceComplex, traceRadian, tracePower, traceHorner, traceMatrix,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -160,4 +160,13 @@ it('evaluates descending polynomial coefficients by multiply-add', () => {
   expect(traceHorner([4, 3, 2], -1).at(-1).variables.result).toBe(3);
   expect(traceHorner([7], 2).at(-1).variables.result).toBe(7);
   expect(() => traceHorner([], 2)).toThrow('horner-input');
+});
+
+it('traces rectangular matrix products and rejects ragged or incompatible inputs', () => {
+  const steps = traceMatrix(['[[1,2,3],[4,5,6]]', '[[1],[2],[3]]']);
+  expect(JSON.parse(steps.at(-1).variables.output)).toEqual([[14], [32]]);
+  expect(JSON.parse(steps[0].variables.output)).toEqual([[0], [0]]);
+  expect(traceMatrix(['[[-2]]', '[[3]]']).at(-1).variables.result).toBe('[[-6]]');
+  expect(() => traceMatrix(['[[1,2],[3]]', '[[1],[2]]'])).toThrow('matrix-input');
+  expect(() => traceMatrix(['[[1,2]]', '[[3,4]]'])).toThrow('matrix-shape');
 });

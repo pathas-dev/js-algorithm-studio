@@ -381,3 +381,9 @@ input { caret-color: #196d53; }
 .float-bits .active-bit { background: #f0dfbd; }
 
 .complex-plane { display: block; width: min(100%, 180px); height: 150px; margin: 0 auto; }
+
+.matrix-product { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.matrix-product .graph-table { width: auto; margin: 0; }
+.matrix-product td { text-align: center; min-width: 34px; padding: 5px 7px; }
+.matrix-product .active-cell { background: #fff0d8; }
+.matrix-product .dependency-cell { background: #d4e9dc; }

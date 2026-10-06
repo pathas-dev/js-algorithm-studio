@@ -1,3 +1,4 @@
+import { dot } from '../algorithms/math/matrix/Matrix';
 import hornerMethod from '../algorithms/math/horner-method/hornerMethod';
 import fastPowering from '../algorithms/math/fast-powering/fastPowering';
 import degreeToRadian from '../algorithms/math/radian/degreeToRadian';
@@ -368,5 +369,29 @@ export function traceHorner(values, x) {
       ...last.variables, result, expression: `P(${x}) = ${result}`,
     },
   });
+  return steps;
+}
+
+export function traceMatrix(inputs) {
+  const matrices = inputs.map((input) => {
+    let matrix;
+    try { matrix = JSON.parse(input); } catch (error) { throw new Error('matrix-input'); }
+    if (!Array.isArray(matrix) || !matrix.length || matrix.length > 4
+      || !matrix.every((row) => Array.isArray(row) && row.length > 0 && row.length <= 4
+        && row.length === matrix[0].length && row.every((value) => (
+        typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= 999
+      )))) throw new Error('matrix-input');
+    return matrix;
+  });
+  if (matrices.length !== 2 || matrices[0][0].length !== matrices[1].length) {
+    throw new Error('matrix-shape');
+  }
+  const steps = [];
+  dot(...matrices, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'matrix-product',
+    },
+  }));
   return steps;
 }
