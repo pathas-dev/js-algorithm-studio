@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * @param {number[][]} chessboard
  * @param {number[]} position
@@ -49,7 +51,7 @@ function isBoardCompletelyVisited(chessboard, moves) {
  * @param {number[][]} moves
  * @return {boolean}
  */
-function knightTourRecursive(chessboard, moves) {
+function knightTourRecursive(chessboard, moves, stepCallback, useHeuristic) {
   const currentChessboard = chessboard;
 
   // If board has been completely visited then we've found a solution.
@@ -61,6 +63,12 @@ function knightTourRecursive(chessboard, moves) {
   const lastMove = moves[moves.length - 1];
   const possibleMoves = getPossibleMoves(currentChessboard, lastMove);
 
+  if (useHeuristic) {
+    const onwardCount = (position) => getPossibleMoves(currentChessboard, position)
+      .filter((move) => isMoveAllowed(currentChessboard, move)).length;
+    possibleMoves.sort((a, b) => onwardCount(a) - onwardCount(b));
+  }
+
   // Try to do next possible moves.
   for (let moveIndex = 0; moveIndex < possibleMoves.length; moveIndex += 1) {
     const currentMove = possibleMoves[moveIndex];
@@ -71,10 +79,22 @@ function knightTourRecursive(chessboard, moves) {
       // Actually do the move.
       moves.push(currentMove);
       currentChessboard[currentMove[0]][currentMove[1]] = 1;
+      recordStep(
+        stepCallback,
+        'move',
+        [],
+        [],
+        () => ({
+          moves: JSON.stringify(moves),
+          row: currentMove[0],
+          column: currentMove[1],
+        }),
+        'currentChessboard[currentMove[0]][currentMove[1]] = 1',
+      );
 
       // If further moves starting from current are successful then
       // return true meaning the solution is found.
-      if (knightTourRecursive(currentChessboard, moves)) {
+      if (knightTourRecursive(currentChessboard, moves, stepCallback, useHeuristic)) {
         return true;
       }
 
@@ -82,6 +102,18 @@ function knightTourRecursive(chessboard, moves) {
       // If current move was unsuccessful then step back and try to do another move.
       moves.pop();
       currentChessboard[currentMove[0]][currentMove[1]] = 0;
+      recordStep(
+        stepCallback,
+        'backtrack',
+        [],
+        [],
+        () => ({
+          moves: JSON.stringify(moves),
+          row: currentMove[0],
+          column: currentMove[1],
+        }),
+        'currentChessboard[currentMove[0]][currentMove[1]] = 0',
+      );
     }
   }
 
@@ -91,9 +123,11 @@ function knightTourRecursive(chessboard, moves) {
 
 /**
  * @param {number} chessboardSize
+ * @param {function} [stepCallback]
+ * @param {boolean} [useHeuristic] - Try cells with fewer onward moves first.
  * @return {number[][]}
  */
-export default function knightTour(chessboardSize) {
+export default function knightTour(chessboardSize, stepCallback = undefined, useHeuristic = false) {
   // Init chessboard.
   const chessboard = Array(chessboardSize).fill(null).map(() => Array(chessboardSize).fill(0));
 
@@ -105,8 +139,17 @@ export default function knightTour(chessboardSize) {
   moves.push(firstMove);
   chessboard[firstMove[0]][firstMove[0]] = 1;
 
+  recordStep(
+    stepCallback,
+    'start',
+    [],
+    [],
+    { moves: JSON.stringify(moves), row: 0, column: 0 },
+    'moves.push(firstMove)',
+  );
+
   // Recursively try to do the next move.
-  const solutionWasFound = knightTourRecursive(chessboard, moves);
+  const solutionWasFound = knightTourRecursive(chessboard, moves, stepCallback, useHeuristic);
 
   return solutionWasFound ? moves : [];
 }

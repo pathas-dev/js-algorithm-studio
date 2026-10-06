@@ -1,3 +1,4 @@
+import knightTour from '../algorithms/uncategorized/knight-tour/knightTour';
 import nQueens from '../algorithms/uncategorized/n-queens/nQueens';
 import dpRainTerraces from '../algorithms/uncategorized/rain-terraces/dpRainTerraces';
 import dpUniquePaths from '../algorithms/uncategorized/unique-paths/dpUniquePaths';
@@ -160,6 +161,37 @@ export function traceQueens(values) {
       result: solutions.length,
       positions: JSON.stringify(coordinates[0] || []),
       solutions: JSON.stringify(coordinates),
+    },
+  });
+  return steps;
+}
+
+export function traceKnight(values) {
+  const n = values[0];
+  if (values.length !== 1 || !Number.isInteger(n) || n < 1 || n > 5) {
+    throw new Error('knight-input');
+  }
+  const steps = [];
+  const solution = knightTour(n, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables,
+      mode: 'knight',
+      n,
+      count: JSON.parse(step.variables.moves).length,
+    },
+  }), true);
+  steps.push({
+    type: 'done',
+    array: [],
+    indices: [],
+    code: 'return solutionWasFound ? moves : []',
+    variables: {
+      mode: 'knight',
+      n,
+      count: solution.length,
+      moves: JSON.stringify(solution),
+      result: solution.length === n ** 2,
     },
   });
   return steps;

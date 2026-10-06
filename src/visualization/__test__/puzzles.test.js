@@ -1,5 +1,5 @@
 import traceHanoi, {
-  traceRotation, traceJump, tracePaths, traceRain, traceQueens,
+  traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight,
 } from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
@@ -66,4 +66,20 @@ it('enumerates safe N-Queens solutions and records actual backtracking', () => {
   expect(traceQueens([3]).at(-1).variables.result).toBe(0);
   expect(traceQueens([1]).at(-1).variables.result).toBe(1);
   expect(() => traceQueens([7])).toThrow('queens-input');
+});
+
+it('finds a legal complete knight tour and exhausts impossible small boards', () => {
+  const steps = traceKnight([5]);
+  const moves = JSON.parse(steps.at(-1).variables.moves);
+  expect(moves).toHaveLength(25);
+  expect(new Set(moves.map((position) => position.join(','))).size).toBe(25);
+  moves.slice(1).forEach((position, i) => {
+    const dx = Math.abs(position[0] - moves[i][0]);
+    const dy = Math.abs(position[1] - moves[i][1]);
+    expect([dx, dy].sort()).toEqual([1, 2]);
+  });
+  expect(steps.length).toBeLessThan(1000);
+  expect(traceKnight([3]).at(-1).variables.result).toBe(false);
+  expect(traceKnight([1]).at(-1).variables.result).toBe(true);
+  expect(() => traceKnight([6])).toThrow('knight-input');
 });

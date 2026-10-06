@@ -1,10 +1,11 @@
+import knightSource from '../src/algorithms/uncategorized/knight-tour/knightTour.js?raw';
 import queensSource from '../src/algorithms/uncategorized/n-queens/nQueens.js?raw';
 import rainSource from '../src/algorithms/uncategorized/rain-terraces/dpRainTerraces.js?raw';
 import pathsSource from '../src/algorithms/uncategorized/unique-paths/dpUniquePaths.js?raw';
 import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -108,4 +109,20 @@ const queens: NumericAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens];
+const knight: NumericAlgorithm = {
+  id: 'knight-tour', category: 'other', example: [5], usesStart: false, singleInput: true,
+  name: { ko: '기사의 여행 문제', en: 'Knight’s tour' }, time: 'O(8^(N²)) · worst case',
+  summary: { ko: '기사가 (0,0)에서 시작해 모든 칸을 정확히 한 번 방문하는 열린 경로를 찾습니다. 가능한 다음 이동이 적은 칸을 먼저 시도하고 막히면 되돌리는 백트래킹을 사용합니다.', en: 'Find an open knight path from (0,0) visiting every square exactly once. Try squares with fewer onward moves first and backtrack on dead ends.' },
+  inputLabels: [{ ko: '보드 크기 N', en: 'Board size N' }, { ko: '', en: '' }],
+  inputHint: { ko: 'N=1–5 · 시작 (0,0) · 원래 구현에 이동 순서 휴리스틱 사용 · 시작점 복귀는 요구하지 않음', en: 'N=1–5 · start (0,0) · enable move-order heuristic in the original solver · returning to start is not required' },
+  source: algorithmCode(knightSource), run: traceKnight,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['왼쪽 위에서 기사 여행 시작', '기사는 한 방향으로 2칸, 직각 방향으로 1칸 이동합니다. 보드 밖이나 이미 방문한 칸은 갈 수 없습니다.'] : ['Start the knight at the top-left', 'Move two squares along one axis and one along the other. Ignore squares outside the board or already visited.'];
+    if (step.type === 'move') return ko ? ['방문하지 않은 칸으로 L자 이동', `(${v.row}, ${v.column})까지 ${v.count}칸 방문했습니다. 다음 이동이 적은 후보부터 시도하지만, 막히면 여전히 백트래킹합니다.`] : ['Make an L-shaped move into an unvisited square', `Visited ${v.count} squares through (${v.row}, ${v.column}). Fewer onward choices are tried first, with backtracking when necessary.`];
+    if (step.type === 'backtrack') return ko ? ['막힌 경로에서 한 칸 되돌리기', `(${v.row}, ${v.column})의 방문을 취소하고 이전 경로로 돌아갑니다. 방문 표시를 지워 다른 가지에서 다시 시도할 수 있게 합니다.`] : ['Backtrack from a dead end', `Undo the visit to (${v.row}, ${v.column}) and return to the previous path. Clear its mark so another branch can reuse it.`];
+    return ko ? [v.result ? '모든 칸을 방문하는 여행 성공' : '이 보드에는 여행 경로가 없음', v.result ? `${v.count}칸을 한 번씩 방문했습니다. 숫자는 방문 순서이며 시작 칸으로 돌아갈 필요는 없습니다.` : '가능한 이동 가지를 모두 탐색했지만 모든 칸을 방문할 수 없었습니다. N=5에서 성공 경로를 확인할 수 있습니다.'] : [v.result ? 'A complete knight tour found' : 'No tour exists on this board', v.result ? `Visited ${v.count} squares once each. Numbers show visit order; returning to the start is not required.` : 'All move branches were exhausted without a complete tour. N=5 provides a successful example.'];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens, knight];
