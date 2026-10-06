@@ -1,3 +1,4 @@
+import stocksSource from '../src/algorithms/uncategorized/best-time-to-buy-sell-stocks/accumulatorBestTimeToBuySellStocks.js?raw';
 import stairsSource from '../src/algorithms/uncategorized/recursive-staircase/recursiveStaircaseDP.js?raw';
 import knightSource from '../src/algorithms/uncategorized/knight-tour/knightTour.js?raw';
 import queensSource from '../src/algorithms/uncategorized/n-queens/nQueens.js?raw';
@@ -6,7 +7,7 @@ import pathsSource from '../src/algorithms/uncategorized/unique-paths/dpUniquePa
 import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight, traceStairs } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight, traceStairs, traceStocks } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -142,4 +143,19 @@ const stairs: NumericAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens, knight, stairs];
+const stocks: NumericAlgorithm = {
+  id: 'best-time-to-buy-sell-stocks', category: 'other', example: [7,1,5,3,6,4], usesStart: false, singleInput: true,
+  name: { ko: '주식 매매 최대 이익', en: 'Maximum stock trading profit' }, time: 'O(n)',
+  summary: { ko: '한 주만 보유하고 매도 후 다시 매수할 수 있는 무제한 거래 문제입니다. 수수료 없이 모든 연속 상승분을 더하면 저점 매수·고점 매도의 최대 이익과 같습니다.', en: 'Unlimited transactions with at most one share held, selling before buying again. Without fees, summing positive consecutive changes equals the maximum profit from valley-to-peak trades.' },
+  inputLabels: [{ ko: '날짜별 가격', en: 'Daily prices' }, { ko: '', en: '' }],
+  inputHint: { ko: '가격 최대 20개 · 정수 0–999 · 거래 무제한, 동시 보유 1주, 수수료 없음 · 빈 입력 이익 0', en: 'At most twenty prices · integers 0–999 · unlimited trades, at most one share, no fees · empty input yields zero' },
+  source: algorithmCode(stocksSource), run: traceStocks,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['상승 구간의 이익만 누적할 준비', '한 번의 거래만 허용하는 문제가 아닙니다. 연속 상승 구간의 하루 차이를 합치면 그 구간의 첫 가격과 마지막 가격 차이와 같습니다.'] : ['Prepare to accumulate only rising intervals', 'Multiple transactions are allowed. Adding daily increases across a rising interval equals its last price minus its first.'];
+    if (step.type === 'gain') return ko ? ['오늘과 어제의 가격 차이 반영', `${Number(v.day) - 1}일 → ${v.day}일 차이는 ${v.change}입니다. ${Number(v.gain) > 0 ? `${v.gain}을 더해` : '하락·동일 가격은 건너뛰어'} 누적 이익 ${v.profit}입니다.`] : ['Accumulate today’s positive change', `Day ${Number(v.day) - 1} → ${v.day} changes by ${v.change}. ${Number(v.gain) > 0 ? `Add ${v.gain}` : 'Skip a decrease or unchanged price'}; accumulated profit is ${v.profit}.`];
+    return ko ? ['무제한 거래의 최대 이익 확정', `최대 이익은 ${v.result}입니다. 하락 구간은 보유하지 않는 것으로 피하며, 계속 하락하면 거래 없이 이익 0입니다.`] : ['Maximum unlimited-trading profit ready', `Maximum profit: ${v.result}. Avoid holding during decreasing intervals; all-decreasing prices produce zero profit without trading.`];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens, knight, stairs, stocks];

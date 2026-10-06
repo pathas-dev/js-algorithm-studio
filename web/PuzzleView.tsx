@@ -1,3 +1,4 @@
+import StockView from './StockView';
 import ChessView from './ChessView';
 import RainView from './RainView';
 import DpView from './DpView';
@@ -7,6 +8,7 @@ import type { Language, Step } from './algorithms';
 export default function PuzzleView({ step, language }: { step: Step; language: Language }) {
   const v = step.variables; const ko = language === 'ko';
   if (['queens', 'knight'].includes(String(v.mode))) return <ChessView step={step} language={language} />;
+  if (v.mode === 'stocks') return <StockView step={step} language={language} />;
   if (v.mode === 'stairs') return <div><p className="frontier">{ko ? '마지막 1칸 이동 + 마지막 2칸 이동' : 'Ending in one step + ending in two steps'}<strong data-testid="puzzle-result">{v.result ?? '—'}</strong></p><div className="matrix-scroll"><table className="graph-table"><caption>{ko ? '계단별 도달 순서의 수' : 'Ordered ways to reach each stair'}</caption><thead><tr><th>n</th>{(JSON.parse(String(v.ways)) as number[]).map((_, index) => <th key={index}>{index}</th>)}</tr></thead><tbody><tr><th>{ko ? '경우' : 'Ways'}</th>{(JSON.parse(String(v.ways)) as number[]).map((value, index) => <td key={index} className={index === Number(v.current) ? 'active-cell' : step.type === 'cell-sum' && [Number(v.current) - 1, Number(v.current) - 2].includes(index) ? 'dependency-cell' : ''}>{step.type === 'start' || step.type !== 'done' && index > Math.max(2, Number(v.current)) ? '—' : value}</td>)}</tr></tbody></table></div></div>;
   if (v.mode === 'rain') return <RainView step={step} language={language} />;
   if (v.mode === 'paths') return <DpView step={step} language={language} />;

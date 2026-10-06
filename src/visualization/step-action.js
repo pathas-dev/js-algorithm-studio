@@ -50,7 +50,8 @@ export default function stepAction(algorithm, step, language, title, index, leng
       else if (algorithm.id === 'quick-sort') decision = a < b ? t('왼쪽 분할 구간에 넣습니다', 'Add to the left partition') : t('오른쪽 구간에 남깁니다', 'Keep in the right partition');
     }
   } else if (algorithm.category === 'other') {
-    if (v.mode === 'stairs') evidence = `n = ${v.n}`;
+    if (v.mode === 'stocks') evidence = `profit = ${v.profit}`;
+    else if (v.mode === 'stairs') evidence = `n = ${v.n}`;
     else if (v.mode === 'knight') evidence = `visited = ${v.count}`;
     else if (v.mode === 'queens') evidence = `solutions = ${v.count}`;
     else if (v.mode === 'rain') evidence = `water = ${v.waterAmount}`;

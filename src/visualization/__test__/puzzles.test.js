@@ -1,5 +1,6 @@
 import traceHanoi, {
-  traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight, traceStairs,
+  traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight,
+  traceStairs, traceStocks,
 } from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
@@ -90,4 +91,14 @@ it('counts ordered one/two-step staircase climbs while preserving the zero conve
   expect(traceStairs([2]).at(-1).variables.result).toBe(2);
   expect(traceStairs([20]).at(-1).variables.result).toBe(10946);
   expect(() => traceStairs([21])).toThrow('stairs-input');
+});
+
+it('accumulates unlimited-trading gains without counting losses', () => {
+  const steps = traceStocks([7, 1, 5, 3, 6, 4]);
+  expect(steps.at(-1).variables.result).toBe(7);
+  expect(JSON.parse(steps.at(-1).variables.history).map((row) => row[1])).toEqual([0, 4, 0, 3, 0]);
+  expect(traceStocks([1, 2, 3, 4, 5]).at(-1).variables.result).toBe(4);
+  expect(traceStocks([5, 4, 3]).at(-1).variables.result).toBe(0);
+  expect(traceStocks([]).at(-1).variables.result).toBe(0);
+  expect(() => traceStocks([-1])).toThrow('stocks-input');
 });

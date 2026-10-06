@@ -1,3 +1,4 @@
+import accumulatorStocks from '../algorithms/uncategorized/best-time-to-buy-sell-stocks/accumulatorBestTimeToBuySellStocks';
 import recursiveStaircaseDP from '../algorithms/uncategorized/recursive-staircase/recursiveStaircaseDP';
 import knightTour from '../algorithms/uncategorized/knight-tour/knightTour';
 import nQueens from '../algorithms/uncategorized/n-queens/nQueens';
@@ -208,5 +209,26 @@ export function traceStairs(values) {
     ...step,
     variables: { ...step.variables, mode: 'stairs' },
   }));
+  return steps;
+}
+
+export function traceStocks(values) {
+  if (values.length > 20
+    || !values.every((value) => Number.isInteger(value) && value >= 0 && value <= 999)) {
+    throw new Error('stocks-input');
+  }
+  const steps = [];
+  const history = [];
+  accumulatorStocks(values, undefined, (step) => {
+    if (step.type === 'gain') {
+      history.push([step.variables.day, step.variables.gain,
+        step.variables.profit]);
+    }
+    steps.push({
+      ...step,
+      array: step.array.map((value, id) => ({ value, id })),
+      variables: { ...step.variables, mode: 'stocks', history: JSON.stringify(history) },
+    });
+  });
   return steps;
 }

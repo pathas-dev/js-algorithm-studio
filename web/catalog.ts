@@ -112,6 +112,5 @@ type CatalogCategory = typeof catalogCategories[number]['id'];
 
 // Planned visualizations from README.ko-KR.md; these entries have no runnable lesson.
 export const plannedAlgorithms: { id: string; category: CatalogCategory; name: Record<Language, string> }[] = [
-  {"id": "planned-algorithms-uncategorized-best-time-to-buy-sell-stocks", "category": "other", "name": {"ko": "주식 매매 최대 이익", "en": "Best Time to Buy and Sell Stock"}},
   {"id": "planned-algorithms-stack-valid-parentheses", "category": "other", "name": {"ko": "올바른 괄호 검사", "en": "Valid Parentheses Problem"}},
 ];
