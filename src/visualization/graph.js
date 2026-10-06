@@ -1,3 +1,4 @@
+import eulerianPath from '../algorithms/graph/eulerian-path/eulerianPath';
 import graphBridges from '../algorithms/graph/bridges/graphBridges';
 import articulationPoints from '../algorithms/graph/articulation-points/articulationPoints';
 import detectDirectedCycle from '../algorithms/graph/detect-cycle/detectDirectedCycle';
@@ -212,5 +213,15 @@ export function traceBridges(nodes, edges) {
     false,
     (graph, _start, callback) => graphBridges(graph, callback),
     'dfs',
+  );
+}
+
+export function traceEulerian(nodes, edges) {
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    edges.map(([a, b]) => [a, b, 0]),
+    false,
+    (graph, _start, callback) => eulerianPath(graph, callback),
   );
 }

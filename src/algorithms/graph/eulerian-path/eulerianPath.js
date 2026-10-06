@@ -1,3 +1,4 @@
+import recordGraphStep from '../../../utils/trace/recordGraphStep';
 import graphBridges from '../bridges/graphBridges';
 
 /**
@@ -6,8 +7,32 @@ import graphBridges from '../bridges/graphBridges';
  * @param {Graph} graph
  * @return {GraphVertex[]}
  */
-export default function eulerianPath(graph) {
+export default function eulerianPath(graph, stepCallback) {
   const eulerianPathVertices = [];
+  const chosen = [];
+  const vertices = graph.getAllVertices();
+  const active = vertices.filter((vertex) => vertex.getDegree());
+  const connected = new Set();
+  const pending = active.length ? [active[0]] : [];
+  while (pending.length) {
+    const vertex = pending.pop();
+    if (!connected.has(vertex)) {
+      connected.add(vertex);
+      pending.push(...vertex.getNeighbors());
+    }
+  }
+  if (connected.size !== active.length) throw new Error('eulerian');
+  const state = (current, next) => ({
+    current: current ? current.getKey() : '',
+    next: next ? next.getKey() : '',
+    seen: eulerianPathVertices.map((vertex) => vertex.getKey()).join(','),
+    processed: '',
+    order: eulerianPathVertices.map((vertex) => vertex.getKey()).join(','),
+    chosen: JSON.stringify(chosen),
+    remaining: graph.getAllEdges().length,
+    result: eulerianPathVertices.map((vertex) => vertex.getKey()).join(' → ') || '∅',
+  });
+  recordGraphStep(stepCallback, graph, 'start', () => state(), 'const eulerianPathVertices = [];');
 
   // Set that contains all vertices with even rank (number of neighbors).
   const evenRankVertices = {};
@@ -38,7 +63,7 @@ export default function eulerianPath(graph) {
   const isCircuit = !Object.values(oddRankVertices).length;
 
   if (!isCircuit && Object.values(oddRankVertices).length !== 2) {
-    throw new Error('Eulerian path must contain two odd-ranked vertices');
+    throw new Error('eulerian');
   }
 
   // Pick start vertex for traversal.
@@ -48,12 +73,19 @@ export default function eulerianPath(graph) {
     // For Eulerian Circuit it doesn't matter from what vertex to start thus we'll just
     // peek a first node.
     const evenVertexKey = Object.keys(evenRankVertices)[0];
-    startVertex = evenRankVertices[evenVertexKey];
+    startVertex = active[0] || evenRankVertices[evenVertexKey];
   } else {
     // For Eulerian Path we need to start from one of two odd-degree vertices.
     const oddVertexKey = Object.keys(oddRankVertices)[0];
     startVertex = oddRankVertices[oddVertexKey];
   }
+
+  if (!graph.getAllEdges().length) {
+    if (startVertex) eulerianPathVertices.push(startVertex);
+    recordGraphStep(stepCallback, graph, 'done', () => state(), 'return startVertex ? [startVertex] : [];');
+    return startVertex ? [startVertex] : [];
+  }
+  recordGraphStep(stepCallback, graph, 'degree', () => ({ ...state(startVertex), odd: Object.keys(oddRankVertices).join(',') || '∅' }), 'const isCircuit = !Object.values(oddRankVertices).length;');
 
   // Start traversing the graph.
   let currentVertex = startVertex;
@@ -65,6 +97,7 @@ export default function eulerianPath(graph) {
     // We need to do it in order to not delete bridges if there are other edges
     // exists for deletion.
     const bridges = graphBridges(graph);
+    recordGraphStep(stepCallback, graph, 'bridges', () => ({ ...state(currentVertex), bridges: Object.keys(bridges).join(',') }), 'const bridges = graphBridges(graph);');
 
     // Peek the next edge to delete from graph.
     const currentEdges = currentVertex.getEdges();
@@ -77,6 +110,9 @@ export default function eulerianPath(graph) {
       // If there are many edges left then we need to peek any of those except bridges.
       [edgeToDelete] = currentEdges.filter((edge) => !bridges[edge.getKey()]);
     }
+
+    if (!edgeToDelete) throw new Error('eulerian');
+    chosen.push([edgeToDelete.startVertex.getKey(), edgeToDelete.endVertex.getKey()]);
 
     // Detect next current vertex.
     if (currentVertex.getKey() === edgeToDelete.startVertex.getKey()) {
@@ -95,7 +131,9 @@ export default function eulerianPath(graph) {
 
     // Delete the edge from graph.
     graph.deleteEdge(edgeToDelete);
+    recordGraphStep(stepCallback, graph, 'take-edge', () => state(currentVertex), 'graph.deleteEdge(edgeToDelete);');
   }
 
+  recordGraphStep(stepCallback, graph, 'done', () => state(), 'return eulerianPathVertices;');
   return eulerianPathVertices;
 }

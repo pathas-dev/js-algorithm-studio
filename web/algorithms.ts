@@ -1,3 +1,4 @@
+import eulerianSource from '../src/algorithms/graph/eulerian-path/eulerianPath.js?raw';
 import bridgesSource from '../src/algorithms/graph/bridges/graphBridges.js?raw';
 import articulationSource from '../src/algorithms/graph/articulation-points/articulationPoints.js?raw';
 import directedCycleSource from '../src/algorithms/graph/detect-cycle/detectDirectedCycle.js?raw';
@@ -61,7 +62,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
+import { traceEulerian, traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -812,6 +813,26 @@ export const bridges: NumericAlgorithm = {
   },
 };
 
+export const eulerian: NumericAlgorithm = {
+  ...articulation, id: 'eulerian-path',
+  name: { ko: '오일러 경로·회로', en: 'Eulerian path & circuit' },
+  summary: { ko: '모든 간선을 정확히 한 번 지납니다. Fleury 알고리즘으로 다른 간선이 남아 있으면 단절선을 피하고, 사용한 간선을 제거하며 진행합니다.', en: 'Visit every edge exactly once. Fleury avoids bridges when alternatives remain, removing each used edge.' },
+  source: algorithmCode(eulerianSource), time: 'O(E(V + E))',
+  example: [1, 2, 3, 4, 5], graphEdges: [[1, 2], [2, 3], [3, 1], [3, 4], [4, 5], [5, 3]],
+  inputHint: { ko: '무방향 · 간선이 있는 정점은 연결되어야 함 · 홀수 차수 정점은 0개 또는 2개 · 고립 정점은 간선 경로에 포함하지 않음', en: 'Undirected · all non-isolated vertices connected · zero or two odd-degree vertices · isolated vertices are excluded' },
+  run: (nodes, _start, edges = eulerian.graphEdges!) => traceEulerian(nodes, edges),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['오일러 경로 준비', '간선이 있는 모든 정점의 연결 여부와 차수를 확인합니다. 간선이 없다면 정점 하나가 길이 0인 경로입니다.'] : ['Prepare an Eulerian walk', 'Check connectivity and degrees of non-isolated vertices. With no edges, one vertex is a zero-length walk.'];
+      case 'degree': return ko ? ['홀수 차수 정점 확인', `홀수 차수 정점: ${v.odd}. 0개면 회로, 2개면 경로입니다. 현재 시작점은 ${v.current}입니다.`] : ['Check odd degrees', `Odd-degree vertices: ${v.odd}. Zero means a circuit; two means a path. Start at ${v.current}.`];
+      case 'bridges': return ko ? ['남은 그래프의 단절선 확인', '현재 그래프의 단절선을 다시 계산합니다. 선택지가 여러 개라면 단절선이 아닌 간선을 선택해 남은 간선이 분리되지 않게 합니다.'] : ['Inspect remaining bridges', 'Recompute bridges. When multiple choices exist, take a non-bridge so the remaining edges stay reachable.'];
+      case 'take-edge': return ko ? ['간선 사용 후 이동', `선택한 간선을 사용하고 정점 ${v.current}로 이동했습니다. 남은 간선: ${v.remaining}. 초록 간선은 이미 사용한 간선입니다.`] : ['Take an edge and advance', `Use the selected edge and advance to ${v.current}. Remaining: ${v.remaining}. Green edges have been used.`];
+      default: return ko ? ['모든 간선 사용 완료', `경로: ${v.result}. 각 간선은 정확히 한 번 사용했습니다.`] : ['Every edge used', `Walk: ${v.result}. Each edge was used exactly once.`];
+    }
+  },
+};
+
 export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
@@ -1498,4 +1519,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

@@ -1,4 +1,6 @@
-import { traceCycle, traceArticulation, traceBridges } from '../graph';
+import {
+  traceCycle, traceArticulation, traceBridges, traceEulerian,
+} from '../graph';
 
 it('distinguishes directed cycles, parent edges and disconnected components', () => {
   const nodes = [1, 2, 3, 4, 5];
@@ -24,4 +26,14 @@ it('finds bridges in disconnected graphs and excludes cycle edges', () => {
   expect(steps.at(-1).variables.result).toBe('1–2');
   expect(JSON.parse(steps.at(-1).variables.chosen)).toEqual([[1, 2]]);
   expect(traceBridges([1, 2, 3], [[1, 2], [2, 3]]).at(-1).variables.result).toContain('2–3');
+});
+
+it('uses every Eulerian edge once and rejects disconnected edge components', () => {
+  const steps = traceEulerian([1, 2, 3, 4], [[2, 3], [3, 4], [4, 2]]);
+  const chosen = JSON.parse(steps.at(-1).variables.chosen);
+  expect(chosen).toHaveLength(3);
+  expect(new Set(chosen.map((edge) => edge.sort().join('-'))).size).toBe(3);
+  expect(steps.at(-1).variables.order.split(',')).toHaveLength(4);
+  expect(traceEulerian([1], []).at(-1).variables.result).toBe('1');
+  expect(() => traceEulerian([1, 2, 3, 4], [[1, 2], [3, 4]])).toThrow('eulerian');
 });
