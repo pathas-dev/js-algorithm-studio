@@ -27,10 +27,10 @@ export default function stepAction(algorithm, step, language, title, index, leng
   else if (/push|enqueue|add|insert|append|prepend|makeSet|choose|take/.test(type)) label = t('추가', 'Add');
   else if (/peek|poll|pop|dequeue|find|get|has|query|degree|neighbors|mayContain|suggest/.test(type)) label = t('조회', 'Read');
   else if (/left|right|shift|jump|enter|leave|focus|fallback|return/.test(type)) label = t('이동', 'Move');
-  else if (/relax|recolor|save|set|count|prefix|place|reverse|union|increase|combine|hash/.test(type)) label = t('갱신', 'Update');
+  else if (/low|relax|recolor|save|set|count|prefix|place|reverse|union|increase|combine|hash/.test(type)) label = t('갱신', 'Update');
   if (/done|complete|settled|merged|pass|partition/.test(type)) label = t('완료', 'Finish');
   if (/found|match/.test(type)) label = t('일치', 'Match');
-  if (type === 'negative-cycle') label = t('사이클', 'Cycle');
+  if (['negative-cycle', 'cycle'].includes(type)) label = t('사이클', 'Cycle');
 
   if (algorithm.category === 'sort') {
     if (pair.length === 2) evidence = `${pair[0]} ${relation(pair[0], pair[1])} ${pair[1]}`;
@@ -68,12 +68,21 @@ export default function stepAction(algorithm, step, language, title, index, leng
     } else if (v.low !== undefined && v.high !== undefined) evidence = `[${v.low}, ${v.high}]`;
     else evidence = `target = ${v.target}`;
   } else if (algorithm.category === 'graph') {
-    if (v.current !== undefined && v.next !== undefined) evidence = `${v.current} → ${v.next}`;
-    else if (v.current !== undefined) evidence = `node = ${v.current}`;
+    if (v.current !== undefined && v.current !== '' && v.next !== undefined && v.next !== '') evidence = `${v.current} → ${v.next}`;
+    else if (v.current !== undefined && v.current !== '') evidence = `node = ${v.current}`;
     else if (v.via !== undefined) evidence = `via = ${v.via}`;
     else if (v.iteration !== undefined) evidence = `round = ${v.iteration}`;
     else if (v.weight !== undefined) evidence = `weight = ${v.weight}`;
     else evidence = `V = ${array.length}`;
+    if (algorithm.id === 'travelling-salesman') {
+      evidence = type === 'done' ? `cost = ${v.weight}` : `cost = ${v.cost}`;
+      if (type === 'compare-tour') {
+        evidence = `${v.cost} / ${v.best}`;
+        const candidate = v.cost === '∞' ? Infinity : Number(v.cost);
+        const best = v.best === '∞' ? Infinity : Number(v.best);
+        decision = candidate < best ? t('더 저렴한 순회를 저장합니다', 'Save a cheaper tour next') : t('현재 최저 비용을 유지합니다', 'Keep the current best cost');
+      }
+    }
     if (type === 'edge' && ['breadth-first-search', 'depth-first-search'].includes(algorithm.id)) {
       const seen = String(v.seen).split(',').includes(String(v.next));
       decision = seen ? t('이미 발견한 정점 · 건너뜁니다', 'Already discovered · skip') : t('새 이웃을 탐색합니다', 'Explore the new neighbor');
@@ -120,7 +129,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
     else if (typeof v.result === 'boolean' || typeof v.result === 'number' || (v.result !== undefined && ['null', 'undefined'].includes(String(v.result)))) evidence = `result = ${v.result}`;
     else if (v.value !== undefined && v.other !== undefined) evidence = `${v.value} ↔ ${v.other}`;
     else if (typeof v.value === 'number') evidence = `value = ${v.value}`;
-    else if (v.current !== undefined) evidence = `node = ${v.current}`;
+    else if (v.current !== undefined && v.current !== '') evidence = `node = ${v.current}`;
     else if (v.word !== undefined) evidence = t(`${Array.from(String(v.word)).length}글자`, `${Array.from(String(v.word)).length} chars`);
     else if (v.heapSize !== undefined) evidence = `heap = ${v.heapSize}`;
 

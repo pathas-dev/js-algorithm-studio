@@ -1,3 +1,4 @@
+import bfTravellingSalesman from '../algorithms/graph/travelling-salesman/bfTravellingSalesman';
 import stronglyConnectedComponents from '../algorithms/graph/strongly-connected-components/stronglyConnectedComponents';
 import hamiltonianPath from '../algorithms/graph/hamiltonian-cycle/hamiltonianPath';
 import eulerianPath from '../algorithms/graph/eulerian-path/eulerianPath';
@@ -255,4 +256,17 @@ export function traceScc(nodes, edges) {
       ...step,
       edges: step.variables.reversed ? step.edges.map(([a, b, w]) => [b, a, w]) : step.edges,
     }));
+}
+
+export function traceSalesman(nodes, edges, directed = false) {
+  requireNodes(nodes);
+  if (nodes.length > 7) throw new Error('graph-search-limit');
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    edges,
+    directed,
+    (graph, _start, callback) => bfTravellingSalesman(graph, callback),
+    'dfs',
+  );
 }

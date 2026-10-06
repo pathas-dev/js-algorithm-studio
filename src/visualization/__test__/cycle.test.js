@@ -1,5 +1,6 @@
 import {
-  traceCycle, traceArticulation, traceBridges, traceEulerian, traceHamiltonian, traceScc,
+  traceCycle, traceArticulation, traceBridges, traceEulerian,
+  traceHamiltonian, traceScc, traceSalesman,
 } from '../graph';
 
 it('distinguishes directed cycles, parent edges and disconnected components', () => {
@@ -53,4 +54,14 @@ it('finds SCCs, including isolated vertices, and displays the transposed edges',
   expect(components.map((group) => group.sort()).sort()).toEqual([[1, 2], [3], [4]]);
   expect(steps.find((step) => step.type === 'transpose').edges).toContainEqual([3, 2, 0]);
   expect(steps[0].edges).toContainEqual([2, 3, 0]);
+});
+
+it('compares complete TSP tours including the closing edge', () => {
+  const steps = traceSalesman([1, 2, 3], [
+    [1, 2, 1], [2, 3, 1], [3, 1, 100], [1, 3, 10], [3, 2, 10], [2, 1, 1],
+  ], true);
+  expect(steps.at(-1).variables.result).toBe('1 → 3 → 2 → 1');
+  expect(steps.at(-1).variables.weight).toBe(21);
+  expect(traceSalesman([1, 2, 3], [[1, 2, 1]], true).at(-1).variables.result).toBe('∅');
+  expect(traceSalesman([1], []).at(-1).variables.weight).toBe(0);
 });

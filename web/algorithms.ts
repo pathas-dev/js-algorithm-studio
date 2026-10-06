@@ -1,3 +1,4 @@
+import salesmanSource from '../src/algorithms/graph/travelling-salesman/bfTravellingSalesman.js?raw';
 import sccSource from '../src/algorithms/graph/strongly-connected-components/stronglyConnectedComponents.js?raw';
 import hamiltonianSource from '../src/algorithms/graph/hamiltonian-cycle/hamiltonianPath.js?raw';
 import eulerianSource from '../src/algorithms/graph/eulerian-path/eulerianPath.js?raw';
@@ -64,7 +65,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceScc, traceHamiltonian, traceEulerian, traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
+import { traceSalesman, traceScc, traceHamiltonian, traceEulerian, traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -877,6 +878,27 @@ export const scc: NumericAlgorithm = {
   },
 };
 
+export const salesman: NumericAlgorithm = {
+  ...hamiltonian, id: 'travelling-salesman', graphWeighted: true,
+  name: { ko: '외판원 문제', en: 'Travelling salesman' },
+  summary: { ko: '모든 정점을 한 번씩 방문하고 출발점으로 돌아오는 순회 중 총 비용이 가장 작은 순회를 전수 탐색합니다. 마지막 귀환 간선도 비용에 포함합니다.', en: 'Exhaustively find the cheapest tour visiting every vertex once and returning to the start. Include the closing edge in the total cost.' },
+  source: algorithmCode(salesmanSource), example: [1, 2, 3, 4],
+  graphEdges: [[1, 2, 10], [1, 3, 15], [1, 4, 20], [2, 3, 35], [2, 4, 25], [3, 4, 30]],
+  inputHint: { ko: '1–7개 정점 · 방향·무방향 · 음수 가중치 허용 · 출발점은 첫 정점 · 최저 비용 순회 하나 반환', en: '1–7 vertices · directed or undirected · negative weights allowed · start at the first vertex · returns one cheapest tour' },
+  run: (nodes, _start, edges = salesman.graphEdges!, directed = false) => traceSalesman(nodes, edges, directed),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['최저 비용 순회 탐색 준비', '출발점을 고정하고 가능한 방문 순서를 모두 시도합니다. 정점 하나는 이동 비용 0인 순회로 처리합니다.'] : ['Prepare exact tour search', 'Fix the start and try all visit orders. A single vertex is a zero-cost tour.'];
+      case 'enter': return ko ? ['순회 후보에 정점 추가', `정점 ${v.current}를 추가했습니다. 현재 누적 비용은 ${v.cost}입니다.`] : ['Add a tour vertex', `Add ${v.current}. Current accumulated cost: ${v.cost}.`];
+      case 'compare-tour': return ko ? ['귀환 포함 총 비용 비교', `출발점으로 돌아오는 간선까지 더한 비용 ${v.cost}를 최저 비용 ${v.best}와 비교합니다. 귀환 간선이 없으면 유효한 순회가 아닙니다.`] : ['Compare the complete tour cost', `Compare cost ${v.cost}, including the closing edge, with best ${v.best}. Without a closing edge this is not a valid tour.`];
+      case 'save-tour': return ko ? ['더 저렴한 순회 저장', `총 비용 ${v.best}인 순회를 새 최적 후보로 저장했습니다. 나머지 순서도 확인합니다.`] : ['Save a cheaper tour', `Save the tour of cost ${v.best} as the best so far. Continue checking other orders.`];
+      case 'backtrack': return ko ? ['다른 방문 순서 탐색', '마지막 정점을 후보에서 빼고 다른 이웃을 시도합니다. 음수 가중치가 있어도 정확하도록 비용만으로 가지를 잘라내지 않습니다.'] : ['Try another visit order', 'Remove the last candidate and try another neighbor. Do not prune only by cost, preserving correctness for negative edges.'];
+      default: return v.result === '∅' ? ko ? ['유효한 순회 없음', '모든 정점을 방문하고 출발점으로 돌아오는 순회가 없습니다.'] : ['No valid tour', 'No tour visits every vertex and returns to the start.'] : ko ? ['최저 비용 순회 완료', `순회: ${v.result}. 총 비용: ${v.weight}.`] : ['Cheapest tour ready', `Tour: ${v.result}. Total cost: ${v.weight}.`];
+    }
+  },
+};
+
 export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
@@ -1563,4 +1585,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

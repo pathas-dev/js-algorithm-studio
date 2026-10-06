@@ -1,104 +1,58 @@
-/**
- * Get all possible paths
- * @param {GraphVertex} startVertex
- * @param {GraphVertex[][]} [paths]
- * @param {GraphVertex[]} [path]
- */
-function findAllPaths(startVertex, paths = [], path = []) {
-  // Clone path.
-  const currentPath = [...path];
+import recordGraphStep from '../../../utils/trace/recordGraphStep';
 
-  // Add startVertex to the path.
-  currentPath.push(startVertex);
-
-  // Generate visited set from path.
-  const visitedSet = currentPath.reduce((accumulator, vertex) => {
-    const updatedAccumulator = { ...accumulator };
-    updatedAccumulator[vertex.getKey()] = vertex;
-
-    return updatedAccumulator;
-  }, {});
-
-  // Get all unvisited neighbors of startVertex.
-  const unvisitedNeighbors = startVertex.getNeighbors().filter((neighbor) => {
-    return !visitedSet[neighbor.getKey()];
+/** Exact TSP by exhaustive search. Return vertices without repeating the start. */
+export default function bfTravellingSalesman(graph, stepCallback) {
+  const vertices = graph.getAllVertices();
+  const start = vertices[0];
+  const path = [];
+  const visited = new Set();
+  let best = [];
+  let bestWeight = Infinity;
+  const routeEdges = (route) => route.slice(1).map(
+    (vertex, i) => [route[i].getKey(), vertex.getKey()],
+  );
+  const state = (vertex, weight = 0) => ({
+    current: vertex ? vertex.getKey() : '',
+    seen: path.map((item) => item.getKey()).join(','),
+    processed: '',
+    stack: path.map((item) => item.getKey()).join(','),
+    order: path.map((item) => item.getKey()).join(','),
+    cost: weight,
+    best: Number.isFinite(bestWeight) ? bestWeight : '∞',
+    chosen: JSON.stringify(routeEdges(path)),
+    result: best.length ? `${best.map((item) => item.getKey()).join(' → ')} → ${start.getKey()}` : '∅',
   });
-
-  // If there no unvisited neighbors then treat current path as complete and save it.
-  if (!unvisitedNeighbors.length) {
-    paths.push(currentPath);
-
-    return paths;
-  }
-
-  // Go through all the neighbors.
-  for (let neighborIndex = 0; neighborIndex < unvisitedNeighbors.length; neighborIndex += 1) {
-    const currentUnvisitedNeighbor = unvisitedNeighbors[neighborIndex];
-    findAllPaths(currentUnvisitedNeighbor, paths, currentPath);
-  }
-
-  return paths;
-}
-
-/**
- * @param {number[][]} adjacencyMatrix
- * @param {object} verticesIndices
- * @param {GraphVertex[]} cycle
- * @return {number}
- */
-function getCycleWeight(adjacencyMatrix, verticesIndices, cycle) {
-  let weight = 0;
-
-  for (let cycleIndex = 1; cycleIndex < cycle.length; cycleIndex += 1) {
-    const fromVertex = cycle[cycleIndex - 1];
-    const toVertex = cycle[cycleIndex];
-    const fromVertexIndex = verticesIndices[fromVertex.getKey()];
-    const toVertexIndex = verticesIndices[toVertex.getKey()];
-    weight += adjacencyMatrix[fromVertexIndex][toVertexIndex];
-  }
-
-  return weight;
-}
-
-/**
- * BRUTE FORCE approach to solve Traveling Salesman Problem.
- *
- * @param {Graph} graph
- * @return {GraphVertex[]}
- */
-export default function bfTravellingSalesman(graph) {
-  // Pick starting point from where we will traverse the graph.
-  const startVertex = graph.getAllVertices()[0];
-
-  // BRUTE FORCE.
-  // Generate all possible paths from startVertex.
-  const allPossiblePaths = findAllPaths(startVertex);
-
-  // Filter out paths that are not cycles.
-  const allPossibleCycles = allPossiblePaths.filter((path) => {
-    /** @var {GraphVertex} */
-    const lastVertex = path[path.length - 1];
-    const lastVertexNeighbors = lastVertex.getNeighbors();
-
-    return lastVertexNeighbors.includes(startVertex);
-  });
-
-  // Go through all possible cycles and pick the one with minimum overall tour weight.
-  const adjacencyMatrix = graph.getAdjacencyMatrix();
-  const verticesIndices = graph.getVerticesIndices();
-  let salesmanPath = [];
-  let salesmanPathWeight = null;
-  for (let cycleIndex = 0; cycleIndex < allPossibleCycles.length; cycleIndex += 1) {
-    const currentCycle = allPossibleCycles[cycleIndex];
-    const currentCycleWeight = getCycleWeight(adjacencyMatrix, verticesIndices, currentCycle);
-
-    // If current cycle weight is smaller then previous ones treat current cycle as most optimal.
-    if (salesmanPathWeight === null || currentCycleWeight < salesmanPathWeight) {
-      salesmanPath = currentCycle;
-      salesmanPathWeight = currentCycleWeight;
+  recordGraphStep(stepCallback, graph, 'start', () => state(), 'let bestWeight = Infinity;');
+  function visit(vertex, weight) {
+    path.push(vertex);
+    visited.add(vertex);
+    recordGraphStep(stepCallback, graph, 'enter', () => state(vertex, weight), 'path.push(vertex);');
+    if (path.length === vertices.length) {
+      const closing = graph.findEdge(vertex, start);
+      let total = vertices.length === 1 ? 0 : Infinity;
+      if (closing) total = weight + closing.weight;
+      recordGraphStep(stepCallback, graph, 'compare-tour', () => state(vertex, total), 'if (total < bestWeight) {');
+      if (total < bestWeight) {
+        best = [...path];
+        bestWeight = total;
+        recordGraphStep(stepCallback, graph, 'save-tour', () => state(vertex, total), 'bestWeight = total;');
+      }
+    } else {
+      vertex.getNeighbors().forEach((next) => {
+        if (!visited.has(next)) visit(next, weight + graph.findEdge(vertex, next).weight);
+      });
     }
+    visited.delete(vertex);
+    path.pop();
+    recordGraphStep(stepCallback, graph, 'backtrack', () => state(vertex, weight), 'path.pop();');
   }
-
-  // Return the solution.
-  return salesmanPath;
+  if (start) visit(start, 0);
+  recordGraphStep(stepCallback, graph, 'done', () => ({
+    ...state(),
+    weight: Number.isFinite(bestWeight) ? bestWeight : '∞',
+    chosen: JSON.stringify(best.length > 1 ? [
+      ...routeEdges(best), [best[best.length - 1].getKey(), start.getKey()],
+    ] : []),
+  }), 'return best;');
+  return best;
 }
