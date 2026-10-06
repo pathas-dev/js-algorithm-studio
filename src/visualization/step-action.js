@@ -50,7 +50,8 @@ export default function stepAction(algorithm, step, language, title, index, leng
       else if (algorithm.id === 'quick-sort') decision = a < b ? t('왼쪽 분할 구간에 넣습니다', 'Add to the left partition') : t('오른쪽 구간에 남깁니다', 'Keep in the right partition');
     }
   } else if (algorithm.category === 'math') {
-    evidence = `result = ${v.result}`;
+    evidence = typeof v.result === 'number' && Math.abs(v.result) >= 1e6
+      ? `≈ ${v.result.toExponential(2)}` : `= ${v.result}`;
   } else if (algorithm.category === 'search') {
     let position = v.middleIndex;
     if (position === undefined) position = v.index;

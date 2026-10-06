@@ -1,6 +1,7 @@
+import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits from '../src/visualization/math';
+import traceBits, { traceFactorial } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -32,4 +33,20 @@ export const bits: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits];
+export const factorialLesson: NumericAlgorithm = {
+  id: 'factorial', category: 'math', usesStart: false,
+  name: { ko: '팩토리얼', en: 'Factorial' },
+  summary: { ko: '1부터 n까지 차례로 곱합니다. 0!과 1!은 1이며, 누적 곱을 업데이트하는 과정을 확인합니다.', en: 'Multiply integers from 1 through n. Both 0! and 1! are one; inspect each accumulated product.' },
+  source: algorithmCode(factorialSource), example: [6], time: 'O(n)',
+  inputLabels: [{ ko: 'n', en: 'n' }, { ko: '', en: '' }],
+  inputHint: { ko: '정수 하나 · 0–18 · 정확한 JavaScript 정수 범위', en: 'One integer · 0–18 · exact JavaScript integer results' },
+  run: (values) => traceFactorial(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['누적 곱 1로 시작', '곱셈의 항등원 1로 시작합니다. n이 0이나 1이면 곱할 값이 없어 그대로 반환합니다.'] : ['Start with product one', 'Start at the multiplicative identity. For n zero or one, return one without multiplying.'];
+    if (step.type === 'multiply') return ko ? ['다음 정수 곱하기', `현재 누적 곱에 ${v.i}를 곱했습니다. ${v.expression}.`] : ['Multiply the next integer', `Multiply the accumulated product by ${v.i}: ${v.expression}.`];
+    return ko ? ['팩토리얼 완료', `${v.number}! = ${v.result}. 입력 18까지는 JavaScript의 안전한 정수 범위 안에서 정확합니다.`] : ['Factorial ready', `${v.number}! = ${v.result}. Inputs through 18 remain exact safe JavaScript integers.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson];

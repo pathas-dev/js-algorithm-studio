@@ -360,3 +360,5 @@ input { caret-color: #196d53; }
 }
 
 .string-cell.different-character { background: #eee5f1; color: #61486f; border-color: #d7c7df; }
+
+.math-expression { font-family: "IBM Plex Mono", monospace; font-size: clamp(18px, 2vw, 28px); line-height: 1.5; color: #305645; overflow-wrap: anywhere; }

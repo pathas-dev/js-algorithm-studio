@@ -1,3 +1,4 @@
+import factorial from '../algorithms/math/factorial/factorial';
 import getBit from '../algorithms/math/bits/getBit';
 import setBit from '../algorithms/math/bits/setBit';
 import clearBit from '../algorithms/math/bits/clearBit';
@@ -32,5 +33,15 @@ export default function traceBits(values) {
   snapshot('multiplyByTwo', multiplyByTwo(number), 'return number << 1;');
   snapshot('divideByTwo', divideByTwo(number), 'return number >> 1;');
   snapshot('done', divideByTwo(number), 'return number >> 1;');
+  return steps;
+}
+
+export function traceFactorial(values) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isInteger(number) || number < 0 || number > 18) {
+    throw new Error('factorial-input');
+  }
+  const steps = [];
+  factorial(number, (step) => steps.push({ ...step, variables: { ...step.variables, mode: 'factorial' } }));
   return steps;
 }

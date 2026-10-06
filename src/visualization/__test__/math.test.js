@@ -1,4 +1,4 @@
-import traceBits from '../math';
+import traceBits, { traceFactorial } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
   const steps = traceBits([13, 2, 0]);
@@ -10,4 +10,14 @@ it('applies bit operations independently and validates the input', () => {
   expect(result('multiplyByTwo')).toBe(26);
   expect(result('divideByTwo')).toBe(6);
   expect(() => traceBits([1, 8, 0])).toThrow('bits-input');
+});
+
+it('records exact factorial products and handles zero without iterations', () => {
+  expect(traceFactorial([0]).at(-1).variables.result).toBe(1);
+  const steps = traceFactorial([6]);
+  expect(steps.at(-1).variables.result).toBe(720);
+  expect(steps.filter((step) => step.type === 'multiply').map((step) => step.variables.result))
+    .toEqual([2, 6, 24, 120, 720]);
+  expect(Number.isSafeInteger(traceFactorial([18]).at(-1).variables.result)).toBe(true);
+  expect(() => traceFactorial([19])).toThrow('factorial-input');
 });
