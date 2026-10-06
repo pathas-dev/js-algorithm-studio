@@ -1,3 +1,4 @@
+import longestCommonSubstring from '../algorithms/string/longest-common-substring/longestCommonSubstring';
 import longestCommonSubsequence from '../algorithms/sets/longest-common-subsequence/longestCommonSubsequence';
 import levenshteinDistance from '../algorithms/string/levenshtein-distance/levenshteinDistance';
 import Knapsack from '../algorithms/sets/knapsack-problem/Knapsack';
@@ -108,5 +109,21 @@ export function traceKnapsack(text, capacity) {
     column: -1,
     selectedItems: JSON.stringify(knapsack.selectedItems.map((item) => items.indexOf(item) + 1)),
   });
+  return steps;
+}
+
+export function traceSubstring(first, second) {
+  if (typeof first !== 'string' || typeof second !== 'string'
+    || [...first].length > 12 || [...second].length > 12) throw new Error('dp-codepoints');
+  const steps = [];
+  longestCommonSubstring(first, second, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables,
+      mode: 'substring',
+      columns: JSON.stringify(['∅', ...first]),
+      rows: JSON.stringify(['∅', ...second]),
+    },
+  }));
   return steps;
 }

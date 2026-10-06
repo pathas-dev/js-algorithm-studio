@@ -1,3 +1,4 @@
+import substringSource from '../src/algorithms/string/longest-common-substring/longestCommonSubstring.js?raw';
 import hammingSource from '../src/algorithms/string/hamming-distance/hammingDistance.js?raw';
 import lruSource from '../src/data-structures/lru-cache/LRUCacheOnMap.js?raw';
 import dequeSource from '../src/data-structures/deque/Deque.js?raw';
@@ -27,7 +28,7 @@ import rabinSource from '../src/algorithms/string/rabin-karp/rabinKarp.js?raw';
 import lcsSource from '../src/algorithms/sets/longest-common-subsequence/longestCommonSubsequence.js?raw';
 import editSource from '../src/algorithms/string/levenshtein-distance/levenshteinDistance.js?raw';
 import knapsackSource from '../src/algorithms/sets/knapsack-problem/Knapsack.js?raw';
-import { traceLcs, traceEditDistance, traceKnapsack } from '../src/visualization/dynamic';
+import { traceSubstring, traceLcs, traceEditDistance, traceKnapsack } from '../src/visualization/dynamic';
 import { traceHamming, traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
@@ -1591,6 +1592,27 @@ export const hamming: TextAlgorithm = {
   },
 };
 
+export const substring: TextAlgorithm = {
+  ...hamming, id: 'longest-common-substring',
+  name: { ko: '최장 공통 부분 문자열', en: 'Longest common substring' },
+  summary: { ko: '두 문자열에서 연속으로 같은 가장 긴 구간을 찾습니다. 같은 문자면 대각선 길이에 1을 더하고, 다르면 0으로 끊습니다.', en: 'Find the longest contiguous common span. Equal characters extend the diagonal by one; mismatches reset it to zero.' },
+  source: algorithmCode(substringSource), example: ['ABABC', 'BABCA'], time: 'O(mn)',
+  inputHint: { ko: '각 문자열 최대 12개 유니코드 코드 포인트 · 문자 순서와 연속성을 유지', en: 'Up to 12 Unicode code points each · preserves order and contiguity' },
+  run: ([first, second]) => traceSubstring(first, second),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['부분 문자열 표 준비', '각 셀은 그 두 문자 위치에서 끝나는 공통 연속 구간의 길이입니다. 아직 계산 전인 셀은 —로 표시합니다.'] : ['Prepare the substring table', 'Each cell is the length of a common contiguous span ending at these positions. Uncomputed cells show —.'];
+      case 'initialize': return ko ? ['빈 접두사의 길이 0', '한 문자열이 비어 있으면 공통 구간이 없어 첫 행과 첫 열을 0으로 초기화합니다.'] : ['Initialize empty prefixes', 'An empty string has no common span. Initialize the first row and column to zero.'];
+      case 'cell-match': return ko ? ['같은 문자 · 연속 길이 증가', `셀 [${v.row}, ${v.column}]은 왼쪽 위 셀에 1을 더합니다. 대각선으로 이어져야 연속 구간이 됩니다.`] : ['Match · extend the span', `Cell [${v.row}, ${v.column}] adds one to the diagonal. Diagonal continuity preserves a contiguous span.`];
+      case 'cell-zero': return ko ? ['다른 문자 · 구간 끊기', '두 문자가 달라 현재 셀을 0으로 만듭니다. 부분 수열과 달리 위·왼쪽 값을 가져오지 않습니다.'] : ['Mismatch · reset to zero', 'Different characters reset this cell to zero. Unlike subsequences, do not take top or left values.'];
+      case 'save-maximum': return ko ? ['가장 긴 구간 갱신', `길이 ${v.length}인 더 긴 구간을 찾았습니다. 끝 위치를 저장해 나중에 문자열을 복원합니다.`] : ['Update the longest span', `Found a longer span of length ${v.length}. Save its endpoint for reconstruction.`];
+      case 'traceback': return ko ? ['대각선으로 문자열 복원', `0이 나올 때까지 왼쪽 위로 이동합니다. 현재 복원한 구간: ${v.sequence}.`] : ['Reconstruct diagonally', `Move up-left until zero. Recovered span: ${v.sequence}.`];
+      default: return ko ? ['최장 공통 부분 문자열 완료', `결과: ${v.result || '∅'}, 길이 ${v.length}. 같은 최대 길이의 구간이 여러 개면 먼저 발견한 구간을 반환합니다.`] : ['Longest common substring ready', `Result: ${v.result || '∅'}, length ${v.length}. Ties return the first span found.`];
+    }
+  },
+};
+
 export const lcs: TextAlgorithm = {
   ...naive, id: 'lcs', category: 'dp', name: { ko: '최장 공통 부분 수열', en: 'Longest common subsequence' },
   summary: { ko: '두 문자열에서 순서를 유지하며 공통으로 선택할 수 있는 가장 긴 수열을 찾습니다. 셀을 채우고 역추적으로 수열을 복원합니다.', en: 'Find the longest shared subsequence while preserving order. Fill prefix cells and recover a sequence by traceback.' },
@@ -1652,4 +1674,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, substring, lcs, editDistance, knapsack];

@@ -93,7 +93,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
       const improves = Number(v.candidate) < previous;
       decision = improves ? t('더 짧은 거리로 갱신합니다', 'Update to the shorter distance') : t('기존 거리를 유지합니다', 'Keep the current distance');
     }
-  } else if (algorithm.category === 'dp') {
+  } else if (algorithm.category === 'dp' || v.dpMatrix !== undefined) {
     if (Number(v.row) >= 0 && Number(v.column) >= 0) evidence = `[${v.row}, ${v.column}]`;
     else if (v.length !== undefined) evidence = `length = ${v.length}`;
     else if (typeof v.result === 'number') evidence = `result = ${v.result}`;

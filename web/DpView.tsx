@@ -11,7 +11,7 @@ export default function DpView({ step, language }: { step: Step; language: Langu
   return <div className="dp-view">
     <p>{ko ? '주황색은 현재 셀 · 초록색은 참조 셀 · —는 아직 계산 전' : 'Orange: current cell · green: referenced cell · —: not calculated yet'}</p>
     <div className="matrix-scroll"><table className="graph-table" data-testid="dp-table">
-      <caption>{v.mode === 'knapsack' ? ko ? '열: 허용 무게 · 행: 정렬된 물건의 접두사 · #은 최초 입력 번호' : 'Columns: capacity · rows: sorted item prefixes · # is the original input number' : ko ? '열: 첫 문자열의 접두사 · 행: 두 번째 문자열의 접두사 · UTF-16 단위' : 'Columns: prefixes of the first string · rows: prefixes of the second · UTF-16 units'}</caption>
+      <caption>{v.mode === 'substring' ? ko ? '열: 첫 문자열 · 행: 둘째 문자열 · 유니코드 코드 포인트 · 현재 위치에서 끝나는 연속 길이' : 'Columns: first string · rows: second string · Unicode code points · contiguous length ending here' : v.mode === 'knapsack' ? ko ? '열: 허용 무게 · 행: 정렬된 물건의 접두사 · #은 최초 입력 번호' : 'Columns: capacity · rows: sorted item prefixes · # is the original input number' : ko ? '열: 첫 문자열의 접두사 · 행: 두 번째 문자열의 접두사 · UTF-16 단위' : 'Columns: prefixes of the first string · rows: prefixes of the second · UTF-16 units'}</caption>
       <thead><tr><th scope="col">∅</th>{columns.map((c, i) => <th scope="col" key={i}>{v.mode === 'knapsack' ? c : <>{i}<br />{display(c)}</>}</th>)}</tr></thead>
       <tbody>{matrix.map((row, i) => <tr key={i}><th scope="row">{i} · {v.mode === 'knapsack' ? rows[i] : display(rows[i])}</th>{row.map((value, j) => <td key={j} className={v.row === i && v.column === j ? 'active-cell' : dependencies.some(([r, c]) => r === i && c === j) ? 'dependency-cell' : ''} aria-current={v.row === i && v.column === j ? 'step' : undefined}>{value ?? '—'}</td>)}</tr>)}</tbody>
     </table></div>
