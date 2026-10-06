@@ -1,3 +1,4 @@
+import powerTwoSource from '../src/algorithms/math/is-power-of-two/isPowerOfTwo.js?raw';
 import sieveSource from '../src/algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes.js?raw';
 import lcmSource from '../src/algorithms/math/least-common-multiple/leastCommonMultiple.js?raw';
 import gcdSource from '../src/algorithms/math/euclidean-algorithm/euclideanAlgorithm.js?raw';
@@ -6,7 +7,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -133,4 +134,20 @@ export const sieveLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson];
+export const powerTwoLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'is-power-of-two',
+  name: { ko: '2의 거듭제곱 판별', en: 'Power of two test' },
+  summary: { ko: '나머지 없이 2로 반복해서 나눠 1에 도달하는지 확인합니다. 1=2⁰은 참이며 0과 음수는 거짓입니다.', en: 'Repeatedly divide by two without a remainder and check whether it reaches one. 1=2⁰ is true; zero and negatives are false.' },
+  source: algorithmCode(powerTwoSource), example: [32], time: 'O(log n)',
+  inputHint: { ko: '정수 하나 · -999부터 999까지 · 1은 2⁰', en: 'One integer · -999 to 999 · one equals 2⁰' },
+  run: (values) => tracePowerTwo(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['양수 조건 확인', '2의 정수 거듭제곱은 양수입니다. 1은 바로 성공하고 0과 음수는 제외합니다.'] : ['Check positivity', 'Integer powers of two are positive. One succeeds immediately; zero and negatives are rejected.'];
+    if (step.type === 'check') return ko ? ['2로 나눈 나머지 확인', `${v.current} mod 2 = ${Number(v.current) % 2}. 1이 아닌 홀수가 나오면 2의 거듭제곱이 아닙니다.`] : ['Check the remainder modulo two', `${v.current} mod 2 = ${Number(v.current) % 2}. An odd value other than one rejects a power of two.`];
+    if (step.type === 'halve') return ko ? ['나머지 없이 절반으로 줄이기', `${v.expression}. 줄인 값에서 다시 같은 조건을 확인합니다.`] : ['Halve without a remainder', `${v.expression}. Repeat the check on the reduced value.`];
+    return ko ? [v.result ? '2의 거듭제곱입니다' : '2의 거듭제곱이 아닙니다', v.result ? '나머지 없이 2로 나누어 1에 도달했습니다.' : Number(v.number) < 1 ? '0과 음수는 2의 정수 거듭제곱이 아닙니다.' : `나누는 도중 홀수 ${v.current}가 나왔습니다.`] : [v.result ? 'It is a power of two' : 'It is not a power of two', v.result ? 'Division by two reached one without remainders.' : Number(v.number) < 1 ? 'Zero and negatives are not integer powers of two.' : `Division reached the odd value ${v.current}.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson];

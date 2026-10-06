@@ -1,5 +1,5 @@
 import traceBits, {
-  traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve,
+  traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -71,4 +71,13 @@ it('sieves composites starting at each prime square and handles tiny limits', ()
   expect(JSON.parse(steps[0].variables.isPrime)[4]).toBe(true);
   expect(traceSieve([0]).at(-1).variables.count).toBe(0);
   expect(() => traceSieve([121])).toThrow('sieve-input');
+});
+
+it('accepts 2^0 and reaches one by exact halving, rejecting odd factors', () => {
+  expect(tracePowerTwo([1]).at(-1).variables.result).toBe(true);
+  expect(tracePowerTwo([0]).at(-1).variables.result).toBe(false);
+  expect(tracePowerTwo([-2]).at(-1).variables.result).toBe(false);
+  expect(tracePowerTwo([32]).at(-1).variables.result).toBe(true);
+  expect(tracePowerTwo([12]).at(-1).variables.current).toBe(3);
+  expect(tracePowerTwo([12]).at(-1).variables.result).toBe(false);
 });

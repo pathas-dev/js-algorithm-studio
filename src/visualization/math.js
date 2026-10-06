@@ -1,3 +1,4 @@
+import isPowerOfTwo from '../algorithms/math/is-power-of-two/isPowerOfTwo';
 import sieveOfEratosthenes from '../algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes';
 import leastCommonMultiple from '../algorithms/math/least-common-multiple/leastCommonMultiple';
 import euclideanAlgorithm from '../algorithms/math/euclidean-algorithm/euclideanAlgorithm';
@@ -105,6 +106,15 @@ export function traceSieve(values) {
   const steps = [];
   sieveOfEratosthenes(number, (step) => steps.push({
     ...step, variables: { ...step.variables, mode: 'sieve' },
+  }));
+  return steps;
+}
+
+export function tracePowerTwo(values) {
+  if (values.length !== 1 || !values.every(Number.isInteger)) throw new Error('integer-single');
+  const steps = [];
+  isPowerOfTwo(values[0], (step) => steps.push({
+    ...step, variables: { ...step.variables, mode: 'power-two' },
   }));
   return steps;
 }
