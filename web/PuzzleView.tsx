@@ -1,8 +1,10 @@
+import DpView from './DpView';
 import ArrayView from './ArrayView';
 import type { Language, Step } from './algorithms';
 
 export default function PuzzleView({ step, language }: { step: Step; language: Language }) {
   const v = step.variables; const ko = language === 'ko';
+  if (v.mode === 'paths') return <DpView step={step} language={language} />;
   if (v.mode === 'jump') return <div><p className="frontier">{ko ? '가장 왼쪽 좋은 위치' : 'Leftmost good position'} <strong>{v.leftGoodPosition}</strong>{'maxCurrentJumpLength' in v && <span>{ko ? '현재 최대 도착 위치' : 'Current maximum reach'}: {v.maxCurrentJumpLength}</span>}</p><ArrayView step={step} language={language} />{step.type === 'done' && <p className="frontier" data-testid="puzzle-result">{v.result ? ko ? '도달 가능' : 'Reachable' : ko ? '도달 불가' : 'Unreachable'}</p>}</div>;
   if (v.mode === 'rotation') return <div className="matrix-product">{[v.input, v.matrix].map((encoded, side) => <div key={side}><p>{side === 0 ? ko ? '원본' : 'Original' : ko ? '교환 중 → 90°' : 'Swapping → 90°'}</p><table className="graph-table" data-testid={side ? 'rotation-result' : undefined}><tbody>{(JSON.parse(String(encoded)) as number[][]).map((row, y) => <tr key={y}>{row.map((value, x) => <td key={x} className={side && step.type !== 'done' && ((y === Number(v.row) && x === Number(v.column)) || (y === Number(v.otherRow) && x === Number(v.otherColumn))) ? 'active-cell' : ''}>{value}</td>)}</tr>)}</tbody></table></div>)}</div>;
   const poles: number[][] = JSON.parse(String(v.poles));

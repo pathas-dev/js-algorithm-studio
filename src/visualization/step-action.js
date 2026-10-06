@@ -50,7 +50,8 @@ export default function stepAction(algorithm, step, language, title, index, leng
       else if (algorithm.id === 'quick-sort') decision = a < b ? t('왼쪽 분할 구간에 넣습니다', 'Add to the left partition') : t('오른쪽 구간에 남깁니다', 'Keep in the right partition');
     }
   } else if (algorithm.category === 'other') {
-    if (v.mode === 'jump') evidence = `good = ${v.leftGoodPosition}`;
+    if (v.mode === 'paths') evidence = `${v.width} × ${v.height}`;
+    else if (v.mode === 'jump') evidence = `good = ${v.leftGoodPosition}`;
     else evidence = v.mode === 'rotation' ? '90° ↻' : `moves = ${v.moves}`;
   } else if (algorithm.category === 'statistics') {
     evidence = `u = ${v.u}`;

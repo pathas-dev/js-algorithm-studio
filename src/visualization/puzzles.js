@@ -1,3 +1,4 @@
+import dpUniquePaths from '../algorithms/uncategorized/unique-paths/dpUniquePaths';
 import greedyJumpGame from '../algorithms/uncategorized/jump-game/greedyJumpGame';
 import squareMatrixRotation from '../algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation';
 import hanoiTower from '../algorithms/uncategorized/hanoi-tower/hanoiTower';
@@ -87,5 +88,25 @@ export function traceJump(values) {
       variables: { ...step.variables, mode: 'jump', matches: good.join(',') },
     });
   });
+  return steps;
+}
+
+export function tracePaths(values, height) {
+  const width = values[0];
+  if (values.length !== 1 || ![width, height].every((value) => (
+    Number.isInteger(value) && value >= 1 && value <= 10
+  ))) throw new Error('paths-input');
+  const steps = [];
+  dpUniquePaths(width, height, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables,
+      mode: 'paths',
+      width,
+      height,
+      rows: JSON.stringify(Array.from({ length: height }, (_, i) => String(i))),
+      columns: JSON.stringify(Array.from({ length: width }, (_, i) => String(i))),
+    },
+  }));
   return steps;
 }

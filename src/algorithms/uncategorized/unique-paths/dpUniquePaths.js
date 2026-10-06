@@ -1,15 +1,26 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * DYNAMIC PROGRAMMING approach of solving Unique Paths problem.
  *
  * @param {number} width - Width of the board.
  * @param {number} height - Height of the board.
+ * @param {function} [stepCallback]
  * @return {number} - Number of unique paths.
  */
-export default function dpUniquePaths(width, height) {
+export default function dpUniquePaths(width, height, stepCallback = undefined) {
   // Init board.
   const board = Array(height).fill(null).map(() => {
     return Array(width).fill(0);
   });
+
+  const state = (row = -1, column = -1, dependencies = []) => ({
+    row,
+    column,
+    dependencies: JSON.stringify(dependencies),
+    dpMatrix: JSON.stringify(board.map((line) => line.map((value) => value || null))),
+  });
+  recordStep(stepCallback, 'start', [], [], () => state(), 'const board = Array(height).fill(null).map(() => {');
 
   // Base case.
   // There is only one way of getting to board[0][any] and
@@ -20,6 +31,14 @@ export default function dpUniquePaths(width, height) {
     for (let columnIndex = 0; columnIndex < width; columnIndex += 1) {
       if (rowIndex === 0 || columnIndex === 0) {
         board[rowIndex][columnIndex] = 1;
+        recordStep(
+          stepCallback,
+          'base',
+          [],
+          [],
+          () => state(rowIndex, columnIndex),
+          'board[rowIndex][columnIndex] = 1',
+        );
       }
     }
   }
@@ -33,8 +52,22 @@ export default function dpUniquePaths(width, height) {
       const uniquesFromTop = board[rowIndex - 1][columnIndex];
       const uniquesFromLeft = board[rowIndex][columnIndex - 1];
       board[rowIndex][columnIndex] = uniquesFromTop + uniquesFromLeft;
+      recordStep(
+        stepCallback,
+        'cell-sum',
+        [],
+        [],
+        () => state(rowIndex, columnIndex, [
+          [rowIndex - 1, columnIndex], [rowIndex, columnIndex - 1],
+        ]),
+        'board[rowIndex][columnIndex] = uniquesFromTop + uniquesFromLeft',
+      );
     }
   }
 
+  recordStep(stepCallback, 'done', [], [], () => ({
+    ...state(),
+    result: board[height - 1][width - 1],
+  }), 'return board[height - 1][width - 1]');
   return board[height - 1][width - 1];
 }

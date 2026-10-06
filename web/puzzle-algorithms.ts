@@ -1,7 +1,8 @@
+import pathsSource from '../src/algorithms/uncategorized/unique-paths/dpUniquePaths.js?raw';
 import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation, traceJump } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -53,4 +54,21 @@ const jump: NumericAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump];
+const paths: NumericAlgorithm = {
+  id: 'unique-paths', category: 'other', example: [4], target: 3, usesStart: true,
+  name: { ko: 'Unique 경로', en: 'Unique paths' }, time: 'O(wh)',
+  summary: { ko: '왼쪽 위에서 오른쪽 아래까지 오른쪽·아래로만 이동하는 경로 수를 셉니다. 각 칸은 위와 왼쪽에서 오는 경로 수를 더하며 장애물이 없는 격자를 사용합니다.', en: 'Count paths from top-left to bottom-right moving only right or down. Each cell adds paths from above and left on a grid without obstacles.' },
+  inputLabels: [{ ko: '격자 폭', en: 'Grid width' }, { ko: '격자 높이', en: 'Grid height' }],
+  targetLabel: { ko: '격자 높이', en: 'Grid height' },
+  inputHint: { ko: '폭과 높이 각각 정수 1–10 · 숫자는 이동 횟수가 아닌 해당 칸까지의 경로 수', en: 'Integer width and height 1–10 · cells show path counts, rather than move counts' },
+  source: algorithmCode(pathsSource), run: tracePaths,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['장애물 없는 격자에서 경로 수 계산', `${v.width}×${v.height} 격자의 왼쪽 위가 시작, 오른쪽 아래가 목적지입니다. 아직 계산하지 않은 칸은 —입니다.`] : ['Count paths on an obstacle-free grid', `Start at the top-left of this ${v.width}×${v.height} grid and finish bottom-right. Uncomputed cells show —.`];
+    if (step.type === 'base') return ko ? ['첫 행·첫 열의 경로 수는 1', '첫 행은 오른쪽으로만, 첫 열은 아래로만 올 수 있어 경로가 하나뿐입니다. 시작 칸도 경로 수 1로 둡니다.'] : ['First row and column each have one path', 'The first row can only be reached from the left; the first column only from above. Initialize the starting cell to one too.'];
+    if (step.type === 'cell-sum') return ko ? ['위와 왼쪽 경로 수를 더하기', `행 ${v.row}, 열 ${v.column}에는 위에서 오거나 왼쪽에서 옵니다. 두 경우가 겹치지 않으므로 경로 수를 더합니다.`] : ['Add paths from above and left', `Cell (${v.row}, ${v.column}) is entered from above or left. These cases are disjoint, so add their counts.`];
+    return ko ? ['목적지까지의 서로 다른 경로 수 확정', `전체 경로는 ${v.result}개입니다. 폭이나 높이가 1이면 한 방향으로만 움직여 경로가 1개입니다.`] : ['Destination path count ready', `There are ${v.result} paths. A width or height of one allows just one direction, producing one path.`];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths];

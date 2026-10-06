@@ -1,4 +1,4 @@
-import traceHanoi, { traceRotation, traceJump } from '../puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths } from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
   [1, 3, 6].forEach((n) => {
@@ -29,4 +29,13 @@ it('checks greedy jump reachability including blocked and singleton arrays', () 
   expect(traceJump([0]).at(-1).variables.result).toBe(true);
   expect(traceJump([0, 1]).at(-1).variables.result).toBe(false);
   expect(() => traceJump([-1])).toThrow('jump-input');
+});
+
+it('counts unique grid paths by adding independent upper and left entries', () => {
+  const steps = tracePaths([4], 3);
+  expect(steps.at(-1).variables.result).toBe(10);
+  expect(steps.find((step) => step.type === 'cell-sum').variables.dependencies).toBe('[[0,1],[1,0]]');
+  expect(tracePaths([1], 10).at(-1).variables.result).toBe(1);
+  expect(tracePaths([10], 1).at(-1).variables.result).toBe(1);
+  expect(() => tracePaths([0], 1)).toThrow('paths-input');
 });
