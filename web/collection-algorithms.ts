@@ -1,9 +1,10 @@
+import permutationSource from '../src/algorithms/sets/permutations/permutateWithoutRepetitions.js?raw';
 import powerSetSource from '../src/algorithms/sets/power-set/bwPowerSet.js?raw';
 import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?raw';
 import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian, { traceShuffle, tracePowerSet } from '../src/visualization/collections';
+import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -53,4 +54,20 @@ export const powerSetLesson: NumericAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson];
+export const permutationLesson: NumericAlgorithm = {
+  ...shuffleLesson, id: 'permutations',
+  name: { ko: '순열', en: 'Permutations' },
+  summary: { ko: '작은 순열의 모든 자리에 첫 원소를 끼워 넣어 전체 순열을 만듭니다. 중복 없는 n개 원소의 순서는 n!개입니다.', en: 'Insert the first item into every position of smaller permutations. There are n! orders for n distinct items.' },
+  source: algorithmCode(permutationSource), example: [1, 2, 3], time: 'O(n × n!)',
+  inputHint: { ko: '서로 다른 숫자 최대 5개 · 중복 제거 · 원소를 반복 사용하지 않는 순열', en: 'At most five distinct numbers · duplicates removed · permutations without repetition' },
+  run: (values) => tracePermutations(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start' || step.type === 'enter') return ko ? ['첫 원소를 제외한 하위 문제 풀기', `현재 ${v.size}개 원소입니다. 첫 원소를 제외한 작은 순열을 먼저 구합니다. 현재 화면은 이 하위 문제의 결과입니다.`] : ['Solve the smaller suffix first', `The current problem has ${v.size} items. First permute the suffix without its first item. The display shows this subproblem.`];
+    if (step.type === 'base') return ko ? ['재귀의 가장 작은 순열', '원소가 1개면 그 원소 하나가 유일한 순열입니다. 원소가 0개일 때도 빈 순열 한 가지가 있어 재귀를 종료합니다.'] : ['The smallest permutation problem', 'One item has one order. Zero items have one empty permutation, ending recursion as well.'];
+    if (step.type === 'insert') return ko ? ['모든 삽입 위치 시도', `작은 순열 (${v.smaller})의 ${v.position}번 자리에 ${v.firstOption}를 끼워 넣었습니다. 원래 원소의 순서가 달라지면 서로 다른 순열입니다.`] : ['Try every insertion position', `Insert ${v.firstOption} at position ${v.position} of (${v.smaller}). Different item orders are distinct permutations.`];
+    return ko ? [step.type === 'done' ? '전체 순열 완성' : '하위 순열 반환', `${v.size}개 원소의 순열 ${v.count}개를 ${step.type === 'done' ? '완성했습니다' : '이전 호출에 반환합니다'}. 결과 수는 ${v.size}!입니다.`] : [step.type === 'done' ? 'All permutations ready' : 'Return the smaller permutations', `${v.count} permutations of ${v.size} items ${step.type === 'done' ? 'are complete' : 'return to the caller'}. The count equals ${v.size}!.`];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson];

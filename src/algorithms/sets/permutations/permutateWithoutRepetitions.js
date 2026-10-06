@@ -1,9 +1,21 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * @param {*[]} permutationOptions
  * @return {*[]}
  */
-export default function permutateWithoutRepetitions(permutationOptions) {
-  if (permutationOptions.length === 1) {
+export default function permutateWithoutRepetitions(permutationOptions, stepCallback) {
+  const state = (groups = [], position = -1) => ({
+    groups: JSON.stringify(groups),
+    inputs: JSON.stringify([permutationOptions]),
+    count: groups.length,
+    size: permutationOptions.length,
+    position,
+    result: '—',
+  });
+  recordStep(stepCallback, 'enter', [], [], () => state(), 'if (permutationOptions.length <= 1) {');
+  if (permutationOptions.length <= 1) {
+    recordStep(stepCallback, 'base', [], [], () => state([permutationOptions]), 'return [permutationOptions];');
     return [permutationOptions];
   }
 
@@ -11,7 +23,10 @@ export default function permutateWithoutRepetitions(permutationOptions) {
   const permutations = [];
 
   // Get all permutations for permutationOptions excluding the first element.
-  const smallerPermutations = permutateWithoutRepetitions(permutationOptions.slice(1));
+  const smallerPermutations = permutateWithoutRepetitions(
+    permutationOptions.slice(1),
+    stepCallback,
+  );
 
   // Insert first option into every possible position of every smaller permutation.
   const firstOption = permutationOptions[0];
@@ -24,8 +39,21 @@ export default function permutateWithoutRepetitions(permutationOptions) {
       const permutationPrefix = smallerPermutation.slice(0, positionIndex);
       const permutationSuffix = smallerPermutation.slice(positionIndex);
       permutations.push(permutationPrefix.concat([firstOption], permutationSuffix));
+      recordStep(
+        stepCallback,
+        'insert',
+        [],
+        [],
+        () => ({
+          ...state(permutations, positionIndex),
+          firstOption,
+          smaller: smallerPermutation.join(', '),
+        }),
+        'permutations.push(permutationPrefix.concat([firstOption], permutationSuffix));',
+      );
     }
   }
 
+  recordStep(stepCallback, 'return', [], [], () => state(permutations), 'return permutations;');
   return permutations;
 }

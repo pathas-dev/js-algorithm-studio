@@ -164,6 +164,7 @@ export default function App() {
     'fourier-input': t('실수 샘플을 1–12개 입력하세요.', 'Enter one to twelve real samples.'),
     'cartesian-input': t('각 집합은 최대 6개 원소, 원소당 12글자까지 입력하세요.', 'Each set supports six items, with at most twelve characters each.'),
     'powerset-input': t('멱집합은 서로 다른 숫자 최대 6개까지 입력하세요.', 'Enter at most six distinct numbers for a power set.'),
+    'permutation-input': t('순열은 서로 다른 숫자 최대 5개까지 입력하세요.', 'Enter at most five distinct numbers for permutations.'),
     'integer-single': t('정수 하나를 입력하세요.', 'Enter one integer.'),
     'sieve-input': t('체의 상한 n으로 정수 하나를 0부터 120까지 입력하세요.', 'Enter one integer sieve upper bound n from 0 to 120.'),
     'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),

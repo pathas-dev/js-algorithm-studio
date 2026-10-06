@@ -1,3 +1,4 @@
+import permutateWithoutRepetitions from '../algorithms/sets/permutations/permutateWithoutRepetitions';
 import bwPowerSet from '../algorithms/sets/power-set/bwPowerSet';
 import fisherYates from '../algorithms/sets/fisher-yates/fisherYates';
 import cartesianProduct from '../algorithms/sets/cartesian-product/cartesianProduct';
@@ -40,5 +41,27 @@ export function tracePowerSet(values) {
       ...step.variables, mode: 'power-set', inputs: JSON.stringify([items]),
     },
   }));
+  return steps;
+}
+
+export function tracePermutations(values) {
+  const items = [...new Set(values)];
+  if (items.length > 5 || !items.every(Number.isFinite)) throw new Error('permutation-input');
+  const steps = [];
+  const groups = permutateWithoutRepetitions(items, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'permutation', originalSize: items.length,
+    },
+  }));
+  steps[0].type = 'start';
+  const last = steps[steps.length - 1];
+  steps.push({
+    ...last,
+    type: 'done',
+    variables: {
+      ...last.variables, result: groups.length,
+    },
+  });
   return steps;
 }

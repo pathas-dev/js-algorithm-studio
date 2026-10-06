@@ -1,4 +1,4 @@
-import traceCartesian, { traceShuffle, tracePowerSet } from '../collections';
+import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations } from '../collections';
 
 it('creates unique ordered pairs and handles an empty set', () => {
   const steps = traceCartesian(['1, 2, 1', 'a b']);
@@ -30,4 +30,15 @@ it('enumerates each subset once including the empty set', () => {
   expect(new Set(subsets.map(JSON.stringify)).size).toBe(8);
   expect(tracePowerSet([]).at(-1).variables.count).toBe(1);
   expect(() => tracePowerSet([1, 2, 3, 4, 5, 6, 7])).toThrow('powerset-input');
+});
+
+it('inserts all permutation positions and terminates the empty recursion', () => {
+  const steps = tracePermutations([1, 2, 3]);
+  const groups = JSON.parse(steps.at(-1).variables.groups);
+  expect(groups).toHaveLength(6);
+  expect(new Set(groups.map(JSON.stringify)).size).toBe(6);
+  expect(groups).toContainEqual([3, 2, 1]);
+  expect(tracePermutations([]).at(-1).variables.count).toBe(1);
+  expect(tracePermutations([2, 2]).at(-1).variables.count).toBe(1);
+  expect(() => tracePermutations([1, 2, 3, 4, 5, 6])).toThrow('permutation-input');
 });
