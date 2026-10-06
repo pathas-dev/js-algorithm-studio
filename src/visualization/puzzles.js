@@ -1,3 +1,4 @@
+import greedyJumpGame from '../algorithms/uncategorized/jump-game/greedyJumpGame';
 import squareMatrixRotation from '../algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation';
 import hanoiTower from '../algorithms/uncategorized/hanoi-tower/hanoiTower';
 import Stack from '../data-structures/stack/Stack';
@@ -68,5 +69,23 @@ export function traceRotation(values) {
       result: step.type === 'done' ? step.variables.matrix : '—',
     },
   }));
+  return steps;
+}
+
+export function traceJump(values) {
+  if (!values.length || values.length > 18
+    || !values.every((value) => Number.isInteger(value) && value >= 0 && value <= 12)) {
+    throw new Error('jump-input');
+  }
+  const steps = [];
+  const good = [values.length - 1];
+  greedyJumpGame(values, (step) => {
+    if (step.type === 'good') good.push(step.variables.numberIndex);
+    steps.push({
+      ...step,
+      array: step.array.map((value, id) => ({ value, id })),
+      variables: { ...step.variables, mode: 'jump', matches: good.join(',') },
+    });
+  });
   return steps;
 }

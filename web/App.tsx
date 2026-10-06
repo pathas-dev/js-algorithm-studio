@@ -156,6 +156,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'jump-input': t('최대 점프는 정수 1–18개, 각 값 0–12로 입력하세요.', 'Enter 1–18 maximum-jump integers, each from 0 to 12.'),
     'rotation-input': t('1–6행의 정방 JSON 행렬을 입력하세요. 숫자는 −999–999입니다.', 'Enter a square JSON matrix of 1–6 rows; values −999–999.'),
     'hanoi-input': t('원판 개수는 정수 하나, 1–6으로 입력하세요.', 'Enter a single integer disc count from 1 to 6.'),
     'weighted-input': t('항목·가중치 JSON 배열(1–8개, 가중치 0–100, 합 양수)과 난수 0≤u<1을 입력하세요.', 'Enter 1–8 item/weight pairs, weights 0–100 with positive total, and 0≤u<1.'),

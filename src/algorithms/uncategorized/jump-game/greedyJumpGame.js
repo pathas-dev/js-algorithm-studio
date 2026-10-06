@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * GREEDY approach of solving Jump Game.
  *
@@ -15,13 +17,23 @@
  * is called a "bad" one.
  *
  * @param {number[]} numbers - array of possible jump length.
+ * @param {function} [stepCallback]
  * @return {boolean}
  */
-export default function greedyJumpGame(numbers) {
+export default function greedyJumpGame(numbers, stepCallback = undefined) {
   // The "good" cell is a cell from which we may jump to the last cell of the numbers array.
 
   // The last cell in numbers array is for sure the "good" one since it is our goal to reach.
   let leftGoodPosition = numbers.length - 1;
+
+  recordStep(
+    stepCallback,
+    'start',
+    numbers,
+    [],
+    { leftGoodPosition },
+    'let leftGoodPosition = numbers.length - 1',
+  );
 
   // Go through all numbers from right to left.
   for (let numberIndex = numbers.length - 2; numberIndex >= 0; numberIndex -= 1) {
@@ -29,12 +41,37 @@ export default function greedyJumpGame(numbers) {
     // one is also "good". Since after all we'll be able to reach the end of the array
     // from it.
     const maxCurrentJumpLength = numberIndex + numbers[numberIndex];
+    recordStep(
+      stepCallback,
+      'check',
+      numbers,
+      [numberIndex],
+      {
+        numberIndex,
+        leftGoodPosition,
+        maxCurrentJumpLength,
+        reachable: maxCurrentJumpLength >= leftGoodPosition,
+      },
+      'if (maxCurrentJumpLength >= leftGoodPosition)',
+    );
     if (maxCurrentJumpLength >= leftGoodPosition) {
       leftGoodPosition = numberIndex;
+      recordStep(
+        stepCallback,
+        'good',
+        numbers,
+        [numberIndex],
+        { numberIndex, leftGoodPosition },
+        'leftGoodPosition = numberIndex',
+      );
     }
   }
 
   // If the most left "good" position is the zero's one then we may say that it IS
   // possible jump to the end of the array from the first cell;
+  recordStep(stepCallback, 'done', numbers, [], {
+    leftGoodPosition,
+    result: leftGoodPosition === 0,
+  }, 'return leftGoodPosition === 0');
   return leftGoodPosition === 0;
 }

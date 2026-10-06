@@ -1,6 +1,7 @@
+import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -36,4 +37,20 @@ const rotation: TextAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation];
+const jump: NumericAlgorithm = {
+  id: 'jump-game', category: 'other', example: [2,3,1,1,4], usesStart: false, singleInput: true,
+  name: { ko: '점프 게임', en: 'Jump game' }, time: 'O(n)',
+  summary: { ko: '각 숫자는 그 위치에서 앞으로 뛸 수 있는 최대 칸 수입니다. 오른쪽부터 마지막 칸에 도달할 수 있는 가장 왼쪽 위치를 갱신해 시작점의 가능 여부를 판정합니다.', en: 'Each value is the maximum forward jump from that position. Scan right to left, updating the leftmost position that can reach the end, then test the starting point.' },
+  inputLabels: [{ ko: '위치별 최대 점프', en: 'Maximum jumps by position' }, { ko: '', en: '' }],
+  inputHint: { ko: '정수 1–18개 · 각 값 0–12 · 0칸 점프는 이동 불가 · 최소 점프 횟수 문제와 다름', en: '1–18 integers · values 0–12 · zero cannot move · reachability, rather than minimum jump count' },
+  source: algorithmCode(jumpSource), run: traceJump,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['마지막 칸부터 도달 가능 위치 기록', `마지막 위치 ${v.leftGoodPosition}는 이미 목적지입니다. 시작점 쪽으로 한 칸씩 거슬러 올라갑니다.`] : ['Mark the final position as reachable', `Position ${v.leftGoodPosition} is already the goal. Scan backward toward the start.`];
+    if (step.type === 'check') return ko ? ['현재 점프로 좋은 위치에 닿는지 확인', `${v.numberIndex}에서 최대 ${v.maxCurrentJumpLength}까지 갈 수 있습니다. 좋은 위치 ${v.leftGoodPosition}에 ${v.reachable ? '닿으므로 갱신합니다' : '못 닿으므로 유지합니다'}. 최대보다 짧게 뛰어도 됩니다.`] : ['Check whether this jump reaches a good position', `From ${v.numberIndex}, reach at most ${v.maxCurrentJumpLength}. ${v.reachable ? 'Update' : 'Keep'} good position ${v.leftGoodPosition}. Jumps may be shorter than the maximum.`];
+    if (step.type === 'good') return ko ? ['가장 왼쪽 좋은 위치 갱신', `위치 ${v.leftGoodPosition}에서도 마지막 칸에 도달할 수 있습니다. 초록색은 이미 도달 가능하다고 확인한 위치입니다.`] : ['Update the leftmost good position', `Position ${v.leftGoodPosition} can also reach the end. Green positions have already been confirmed reachable.`];
+    return ko ? [v.result ? '시작점에서 마지막 칸 도달 가능' : '시작점에서 마지막 칸 도달 불가', `가장 왼쪽 좋은 위치는 ${v.leftGoodPosition}입니다. 이 값이 0일 때만 시작점부터 도달할 수 있습니다.`] : [v.result ? 'The start can reach the final position' : 'The start cannot reach the final position', `Leftmost good position: ${v.leftGoodPosition}. The start reaches the end only when this is zero.`];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump];
