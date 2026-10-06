@@ -3,6 +3,7 @@ import type { Step, Language } from './algorithms';
 
 export default function LinkedListView({ step, language }: { step: Step; language: Language }) {
   const links: number[][] = JSON.parse(String(step.variables.links));
+  const deque = step.variables.structure === 'deque';
   const doubly = 'previousLinks' in step.variables;
   const previousLinks: number[][] = doubly ? JSON.parse(String(step.variables.previousLinks)) : [];
   const nodes = step.array.map((item, index) => ({ ...item, x: 64 + index * 94 }));
@@ -27,12 +28,12 @@ export default function LinkedListView({ step, language }: { step: Step; languag
             : <text key={from} x={start.x + 10} y={160} textAnchor="middle" fill="#8877a2" fontSize={12}>↓ ∅</text>;
         })}
         {nodes.map((node, index) => <motion.g key={node.id} animate={{ x: node.x }} transition={{ duration: .24 }}>
-          <text y={21} textAnchor="middle" fontSize={10} fill="#617469">{[step.variables.head === node.id ? 'HEAD' : '', step.variables.tail === node.id ? 'TAIL' : ''].filter(Boolean).join(' / ')}</text>
+          <text y={21} textAnchor="middle" fontSize={10} fill="#617469">{[step.variables.head === node.id ? deque ? 'FRONT' : 'HEAD' : '', step.variables.tail === node.id ? deque ? 'BACK' : 'TAIL' : ''].filter(Boolean).join(' / ')}</text>
           <rect x={-35} y={32} width={70} height={56} rx={8} fill={step.indices.includes(index) ? '#fff0d8' : '#eaf0e9'} stroke={step.indices.includes(index) ? '#d8964a' : '#cddbd1'} />
           <text y={50} textAnchor="middle" fontSize={10} fill="#617469">N{node.id}</text>
           <text y={74} textAnchor="middle" fontSize={13} fill="#305645">{node.value}</text>
         </motion.g>)}
-        {!nodes.length && <text x={width / 2} y={72} textAnchor="middle" fill="#617469">HEAD = TAIL = ∅</text>}
+        {!nodes.length && <text x={width / 2} y={72} textAnchor="middle" fill="#617469">{deque ? 'FRONT = BACK = ∅' : 'HEAD = TAIL = ∅'}</text>}
       </svg>
     </div>
     {'result' in step.variables && <div className="frontier">{language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}

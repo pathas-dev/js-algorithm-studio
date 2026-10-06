@@ -1,3 +1,4 @@
+import dequeSource from '../src/data-structures/deque/Deque.js?raw';
 import salesmanSource from '../src/algorithms/graph/travelling-salesman/bfTravellingSalesman.js?raw';
 import sccSource from '../src/algorithms/graph/strongly-connected-components/stronglyConnectedComponents.js?raw';
 import hamiltonianSource from '../src/algorithms/graph/hamiltonian-cycle/hamiltonianPath.js?raw';
@@ -45,7 +46,7 @@ import linkedListSource from '../src/data-structures/linked-list/LinkedList.js?r
 import doublyListSource from '../src/data-structures/doubly-linked-list/DoublyLinkedList.js?raw';
 import queueSource from '../src/data-structures/queue/Queue.js?raw';
 import stackSource from '../src/data-structures/stack/Stack.js?raw';
-import { traceStack, traceQueue, traceLinkedList, traceDoublyLinkedList, traceHeap, traceMaxHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
+import { traceDeque, traceStack, traceQueue, traceLinkedList, traceDoublyLinkedList, traceHeap, traceMaxHeap, tracePriorityQueue, traceBinarySearchTree, traceAvlTree, traceRedBlackTree } from '../src/visualization/structures';
 import topologicalSource from '../src/algorithms/graph/topological-sorting/topologicalSort.js?raw';
 import kruskalSource from '../src/algorithms/graph/kruskal/kruskal.js?raw';
 import primSource from '../src/algorithms/graph/prim/prim.js?raw';
@@ -949,6 +950,29 @@ export const queue: NumericAlgorithm = {
   },
 };
 
+export const deque: NumericAlgorithm = {
+  id: 'deque', category: 'structure', usesStart: false,
+  name: { ko: '덱 (양방향 큐)', en: 'Deque' },
+  summary: { ko: '양 끝에서 값을 추가·삭제·조회합니다. 이중 연결 리스트의 앞과 뒤를 사용하며 각 연산은 O(1)입니다.', en: 'Add, remove and inspect either end. Uses the front and back of a doubly linked list; each operation is O(1).' },
+  source: algorithmCode(dequeSource), example: [3, 6, 9], time: 'O(1)',
+  operations: 'addFront 1, addBack 12, peekFront, peekBack, removeFront, removeBack, size',
+  operationHint: 'addFront 1, addBack 9, removeFront, removeBack, peekFront, peekBack, size',
+  run: (values, _target, _edges, _directed, operations = deque.operations!) => traceDeque(values, operations),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['빈 덱 준비', 'FRONT와 BACK이 비어 있는 이중 연결 리스트를 준비합니다. 초기 입력은 BACK에 순서대로 추가합니다.'] : ['Prepare an empty deque', 'Create a doubly linked list with empty FRONT and BACK. Add initial values at BACK in order.'];
+      case 'addFront': return ko ? ['앞에 추가', `${v.value}를 FRONT에 추가했습니다. 현재 크기는 ${v.size}입니다.`] : ['Add at the front', `Add ${v.value} at FRONT. Size: ${v.size}.`];
+      case 'addBack': return ko ? ['뒤에 추가', `${v.value}를 BACK에 추가했습니다. 현재 크기는 ${v.size}입니다.`] : ['Add at the back', `Add ${v.value} at BACK. Size: ${v.size}.`];
+      case 'removeFront': return ko ? ['앞에서 삭제', `FRONT에서 꺼낸 값은 ${v.result}입니다. 비어 있으면 null을 반환합니다.`] : ['Remove from the front', `Return ${v.result} from FRONT; an empty deque returns null.`];
+      case 'removeBack': return ko ? ['뒤에서 삭제', `BACK에서 꺼낸 값은 ${v.result}입니다. 비어 있으면 null을 반환합니다.`] : ['Remove from the back', `Return ${v.result} from BACK; an empty deque returns null.`];
+      case 'peekFront': case 'peekBack': return ko ? ['끝의 값 조회', `${step.type === 'peekFront' ? 'FRONT' : 'BACK'}의 값은 ${v.result}입니다. 조회는 값을 삭제하지 않습니다.`] : ['Inspect an end', `${step.type === 'peekFront' ? 'FRONT' : 'BACK'} is ${v.result}. Reading does not remove it.`];
+      case 'size': return ko ? ['크기 조회', `저장된 원소 수는 ${v.result}입니다. 원소 수를 따로 유지하여 O(1)에 반환합니다.`] : ['Read the size', `Stored element count: ${v.result}. A running count returns this in O(1).`];
+      default: return ko ? ['덱 연산 완료', `현재 크기: ${v.size}. FRONT부터 BACK 순서로 표시합니다.`] : ['Deque operations complete', `Size: ${v.size}. Displayed from FRONT to BACK.`];
+    }
+  },
+};
+
 export const linkedList: NumericAlgorithm = {
   id: 'linked-list', category: 'structure', usesStart: false,
   name: { ko: '연결 리스트', en: 'Linked list' },
@@ -1585,4 +1609,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

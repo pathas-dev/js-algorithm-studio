@@ -1,3 +1,4 @@
+import Deque from '../data-structures/deque/Deque';
 import BinarySearchTree from '../data-structures/tree/binary-search-tree/BinarySearchTree';
 import AvlTree from '../data-structures/tree/avl-tree/AvlTree';
 import RedBlackTree from '../data-structures/tree/red-black-tree/RedBlackTree';
@@ -387,4 +388,70 @@ export function traceAvlTree(values, operations = '') {
 
 export function traceRedBlackTree(values, operations = '') {
   return traceBinarySearchTree(values, operations, RedBlackTree, 'red-black-tree');
+}
+
+export function traceDeque(values, operations = '') {
+  const commands = parseOperations(operations, {
+    addFront: 1,
+    addBack: 1,
+    removeFront: 0,
+    removeBack: 0,
+    peekFront: 0,
+    peekBack: 0,
+    size: 0,
+  });
+  if (values.length > MAX_VALUES) throw new Error('limit');
+  const deque = new Deque();
+  const steps = [];
+  const ids = new WeakMap();
+  let nextId = 0;
+  const identify = (node) => {
+    if (!node) return -1;
+    if (!ids.has(node)) { ids.set(node, nextId); nextId += 1; }
+    return ids.get(node);
+  };
+  const snapshot = (type, code, variables = {}, active = null) => {
+    const nodes = deque.linkedList.toArray();
+    steps.push({
+      type,
+      code,
+      array: nodes.map((node) => ({ value: node.value, id: identify(node) })),
+      indices: nodes.flatMap((node, index) => (node === active ? [index] : [])),
+      variables: {
+        structure: 'deque',
+        head: identify(deque.linkedList.head),
+        tail: identify(deque.linkedList.tail),
+        size: deque.size,
+        links: JSON.stringify(nodes.map((node) => [identify(node), identify(node.next)])),
+        previousLinks: JSON.stringify(nodes.map(
+          (node) => [identify(node), identify(node.previous)],
+        )),
+        ...variables,
+      },
+    });
+  };
+  snapshot('start', 'this.linkedList = new DoublyLinkedList();');
+  const run = ({ name, value }, phase) => {
+    if (name === 'addFront' || name === 'addBack') {
+      if (deque.size >= MAX_VALUES) throw new Error('capacity');
+      deque[name](value);
+      snapshot(
+        name,
+        `${name}(value) {`,
+        { value, phase },
+        name === 'addFront' ? deque.linkedList.head : deque.linkedList.tail,
+      );
+    } else {
+      const result = name === 'size' ? deque.size : deque[name]();
+      snapshot(
+        name,
+        name === 'size' ? 'return this.length;' : `${name}() {`,
+        { result: result === null ? 'null' : result, phase },
+      );
+    }
+  };
+  values.forEach((value) => run({ name: 'addBack', value }, 'input'));
+  commands.forEach((command) => run(command, 'commands'));
+  snapshot('done', 'toArray() {');
+  return steps;
 }
