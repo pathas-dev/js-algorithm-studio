@@ -1,3 +1,4 @@
+import regularExpressionMatching from '../algorithms/string/regular-expression-matching/regularExpressionMatching';
 import longestCommonSubstring from '../algorithms/string/longest-common-substring/longestCommonSubstring';
 import longestCommonSubsequence from '../algorithms/sets/longest-common-subsequence/longestCommonSubsequence';
 import levenshteinDistance from '../algorithms/string/levenshtein-distance/levenshteinDistance';
@@ -123,6 +124,21 @@ export function traceSubstring(first, second) {
       mode: 'substring',
       columns: JSON.stringify(['∅', ...first]),
       rows: JSON.stringify(['∅', ...second]),
+    },
+  }));
+  return steps;
+}
+
+export function traceRegex(text, pattern) {
+  requireDpStrings(text, pattern);
+  const steps = [];
+  regularExpressionMatching(text, pattern, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables,
+      mode: 'regex',
+      columns: JSON.stringify(['∅', ...pattern.split('')]),
+      rows: JSON.stringify(['∅', ...text.split('')]),
     },
   }));
   return steps;

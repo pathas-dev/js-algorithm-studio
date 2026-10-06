@@ -132,7 +132,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-sets-shortest-common-supersequence", "category": "sets", "name": {"ko": "최단 공통 상위 수열", "en": "Shortest Common Supersequence"}},
   {"id": "planned-algorithms-sets-maximum-subarray", "category": "sets", "name": {"ko": "최대 구간합", "en": "Maximum subarray problem"}},
   {"id": "planned-algorithms-sets-combination-sum", "category": "sets", "name": {"ko": "조합 합", "en": "Combination Sum Problem"}},
-  {"id": "planned-algorithms-string-regular-expression-matching", "category": "string", "name": {"ko": "정규 표현식 매칭", "en": "Regular Expression Matching"}},
   {"id": "planned-algorithms-tree-depth-first-search", "category": "tree", "name": {"ko": "트리 깊이 우선 탐색", "en": "Tree Depth-First Search (DFS)"}},
   {"id": "planned-algorithms-tree-breadth-first-search", "category": "tree", "name": {"ko": "트리 너비 우선 탐색", "en": "Tree Breadth-First Search (BFS)"}},
   {"id": "planned-algorithms-uncategorized-hanoi-tower", "category": "other", "name": {"ko": "하노이 탑", "en": "Tower of Hanoi"}},

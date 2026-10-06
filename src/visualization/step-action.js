@@ -96,7 +96,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
   } else if (algorithm.category === 'dp' || v.dpMatrix !== undefined) {
     if (Number(v.row) >= 0 && Number(v.column) >= 0) evidence = `[${v.row}, ${v.column}]`;
     else if (v.length !== undefined) evidence = `length = ${v.length}`;
-    else if (typeof v.result === 'number') evidence = `result = ${v.result}`;
+    else if (typeof v.result === 'number' || typeof v.result === 'boolean') evidence = `result = ${v.result}`;
     else if (v.rows !== undefined && v.columns !== undefined) evidence = `${JSON.parse(String(v.rows)).length} × ${JSON.parse(String(v.columns)).length}`;
     if (type === 'cell-min') decision = t('삭제·삽입·치환 중 최소 비용', 'Minimum edit cost of three');
     if (type === 'cell-max') decision = t('위·왼쪽 중 더 긴 수열', 'Longer of top and left');

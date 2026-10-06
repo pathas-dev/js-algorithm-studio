@@ -1,3 +1,4 @@
+import regexSource from '../src/algorithms/string/regular-expression-matching/regularExpressionMatching.js?raw';
 import substringSource from '../src/algorithms/string/longest-common-substring/longestCommonSubstring.js?raw';
 import hammingSource from '../src/algorithms/string/hamming-distance/hammingDistance.js?raw';
 import lruSource from '../src/data-structures/lru-cache/LRUCacheOnMap.js?raw';
@@ -28,7 +29,7 @@ import rabinSource from '../src/algorithms/string/rabin-karp/rabinKarp.js?raw';
 import lcsSource from '../src/algorithms/sets/longest-common-subsequence/longestCommonSubsequence.js?raw';
 import editSource from '../src/algorithms/string/levenshtein-distance/levenshteinDistance.js?raw';
 import knapsackSource from '../src/algorithms/sets/knapsack-problem/Knapsack.js?raw';
-import { traceSubstring, traceLcs, traceEditDistance, traceKnapsack } from '../src/visualization/dynamic';
+import { traceRegex, traceSubstring, traceLcs, traceEditDistance, traceKnapsack } from '../src/visualization/dynamic';
 import { traceHamming, traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
@@ -1613,6 +1614,26 @@ export const substring: TextAlgorithm = {
   },
 };
 
+export const regexMatching: TextAlgorithm = {
+  ...naive, id: 'regular-expression-matching',
+  name: { ko: '정규 표현식 매칭', en: 'Regular expression matching' },
+  summary: { ko: '전체 문자열이 패턴과 일치하는지 DP로 확인합니다. .은 문자 하나, *는 바로 앞 문자 또는 .의 0회 이상 반복입니다.', en: 'Use DP to match the entire string. A dot matches one character; star repeats the preceding character or dot zero or more times.' },
+  source: algorithmCode(regexSource), example: ['aab', 'c*a*b'], time: 'O(mn)',
+  inputLabels: [{ ko: '문자열', en: 'String' }, { ko: '패턴 · .과 * 지원', en: 'Pattern · dot and star' }],
+  inputHint: { ko: '각 입력 최대 12 UTF-16 코드 단위 · .과 *만 특별 문법 · 나머지는 문자 그대로 · 부분 검색이 아닌 전체 일치', en: 'Up to 12 UTF-16 units each · only dot and star are special · all other characters literal · full match, not substring search' },
+  run: ([text, pattern]) => traceRegex(text, pattern),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['전체 일치 표 준비', '행은 문자열 접두사, 열은 패턴 접두사입니다. T는 일치, F는 불일치이며 —는 아직 계산 전입니다.'] : ['Prepare full-match DP', 'Rows are string prefixes, columns pattern prefixes. T means match, F mismatch; — is uncomputed.'];
+      case 'initialize': return ko ? ['빈 문자열·빈 패턴 초기화', '빈 문자열과 빈 패턴은 일치합니다. a*처럼 0회 반복 가능한 패턴은 빈 문자열과도 일치할 수 있습니다.'] : ['Initialize empty cases', 'Empty string matches empty pattern. Zero repetitions, such as a*, may also match empty string.'];
+      case 'star': return ko ? ['0회 또는 추가 반복 비교', `셀 [${v.row}, ${v.column}]에서 두 칸 왼쪽은 0회 반복, 위 셀은 문자 하나를 더 소비한 반복입니다. 앞 문자가 현재 문자와 같거나 .일 때만 위 셀을 참조합니다.`] : ['Check zero or additional repetitions', `At [${v.row}, ${v.column}], two cells left means zero repetitions; above means consume another matching character. Use above only when the preceding pattern character matches or is a dot.`];
+      case 'cell-match': return ko ? ['문자·점과 대각선 확인', '현재 문자와 패턴 문자가 같거나 패턴이 .이면 왼쪽 위 셀을 가져옵니다. 다르면 F입니다.'] : ['Check a literal or dot', 'If the characters match or the pattern is a dot, copy the diagonal cell. Otherwise store F.'];
+      default: return ko ? [v.result ? '전체 문자열 일치' : '전체 문자열 불일치', `마지막 셀의 값은 ${v.result ? 'T' : 'F'}입니다. 문자열 전체와 패턴 전체의 일치 여부입니다.`] : [v.result ? 'Full string matches' : 'Full string does not match', `The final cell is ${v.result ? 'T' : 'F'}: matching the entire string against the entire pattern.`];
+    }
+  },
+};
+
 export const lcs: TextAlgorithm = {
   ...naive, id: 'lcs', category: 'dp', name: { ko: '최장 공통 부분 수열', en: 'Longest common subsequence' },
   summary: { ko: '두 문자열에서 순서를 유지하며 공통으로 선택할 수 있는 가장 긴 수열을 찾습니다. 셀을 채우고 역추적으로 수열을 복원합니다.', en: 'Find the longest shared subsequence while preserving order. Fill prefix cells and recover a sequence by traceback.' },
@@ -1674,4 +1695,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, substring, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, substring, regexMatching, lcs, editDistance, knapsack];
