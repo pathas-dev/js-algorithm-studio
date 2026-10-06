@@ -156,6 +156,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'rotation-input': t('1–6행의 정방 JSON 행렬을 입력하세요. 숫자는 −999–999입니다.', 'Enter a square JSON matrix of 1–6 rows; values −999–999.'),
     'hanoi-input': t('원판 개수는 정수 하나, 1–6으로 입력하세요.', 'Enter a single integer disc count from 1 to 6.'),
     'weighted-input': t('항목·가중치 JSON 배열(1–8개, 가중치 0–100, 합 양수)과 난수 0≤u<1을 입력하세요.', 'Enter 1–8 item/weight pairs, weights 0–100 with positive total, and 0≤u<1.'),
     'seam-input': t('회색조 JSON 행렬(1–6행, 1–8열, 정수 0–255)과 목표 폭 1–현재 폭을 입력하세요.', 'Enter a grayscale JSON matrix (1–6 rows, 1–8 columns, integers 0–255) and target width 1–current width.'),

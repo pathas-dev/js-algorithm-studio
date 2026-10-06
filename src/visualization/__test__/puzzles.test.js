@@ -1,4 +1,4 @@
-import traceHanoi from '../puzzles';
+import traceHanoi, { traceRotation } from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
   [1, 3, 6].forEach((n) => {
@@ -12,4 +12,13 @@ it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () 
     }));
   });
   expect(() => traceHanoi([0])).toThrow('hanoi-input');
+});
+
+it('rotates through independent transpose and reversal snapshots', () => {
+  const steps = traceRotation(['[[1,2],[3,4]]']);
+  expect(steps.at(-1).variables.matrix).toBe('[[3,1],[4,2]]');
+  expect(steps.find((step) => step.type === 'transpose').variables.matrix).toBe('[[1,3],[2,4]]');
+  expect(steps[0].variables.matrix).toBe('[[1,2],[3,4]]');
+  expect(traceRotation(['[[9]]']).at(-1).variables.matrix).toBe('[[9]]');
+  expect(() => traceRotation(['[[1,2]]'])).toThrow('rotation-input');
 });
