@@ -1,9 +1,10 @@
+import gcdSource from '../src/algorithms/math/euclidean-algorithm/euclideanAlgorithm.js?raw';
 import primeSource from '../src/algorithms/math/primality-test/trialDivision.js?raw';
 import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?raw';
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -81,4 +82,22 @@ export const primalityLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson];
+export const gcdLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'euclidean-algorithm',
+  name: { ko: '유클리드 호제법', en: 'Euclidean algorithm' },
+  summary: { ko: 'gcd(a, b)를 gcd(b, a mod b)로 바꿉니다. 두 번째 값이 0이면 첫 번째 값이 최대공약수입니다.', en: 'Replace gcd(a, b) with gcd(b, a mod b). When the second value is zero, the first is the greatest common divisor.' },
+  source: algorithmCode(gcdSource), example: [252, 105], time: 'O(log(min(|a|, |b|)))',
+  inputLabels: [{ ko: '두 정수 · a, b', en: 'Two integers · a, b' }, { ko: '', en: '' }],
+  inputHint: { ko: '정수 두 개 · 각 값 -999부터 999까지 · 절댓값 사용 · 이 구현에서 gcd(0, 0)=0', en: 'Two integers · -999 to 999 each · absolute values · this implementation defines gcd(0, 0)=0' },
+  run: (values) => traceGcd(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start' || step.type === 'enter') return ko ? ['두 수의 절댓값 준비', `${v.expression}를 계산합니다. 음수는 절댓값으로 정규화합니다.`] : ['Prepare absolute values', `Compute ${v.expression}. Normalize negative inputs to absolute values.`];
+    if (step.type === 'modulo') return ko ? ['나머지로 문제 줄이기', `${v.expression}. 다음 호출은 gcd(${v.b}, ${Number(v.a) % Number(v.b)})입니다. 나머지를 써도 공약수는 변하지 않습니다.`] : ['Reduce using the remainder', `${v.expression}. Recurse with gcd(${v.b}, ${Number(v.a) % Number(v.b)}); common divisors are unchanged.`];
+    if (step.type === 'base') return ko ? ['두 번째 값 0 · 재귀 종료', `gcd(${v.a}, 0) = ${v.a}입니다. 이 값을 이전 호출에 돌려줍니다.`] : ['Second value zero · stop recursion', `gcd(${v.a}, 0) = ${v.a}. Return it to the previous call.`];
+    if (step.type === 'return') return ko ? ['최대공약수 전달', `재귀 호출의 답 ${v.result}를 그대로 이전 호출에 전달합니다.`] : ['Return the GCD', `Pass the recursive answer ${v.result} back unchanged.`];
+    return ko ? ['최대공약수 완료', `${v.expression} = ${v.result}.`] : ['GCD ready', `${v.expression} = ${v.result}.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson];

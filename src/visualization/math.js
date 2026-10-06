@@ -1,3 +1,4 @@
+import euclideanAlgorithm from '../algorithms/math/euclidean-algorithm/euclideanAlgorithm';
 import trialDivision from '../algorithms/math/primality-test/trialDivision';
 import fibonacciNth from '../algorithms/math/fibonacci/fibonacciNth';
 import factorial from '../algorithms/math/factorial/factorial';
@@ -71,5 +72,16 @@ export function tracePrimality(values) {
     if (step.type === 'check-divisor') checks.push([step.variables.divider, step.variables.remainder]);
     steps.push({ ...step, variables: { ...step.variables, mode: 'primality', checks: JSON.stringify(checks) } });
   });
+  return steps;
+}
+
+export function traceGcd(values) {
+  if (values.length !== 2 || !values.every(Number.isInteger)) throw new Error('integer-pair');
+  const steps = [];
+  euclideanAlgorithm(...values, (step) => steps.push({
+    ...step, variables: { ...step.variables, mode: 'gcd' },
+  }));
+  steps[0].type = 'start';
+  steps[steps.length - 1].type = 'done';
   return steps;
 }

@@ -1,4 +1,6 @@
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality } from '../math';
+import traceBits, {
+  traceFactorial, traceFibonacci, tracePrimality, traceGcd,
+} from '../math';
 
 it('applies bit operations independently and validates the input', () => {
   const steps = traceBits([13, 2, 0]);
@@ -42,4 +44,14 @@ it('checks only necessary primality divisors and rejects nonintegers', () => {
   expect(JSON.parse(prime.at(-1).variables.checks).map(([divider]) => divider))
     .toEqual([2, 3, 5, 7, 9]);
   expect(() => tracePrimality([1.5])).toThrow('primality-input');
+});
+
+it('reduces GCD by remainders and handles signed and zero inputs', () => {
+  const steps = traceGcd([252, 105]);
+  expect(steps.at(-1).variables.result).toBe(21);
+  expect(steps.filter((step) => step.type === 'modulo').map((step) => step.variables.b))
+    .toEqual([105, 42, 21]);
+  expect(traceGcd([-60, 24]).at(-1).variables.result).toBe(12);
+  expect(traceGcd([0, 0]).at(-1).variables.result).toBe(0);
+  expect(() => traceGcd([2, 1.5])).toThrow('integer-pair');
 });

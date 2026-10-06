@@ -148,6 +148,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'integer-pair': t('쉼표로 구분한 정수 두 개를 입력하세요.', 'Enter two integers separated by a comma.'),
     'primality-input': t('소수 판별에는 정수 하나를 입력하세요.', 'Enter one integer for primality testing.'),
     'fibonacci-input': t('피보나치 인덱스로 정수 하나를 0부터 78까지 입력하세요.', 'Enter one Fibonacci index integer from 0 to 78.'),
     'factorial-input': t('팩토리얼에는 정수 하나를 0부터 18까지 입력하세요.', 'Enter one factorial input integer from 0 to 18.'),
