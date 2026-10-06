@@ -1,3 +1,4 @@
+import isPalindrome from '../algorithms/string/palindrome/isPalindrome';
 import hammingDistance from '../algorithms/string/hamming-distance/hammingDistance';
 import naiveSearch from '../algorithms/string/naive-search/naiveSearch';
 import knuthMorrisPratt from '../algorithms/string/knuth-morris-pratt/knuthMorrisPratt';
@@ -94,6 +95,32 @@ export function traceHamming(text, pattern) {
         alignment: 0,
         mode: 'hamming',
         differences: JSON.stringify(differences),
+      },
+    });
+  });
+  return steps;
+}
+
+export function tracePalindrome(text) {
+  if (typeof text !== 'string' || [...text].length > 48) throw new Error('palindrome-length');
+  const characters = [...text];
+  const steps = [];
+  isPalindrome(text, (step) => {
+    const { left, right, result } = step.variables;
+    steps.push({
+      ...step,
+      array: characters.map((char, id) => ({ value: char.codePointAt(0), id })),
+      indices: left < right ? [left, right] : [],
+      variables: {
+        ...step.variables,
+        text,
+        pattern: '',
+        alignment: 0,
+        mode: 'palindrome',
+        settledCharacters: JSON.stringify(characters.flatMap((_, index) => (
+          result === true || index < left || index > right ? [index] : []
+        ))),
+        differences: JSON.stringify(result === false ? [left, right] : []),
       },
     });
   });

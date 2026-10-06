@@ -115,6 +115,13 @@ export default function stepAction(algorithm, step, language, title, index, leng
     else if (v.textIndex !== undefined && v.wordIndex !== undefined) evidence = `[${v.textIndex}, ${v.wordIndex}]`;
     else if (typeof v.result === 'number') evidence = `index = ${v.result}`;
     else evidence = `offset = ${v.alignment}`;
+    if (algorithm.id === 'palindrome') {
+      evidence = type === 'done' ? `result = ${v.result}` : `[${v.left}, ${v.right}]`;
+      if (type === 'compare') {
+        const characters = [...String(v.text)];
+        decision = characters[Number(v.left)] === characters[Number(v.right)] ? t('같은 문자 · 안쪽으로 이동합니다', 'Equal characters · move inward') : t('다른 문자 · 회문이 아닙니다', 'Different characters · reject');
+      }
+    }
     if (algorithm.id === 'hamming-distance') {
       evidence = `distance = ${v.distance}`;
       if (type === 'compare') decision = String(v.text)[Number(v.textIndex)] === String(v.pattern)[Number(v.wordIndex)] ? t('같은 문자 · 거리를 유지합니다', 'Equal characters · keep distance') : t('다른 문자 · 거리를 1 늘립니다', 'Different characters · add one');

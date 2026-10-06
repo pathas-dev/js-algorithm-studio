@@ -1,3 +1,4 @@
+import palindromeSource from '../src/algorithms/string/palindrome/isPalindrome.js?raw';
 import regexSource from '../src/algorithms/string/regular-expression-matching/regularExpressionMatching.js?raw';
 import substringSource from '../src/algorithms/string/longest-common-substring/longestCommonSubstring.js?raw';
 import hammingSource from '../src/algorithms/string/hamming-distance/hammingDistance.js?raw';
@@ -30,7 +31,7 @@ import lcsSource from '../src/algorithms/sets/longest-common-subsequence/longest
 import editSource from '../src/algorithms/string/levenshtein-distance/levenshteinDistance.js?raw';
 import knapsackSource from '../src/algorithms/sets/knapsack-problem/Knapsack.js?raw';
 import { traceRegex, traceSubstring, traceLcs, traceEditDistance, traceKnapsack } from '../src/visualization/dynamic';
-import { traceHamming, traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
+import { tracePalindrome, traceHamming, traceStringSearch, traceKmpSearch, traceZSearch, traceRabinSearch } from '../src/visualization/strings';
 import traceHashTable from '../src/visualization/hash';
 import segmentSource from '../src/data-structures/tree/segment-tree/SegmentTree.js?raw';
 import fenwickSource from '../src/data-structures/tree/fenwick-tree/FenwickTree.js?raw';
@@ -107,6 +108,7 @@ type AlgorithmConfig = {
   time: string | Record<Language, string>;
   category: 'sort' | 'search' | 'graph' | 'structure' | 'string' | 'dp';
   inputLabels?: [Record<Language, string>, Record<Language, string>];
+  singleInput?: boolean;
   operations?: string;
   operationHint?: string;
   target?: number;
@@ -1634,6 +1636,25 @@ export const regexMatching: TextAlgorithm = {
   },
 };
 
+export const palindrome: TextAlgorithm = {
+  ...naive, id: 'palindrome', singleInput: true,
+  name: { ko: '회문 검사', en: 'Palindrome check' },
+  summary: { ko: '양 끝 문자를 비교하며 중앙으로 이동합니다. 하나라도 다르면 회문이 아닙니다. 대소문자·공백을 그대로 비교합니다.', en: 'Compare both ends and move inward. Any differing pair rejects the palindrome. Case and spaces are compared literally.' },
+  source: algorithmCode(palindromeSource), example: ['racecar', ''], time: 'O(n)',
+  inputLabels: [{ ko: '문자열', en: 'String' }, { ko: '', en: '' }],
+  inputHint: { ko: '최대 48개 유니코드 코드 포인트 · 대소문자·공백 구분 · 빈 문자열은 회문', en: 'Up to 48 Unicode code points · case and spaces matter · an empty string is a palindrome' },
+  run: ([text]) => tracePalindrome(text),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['양 끝 포인터 준비', '문자열을 유니코드 코드 포인트로 나눕니다. left는 처음, right는 마지막 문자를 가리킵니다.'] : ['Prepare end pointers', 'Split into Unicode code points. Left starts at the first character; right at the last.'];
+      case 'compare': return ko ? ['양 끝 문자 비교', `위치 ${v.left}와 ${v.right}의 문자를 비교합니다. 같으면 안쪽으로 이동하고 다르면 즉시 false를 반환합니다.`] : ['Compare the two ends', `Compare positions ${v.left} and ${v.right}. Equal characters move inward; a mismatch immediately returns false.`];
+      case 'move': return ko ? ['포인터를 안쪽으로 이동', '같은 두 문자를 확인했으므로 left를 1 늘리고 right를 1 줄입니다. 초록색 위치는 이미 확인한 문자입니다.'] : ['Move the pointers inward', 'The pair matches: increment left and decrement right. Green characters have already been checked.'];
+      default: return ko ? [v.result ? '회문입니다' : '회문이 아닙니다', v.result ? '모든 대칭 위치가 같았습니다. 홀수 길이의 가운데 문자는 따로 비교하지 않습니다.' : '보라색으로 표시한 대칭 위치가 다릅니다. 나머지 위치는 비교할 필요가 없습니다.'] : [v.result ? 'It is a palindrome' : 'It is not a palindrome', v.result ? 'Every symmetric pair matched. An odd-length middle character needs no comparison.' : 'The purple symmetric positions differ. No further comparisons are needed.'];
+    }
+  },
+};
+
 export const lcs: TextAlgorithm = {
   ...naive, id: 'lcs', category: 'dp', name: { ko: '최장 공통 부분 수열', en: 'Longest common subsequence' },
   summary: { ko: '두 문자열에서 순서를 유지하며 공통으로 선택할 수 있는 가장 긴 수열을 찾습니다. 셀을 채우고 역추적으로 수열을 복원합니다.', en: 'Find the longest shared subsequence while preserving order. Fill prefix cells and recover a sequence by traceback.' },
@@ -1695,4 +1716,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, substring, regexMatching, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, salesman, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, deque, lru, naive, kmp, zSearch, rabin, hamming, substring, regexMatching, palindrome, lcs, editDistance, knapsack];
