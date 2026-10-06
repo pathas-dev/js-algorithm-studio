@@ -8,10 +8,11 @@ export default function CollectionView({ step, language }: { step: Step; languag
   const inputs: (string | number)[][] = JSON.parse(String(v.inputs));
   const groups: (string | number)[][] = JSON.parse(String(v.groups));
   const selection: (string | number)[] = JSON.parse(String(v.selection ?? '[]'));
-  const subset = v.mode === 'power-set' || v.mode === 'combination';
+  const subset = v.mode === 'power-set' || v.mode === 'combination' || v.mode === 'combination-sum';
   const maskMode = v.mode === 'power-set';
   return <div className="collection-view">
-    {v.mode === 'scs' && <p className="fourier-expression">LCS: {(JSON.parse(String(v.lcs)) as string[]).join('') || '∅'} · {ko ? '공통 문자는 한 번만 추가' : 'Include shared characters once'}</p>}
+    {v.mode === 'combination-sum' && <p className="fourier-expression">{ko ? '현재 선택' : 'Current selection'}: [{selection.join(', ')}] · {ko ? '남은 합' : 'Remaining sum'}: {v.remainingSum}</p>}
+    {v.mode === 'scs'  && <p className="fourier-expression">LCS: {(JSON.parse(String(v.lcs)) as string[]).join('') || '∅'} · {ko ? '공통 문자는 한 번만 추가' : 'Include shared characters once'}</p>}
     {v.mode === 'combination'  && <p className="fourier-expression">{ko ? '현재 하위 문제' : 'Current subproblem'} · n = {v.size}, k = {v.k}</p>}
     {v.mode === 'permutation' && <p className="fourier-expression">{ko ? '현재 하위 문제' : 'Current subproblem'} · n = {v.size} / {v.originalSize}</p>}
     {maskMode && step.type !== 'done' && <p className="fourier-expression">mask = {v.mask} · {Number(v.mask).toString(2).padStart(Math.max(1, inputs[0].length), '0')}</p>}

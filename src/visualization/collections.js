@@ -1,3 +1,4 @@
+import combinationSum from '../algorithms/sets/combination-sum/combinationSum';
 import dpMaximumSubarray from '../algorithms/sets/maximum-subarray/dpMaximumSubarray';
 import shortestCommonSupersequence from '../algorithms/sets/shortest-common-supersequence/shortestCommonSupersequence';
 import dpLongestIncreasingSubsequence from '../algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence';
@@ -119,5 +120,36 @@ export function traceMaximumSubarray(values) {
     array: step.array.map((value, id) => ({ value, id })),
     variables: { ...step.variables, mode: 'maximum-subarray' },
   }));
+  return steps;
+}
+
+export function traceCombinationSum(values, target) {
+  const items = [...new Set(values)];
+  if (items.length > 5 || !items.every((value) => Number.isInteger(value) && value > 0)
+    || !Number.isInteger(target) || target < 0 || target > 12) throw new Error('combination-sum-input');
+  const steps = [];
+  const groups = combinationSum(items, target, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'combination-sum', inputs: JSON.stringify([items]), target, result: '—',
+    },
+  }));
+  steps[0].type = 'start';
+  steps.push({
+    type: 'done',
+    array: [],
+    indices: [],
+    code: 'return combinationSumRecursive(candidates, target, [], [], 0, stepCallback);',
+    variables: {
+      mode: 'combination-sum',
+      inputs: JSON.stringify([items]),
+      groups: JSON.stringify(groups),
+      selection: '[]',
+      remainingSum: target,
+      target,
+      count: groups.length,
+      result: groups.length,
+    },
+  });
   return steps;
 }

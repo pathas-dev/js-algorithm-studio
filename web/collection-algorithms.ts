@@ -1,3 +1,4 @@
+import combinationSumSource from '../src/algorithms/sets/combination-sum/combinationSum.js?raw';
 import maximumSource from '../src/algorithms/sets/maximum-subarray/dpMaximumSubarray.js?raw';
 import scsSource from '../src/algorithms/sets/shortest-common-supersequence/shortestCommonSupersequence.js?raw';
 import lisSource from '../src/algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence.js?raw';
@@ -8,7 +9,7 @@ import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?ra
 import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence, traceMaximumSubarray } from '../src/visualization/collections';
+import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence, traceMaximumSubarray, traceCombinationSum } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -143,4 +144,22 @@ export const maximumLesson: NumericAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson, lisLesson, supersequenceLesson, maximumLesson];
+export const combinationSumLesson: NumericAlgorithm = {
+  ...combinationLesson, id: 'combination-sum', target: 7,
+  name: { ko: '조합 합', en: 'Combination sum' },
+  summary: { ko: '양의 정수 후보를 반복 사용해 목표 합을 만듭니다. 같은 후보부터 다시 탐색해 반복을 허용하면서 순서만 다른 결과는 중복 생성하지 않습니다.', en: 'Reuse positive integer candidates to reach a target sum. Recurse from the same candidate to allow repetition while avoiding reordered duplicates.' },
+  source: algorithmCode(combinationSumSource), example: [2, 3, 6, 7], time: { ko: '지수적 백트래킹', en: 'Exponential backtracking' },
+  targetLabel: { ko: '목표 합', en: 'Target sum' },
+  inputHint: { ko: '양의 정수 후보 최대 5개 · 중복 제거 · 목표 0–12 · 0·음수 후보는 무한 재귀 방지를 위해 제외', en: 'At most five positive integer candidates · duplicates removed · target 0–12 · reject zero and negative candidates to prevent unbounded recursion' },
+  run: (values, target) => traceCombinationSum(values, target),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start' || step.type === 'enter') return ko ? ['선택한 후보만큼 남은 합 줄이기', `목표 ${v.target}, 남은 합 ${v.remainingSum}입니다. 같은 후보를 다시 고를 수 있고, 앞선 후보로 돌아가지 않아 순서 중복을 막습니다.`] : ['Reduce the remaining sum by the choice', `Target ${v.target}; remainder ${v.remainingSum}. Reuse the same candidate, but never return to earlier candidates, avoiding reordered duplicates.`];
+    if (step.type === 'prune') return ko ? ['목표를 넘은 가지 종료', `남은 합이 ${v.remainingSum}으로 음수입니다. 후보가 모두 양수이므로 더 골라도 회복할 수 없어 이 가지를 버립니다.`] : ['Prune an overshooting branch', `Remainder ${v.remainingSum} is negative. All candidates are positive, so additional choices cannot recover this branch.`];
+    if (step.type === 'solution') return ko ? ['목표 합을 만든 조합 저장', `남은 합이 0이므로 현재 선택을 복사해 저장했습니다. 지금까지 ${v.count}가지 해를 찾았습니다. 목표 0에는 빈 조합 하나가 있습니다.`] : ['Save a combination reaching the target', `Zero remainder saves a copy of the selection; ${v.count} solutions found. Target zero has one empty combination.`];
+    if (step.type === 'backtrack') return ko ? ['마지막 선택을 빼고 다른 후보 탐색', '마지막 후보를 제거하고 이전 선택 상태로 돌아왔습니다. 저장한 해는 복사본이라 되돌리기에 영향을 받지 않습니다.'] : ['Undo the last choice and try alternatives', 'Remove the last candidate and restore the previous selection. Saved solutions are copies and remain unchanged.'];
+    return ko ? ['모든 조합 합 탐색 완료', `목표 ${v.target}을 만드는 방법은 ${v.count}가지입니다. 출력의 순서는 후보 입력 순서를 따르며 각 조합에서 순서만 바꾼 경우는 하나로 셉니다.`] : ['Combination-sum search complete', `${v.count} combinations reach ${v.target}. Output follows candidate order; reordered versions of each combination count once.`];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson, lisLesson, supersequenceLesson, maximumLesson, combinationSumLesson];

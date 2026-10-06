@@ -1,9 +1,12 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * @param {number[]} candidates - candidate numbers we're picking from.
  * @param {number} remainingSum - remaining sum after adding candidates to currentCombination.
  * @param {number[][]} finalCombinations - resulting list of combinations.
  * @param {number[]} currentCombination - currently explored candidates.
  * @param {number} startFrom - index of the candidate to start further exploration from.
+ * @param {function} [stepCallback]
  * @return {number[][]}
  */
 function combinationSumRecursive(
@@ -12,8 +15,17 @@ function combinationSumRecursive(
   finalCombinations = [],
   currentCombination = [],
   startFrom = 0,
+  stepCallback = undefined,
 ) {
+  const state = () => ({
+    remainingSum,
+    selection: JSON.stringify(currentCombination),
+    groups: JSON.stringify(finalCombinations),
+    count: finalCombinations.length,
+  });
+  recordStep(stepCallback, 'enter', [], [], state, 'if (remainingSum < 0) {');
   if (remainingSum < 0) {
+    recordStep(stepCallback, 'prune', [], [], state, 'if (remainingSum < 0) {');
     // By adding another candidate we've gone below zero.
     // This would mean that the last candidate was not acceptable.
     return finalCombinations;
@@ -24,6 +36,7 @@ function combinationSumRecursive(
     // became zero - we need to save the current combination since it is one
     // of the answers we're looking for.
     finalCombinations.push(currentCombination.slice());
+    recordStep(stepCallback, 'solution', [], [], state, 'finalCombinations.push(currentCombination.slice());');
 
     return finalCombinations;
   }
@@ -43,11 +56,13 @@ function combinationSumRecursive(
       finalCombinations,
       currentCombination,
       candidateIndex,
+      stepCallback,
     );
 
     // BACKTRACKING.
     // Let's get back, exclude current candidate and try another ones later.
     currentCombination.pop();
+    recordStep(stepCallback, 'backtrack', [], [], state, 'currentCombination.pop();');
   }
 
   return finalCombinations;
@@ -58,8 +73,13 @@ function combinationSumRecursive(
  *
  * @param {number[]} candidates
  * @param {number} target
+ * @param {function} [stepCallback]
  * @return {number[][]}
  */
-export default function combinationSum(candidates, target) {
-  return combinationSumRecursive(candidates, target);
+export default function combinationSum(candidates, target, stepCallback) {
+  if (!Number.isInteger(target) || target < 0
+    || !candidates.every((value) => Number.isInteger(value) && value > 0)) {
+    throw new Error('Candidates must be positive integers and target a nonnegative integer');
+  }
+  return combinationSumRecursive(candidates, target, [], [], 0, stepCallback);
 }

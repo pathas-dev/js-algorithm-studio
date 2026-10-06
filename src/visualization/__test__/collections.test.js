@@ -1,6 +1,6 @@
 import traceCartesian, {
   traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence,
-  traceMaximumSubarray,
+  traceMaximumSubarray, traceCombinationSum,
 } from '../collections';
 
 it('creates unique ordered pairs and handles an empty set', () => {
@@ -81,4 +81,14 @@ it('retains the best contiguous interval through resets and all-negative inputs'
   expect(traceMaximumSubarray([-3, -1, -2]).at(-1).variables.result).toBe('-1');
   expect(traceMaximumSubarray([0, 0]).at(-1).variables.result).toBe('0');
   expect(traceMaximumSubarray([]).at(-1).variables.result).toBe('∅');
+});
+
+it('finds repeated-candidate sum combinations and rejects nonterminating candidates', () => {
+  const steps = traceCombinationSum([2, 3, 6, 7], 7);
+  expect(JSON.parse(steps.at(-1).variables.groups)).toEqual([[2, 2, 3], [7]]);
+  expect(steps.some((step) => step.type === 'prune')).toBe(true);
+  expect(JSON.parse(traceCombinationSum([], 0).at(-1).variables.groups)).toEqual([[]]);
+  expect(traceCombinationSum([2], 3).at(-1).variables.count).toBe(0);
+  expect(() => traceCombinationSum([0, 1], 3)).toThrow('combination-sum-input');
+  expect(() => traceCombinationSum([-1, 2], 3)).toThrow('combination-sum-input');
 });
