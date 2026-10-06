@@ -1,3 +1,4 @@
+import articulationSource from '../src/algorithms/graph/articulation-points/articulationPoints.js?raw';
 import directedCycleSource from '../src/algorithms/graph/detect-cycle/detectDirectedCycle.js?raw';
 import undirectedCycleSource from '../src/algorithms/graph/detect-cycle/detectUndirectedCycle.js?raw';
 import BucketSort from '../src/algorithms/sorting/bucket-sort/BucketSort';
@@ -59,7 +60,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
+import { traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -773,6 +774,28 @@ export const cycleDetection: NumericAlgorithm = {
   },
 };
 
+export const articulation: NumericAlgorithm = {
+  id: 'articulation-points', category: 'graph', usesStart: false, fixedDirection: true,
+  name: { ko: '단절점', en: 'Articulation points' },
+  summary: { ko: '정점을 제거했을 때 연결 성분이 늘어나는 지점을 찾습니다. DFS 방문 시각과 역방향 간선으로 도달할 수 있는 가장 이른 시각(low)을 비교합니다.', en: 'Find vertices whose removal increases the component count. Compare DFS discovery times with the earliest reachable time (low).' },
+  source: algorithmCode(articulationSource), time: 'O(V + E)', example: [1, 2, 3, 4, 5, 6],
+  graphEdges: [[1, 2], [2, 3], [3, 1], [3, 4], [4, 5], [4, 6]],
+  run: (nodes, _start, edges = articulation.graphEdges!) => traceArticulation(nodes, edges),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['방문 시각과 low 준비', '모든 연결 성분을 검사합니다. DFS 루트는 자식 수가 2개 이상일 때만 단절점입니다.'] : ['Prepare discovery and low', 'Inspect all components. A DFS root is a cut vertex only when it has at least two children.'];
+      case 'enter': return ko ? ['정점의 방문 시각 기록', `정점 ${v.current}에 새로운 방문 시각을 부여하고 low를 같은 값으로 초기화합니다.`] : ['Record discovery time', `Assign a new discovery time to ${v.current} and initialize low to it.`];
+      case 'edge': return ko ? ['부모 이외의 간선 확인', `${v.current} → ${v.next}를 검사합니다. 미방문 정점이면 자식으로 탐색하고, 이미 방문했다면 역방향 간선으로 low를 갱신합니다.`] : ['Inspect a non-parent edge', `Inspect ${v.current} → ${v.next}. Visit an unseen child or update low using a back edge.`];
+      case 'low': return ko ? ['자식의 low 전달', '자식 탐색을 마쳤습니다. 자식이 더 이른 정점으로 연결된다면 부모의 low도 낮춥니다.'] : ['Propagate child low', 'The child is finished. If it reaches an earlier vertex, lower the parent low too.'];
+      case 'back-edge': return ko ? ['역방향 간선으로 low 갱신', '이웃의 방문 시각을 사용합니다. 이웃의 low를 사용하지 않아 다른 DFS 가지를 잘못 포함하지 않습니다.'] : ['Update low with a back edge', 'Use the neighbor discovery time, rather than its low, to avoid mixing other DFS branches.'];
+      case 'cut': return ko ? ['단절점 발견', `정점 ${v.current}를 제거하면 자식 쪽 성분이 분리됩니다. 루트의 자식 수 또는 low[자식] ≥ discovery[부모] 조건을 만족합니다.`] : ['Cut vertex found', `Removing ${v.current} separates a child component: the root has multiple children or low[child] ≥ discovery[parent].`];
+      case 'leave': return ko ? ['정점 탐색 완료', '부모로 돌아가 방문 시각과 low를 비교합니다.'] : ['Finish a vertex', 'Return to the parent to compare discovery and low.'];
+      default: return ko ? ['단절점 검사 완료', `단절점: ${v.result}. ∅는 단절점이 없다는 뜻입니다.`] : ['Cut vertices ready', `Cut vertices: ${v.result}. ∅ means none.`];
+    }
+  },
+};
+
 export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
@@ -1459,4 +1482,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

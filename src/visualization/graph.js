@@ -1,3 +1,4 @@
+import articulationPoints from '../algorithms/graph/articulation-points/articulationPoints';
 import detectDirectedCycle from '../algorithms/graph/detect-cycle/detectDirectedCycle';
 import detectUndirectedCycle from '../algorithms/graph/detect-cycle/detectUndirectedCycle';
 import topologicalSort from '../algorithms/graph/topological-sorting/topologicalSort';
@@ -187,6 +188,17 @@ export function traceCycle(nodes, edges, directed = false) {
     weighted,
     directed,
     (graph, _start, callback) => detect(graph, callback),
+    'dfs',
+  );
+}
+
+export function traceArticulation(nodes, edges) {
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    edges.map(([a, b]) => [a, b, 0]),
+    false,
+    (graph, _start, callback) => articulationPoints(graph, callback),
     'dfs',
   );
 }
