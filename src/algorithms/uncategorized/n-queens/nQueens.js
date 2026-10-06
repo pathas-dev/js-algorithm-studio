@@ -1,3 +1,4 @@
+import recordStep from '../../../utils/trace/recordStep';
 import QueenPosition from './QueenPosition';
 
 /**
@@ -43,9 +44,10 @@ function isSafe(queensPositions, rowIndex, columnIndex) {
  * @param {QueenPosition[]} previousQueensPositions
  * @param {number} queensCount
  * @param {number} rowIndex
+ * @param {function} stepCallback
  * @return {boolean}
  */
-function nQueensRecursive(solutions, previousQueensPositions, queensCount, rowIndex) {
+function nQueensRecursive(solutions, previousQueensPositions, queensCount, rowIndex, stepCallback) {
   // Clone positions array.
   const queensPositions = [...previousQueensPositions].map((queenPosition) => {
     return !queenPosition ? queenPosition : new QueenPosition(
@@ -54,10 +56,21 @@ function nQueensRecursive(solutions, previousQueensPositions, queensCount, rowIn
     );
   });
 
+  const state = (column = -1, safe = false) => ({
+    row: rowIndex,
+    column,
+    safe,
+    count: solutions.length,
+    positions: JSON.stringify(queensPositions.map((queen) => (
+      queen ? [queen.rowIndex, queen.columnIndex] : null
+    ))),
+  });
+
   if (rowIndex === queensCount) {
     // We've successfully reached the end of the board.
     // Store solution to the list of solutions.
     solutions.push(queensPositions);
+    recordStep(stepCallback, 'solution', [], [], () => state(), 'solutions.push(queensPositions)');
 
     // Solution found.
     return true;
@@ -65,16 +78,41 @@ function nQueensRecursive(solutions, previousQueensPositions, queensCount, rowIn
 
   // Let's try to put queen at row rowIndex into its safe column position.
   for (let columnIndex = 0; columnIndex < queensCount; columnIndex += 1) {
-    if (isSafe(queensPositions, rowIndex, columnIndex)) {
+    const safe = isSafe(queensPositions, rowIndex, columnIndex);
+    recordStep(
+      stepCallback,
+      'check',
+      [],
+      [],
+      () => state(columnIndex, safe),
+      'const safe = isSafe(queensPositions, rowIndex, columnIndex)',
+    );
+    if (safe) {
       // Place current queen to its current position.
       queensPositions[rowIndex] = new QueenPosition(rowIndex, columnIndex);
+      recordStep(
+        stepCallback,
+        'place',
+        [],
+        [],
+        () => state(columnIndex, true),
+        'queensPositions[rowIndex] = new QueenPosition(rowIndex, columnIndex)',
+      );
 
       // Try to place all other queens as well.
-      nQueensRecursive(solutions, queensPositions, queensCount, rowIndex + 1);
+      nQueensRecursive(solutions, queensPositions, queensCount, rowIndex + 1, stepCallback);
 
       // BACKTRACKING.
       // Remove the queen from the row to avoid isSafe() returning false.
       queensPositions[rowIndex] = null;
+      recordStep(
+        stepCallback,
+        'backtrack',
+        [],
+        [],
+        () => state(columnIndex),
+        'queensPositions[rowIndex] = null',
+      );
     }
   }
 
@@ -83,9 +121,10 @@ function nQueensRecursive(solutions, previousQueensPositions, queensCount, rowIn
 
 /**
  * @param {number} queensCount
+ * @param {function} [stepCallback]
  * @return {QueenPosition[][]}
  */
-export default function nQueens(queensCount) {
+export default function nQueens(queensCount, stepCallback = undefined) {
   // Init NxN chessboard with zeros.
   // const chessboard = Array(queensCount).fill(null).map(() => Array(queensCount).fill(0));
 
@@ -97,7 +136,7 @@ export default function nQueens(queensCount) {
   const solutions = [];
 
   // Solve problem recursively.
-  nQueensRecursive(solutions, queensPositions, queensCount, 0);
+  nQueensRecursive(solutions, queensPositions, queensCount, 0, stepCallback);
 
   return solutions;
 }

@@ -1,5 +1,5 @@
 import traceHanoi, {
-  traceRotation, traceJump, tracePaths, traceRain,
+  traceRotation, traceJump, tracePaths, traceRain, traceQueens,
 } from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
@@ -50,4 +50,20 @@ it('traps water using the lower of the two maximum walls', () => {
   expect(traceRain([1, 2, 3]).at(-1).variables.result).toBe(0);
   expect(traceRain([0]).at(-1).variables.result).toBe(0);
   expect(() => traceRain([-1])).toThrow('rain-input');
+});
+
+it('enumerates safe N-Queens solutions and records actual backtracking', () => {
+  const steps = traceQueens([4]);
+  const solutions = JSON.parse(steps.at(-1).variables.solutions);
+  expect(solutions).toHaveLength(2);
+  solutions.forEach((solution) => solution.forEach(([row, col], i) => (
+    solution.slice(i + 1).forEach(([r, c]) => {
+      expect(col).not.toBe(c);
+      expect(Math.abs(row - r)).not.toBe(Math.abs(col - c));
+    })
+  )));
+  expect(steps.some((step) => step.type === 'backtrack')).toBe(true);
+  expect(traceQueens([3]).at(-1).variables.result).toBe(0);
+  expect(traceQueens([1]).at(-1).variables.result).toBe(1);
+  expect(() => traceQueens([7])).toThrow('queens-input');
 });

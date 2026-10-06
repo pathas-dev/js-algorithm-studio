@@ -1,0 +1,7 @@
+import type { Language, Step } from './algorithms';
+
+export default function ChessView({ step, language }: { step: Step; language: Language }) {
+  const v = step.variables; const ko = language === 'ko'; const n = Number(v.n);
+  const positions: (number[] | null)[] = JSON.parse(String(v.positions));
+  return <div className="chess-view"><p className="frontier">N = {n} <strong data-testid="puzzle-result">{ko ? '해' : 'Solutions'}: {v.count}</strong></p><table className="chess-board" aria-label={ko ? '퀸 배치와 현재 검사 칸' : 'Queen positions and current candidate'}><tbody>{Array.from({ length: n }, (_, row) => <tr key={row}>{Array.from({ length: n }, (_, column) => <td key={column} className={(row + column) % 2 ? 'dark-square' : ''} style={row === Number(v.row) && column === Number(v.column) && step.type !== 'done' ? { outline: '2px solid #d9a446', outlineOffset: '-2px' } : undefined}>{positions.some((position) => position && position[0] === row && position[1] === column) ? '♛' : step.type === 'check' && row === Number(v.row) && column === Number(v.column) ? v.safe ? '·' : '×' : ''}</td>)}</tr>)}</tbody></table>{step.type === 'done' && <div className="collection-results">{(JSON.parse(String(v.solutions)) as number[][][]).map((solution, index) => <div key={index}>#{index + 1}: [{solution.map((position) => position[1]).join(', ')}]</div>)}{!Number(v.count) && <span>{ko ? '가능한 배치 없음' : 'No valid placement'}</span>}</div>}</div>;
+}

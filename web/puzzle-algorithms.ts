@@ -1,9 +1,10 @@
+import queensSource from '../src/algorithms/uncategorized/n-queens/nQueens.js?raw';
 import rainSource from '../src/algorithms/uncategorized/rain-terraces/dpRainTerraces.js?raw';
 import pathsSource from '../src/algorithms/uncategorized/unique-paths/dpUniquePaths.js?raw';
 import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -89,4 +90,22 @@ const rain: NumericAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain];
+const queens: NumericAlgorithm = {
+  id: 'n-queens', category: 'other', example: [4], usesStart: false, singleInput: true,
+  name: { ko: 'N-Queens 문제', en: 'N-Queens problem' }, time: 'O(N!) · backtracking',
+  summary: { ko: 'N×N 보드의 각 행에 퀸 하나씩 놓되 같은 열이나 대각선에서 공격하지 않게 배치합니다. 후보를 검사하고 막히면 이전 퀸을 빼며 모든 해를 탐색합니다.', en: 'Place one queen per row on an N×N board without sharing a column or diagonal. Check candidates, remove earlier queens on backtracking, and enumerate every solution.' },
+  inputLabels: [{ ko: '보드 크기 N', en: 'Board size N' }, { ko: '', en: '' }],
+  inputHint: { ko: 'N=1–6 · 모든 해 탐색 · 마지막 보드에는 첫 번째 해 표시 · N=2,3은 해가 없음', en: 'N=1–6 · enumerate all solutions · final board shows the first solution · no solution for N=2 or 3' },
+  source: algorithmCode(queensSource), run: traceQueens,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['첫 행부터 퀸 배치 탐색', '각 행에 하나씩 놓고 왼쪽 열부터 후보를 검사합니다. 같은 열·두 대각선에 기존 퀸이 있으면 놓을 수 없습니다.'] : ['Start placing queens from the first row', 'Try columns left to right, placing one queen per row. Existing queens in the same column or either diagonal block placement.'];
+    if (step.type === 'check') return ko ? [v.safe ? '공격받지 않는 후보' : '기존 퀸과 충돌하는 후보', `행 ${v.row}, 열 ${v.column}: ${v.safe ? '안전하므로 배치합니다' : '같은 열·대각선 충돌로 건너뜁니다'}.`] : [v.safe ? 'A safe candidate' : 'A conflicting candidate', `Row ${v.row}, column ${v.column}: ${v.safe ? 'safe to place' : 'skip a shared-column or diagonal conflict'}.`];
+    if (step.type === 'place') return ko ? ['현재 행에 퀸 배치', `(${v.row}, ${v.column})에 놓고 다음 행으로 재귀 탐색합니다. 이 배치가 전체 해가 될지는 아직 모릅니다.`] : ['Place a queen in this row', `Place at (${v.row}, ${v.column}) and recurse into the next row. This partial placement may not lead to a solution.`];
+    if (step.type === 'backtrack') return ko ? ['현재 퀸 제거 · 다른 후보 탐색', '아래 행의 탐색을 마쳤거나 막혔으므로 현재 퀸을 제거합니다. 다음 열 후보로 탐색을 이어갑니다.'] : ['Remove this queen and explore another candidate', 'Lower rows finished or reached a dead end. Remove this queen and continue with the next column.'];
+    if (step.type === 'solution') return ko ? ['모든 행 배치 성공 · 해 저장', `${v.count}번째 해를 저장했습니다. 다른 해를 찾기 위해 되돌아가 탐색을 계속합니다.`] : ['All rows placed · save a solution', `Saved solution ${v.count}. Backtrack and continue searching for other solutions.`];
+    return ko ? [v.count ? '모든 해 탐색 완료' : '가능한 배치가 없음', `총 ${v.count}개입니다. ${v.count ? '보드에는 첫 번째 해를 표시하며 아래에 모든 해의 행별 열 번호가 나옵니다.' : '모든 후보를 검사했지만 N개 퀸을 안전하게 놓을 수 없습니다.'}`] : [v.count ? 'All solutions ready' : 'No valid placement', `Found ${v.count} solutions. ${v.count ? 'The board shows the first; all row-wise column lists appear below.' : 'All candidates were explored without a complete safe placement.'}`];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens];

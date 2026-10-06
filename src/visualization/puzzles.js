@@ -1,3 +1,4 @@
+import nQueens from '../algorithms/uncategorized/n-queens/nQueens';
 import dpRainTerraces from '../algorithms/uncategorized/rain-terraces/dpRainTerraces';
 import dpUniquePaths from '../algorithms/uncategorized/unique-paths/dpUniquePaths';
 import greedyJumpGame from '../algorithms/uncategorized/jump-game/greedyJumpGame';
@@ -123,5 +124,43 @@ export function traceRain(values) {
     array: step.array.map((value, id) => ({ value, id })),
     variables: { ...step.variables, mode: 'rain' },
   }));
+  return steps;
+}
+
+export function traceQueens(values) {
+  const n = values[0];
+  if (values.length !== 1 || !Number.isInteger(n) || n < 1 || n > 6) {
+    throw new Error('queens-input');
+  }
+  const steps = [{
+    type: 'start',
+    array: [],
+    indices: [],
+    code: 'const queensPositions = Array(queensCount).fill(null)',
+    variables: {
+      mode: 'queens', n, count: 0, positions: '[]',
+    },
+  }];
+  const solutions = nQueens(n, (step) => steps.push({
+    ...step,
+    variables: { ...step.variables, mode: 'queens', n },
+  }));
+  const coordinates = solutions.map((solution) => solution.map((queen) => (
+    [queen.rowIndex, queen.columnIndex]
+  )));
+  steps.push({
+    type: 'done',
+    array: [],
+    indices: [],
+    code: 'return solutions',
+    variables: {
+      mode: 'queens',
+      n,
+      count: solutions.length,
+      result: solutions.length,
+      positions: JSON.stringify(coordinates[0] || []),
+      solutions: JSON.stringify(coordinates),
+    },
+  });
   return steps;
 }
