@@ -1,10 +1,11 @@
+import lcmSource from '../src/algorithms/math/least-common-multiple/leastCommonMultiple.js?raw';
 import gcdSource from '../src/algorithms/math/euclidean-algorithm/euclideanAlgorithm.js?raw';
 import primeSource from '../src/algorithms/math/primality-test/trialDivision.js?raw';
 import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?raw';
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -100,4 +101,19 @@ export const gcdLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson];
+export const lcmLesson: NumericAlgorithm = {
+  ...gcdLesson, id: 'least-common-multiple',
+  name: { ko: '최소 공배수', en: 'Least common multiple' },
+  summary: { ko: '최대공약수를 구한 뒤 |a ÷ gcd(a,b) × b|를 계산합니다. 0이 포함되면 최소 공배수는 0입니다.', en: 'Find the GCD, then compute |a ÷ gcd(a,b) × b|. If either input is zero, the LCM is zero.' },
+  source: algorithmCode(lcmSource + '\n' + gcdSource), example: [12, 18],
+  inputHint: { ko: '정수 두 개 · 각 값 -999부터 999까지 · 결과는 0 이상', en: 'Two integers · -999 to 999 each · nonnegative result' },
+  run: (values) => traceLcm(values),
+  explain(step, language) {
+    if (step.variables.phase === 'gcd') return gcdLesson.explain(step, language);
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['최소 공배수 준비', '둘 중 하나라도 0이면 결과는 0입니다. 나머지 경우에는 먼저 최대공약수를 구합니다.'] : ['Prepare LCM', 'If either input is zero, return zero. Otherwise calculate their GCD first.'];
+    return ko ? ['최소 공배수 완료', Number(v.result) === 0 ? '입력에 0이 있어 결과도 0입니다.' : `${v.expression}. 최대공약수로 먼저 나누어 공통 인수를 중복 계산하지 않습니다.`] : ['LCM ready', Number(v.result) === 0 ? 'A zero input makes the result zero.' : `${v.expression}. Divide by the GCD first to avoid counting shared factors twice.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson];

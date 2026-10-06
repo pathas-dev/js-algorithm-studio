@@ -1,5 +1,5 @@
 import traceBits, {
-  traceFactorial, traceFibonacci, tracePrimality, traceGcd,
+  traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -54,4 +54,12 @@ it('reduces GCD by remainders and handles signed and zero inputs', () => {
   expect(traceGcd([-60, 24]).at(-1).variables.result).toBe(12);
   expect(traceGcd([0, 0]).at(-1).variables.result).toBe(0);
   expect(() => traceGcd([2, 1.5])).toThrow('integer-pair');
+});
+
+it('derives LCM from GCD with zero and signed inputs', () => {
+  const steps = traceLcm([12, 18]);
+  expect(steps.at(-1).variables.result).toBe(36);
+  expect(steps.some((step) => step.variables.phase === 'gcd')).toBe(true);
+  expect(traceLcm([0, 4]).at(-1).variables.result).toBe(0);
+  expect(traceLcm([-9, 18]).at(-1).variables.result).toBe(18);
 });
