@@ -1,3 +1,4 @@
+import sccSource from '../src/algorithms/graph/strongly-connected-components/stronglyConnectedComponents.js?raw';
 import hamiltonianSource from '../src/algorithms/graph/hamiltonian-cycle/hamiltonianPath.js?raw';
 import eulerianSource from '../src/algorithms/graph/eulerian-path/eulerianPath.js?raw';
 import bridgesSource from '../src/algorithms/graph/bridges/graphBridges.js?raw';
@@ -63,7 +64,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceHamiltonian, traceEulerian, traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
+import { traceScc, traceHamiltonian, traceEulerian, traceBridges, traceArticulation, traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -855,6 +856,27 @@ export const hamiltonian: NumericAlgorithm = {
   },
 };
 
+export const scc: NumericAlgorithm = {
+  id: 'strongly-connected-components', category: 'graph', usesStart: false, fixedDirection: true, graphDirected: true,
+  name: { ko: '강결합 컴포넌트', en: 'Strongly connected components' },
+  summary: { ko: '서로 오갈 수 있는 정점들을 묶습니다. DFS 종료 순서를 기록하고, 간선을 뒤집은 뒤 종료 시각 역순으로 다시 탐색합니다.', en: 'Group mutually reachable vertices. Record DFS finishing order, reverse the edges, then traverse in decreasing finish order.' },
+  source: algorithmCode(sccSource), time: 'O(V + E)', example: [1, 2, 3, 4, 5, 6],
+  graphEdges: [[1, 2], [2, 3], [3, 1], [3, 4], [4, 5], [5, 4]],
+  run: (nodes, _start, edges = scc.graphEdges!) => traceScc(nodes, edges),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['첫 DFS 준비', '모든 정점에서 DFS를 수행해 종료 시각 순서를 기록합니다. 고립 정점도 하나의 컴포넌트가 됩니다.'] : ['Prepare the first DFS', 'Visit all vertices and record finishing order. Isolated vertices form singleton components.'];
+      case 'enter': return ko ? ['첫 DFS 정점 방문', `원래 방향으로 정점 ${v.current}를 방문합니다.`] : ['Visit in the first DFS', `Visit ${v.current} using the original edge directions.`];
+      case 'finish': return ko ? ['종료 순서 기록', `정점 ${v.current}의 탐색을 마쳤습니다. 종료 스택 위에 추가하여 두 번째 DFS 순서를 정합니다.`] : ['Record finishing order', `Finish ${v.current} and push it onto the finishing stack for the second pass.`];
+      case 'transpose': return ko ? ['간선 방향 뒤집기', '화면의 모든 화살표가 뒤집혔습니다. 방문 상태를 초기화하고 가장 늦게 종료한 정점부터 탐색합니다.'] : ['Transpose the graph', 'All arrows are now reversed. Clear visitation state and start with the latest finished vertex.'];
+      case 'collect': return ko ? ['같은 컴포넌트 수집', `전치 그래프에서 정점 ${v.current}를 방문해 현재 컴포넌트에 넣습니다.`] : ['Collect a component member', `Visit ${v.current} in the transpose and add it to the current component.`];
+      case 'component': return ko ? ['강결합 컴포넌트 확정', '이번 DFS로 방문한 정점들은 원래 그래프에서도 서로 도달할 수 있습니다. 한 컴포넌트로 확정합니다.'] : ['Finalize a component', 'Vertices in this DFS are mutually reachable in the original graph. Finalize this component.'];
+      default: return ko ? ['강결합 컴포넌트 완료', `결과: ${v.result}. 화면은 두 번째 탐색의 전치 그래프입니다.`] : ['Components ready', `Result: ${v.result}. The display remains the transpose used in the second pass.`];
+    }
+  },
+};
+
 export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
@@ -1541,4 +1563,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, articulation, bridges, eulerian, hamiltonian, scc, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

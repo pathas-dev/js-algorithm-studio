@@ -1,133 +1,63 @@
-import Stack from '../../../data-structures/stack/Stack';
-import depthFirstSearch from '../depth-first-search/depthFirstSearch';
+import recordGraphStep from '../../../utils/trace/recordGraphStep';
 
-/**
- * @param {Graph} graph
- * @return {Stack}
- */
-function getVerticesSortedByDfsFinishTime(graph) {
-  // Set of all visited vertices during DFS pass.
-  const visitedVerticesSet = {};
-
-  // Stack of vertices by finish time.
-  // All vertices in this stack are ordered by finished time in decreasing order.
-  // Vertex that has been finished first will be at the bottom of the stack and
-  // vertex that has been finished last will be at the top of the stack.
-  const verticesByDfsFinishTime = new Stack();
-
-  // Set of all vertices we're going to visit.
-  const notVisitedVerticesSet = {};
-  graph.getAllVertices().forEach((vertex) => {
-    notVisitedVerticesSet[vertex.getKey()] = vertex;
+/** Kosaraju: finishing order, transpose, then DFS in decreasing finish order. */
+export default function stronglyConnectedComponents(graph, stepCallback) {
+  const seen = new Set();
+  const finish = [];
+  const stack = [];
+  const components = [];
+  const processed = [];
+  let reversed = false;
+  const state = (vertex) => ({
+    current: vertex ? vertex.getKey() : '',
+    reversed,
+    seen: [...seen].map((item) => item.getKey()).join(','),
+    processed: processed.join(','),
+    stack: stack.join(','),
+    finish: finish.map((item) => item.getKey()).reverse().join(','),
+    components: JSON.stringify(components.map((group) => group.map((item) => item.getKey()))),
+    result: components.map((group) => `[${group.map((item) => item.getKey()).join(',')}]`).join(' · ') || '∅',
+    order: '',
   });
-
-  // Specify DFS traversal callbacks.
-  const dfsCallbacks = {
-    enterVertex: ({ currentVertex }) => {
-      // Add current vertex to visited set.
-      visitedVerticesSet[currentVertex.getKey()] = currentVertex;
-
-      // Delete current vertex from not visited set.
-      delete notVisitedVerticesSet[currentVertex.getKey()];
-    },
-    leaveVertex: ({ currentVertex }) => {
-      // Push vertex to the stack when leaving it.
-      // This will make stack to be ordered by finish time in decreasing order.
-      verticesByDfsFinishTime.push(currentVertex);
-    },
-    allowTraversal: ({ nextVertex }) => {
-      // Don't allow to traverse the nodes that have been already visited.
-      return !visitedVerticesSet[nextVertex.getKey()];
-    },
-  };
-
-  // Do FIRST DFS PASS traversal for all graph vertices to fill the verticesByFinishTime stack.
-  while (Object.values(notVisitedVerticesSet).length) {
-    // Peek any vertex to start DFS traversal from.
-    const startVertexKey = Object.keys(notVisitedVerticesSet)[0];
-    const startVertex = notVisitedVerticesSet[startVertexKey];
-    delete notVisitedVerticesSet[startVertexKey];
-
-    depthFirstSearch(graph, startVertex, dfsCallbacks);
+  recordGraphStep(stepCallback, graph, 'start', () => state(), 'const finish = [];');
+  function firstPass(vertex) {
+    seen.add(vertex);
+    stack.push(vertex.getKey());
+    recordGraphStep(stepCallback, graph, 'enter', () => state(vertex), 'seen.add(vertex);');
+    vertex.getNeighbors().forEach((next) => {
+      if (!seen.has(next)) firstPass(next);
+    });
+    finish.push(vertex);
+    stack.pop();
+    recordGraphStep(stepCallback, graph, 'finish', () => state(vertex), 'finish.push(vertex);');
   }
-
-  return verticesByDfsFinishTime;
-}
-
-/**
- * @param {Graph} graph
- * @param {Stack} verticesByFinishTime
- * @return {*[]}
- */
-function getSCCSets(graph, verticesByFinishTime) {
-  // Array of arrays of strongly connected vertices.
-  const stronglyConnectedComponentsSets = [];
-
-  // Array that will hold all vertices that are being visited during one DFS run.
-  let stronglyConnectedComponentsSet = [];
-
-  // Visited vertices set.
-  const visitedVerticesSet = {};
-
-  // Callbacks for DFS traversal.
-  const dfsCallbacks = {
-    enterVertex: ({ currentVertex }) => {
-      // Add current vertex to SCC set of current DFS round.
-      stronglyConnectedComponentsSet.push(currentVertex);
-
-      // Add current vertex to visited set.
-      visitedVerticesSet[currentVertex.getKey()] = currentVertex;
-    },
-    leaveVertex: ({ previousVertex }) => {
-      // Once DFS traversal is finished push the set of found strongly connected
-      // components during current DFS round to overall strongly connected components set.
-      // The sign that traversal is about to be finished is that we came back to start vertex
-      // which doesn't have parent.
-      if (previousVertex === null) {
-        stronglyConnectedComponentsSets.push([...stronglyConnectedComponentsSet]);
-      }
-    },
-    allowTraversal: ({ nextVertex }) => {
-      // Don't allow traversal of already visited vertices.
-      return !visitedVerticesSet[nextVertex.getKey()];
-    },
-  };
-
-  while (!verticesByFinishTime.isEmpty()) {
-    /** @var {GraphVertex} startVertex */
-    const startVertex = verticesByFinishTime.pop();
-
-    // Reset the set of strongly connected vertices.
-    stronglyConnectedComponentsSet = [];
-
-    // Don't do DFS on already visited vertices.
-    if (!visitedVerticesSet[startVertex.getKey()]) {
-      // Do DFS traversal.
-      depthFirstSearch(graph, startVertex, dfsCallbacks);
+  graph.getAllVertices().forEach((vertex) => {
+    if (!seen.has(vertex)) firstPass(vertex);
+  });
+  graph.reverse();
+  reversed = true;
+  seen.clear();
+  recordGraphStep(stepCallback, graph, 'transpose', () => state(), 'graph.reverse();');
+  function secondPass(vertex, group) {
+    seen.add(vertex);
+    group.push(vertex);
+    stack.push(vertex.getKey());
+    recordGraphStep(stepCallback, graph, 'collect', () => state(vertex), 'group.push(vertex);');
+    vertex.getNeighbors().forEach((next) => {
+      if (!seen.has(next)) secondPass(next, group);
+    });
+    stack.pop();
+  }
+  while (finish.length) {
+    const vertex = finish.pop();
+    if (!seen.has(vertex)) {
+      const group = [];
+      secondPass(vertex, group);
+      components.push(group);
+      processed.push(...group.map((item) => item.getKey()));
+      recordGraphStep(stepCallback, graph, 'component', () => state(vertex), 'components.push(group);');
     }
   }
-
-  return stronglyConnectedComponentsSets;
-}
-
-/**
- * Kosaraju's algorithm.
- *
- * @param {Graph} graph
- * @return {*[]}
- */
-export default function stronglyConnectedComponents(graph) {
-  // In this algorithm we will need to do TWO DFS PASSES overt the graph.
-
-  // Get stack of vertices ordered by DFS finish time.
-  // All vertices in this stack are ordered by finished time in decreasing order:
-  // Vertex that has been finished first will be at the bottom of the stack and
-  // vertex that has been finished last will be at the top of the stack.
-  const verticesByFinishTime = getVerticesSortedByDfsFinishTime(graph);
-
-  // Reverse the graph.
-  graph.reverse();
-
-  // Do DFS once again on reversed graph.
-  return getSCCSets(graph, verticesByFinishTime);
+  recordGraphStep(stepCallback, graph, 'done', () => state(), 'return components;');
+  return components;
 }

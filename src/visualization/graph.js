@@ -1,3 +1,4 @@
+import stronglyConnectedComponents from '../algorithms/graph/strongly-connected-components/stronglyConnectedComponents';
 import hamiltonianPath from '../algorithms/graph/hamiltonian-cycle/hamiltonianPath';
 import eulerianPath from '../algorithms/graph/eulerian-path/eulerianPath';
 import graphBridges from '../algorithms/graph/bridges/graphBridges';
@@ -239,4 +240,19 @@ export function traceHamiltonian(nodes, edges, directed = false) {
     (graph, _start, callback) => hamiltonianPath(graph, callback),
     'dfs',
   );
+}
+
+export function traceScc(nodes, edges) {
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    edges.map(([a, b]) => [a, b, 0]),
+    true,
+    (graph, _start, callback) => stronglyConnectedComponents(graph, callback),
+    'dfs',
+  )
+    .map((step) => ({
+      ...step,
+      edges: step.variables.reversed ? step.edges.map(([a, b, w]) => [b, a, w]) : step.edges,
+    }));
 }

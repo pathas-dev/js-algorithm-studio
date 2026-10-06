@@ -1,5 +1,5 @@
 import {
-  traceCycle, traceArticulation, traceBridges, traceEulerian, traceHamiltonian,
+  traceCycle, traceArticulation, traceBridges, traceEulerian, traceHamiltonian, traceScc,
 } from '../graph';
 
 it('distinguishes directed cycles, parent edges and disconnected components', () => {
@@ -45,4 +45,12 @@ it('finds Hamiltonian paths without requiring a cycle and tries other starting v
   expect(traceHamiltonian([1, 2, 3], [[1, 2]]).at(-1).variables.result).toBe('∅');
   expect(traceHamiltonian([1, 2], [[2, 1]], true).at(-1).variables.order).toBe('2,1');
   expect(() => traceHamiltonian([1, 2, 3, 4, 5, 6, 7, 8], [])).toThrow('graph-search-limit');
+});
+
+it('finds SCCs, including isolated vertices, and displays the transposed edges', () => {
+  const steps = traceScc([1, 2, 3, 4], [[1, 2], [2, 1], [2, 3]]);
+  const components = JSON.parse(steps.at(-1).variables.components);
+  expect(components.map((group) => group.sort()).sort()).toEqual([[1, 2], [3], [4]]);
+  expect(steps.find((step) => step.type === 'transpose').edges).toContainEqual([3, 2, 0]);
+  expect(steps[0].edges).toContainEqual([2, 3, 0]);
 });

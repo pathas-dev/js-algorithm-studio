@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
 
-export default function GraphView({ step, language }: { step: Step; language: Language }) {
+export default function GraphView({ step, language, weighted = true }: { step: Step; language: Language; weighted?: boolean }) {
   const ko = language === 'ko';
   const statusId = useId();
   const markerId = `${statusId}-arrow`;
@@ -36,7 +36,7 @@ export default function GraphView({ step, language }: { step: Step; language: La
         const bend = reciprocal ? 28 : 0;
         const cx = (from.x + to.x) / 2 - dy / length * bend, cy = (from.y + to.y) / 2 + dx / length * bend;
         return <g key={`${a}-${b}`}><path d={`M ${from.x + dx / length * 22} ${from.y + dy / length * 22} Q ${cx} ${cy} ${to.x - dx / length * 24} ${to.y - dy / length * 24}`} fill="none" stroke={active ? '#d8964a' : selected ? '#326f54' : '#aabdb0'} strokeWidth={active || selected ? 4 : 2} markerEnd={step.variables.directed ? `url(#${markerId})` : undefined} />
-          {weight !== undefined && <text x={(from.x + 2 * cx + to.x) / 4} y={(from.y + 2 * cy + to.y) / 4 - 5} textAnchor="middle" fontSize={12} fontWeight={700} fill="#305645" stroke="#fff" strokeWidth={4} paintOrder="stroke">{weight}</text>}
+          {weighted && weight !== undefined && <text x={(from.x + 2 * cx + to.x) / 4} y={(from.y + 2 * cy + to.y) / 4 - 5} textAnchor="middle" fontSize={12} fontWeight={700} fill="#305645" stroke="#fff" strokeWidth={4} paintOrder="stroke">{weight}</text>}
         </g>;
       })}
       {positions.map((node, index) => {
@@ -55,6 +55,7 @@ export default function GraphView({ step, language }: { step: Step; language: La
     {groups && <div className="frontier" id={step.variables.structure === 'disjoint-set' ? statusId : undefined}><span>{ko ? '분리 집합 · 대표: 구성원' : 'Disjoint sets · representative: members'}</span><output data-testid="disjoint-groups">{[...groupMap].map(([root, members]) => `${root}: [${members.join(', ')}]`).join(' · ')}</output></div>}
     {distances && <table className="graph-table" data-testid="distance-table"><caption>{step.variables.negativeCycle ? ko ? '음수 사이클 · 잠정 거리 (최단 거리 아님)' : 'Negative cycle · tentative distances (not shortest)' : ko ? '시작점에서의 거리 · ∞는 도달 불가' : 'Distance from start · ∞ means unreachable'}</caption><thead><tr><th>{ko ? '정점' : 'Vertex'}</th><th>{ko ? '거리' : 'Distance'}</th><th>{ko ? '이전 정점' : 'Previous'}</th></tr></thead><tbody>{step.array.map((item) => <tr key={item.id}><td>{item.value}</td><td>{distances[item.value] ?? '∞'}</td><td>{previous?.[item.value] ?? '—'}</td></tr>)}</tbody></table>}
     {matrix && <div className="matrix-scroll" id={statusId}><table className="graph-table" data-testid="distance-matrix"><caption>{step.variables.negativeCycle ? ko ? '음수 사이클 · 잠정 거리 행렬' : 'Negative cycle · tentative matrix' : ko ? '거리 행렬 · 행: 출발 / 열: 도착' : 'Distance matrix · row: source / column: destination'}</caption><thead><tr><th>→</th>{step.array.map((item) => <th key={item.id}>{item.value}</th>)}</tr></thead><tbody>{matrix.map((row, i) => <tr key={i}><th>{step.array[i].value}</th>{row.map((value, j) => <td key={j} className={step.variables.current === step.array[i].value && step.variables.next === step.array[j].value ? 'active-bucket' : undefined}>{value ?? '∞'}</td>)}</tr>)}</tbody></table></div>}
+    {'finish' in step.variables && <div className="frontier"><span>{ko ? '종료 스택 · 위 → 아래' : 'Finishing stack · top → bottom'}</span><output>[{String(step.variables.finish).split(',').filter(Boolean).join(', ')}]</output></div>}
     {'discovery' in step.variables && <table className="graph-table" data-testid="low-table"><caption>{ko ? 'DFS 방문 시각 · low' : 'DFS discovery time · low'}</caption><thead><tr><th>{ko ? '정점' : 'Vertex'}</th><th>discovery</th><th>low</th></tr></thead><tbody>{step.array.map((item) => <tr key={item.id}><td>{item.value}</td><td>{JSON.parse(String(step.variables.discovery))[item.value] ?? '—'}</td><td>{JSON.parse(String(step.variables.low))[item.value] ?? '—'}</td></tr>)}</tbody></table>}
     {!matrix && step.variables.structure !== 'disjoint-set' && <div className="graph-status" id={statusId} aria-live="polite">{step.variables.structure === 'graph-structure' ? ko ? `현재 정점: ${seen.join(', ') || '∅'}` : `Current vertices: ${seen.join(', ') || '∅'}` : <>{ko ? '발견: ' : 'Discovered: '}{seen.join(', ')} · {ko ? '처리 완료: ' : 'Processed: '}{processed.filter(Boolean).join(', ') || '∅'}</>}</div>}
   </div>;
