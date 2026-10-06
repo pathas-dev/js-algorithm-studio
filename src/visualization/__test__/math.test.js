@@ -1,7 +1,7 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
-  traceComplex, traceRadian, tracePower,
+  traceComplex, traceRadian, tracePower, traceHorner,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -150,4 +150,14 @@ it('reuses recursive half powers with odd, even and zero exponents', () => {
   expect(tracePower([0, 0]).at(-1).variables.result).toBe(1);
   expect(tracePower([3, 7]).filter((step) => step.type === 'enter').length).toBe(3);
   expect(() => tracePower([3, -1])).toThrow('power-input');
+});
+
+it('evaluates descending polynomial coefficients by multiply-add', () => {
+  const steps = traceHorner([4, 3, 2], 2);
+  expect(steps.filter((step) => step.type === 'multiply-add')
+    .map((step) => step.variables.result)).toEqual([4, 11, 24]);
+  expect(traceHorner([4, 3, 2], 0).at(-1).variables.result).toBe(2);
+  expect(traceHorner([4, 3, 2], -1).at(-1).variables.result).toBe(3);
+  expect(traceHorner([7], 2).at(-1).variables.result).toBe(7);
+  expect(() => traceHorner([], 2)).toThrow('horner-input');
 });

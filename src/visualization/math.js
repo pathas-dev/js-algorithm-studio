@@ -1,3 +1,4 @@
+import hornerMethod from '../algorithms/math/horner-method/hornerMethod';
 import fastPowering from '../algorithms/math/fast-powering/fastPowering';
 import degreeToRadian from '../algorithms/math/radian/degreeToRadian';
 import radianToDegree from '../algorithms/math/radian/radianToDegree';
@@ -345,5 +346,27 @@ export function tracePower(values) {
   });
   steps[0].type = 'start';
   steps[steps.length - 1].type = 'done';
+  return steps;
+}
+
+export function traceHorner(values, x) {
+  if (!values.length || values.length > 8 || !values.every(Number.isFinite)
+    || !Number.isFinite(x) || Math.abs(x) > 10) throw new Error('horner-input');
+  const steps = [];
+  const result = hornerMethod(values, x, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'horner',
+    },
+  }));
+  const last = steps[steps.length - 1];
+  steps.push({
+    ...last,
+    type: 'done',
+    code: 'return result;',
+    variables: {
+      ...last.variables, result, expression: `P(${x}) = ${result}`,
+    },
+  });
   return steps;
 }

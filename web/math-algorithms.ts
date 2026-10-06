@@ -1,3 +1,4 @@
+import hornerSource from '../src/algorithms/math/horner-method/hornerMethod.js?raw';
 import powerSource from '../src/algorithms/math/fast-powering/fastPowering.js?raw';
 import degreeSource from '../src/algorithms/math/radian/degreeToRadian.js?raw';
 import radianSource from '../src/algorithms/math/radian/radianToDegree.js?raw';
@@ -17,7 +18,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -298,4 +299,21 @@ export const powerLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson];
+export const hornerLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'horner-method', usesStart: true, target: 2,
+  name: { ko: '호너 방법', en: "Horner's method" },
+  summary: { ko: '높은 차수부터 입력한 다항식 계수를 중첩 계산합니다. 거듭제곱을 따로 만들지 않고 계수마다 한 번 곱하고 더합니다.', en: 'Evaluate polynomial coefficients from highest degree using nested multiplication. Multiply and add once per coefficient without computing powers separately.' },
+  source: algorithmCode(hornerSource), example: [4, 3, 2], time: 'O(n)',
+  targetLabel: { ko: 'x 값', en: 'x value' },
+  inputLabels: [{ ko: '계수 · 높은 차수부터', en: 'Coefficients · highest degree first' }, { ko: 'x 값', en: 'x value' }],
+  inputHint: { ko: '계수 1–8개 · x는 -10–10 · 예: 4, 3, 2는 4x²+3x+2', en: 'One to eight coefficients · x -10–10 · 4, 3, 2 means 4x²+3x+2' },
+  run: (values, x) => traceHorner(values, x),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['최고차항부터 누적', '누적값 0으로 시작합니다. 계수는 높은 차수부터 상수항까지 입력합니다. 첫 계수는 곱셈 뒤 그대로 누적값이 됩니다.'] : ['Accumulate from the highest degree', 'Start at zero. Coefficients run from the highest degree to the constant; the first coefficient becomes the accumulator.'];
+    if (step.type === 'multiply-add') return ko ? ['x를 곱하고 다음 계수 더하기', `${v.expression}. x를 곱하면 지금까지 만든 다항식의 차수가 하나 올라가고, 다음 계수를 더해 다음 항을 포함합니다.`] : ['Multiply by x and add the next coefficient', `${v.expression}. Multiplication raises the accumulated polynomial degree; addition incorporates the next coefficient.`];
+    return ko ? ['다항식 계산 완료', `${v.expression}. 거듭제곱을 따로 계산하지 않아 계수 개수에 비례하는 연산만 필요합니다.`] : ['Polynomial value ready', `${v.expression}. Avoiding separate powers needs only a linear number of operations.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson];
