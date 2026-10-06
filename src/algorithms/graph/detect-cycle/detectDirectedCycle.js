@@ -1,3 +1,4 @@
+import recordGraphStep from '../../../utils/trace/recordGraphStep';
 import depthFirstSearch from '../depth-first-search/depthFirstSearch';
 
 /**
@@ -5,7 +6,7 @@ import depthFirstSearch from '../depth-first-search/depthFirstSearch';
  *
  * @param {Graph} graph
  */
-export default function detectDirectedCycle(graph) {
+export default function detectDirectedCycle(graph, stepCallback) {
   let cycle = null;
 
   // Will store parents (previous vertices) for all visited nodes.
@@ -33,6 +34,21 @@ export default function detectDirectedCycle(graph) {
     whiteSet[vertex.getKey()] = vertex;
   });
 
+  const state = (currentVertex, nextVertex) => ({
+    mode: 'dfs',
+    seen: [...Object.keys(graySet), ...Object.keys(blackSet)].join(','),
+    processed: Object.keys(blackSet).join(','),
+    stack: Object.keys(graySet).join(','),
+    order: cycle ? Object.keys(cycle).join(',') : '',
+    result: cycle ? 'cycle' : 'acyclic',
+    chosen: JSON.stringify(cycle ? Object.entries(cycle).map(
+      ([key, parent]) => [parent.getKey(), graph.getVertexByKey(key).getKey()],
+    ) : []),
+    ...(currentVertex ? { current: currentVertex.getKey() } : {}),
+    ...(nextVertex ? { next: nextVertex.getKey() } : {}),
+  });
+  recordGraphStep(stepCallback, graph, 'start', () => state(), 'const whiteSet = {};');
+
   // Describe BFS callbacks.
   const callbacks = {
     enterVertex: ({ currentVertex, previousVertex }) => {
@@ -51,6 +67,7 @@ export default function detectDirectedCycle(graph) {
         }
 
         cycle[currentCycleVertex.getKey()] = previousCycleVertex;
+        recordGraphStep(stepCallback, graph, 'cycle', () => state(currentVertex), 'cycle = {};');
       } else {
         // Otherwise let's add current vertex to gray set and remove it from white set.
         graySet[currentVertex.getKey()] = currentVertex;
@@ -58,6 +75,7 @@ export default function detectDirectedCycle(graph) {
 
         // Update DFS parents list.
         dfsParentMap[currentVertex.getKey()] = previousVertex;
+        recordGraphStep(stepCallback, graph, 'enter', () => state(currentVertex), 'graySet[currentVertex.getKey()] = currentVertex;');
       }
     },
     leaveVertex: ({ currentVertex }) => {
@@ -65,8 +83,10 @@ export default function detectDirectedCycle(graph) {
       // and move it to the black set meaning that all its neighbors are visited.
       blackSet[currentVertex.getKey()] = currentVertex;
       delete graySet[currentVertex.getKey()];
+      recordGraphStep(stepCallback, graph, 'leave', () => state(currentVertex), 'delete graySet[currentVertex.getKey()];');
     },
-    allowTraversal: ({ nextVertex }) => {
+    allowTraversal: ({ currentVertex, nextVertex }) => {
+      recordGraphStep(stepCallback, graph, 'edge', () => state(currentVertex, nextVertex), 'return !blackSet[nextVertex.getKey()];');
       // If cycle was detected we must forbid all further traversing since it will
       // cause infinite traversal loop.
       if (cycle) {
@@ -89,5 +109,6 @@ export default function detectDirectedCycle(graph) {
     depthFirstSearch(graph, startVertex, callbacks);
   }
 
+  recordGraphStep(stepCallback, graph, 'done', () => state(), 'return cycle;');
   return cycle;
 }

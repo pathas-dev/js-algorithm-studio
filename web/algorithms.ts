@@ -1,3 +1,5 @@
+import directedCycleSource from '../src/algorithms/graph/detect-cycle/detectDirectedCycle.js?raw';
+import undirectedCycleSource from '../src/algorithms/graph/detect-cycle/detectUndirectedCycle.js?raw';
 import BucketSort from '../src/algorithms/sorting/bucket-sort/BucketSort';
 import bucketSource from '../src/algorithms/sorting/bucket-sort/BucketSort.js?raw';
 import hashTableSource from '../src/data-structures/hash-table/HashTable.js?raw';
@@ -57,7 +59,7 @@ import ShellSort from '../src/algorithms/sorting/shell-sort/ShellSort';
 import shellSource from '../src/algorithms/sorting/shell-sort/ShellSort.js?raw';
 import dfsSource from '../src/algorithms/graph/depth-first-search/depthFirstSearch.js?raw';
 import bfsSource from '../src/algorithms/graph/breadth-first-search/breadthFirstSearch.js?raw';
-import { traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
+import { traceCycle, traceBfs, traceDfs, traceDijkstra, traceBellmanFord, traceFloydWarshall, tracePrim, traceKruskal, traceTopological } from '../src/visualization/graph';
 import binarySearch from '../src/algorithms/search/binary-search/binarySearch';
 import binarySource from '../src/algorithms/search/binary-search/binarySearch.js?raw';
 import linearSearch from '../src/algorithms/search/linear-search/linearSearch';
@@ -751,6 +753,26 @@ export const topological: NumericAlgorithm = {
   },
 };
 
+export const cycleDetection: NumericAlgorithm = {
+  id: 'detect-cycle', category: 'graph', usesStart: false,
+  name: { ko: '사이클 탐지', en: 'Cycle detection' },
+  summary: { ko: '모든 연결 성분을 DFS로 확인합니다. 방향 그래프는 현재 경로 재방문을, 무방향 그래프는 부모가 아닌 방문 정점 연결을 검사합니다.', en: 'Inspect every component with DFS. Directed graphs detect a return to the active path; undirected graphs exclude the parent edge.' },
+  source: algorithmCode(directedCycleSource + '\n' + undirectedCycleSource), time: 'O(V + E)',
+  example: [1, 2, 3, 4, 5], graphEdges: [[1, 2], [2, 3], [3, 1], [3, 4]],
+  run: (nodes, _start, edges = cycleDetection.graphEdges!, directed = false) => traceCycle(nodes, edges, directed),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    switch (step.type) {
+      case 'start': return ko ? ['DFS 상태 준비', '미방문·현재 경로·처리 완료 상태를 구분합니다. 고립된 정점과 떨어진 연결 성분도 확인합니다.'] : ['Prepare DFS states', 'Distinguish unvisited, active-path and finished vertices. Inspect isolated and disconnected components too.'];
+      case 'enter': return ko ? ['현재 경로에 정점 추가', `정점 ${v.current}를 방문합니다. 부모 정보를 저장해 사이클 경로를 복원합니다.`] : ['Enter a vertex', `Visit ${v.current} and record its parent to reconstruct a cycle.`];
+      case 'edge': return ko ? ['이웃의 방문 상태 확인', `${v.current} → ${v.next}를 검사합니다. 방향 간선은 처리 완료 정점을 건너뛰고, 무방향 간선은 부모로 돌아가는 간선을 제외합니다.`] : ['Inspect an edge', `Check ${v.current} → ${v.next}. Directed traversal skips finished vertices; undirected traversal excludes the parent edge.`];
+      case 'cycle': return ko ? ['사이클 발견', `경로 안의 정점으로 돌아왔습니다. 사이클의 정점은 ${v.order}입니다. 결과 순서는 부모 역추적 순서입니다.`] : ['Cycle detected', `Returned to a vertex on the path. Cycle vertices: ${v.order}, listed in parent traceback order.`];
+      case 'leave': return ko ? ['정점 탐색 완료', `정점 ${v.current}에서 돌아옵니다. 현재 재귀 경로에서 제외합니다.`] : ['Finish a vertex', `Return from ${v.current} and remove it from the active path.`];
+      default: return v.result === 'cycle' ? ko ? ['사이클 있음', `사이클을 찾았습니다: ${v.order}.`] : ['Cycle exists', `Detected a cycle: ${v.order}.`] : ko ? ['사이클 없음', '모든 연결 성분을 확인했으며 사이클이 없습니다.'] : ['No cycle', 'All connected components were inspected; no cycle exists.'];
+    }
+  },
+};
+
 export const stack: NumericAlgorithm = {
   id: 'stack', category: 'structure', usesStart: false,
   name: { ko: '스택', en: 'Stack' },
@@ -1437,4 +1459,4 @@ export const knapsack: TextAlgorithm = {
   },
 };
 
-export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];
+export const algorithms: Algorithm[] = [bubble, selection, insertion, merge, quick, shell, heap, counting, radix, bucket, linear, binary, jump, interpolation, bfs, dfs, dijkstra, bellman, floyd, prim, kruskal, topological, cycleDetection, stack, queue, linkedList, doublyLinkedList, minHeap, maxHeap, priorityQueue, binarySearchTree, avlTree, redBlackTree, trie, fenwick, segment, hashTable, disjointSet, bloomFilter, graphStructure, naive, kmp, zSearch, rabin, lcs, editDistance, knapsack];

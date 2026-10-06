@@ -1,3 +1,5 @@
+import detectDirectedCycle from '../algorithms/graph/detect-cycle/detectDirectedCycle';
+import detectUndirectedCycle from '../algorithms/graph/detect-cycle/detectUndirectedCycle';
 import topologicalSort from '../algorithms/graph/topological-sorting/topologicalSort';
 import kruskal from '../algorithms/graph/kruskal/kruskal';
 import prim from '../algorithms/graph/prim/prim';
@@ -174,4 +176,17 @@ export function traceTopological(nodes, edges) {
   ).map((step) => ({
     ...step, edges: edges.map((edge) => [...edge]),
   }));
+}
+
+export function traceCycle(nodes, edges, directed = false) {
+  const detect = directed ? detectDirectedCycle : detectUndirectedCycle;
+  const weighted = edges.map(([a, b]) => [a, b, 0]);
+  return traceWeighted(
+    nodes,
+    nodes[0],
+    weighted,
+    directed,
+    (graph, _start, callback) => detect(graph, callback),
+    'dfs',
+  );
 }

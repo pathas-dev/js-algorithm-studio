@@ -1,6 +1,11 @@
 import recordStep from '../../../utils/trace/recordStep';
 
-/** Sort finite numbers by range, then sort and concatenate each bucket. */
+/**
+ * Sort finite numbers by range, then sort and concatenate each bucket.
+ * @param {number[]} arr
+ * @param {number} [bucketsNum]
+ * @param {function} [stepCallback]
+ */
 export default function BucketSort(arr, bucketsNum = 1, stepCallback = undefined) {
   if (!Number.isInteger(bucketsNum) || bucketsNum < 1) throw new Error('buckets');
   if (arr.some((value) => !Number.isFinite(value))) throw new Error('range');

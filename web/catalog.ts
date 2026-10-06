@@ -137,7 +137,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-string-regular-expression-matching", "category": "string", "name": {"ko": "정규 표현식 매칭", "en": "Regular Expression Matching"}},
   {"id": "planned-algorithms-tree-depth-first-search", "category": "tree", "name": {"ko": "트리 깊이 우선 탐색", "en": "Tree Depth-First Search (DFS)"}},
   {"id": "planned-algorithms-tree-breadth-first-search", "category": "tree", "name": {"ko": "트리 너비 우선 탐색", "en": "Tree Breadth-First Search (BFS)"}},
-  {"id": "planned-algorithms-graph-detect-cycle", "category": "graph", "name": {"ko": "사이클 탐지", "en": "Detect Cycle in Graphs"}},
   {"id": "planned-algorithms-graph-articulation-points", "category": "graph", "name": {"ko": "단절점", "en": "Articulation Points (or Cut Vertices)"}},
   {"id": "planned-algorithms-graph-bridges", "category": "graph", "name": {"ko": "단절선", "en": "Bridges in Graph"}},
   {"id": "planned-algorithms-graph-eulerian-path", "category": "graph", "name": {"ko": "오일러 경로 와 오일러 회로", "en": "Eulerian Path"}},
