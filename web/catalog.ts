@@ -112,7 +112,6 @@ type CatalogCategory = typeof catalogCategories[number]['id'];
 
 // Planned visualizations from README.ko-KR.md; these entries have no runnable lesson.
 export const plannedAlgorithms: { id: string; category: CatalogCategory; name: Record<Language, string> }[] = [
-  {"id": "planned-algorithms-tree-breadth-first-search", "category": "tree", "name": {"ko": "트리 너비 우선 탐색", "en": "Tree Breadth-First Search (BFS)"}},
   {"id": "planned-algorithms-uncategorized-hanoi-tower", "category": "other", "name": {"ko": "하노이 탑", "en": "Tower of Hanoi"}},
   {"id": "planned-algorithms-uncategorized-square-matrix-rotation", "category": "other", "name": {"ko": "정방 행렬 회전", "en": "Square Matrix In-Place Rotation"}},
   {"id": "planned-algorithms-uncategorized-jump-game", "category": "other", "name": {"ko": "점프 게임", "en": "Jump Game"}},

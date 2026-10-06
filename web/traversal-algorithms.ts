@@ -1,6 +1,7 @@
+import bfsSource from '../src/algorithms/tree/breadth-first-search/breadthFirstSearch.js?raw';
 import type { Algorithm, NumericAlgorithm } from './algorithms';
 import dfsSource from '../src/algorithms/tree/depth-first-search/depthFirstSearch.js?raw';
-import traceTreeDfs from '../src/visualization/traversals';
+import traceTreeDfs, { traceTreeBfs } from '../src/visualization/traversals';
 import { algorithmCode } from '../src/visualization/playback';
 
 export const treeDfsLesson: NumericAlgorithm = {
@@ -21,4 +22,22 @@ export const treeDfsLesson: NumericAlgorithm = {
   },
 };
 
-export const traversalAlgorithms: Algorithm[] = [treeDfsLesson];
+export const treeBfsLesson: NumericAlgorithm = {
+  ...treeDfsLesson, id: 'tree-breadth-first-search',
+  name: { ko: '트리 너비 우선 탐색', en: 'Tree breadth-first search' },
+  summary: { ko: '루트를 큐에 넣고 앞에서 꺼낸 노드의 왼쪽·오른쪽 자식을 뒤에 넣습니다. 같은 깊이의 노드를 먼저 방문하는 레벨 순회입니다.', en: 'Queue the root, dequeue from the front and append its left and right children. Visit every node at a depth before moving deeper: level-order traversal.' },
+  source: algorithmCode(bfsSource),
+  run: (values) => traceTreeBfs(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return treeDfsLesson.explain(step, language);
+    if (step.type === 'enqueue') return ko ? ['노드를 대기 큐 뒤에 추가', `${v.current}를 큐 뒤에 넣었습니다. 이미 대기 중인 같은 레벨 노드를 먼저 처리한 뒤 이 노드를 방문합니다.`] : ['Append a node to the queue', `Enqueue ${v.current} at the rear. Visit already queued nodes at this level before processing it.`];
+    if (step.type === 'dequeue') return ko ? ['대기 큐 앞에서 꺼내기', `${v.current}를 큐 앞에서 꺼냈습니다. 다음 단계에서 방문을 기록하고 자식들을 큐에 넣습니다.`] : ['Remove the queue front', `Dequeue ${v.current}. Next record its visit and enqueue its children.`];
+    if (step.type === 'enter') return ko ? ['꺼낸 노드 방문 기록', `${v.current}를 방문했습니다. 큐의 선입선출 순서가 레벨별 방문을 유지합니다.`] : ['Record the dequeued node visit', `Visit ${v.current}. FIFO order keeps visits grouped by level.`];
+    if (step.type === 'edge') return ko ? ['존재하는 자식 확인', `${v.current}의 자식 ${v.next}를 확인했습니다. 다음 단계에서 재귀 호출 대신 큐 뒤에 넣습니다.`] : ['Inspect an existing child', `Inspect child ${v.next} of ${v.current}. Enqueue it next rather than recursing.`];
+    if (step.type === 'leave') return ko ? ['현재 노드 처리 완료', `${v.current}의 자식들을 큐에 넣었습니다. DFS와 달리 자손 탐색을 기다리지 않고 다음 큐 노드로 넘어갑니다.`] : ['Finish processing this node', `Children of ${v.current} are queued. Unlike DFS, move to the next queued node without waiting for descendants.`];
+    return ko ? ['너비 우선 레벨 순회 완료', `방문 순서는 ${v.result}입니다. 대기 큐가 비었으므로 모든 노드를 처리했습니다.`] : ['Breadth-first level traversal ready', `Visit order: ${v.result}. The empty queue means all nodes are processed.`];
+  },
+};
+
+export const traversalAlgorithms: Algorithm[] = [treeDfsLesson, treeBfsLesson];

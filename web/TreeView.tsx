@@ -39,7 +39,7 @@ export default function TreeView({ step, language }: { step: Step; language: Lan
         {!nodes.length && <text x={width / 2} y={55} textAnchor="middle" fill="#617469">ROOT = ∅</text>}
       </svg>
     </div>
-    {traversal && <div className="frontier">{language === 'ko' ? '호출 스택 · 루트 → 현재' : 'Call stack · root → current'} <strong>{String(step.variables.stack) || '∅'}</strong></div>}
+    {traversal && <div className="frontier">{step.variables.mode === 'tree-bfs' ? language === 'ko' ? '대기 큐 · FRONT → REAR' : 'Queue · FRONT → REAR' : language === 'ko' ? '호출 스택 · 루트 → 현재' : 'Call stack · root → current'} <strong>{step.variables.mode === 'tree-bfs' ? (JSON.parse(String(step.variables.queue)) as number[]).join(' → ') || '∅' : String(step.variables.stack) || '∅'}</strong></div>}
     {'result' in step.variables && <div className="frontier">{traversal ? language === 'ko' ? '방문 순서' : 'Visit order' : language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(traversal ? step.variables.order : step.variables.result) || '∅'}</output></div>}
   </div>;
 }

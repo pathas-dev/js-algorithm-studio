@@ -1,7 +1,8 @@
+import breadthFirstSearch from '../algorithms/tree/breadth-first-search/breadthFirstSearch';
 import BinaryTreeNode from '../data-structures/tree/BinaryTreeNode';
 import depthFirstSearch from '../algorithms/tree/depth-first-search/depthFirstSearch';
 
-export default function traceTreeDfs(values) {
+function traceTree(values, breadth) {
   if (values.length > 15 || !values.every(Number.isFinite)) throw new Error('traversal-tree-input');
   const nodes = values.map((value) => new BinaryTreeNode(value));
   nodes.forEach((node, index) => {
@@ -19,6 +20,7 @@ export default function traceTreeDfs(values) {
   const order = [];
   const stack = [];
   const processed = [];
+  let queue = '[]';
   const snapshot = (type, code, current = null, next = null) => {
     const currentId = nodes.indexOf(current);
     steps.push({
@@ -27,7 +29,8 @@ export default function traceTreeDfs(values) {
       array: values.map((value, id) => ({ value, id })),
       indices: currentId < 0 ? [] : [currentId],
       variables: {
-        mode: 'tree-dfs',
+        mode: breadth ? 'tree-bfs' : 'tree-dfs',
+        queue,
         structure: 'binary-tree',
         tree: JSON.stringify(tree),
         current: current ? current.value : '—',
@@ -40,28 +43,45 @@ export default function traceTreeDfs(values) {
       },
     });
   };
-  snapshot('start', 'depthFirstSearchRecursive(rootNode, processedCallbacks);');
+  const entryCode = breadth ? 'while (!nodeQueue.isEmpty()) {'
+    : 'depthFirstSearchRecursive(rootNode, processedCallbacks);';
+  snapshot('start', entryCode);
   if (nodes.length) {
-    depthFirstSearch(nodes[0], {
+    const callbacks = {
       enterNode(node) {
         const id = nodes.indexOf(node);
         order.push(id);
-        stack.push(id);
-        snapshot('enter', 'callbacks.enterNode(node);', node);
+        if (!breadth) stack.push(id);
+        snapshot('enter', breadth ? 'callbacks.enterNode(currentNode);' : 'callbacks.enterNode(node);', node);
       },
       allowTraversal(node, child) {
+        const parentName = breadth ? 'currentNode' : 'node';
         snapshot('edge', child === node.left
-          ? 'if (node.left && callbacks.allowTraversal(node, node.left)) {'
-          : 'if (node.right && callbacks.allowTraversal(node, node.right)) {', node, child);
+          ? `if (${parentName}.left && callbacks.allowTraversal(${parentName}, ${parentName}.left)) {`
+          : `if (${parentName}.right && callbacks.allowTraversal(${parentName}, ${parentName}.right)) {`, node, child);
         return true;
       },
       leaveNode(node) {
         processed.push(nodes.indexOf(node));
-        stack.pop();
-        snapshot('leave', 'callbacks.leaveNode(node);', node);
+        if (!breadth) stack.pop();
+        snapshot('leave', breadth ? 'callbacks.leaveNode(currentNode);' : 'callbacks.leaveNode(node);', node);
       },
-    });
+    };
+    if (breadth) {
+      breadthFirstSearch(nodes[0], callbacks, (step) => {
+        queue = step.variables.queue;
+        snapshot(step.type, step.code, step.array[0]);
+      });
+    } else depthFirstSearch(nodes[0], callbacks);
   }
-  snapshot('done', 'depthFirstSearchRecursive(rootNode, processedCallbacks);');
+  snapshot('done', entryCode);
   return steps;
+}
+
+export default function traceTreeDfs(values) {
+  return traceTree(values, false);
+}
+
+export function traceTreeBfs(values) {
+  return traceTree(values, true);
 }
