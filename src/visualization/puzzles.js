@@ -1,3 +1,4 @@
+import recursiveStaircaseDP from '../algorithms/uncategorized/recursive-staircase/recursiveStaircaseDP';
 import knightTour from '../algorithms/uncategorized/knight-tour/knightTour';
 import nQueens from '../algorithms/uncategorized/n-queens/nQueens';
 import dpRainTerraces from '../algorithms/uncategorized/rain-terraces/dpRainTerraces';
@@ -194,5 +195,18 @@ export function traceKnight(values) {
       result: solution.length === n ** 2,
     },
   });
+  return steps;
+}
+
+export function traceStairs(values) {
+  const n = values[0];
+  if (values.length !== 1 || !Number.isInteger(n) || n < 0 || n > 20) {
+    throw new Error('stairs-input');
+  }
+  const steps = [];
+  recursiveStaircaseDP(n, (step) => steps.push({
+    ...step,
+    variables: { ...step.variables, mode: 'stairs' },
+  }));
   return steps;
 }

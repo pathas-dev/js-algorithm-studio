@@ -156,6 +156,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'stairs-input': t('계단 수는 정수 하나, 0–20으로 입력하세요.', 'Enter a single integer stair count from 0 to 20.'),
     'knight-input': t('보드 크기는 정수 하나, 1–5로 입력하세요.', 'Enter a single integer board size from 1 to 5.'),
     'queens-input': t('보드 크기는 정수 하나, 1–6으로 입력하세요.', 'Enter a single integer board size from 1 to 6.'),
     'rain-input': t('지형 높이는 정수 1–18개, 각 값 0–12로 입력하세요.', 'Enter 1–18 integer terrain heights from 0 to 12.'),

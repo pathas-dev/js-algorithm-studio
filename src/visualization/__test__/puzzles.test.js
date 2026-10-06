@@ -1,5 +1,5 @@
 import traceHanoi, {
-  traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight,
+  traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight, traceStairs,
 } from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
@@ -82,4 +82,12 @@ it('finds a legal complete knight tour and exhausts impossible small boards', ()
   expect(traceKnight([3]).at(-1).variables.result).toBe(false);
   expect(traceKnight([1]).at(-1).variables.result).toBe(true);
   expect(() => traceKnight([6])).toThrow('knight-input');
+});
+
+it('counts ordered one/two-step staircase climbs while preserving the zero convention', () => {
+  expect(traceStairs([5]).at(-1).variables.result).toBe(8);
+  expect(traceStairs([0]).at(-1).variables.result).toBe(0);
+  expect(traceStairs([2]).at(-1).variables.result).toBe(2);
+  expect(traceStairs([20]).at(-1).variables.result).toBe(10946);
+  expect(() => traceStairs([21])).toThrow('stairs-input');
 });

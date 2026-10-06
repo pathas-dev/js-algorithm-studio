@@ -1,3 +1,4 @@
+import stairsSource from '../src/algorithms/uncategorized/recursive-staircase/recursiveStaircaseDP.js?raw';
 import knightSource from '../src/algorithms/uncategorized/knight-tour/knightTour.js?raw';
 import queensSource from '../src/algorithms/uncategorized/n-queens/nQueens.js?raw';
 import rainSource from '../src/algorithms/uncategorized/rain-terraces/dpRainTerraces.js?raw';
@@ -5,7 +6,7 @@ import pathsSource from '../src/algorithms/uncategorized/unique-paths/dpUniquePa
 import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain, traceQueens, traceKnight, traceStairs } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -125,4 +126,20 @@ const knight: NumericAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens, knight];
+const stairs: NumericAlgorithm = {
+  id: 'recursive-staircase', category: 'other', example: [5], usesStart: false, singleInput: true,
+  name: { ko: '계단 오르기 경우의 수', en: 'Staircase ways' }, time: 'O(n)',
+  summary: { ko: '한 번에 1칸 또는 2칸 오를 때 n번째 계단까지 도달하는 순서를 셉니다. 원본 DP 구현은 직전 두 계단의 경우의 수를 더해 다음 값을 계산합니다.', en: 'Count ordered ways to reach stair n using one- or two-step climbs. The original dynamic-programming implementation adds the counts of the two preceding stairs.' },
+  inputLabels: [{ ko: '계단 수 n', en: 'Stair count n' }, { ko: '', en: '' }],
+  inputHint: { ko: 'n=0–20 · 1칸/2칸 이동 · 원본 함수의 규약상 n=0은 0개', en: 'n=0–20 · one- or two-step moves · the original function defines zero stairs as zero ways' },
+  source: algorithmCode(stairsSource), run: traceStairs,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['계단별 경우의 수 배열 준비', `n=${v.n}까지 계산합니다. [1,2]와 [2,1]은 다른 순서이므로 따로 셉니다.`] : ['Prepare counts for each stair', `Calculate through n=${v.n}. [1,2] and [2,1] count separately because order matters.`];
+    if (step.type === 'base') return ko ? ['1칸과 2칸의 기본 경우 설정', '1번째 계단은 [1] 하나, 2번째 계단은 [1,1]과 [2] 두 개입니다. 원본 규약을 따라 0번째 값은 0으로 표시합니다.'] : ['Initialize one- and two-stair base cases', 'Stair 1 has [1]; stair 2 has [1,1] and [2]. Preserve the original convention of zero ways for stair 0.'];
+    if (step.type === 'cell-sum') return ko ? ['마지막 이동이 1칸·2칸인 경우 더하기', `${v.current}번째 계단은 직전 계단에서 1칸, 두 칸 전에서 2칸 이동해 옵니다. 두 경우가 겹치지 않으므로 이전 두 값을 더합니다.`] : ['Add cases ending with one- and two-step moves', `Stair ${v.current} is reached by one step from the previous stair or two from the stair before it. Add these disjoint counts.`];
+    return ko ? ['계단 오르기 경우의 수 확정', `${v.n}개 계단을 오르는 순서는 ${v.result}개입니다. 재귀 관계를 배열에 저장해 같은 하위 문제를 반복 계산하지 않습니다.`] : ['Staircase count ready', `There are ${v.result} ordered ways for ${v.n} stairs. Storing the recurrence avoids repeated subproblem calculations.`];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain, queens, knight, stairs];
