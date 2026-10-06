@@ -1,3 +1,4 @@
+import fibonacciNth from '../algorithms/math/fibonacci/fibonacciNth';
 import factorial from '../algorithms/math/factorial/factorial';
 import getBit from '../algorithms/math/bits/getBit';
 import setBit from '../algorithms/math/bits/setBit';
@@ -43,5 +44,19 @@ export function traceFactorial(values) {
   }
   const steps = [];
   factorial(number, (step) => steps.push({ ...step, variables: { ...step.variables, mode: 'factorial' } }));
+  return steps;
+}
+
+export function traceFibonacci(values) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isInteger(number) || number < 0 || number > 78) {
+    throw new Error('fibonacci-input');
+  }
+  const sequence = number === 0 ? [0] : [0, 1];
+  const steps = [];
+  fibonacciNth(number, (step) => {
+    if (step.type === 'add') sequence.push(step.variables.result);
+    steps.push({ ...step, variables: { ...step.variables, mode: 'fibonacci', sequence: JSON.stringify(sequence) } });
+  });
   return steps;
 }

@@ -1,4 +1,4 @@
-import traceBits, { traceFactorial } from '../math';
+import traceBits, { traceFactorial, traceFibonacci } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
   const steps = traceBits([13, 2, 0]);
@@ -20,4 +20,15 @@ it('records exact factorial products and handles zero without iterations', () =>
     .toEqual([2, 6, 24, 120, 720]);
   expect(Number.isSafeInteger(traceFactorial([18]).at(-1).variables.result)).toBe(true);
   expect(() => traceFactorial([19])).toThrow('factorial-input');
+});
+
+it('starts Fibonacci at zero and accumulates exact values through F(78)', () => {
+  expect(traceFibonacci([0]).at(-1).variables.result).toBe(0);
+  const steps = traceFibonacci([10]);
+  expect(steps.at(-1).variables.result).toBe(55);
+  expect(JSON.parse(steps.at(-1).variables.sequence))
+    .toEqual([0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
+  expect(JSON.parse(steps[0].variables.sequence)).toEqual([0, 1]);
+  expect(Number.isSafeInteger(traceFibonacci([78]).at(-1).variables.result)).toBe(true);
+  expect(() => traceFibonacci([79])).toThrow('fibonacci-input');
 });

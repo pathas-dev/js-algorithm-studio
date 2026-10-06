@@ -1,7 +1,8 @@
+import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?raw';
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -49,4 +50,19 @@ export const factorialLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson];
+export const fibonacciLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'fibonacci',
+  name: { ko: '피보나치 수', en: 'Fibonacci number' },
+  summary: { ko: 'F(0)=0, F(1)=1에서 시작해 앞의 두 값을 더합니다. 이전 두 값만 유지하는 반복 계산을 확인합니다.', en: 'Start at F(0)=0 and F(1)=1, then add the preceding pair. The iterative calculation keeps only two previous values.' },
+  source: algorithmCode(fibonacciSource), example: [10],
+  inputHint: { ko: '정수 하나 · 인덱스 n은 0–78 · 정확한 JavaScript 정수 결과', en: 'One integer index n · 0–78 · exact JavaScript integer results' },
+  run: (values) => traceFibonacci(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['시작 값 준비', 'F(0)은 0, F(1)은 1입니다. 뒤의 값은 앞의 두 값을 더해 만듭니다.'] : ['Prepare the base values', 'F(0) is zero and F(1) is one. Each later value is the sum of the preceding two.'];
+    if (step.type === 'add') return ko ? ['이전 두 값 더하기', `F(${v.index}) = ${v.result}. ${v.expression}. 이전 현재 값을 다음 반복의 이전 값으로 옮깁니다.`] : ['Add the preceding pair', `F(${v.index}) = ${v.result}: ${v.expression}. The former current value becomes the previous value.`];
+    return ko ? ['피보나치 수 완료', `F(${v.n}) = ${v.result}. 수열 인덱스는 0부터 시작합니다.`] : ['Fibonacci number ready', `F(${v.n}) = ${v.result}. Sequence indices start at zero.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson];
