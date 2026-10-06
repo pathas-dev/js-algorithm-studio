@@ -1,3 +1,4 @@
+import fisherYates from '../algorithms/sets/fisher-yates/fisherYates';
 import cartesianProduct from '../algorithms/sets/cartesian-product/cartesianProduct';
 
 export default function traceCartesian(inputs) {
@@ -11,5 +12,19 @@ export default function traceCartesian(inputs) {
       ...step.variables, mode: 'cartesian', inputs: JSON.stringify(sets),
     },
   }));
+  return steps;
+}
+
+export function traceShuffle(values, random = Math.random) {
+  if (values.length > 32 || !values.every(Number.isFinite)) throw new Error('limit');
+  const steps = [];
+  fisherYates(values.map((value, id) => ({ value, id })), (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables,
+      mode: 'shuffle',
+      result: step.type === 'done' ? step.array.map((item) => item.value).join(', ') || '∅' : '—',
+    },
+  }), random);
   return steps;
 }

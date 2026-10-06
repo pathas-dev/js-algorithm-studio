@@ -1,7 +1,8 @@
-import type { Algorithm, TextAlgorithm } from './algorithms';
+import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?raw';
+import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian from '../src/visualization/collections';
+import traceCartesian, { traceShuffle } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -19,4 +20,20 @@ export const cartesianLesson: TextAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson];
+export const shuffleLesson: NumericAlgorithm = {
+  id: 'fisher-yates', category: 'sets', usesStart: false, singleInput: true,
+  name: { ko: 'Fisher–Yates 셔플', en: 'Fisher–Yates shuffle' },
+  summary: { ko: '오른쪽 자리부터 0–i 중 한 위치를 무작위로 골라 교환합니다. 녹색 자리는 확정됐으며 뒤의 반복에서 다시 바꾸지 않습니다.', en: 'From the right, choose a random position in 0–i and swap. Green positions are fixed and untouched by later iterations.' },
+  source: algorithmCode(shuffleSource), example: [1, 2, 3, 4, 5, 6, 7, 8], time: 'O(n)',
+  inputHint: { ko: '숫자 최대 32개 · 중복과 음수 허용 · 다시 재생은 같은 추첨, 입력 적용은 새 추첨', en: 'At most 32 numbers · duplicates and negatives allowed · replay keeps the draw; applying input draws anew' },
+  run: (values) => traceShuffle(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['입력 배열 복사', '원본을 보존하고 복사본을 섞습니다. 오른쪽부터 한 자리씩 확정합니다. 셔플 결과가 원본과 같을 수도 있습니다.'] : ['Copy the input array', 'Preserve the original and shuffle a copy, fixing positions from the right. A valid shuffle can equal the original.'];
+    if (step.type === 'select') return ko ? ['남은 범위에서 균등 선택', `0부터 ${v.i}까지 ${Number(v.i) + 1}개 위치 중 ${v.randomIndex}를 골랐습니다. 자기 자신도 선택할 수 있어야 모든 순열이 균등하게 가능합니다.`] : ['Choose uniformly from the remaining range', `Choose ${v.randomIndex} from ${Number(v.i) + 1} positions, zero through ${v.i}. Allow self-selection so every permutation remains equally possible.`];
+    if (step.type === 'swap') return ko ? ['교환하고 오른쪽 자리 확정', `${v.i}와 ${v.randomIndex}를 교환했습니다. ${v.i}번 자리는 이후 반복에서 제외합니다.`] : ['Swap and fix the right position', `Swap positions ${v.i} and ${v.randomIndex}. Position ${v.i} is excluded from later iterations.`];
+    return ko ? ['셔플 완료', '값을 추가하거나 삭제하지 않고 순서만 바꿨습니다. 재생을 다시 하면 기록한 동일 추첨을 보여주며 입력 적용 시 새로 추첨합니다.'] : ['Shuffle ready', 'Only the order changed; no values were added or removed. Replay uses the recorded draw; applying input draws a new shuffle.'];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson];

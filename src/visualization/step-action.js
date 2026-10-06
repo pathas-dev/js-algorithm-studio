@@ -51,6 +51,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
     }
   } else if (algorithm.category === 'sets') {
     evidence = `count = ${v.count === undefined ? array.length : v.count}`;
+    if (v.mode === 'shuffle' && v.i !== undefined) evidence = type === 'select' ? `[0, ${v.i}] → ${v.randomIndex}` : `${v.i} ↔ ${v.randomIndex}`;
   } else if (algorithm.category === 'math') {
     evidence = typeof v.result === 'number' && Math.abs(v.result) >= 1e6
       ? `≈ ${v.result.toExponential(2)}` : `= ${v.result}`;
