@@ -1,5 +1,6 @@
+import railSource from '../src/algorithms/cryptography/rail-fence-cipher/railFenceCipher.js?raw';
 import source from '../src/algorithms/cryptography/polynomial-hash/PolynomialHash.js?raw';
-import tracePolynomialHash from '../src/visualization/cryptography';
+import tracePolynomialHash, { traceRailFence } from '../src/visualization/cryptography';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, TextAlgorithm } from './algorithms';
 
@@ -22,4 +23,20 @@ const polynomialHash: TextAlgorithm = {
   },
 };
 
-export const cryptographyAlgorithms: Algorithm[] = [polynomialHash];
+const railFence: TextAlgorithm = {
+  id: 'rail-fence-cipher', category: 'cryptography', inputMode: 'text', example: ['WEAREDISCOVERED', '3'],
+  name: { ko: '레일 펜스 암호', en: 'Rail fence cipher' }, time: 'O(n² + nr)',
+  summary: { ko: '문자를 지그재그로 레일에 배치한 뒤 위에서 아래로 행을 읽습니다. 문자 자체는 그대로 두고 순서만 바꾸는 전치 암호입니다.', en: 'Place characters along zigzag rails, then read rows from top to bottom. This transposition cipher changes order while preserving characters.' },
+  inputLabels: [{ ko: '평문', en: 'Plaintext' }, { ko: '레일 수', en: 'Rails' }],
+  inputHint: { ko: '문자 1–24개 · 레일 2–6개 · 공백·이모지 보존 · 원본 재귀 구현의 배열 복사 비용 포함', en: '1–24 characters · 2–6 rails · spaces and emoji preserved · includes array-copy costs of the recursive implementation' },
+  source: algorithmCode(railSource), run: traceRailFence,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['맨 위 레일에서 아래 방향으로 시작', '첫 문자를 첫 레일에 놓습니다. 맨 위와 맨 아래에서 진행 방향을 바꿉니다.'] : ['Start on the top rail, moving down', 'Place the first character on the first rail. Reverse direction at the top and bottom.'];
+    if (step.type === 'place') return ko ? ['현재 레일에 문자 배치', `위치 ${v.column}의 “${v.letter}”를 레일 ${Number(v.currentRail) + 1}에 놓습니다. 다음 문자는 지그재그 경로의 다음 레일로 이동합니다.`] : ['Place a character on this rail', `Place “${v.letter}” from position ${v.column} on rail ${Number(v.currentRail) + 1}. Move along the zigzag for the next character.`];
+    if (step.type === 'read') return ko ? ['레일을 왼쪽부터 이어 읽기', `레일 ${Number(v.currentRail) + 1}까지 이어 읽은 암호문은 “${v.output}”입니다. 세로 방향의 빈 칸은 건너뜁니다.`] : ['Read a rail from left to right', `Reading through rail ${Number(v.currentRail) + 1} gives “${v.output}”. Skip empty positions.`];
+    return ko ? ['암호문 완성 · 원본으로 복원 확인', `암호문은 “${v.result}”이며 원본 복호화 함수로 “${v.restored}”가 복원됩니다. 레일 수를 알면 지그재그 경로를 다시 따라갈 수 있습니다.`] : ['Ciphertext ready · round trip verified', `Ciphertext: “${v.result}”. The original decoder restores “${v.restored}” by following the same rail count and zigzag path.`];
+  },
+};
+
+export const cryptographyAlgorithms: Algorithm[] = [polynomialHash, railFence];

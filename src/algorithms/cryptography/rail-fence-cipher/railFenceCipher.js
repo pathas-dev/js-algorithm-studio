@@ -1,3 +1,5 @@
+import recordStep from '../../../utils/trace/recordStep';
+
 /**
  * @typedef {string[]} Rail
  * @typedef {Rail[]} Fence
@@ -74,6 +76,7 @@ const addCharToRail = (targetRailIndex, letter) => {
  * @param {number} params.currentRail
  * @param {Direction} params.direction
  * @param {string[]} params.chars
+ * @param {function} [params.stepCallback]
  * @returns {Fence}
  */
 const fillEncodeFence = ({
@@ -81,6 +84,7 @@ const fillEncodeFence = ({
   currentRail,
   direction,
   chars,
+  stepCallback,
 }) => {
   if (chars.length === 0) {
     // All chars have been placed on a fence.
@@ -97,11 +101,18 @@ const fillEncodeFence = ({
     direction,
   });
 
+  recordStep(stepCallback, 'place', [], [], {
+    currentRail,
+    letter,
+    column: fence.flat().length,
+  }, 'const [letter, ...nextChars] = chars');
+
   return fillEncodeFence({
     fence: fence.map(addCharToRail(currentRail, letter)),
     currentRail: currentRail + nextDirection,
     direction: nextDirection,
     chars: nextChars,
+    stepCallback,
   });
 };
 
@@ -198,16 +209,18 @@ const decodeFence = (params) => {
  *
  * @param {string} string - The string to be encoded
  * @param {number} railCount - The number of rails in a fence
+ * @param {function} [stepCallback]
  * @returns {string} - Encoded string
  */
-export const encodeRailFenceCipher = (string, railCount) => {
+export const encodeRailFenceCipher = (string, railCount, stepCallback = undefined) => {
   const fence = buildFence(railCount);
 
   const filledFence = fillEncodeFence({
     fence,
     currentRail: 0,
     direction: DIRECTIONS.DOWN,
-    chars: string.split(''),
+    chars: Array.from(string),
+    stepCallback,
   });
 
   return filledFence.flat().join('');
@@ -221,11 +234,11 @@ export const encodeRailFenceCipher = (string, railCount) => {
  * @returns {string} - Decoded string.
  */
 export const decodeRailFenceCipher = (string, railCount) => {
-  const strLen = string.length;
+  const strLen = Array.from(string).length;
   const emptyFence = buildFence(railCount);
   const filledFence = fillDecodeFence({
     strLen,
-    chars: string.split(''),
+    chars: Array.from(string),
     fence: emptyFence,
     targetRail: 0,
     direction: DIRECTIONS.DOWN,

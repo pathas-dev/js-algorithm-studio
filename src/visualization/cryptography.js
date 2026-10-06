@@ -1,3 +1,4 @@
+import { encodeRailFenceCipher, decodeRailFenceCipher } from '../algorithms/cryptography/rail-fence-cipher/railFenceCipher';
 import PolynomialHash from '../algorithms/cryptography/polynomial-hash/PolynomialHash';
 
 export default function tracePolynomialHash(values) {
@@ -48,5 +49,42 @@ export default function tracePolynomialHash(values) {
     hash,
     result: rows.map((row) => row[2]).join(', '),
   }, 'return rollingHash');
+  return steps;
+}
+
+export function traceRailFence(values) {
+  const text = values[0];
+  const characters = Array.from(text);
+  const rails = Number(values[1]);
+  if (!characters.length || characters.length > 24 || !Number.isInteger(rails)
+    || rails < 2 || rails > 6) throw new Error('rail-input');
+  const grid = Array.from({ length: rails }, () => Array(characters.length).fill(''));
+  const steps = [];
+  const save = (type, variables, code) => steps.push({
+    type,
+    array: [],
+    indices: [],
+    code,
+    variables: {
+      mode: 'rail-fence', text, rails, grid: JSON.stringify(grid), ...variables,
+    },
+  });
+  save('start', { output: '' }, 'const fence = buildFence(railCount)');
+  const result = encodeRailFenceCipher(text, rails, (step) => {
+    const { currentRail, column, letter } = step.variables;
+    grid[currentRail][column] = letter;
+    save(step.type, step.variables, step.code);
+  });
+  for (let rail = 0; rail < rails; rail += 1) {
+    save('read', {
+      currentRail: rail,
+      output: grid.slice(0, rail + 1).flat().join(''),
+    }, "return filledFence.flat().join('')");
+  }
+  save(
+    'done',
+    { output: result, result, restored: decodeRailFenceCipher(result, rails) },
+    "return filledFence.flat().join('')",
+  );
   return steps;
 }

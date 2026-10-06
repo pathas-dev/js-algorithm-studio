@@ -1,4 +1,4 @@
-import tracePolynomialHash from '../cryptography';
+import tracePolynomialHash, { traceRailFence } from '../cryptography';
 import PolynomialHash from '../../algorithms/cryptography/polynomial-hash/PolynomialHash';
 
 it('rolls each Unicode window to the same hash as a fresh calculation', () => {
@@ -17,4 +17,14 @@ it('rolls each Unicode window to the same hash as a fresh calculation', () => {
     .toBe(String(hasher.hash('😀')));
   expect(() => tracePolynomialHash(['abc', '4'])).toThrow('hash-input');
   expect(() => tracePolynomialHash(['', '1'])).toThrow('hash-input');
+});
+
+it('places rail characters on the actual zigzag and restores Unicode plaintext', () => {
+  const steps = traceRailFence(['WEAREDISCOVERED', '3']);
+  expect(steps.at(-1).variables.result).toBe('WECRERDSOEEAIVD');
+  expect(steps.filter((step) => step.type === 'place').map((step) => step.variables.currentRail))
+    .toEqual([0, 1, 2, 1, 0, 1, 2, 1, 0, 1, 2, 1, 0, 1, 2]);
+  expect(steps.at(-1).variables.restored).toBe('WEAREDISCOVERED');
+  expect(traceRailFence(['a😀 집', '6']).at(-1).variables.restored).toBe('a😀 집');
+  expect(() => traceRailFence(['abc', '1'])).toThrow('rail-input');
 });

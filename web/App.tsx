@@ -152,6 +152,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'rail-input': t('문자 1–24개와 레일 수 2–6을 입력하세요.', 'Enter 1–24 characters and 2–6 rails.'),
     'hash-input': t('문자 1–24개와 창 길이 1–12(문자열 길이 이하)를 입력하세요.', 'Enter 1–24 characters and a window length of 1–12, no longer than the text.'),
     'pascal-input': t('행 번호는 0–12의 정수 하나로 입력하세요.', 'Enter one integer row index from 0 to 12.'),
     'partition-input': t('정수 하나를 0–12 범위로 입력하세요.', 'Enter one integer from 0 to 12.'),

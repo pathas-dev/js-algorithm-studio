@@ -4,6 +4,10 @@ export default function CipherView({ step, language }: { step: Step; language: L
   const v = step.variables;
   const ko = language === 'ko';
   const characters = Array.from(String(v.text));
+  if (v.mode === 'rail-fence') {
+    const grid: string[][] = JSON.parse(String(v.grid));
+    return <div className="collection-view"><p className="frontier">{ko ? '지그재그 배치 → 행 순서로 읽기' : 'Zigzag placement → read in row order'} <strong>{v.rails} rails</strong></p><div className="matrix-scroll"><table className="graph-table"><tbody>{grid.map((rail, row) => <tr key={row}><th>R{row + 1}</th>{rail.map((letter, column) => <td key={column} className={row === Number(v.currentRail) && (step.type === 'read' || column === Number(v.column)) ? 'active-cell' : ''}>{letter === ' ' ? '␣' : letter || '·'}</td>)}</tr>)}</tbody></table></div><p className="fourier-expression">{ko ? '암호문' : 'Ciphertext'}: <output data-testid="cipher-output">{v.output || '—'}</output></p>{step.type === 'done' && <p className="frontier">{ko ? '복원 확인' : 'Restored'}: {v.restored}</p>}</div>;
+  }
   const rows: [number, string, number][] = JSON.parse(String(v.rows));
   return <div className="collection-view">
     <p className="frontier"><span>base = {v.base}</span><span>mod = {v.modulus}</span><strong>{ko ? '현재 해시' : 'Current hash'}: {v.hash}</strong></p>
