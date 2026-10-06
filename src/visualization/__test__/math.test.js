@@ -2,7 +2,7 @@ import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
   tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors,
   traceComplex, traceRadian, tracePower, traceHorner, traceMatrix,
-  traceDistance,
+  traceDistance, traceRoot,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -179,4 +179,13 @@ it('sums squared coordinate differences before rounding the distance', () => {
   expect(traceDistance([2, 2]).at(-1).variables.result).toBe(0);
   expect(traceDistance([0, 0, 3, 4])[1].variables.sum).toBe(9);
   expect(() => traceDistance([1, 2, 3])).toThrow('distance-input');
+});
+
+it('converges Newton estimates before rounding and handles small positive inputs', () => {
+  expect(traceRoot([2], 6).at(-1).variables.result).toBe(1.414214);
+  expect(traceRoot([0.01], 0).at(-1).variables.result).toBe(0);
+  expect(traceRoot([3], 1).at(-1).variables.result).toBe(1.7);
+  expect(traceRoot([0], 6).at(-1).variables.result).toBe(0);
+  expect(() => traceRoot([-1], 6)).toThrow('root-input');
+  expect(() => traceRoot([2], 7)).toThrow('root-input');
 });

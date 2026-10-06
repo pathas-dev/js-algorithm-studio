@@ -1,3 +1,4 @@
+import squareRoot from '../algorithms/math/square-root/squareRoot';
 import euclideanDistance from '../algorithms/math/euclidean-distance/euclideanDistance';
 import { dot } from '../algorithms/math/matrix/Matrix';
 import hornerMethod from '../algorithms/math/horner-method/hornerMethod';
@@ -417,6 +418,25 @@ export function traceDistance(values) {
           ? [[first[0], first[1], 'A'], [second[0], second[1], 'B']] : []),
         cells: JSON.stringify([['A', first.join(', ')], ['B', second.join(', ')],
           ['Σ squared differences', step.variables.sum]]),
+      },
+    });
+  });
+  return steps;
+}
+
+export function traceRoot(values, tolerance) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isFinite(number) || number < 0
+    || (number > 0 && number < 1e-6) || !Number.isInteger(tolerance)
+    || tolerance < 0 || tolerance > 6) throw new Error('root-input');
+  const steps = [];
+  const sequence = [];
+  squareRoot(number, tolerance, (step) => {
+    sequence.push(step.variables.root);
+    steps.push({
+      ...step,
+      variables: {
+        ...step.variables, mode: 'root', sequence: JSON.stringify(sequence),
       },
     });
   });

@@ -27,7 +27,7 @@ describe('squareRoot', () => {
     expect(squareRoot(0, tolerance)).toBe(0);
     expect(squareRoot(1, tolerance)).toBe(1);
     expect(squareRoot(2, tolerance)).toBe(1.4);
-    expect(squareRoot(3, tolerance)).toBe(1.8);
+    expect(squareRoot(3, tolerance)).toBe(1.7);
     expect(squareRoot(4, tolerance)).toBe(2);
     expect(squareRoot(15, tolerance)).toBe(3.9);
     expect(squareRoot(16, tolerance)).toBe(4);
@@ -66,4 +66,11 @@ describe('squareRoot', () => {
     expect(squareRoot(4.5, 10)).toBe(2.1213203436);
     expect(squareRoot(217.534, 10)).toBe(14.7490338667);
   });
+});
+
+it('rounds small real roots correctly and rejects nonfinite inputs', () => {
+  expect(squareRoot(0.01)).toBe(0);
+  expect(squareRoot(0.01, 6)).toBe(0.1);
+  expect(squareRoot(0.000001, 6)).toBe(0.001);
+  expect(() => squareRoot(Infinity)).toThrow();
 });

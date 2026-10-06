@@ -130,7 +130,6 @@ export const plannedAlgorithms: { id: string; category: CatalogCategory; name: R
   {"id": "planned-algorithms-uncategorized-rain-terraces", "category": "other", "name": {"ko": "빗물 담기 문제", "en": "Rain Terraces (Trapping Rain Water) Problem"}},
   {"id": "planned-algorithms-uncategorized-n-queens", "category": "other", "name": {"ko": "N-Queens 문제", "en": "N-Queens Problem"}},
   {"id": "planned-algorithms-uncategorized-knight-tour", "category": "other", "name": {"ko": "기사의 여행 문제", "en": "Knight's Tour"}},
-  {"id": "planned-algorithms-math-square-root", "category": "math", "name": {"ko": "뉴턴 방법으로 제곱근 구하기", "en": "Square Root (Newton's Method)"}},
   {"id": "planned-algorithms-math-fourier-transform", "category": "math", "name": {"ko": "푸리에 변환", "en": "Fourier Transform"}},
   {"id": "planned-algorithms-linked-list-traversal", "category": "linked-list", "name": {"ko": "연결 리스트 순회", "en": "Linked List Traversal"}},
   {"id": "planned-algorithms-linked-list-reverse-traversal", "category": "linked-list", "name": {"ko": "연결 리스트 역순 순회", "en": "Reversed Linked List Traversal"}},

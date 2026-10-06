@@ -1,3 +1,4 @@
+import rootSource from '../src/algorithms/math/square-root/squareRoot.js?raw';
 import distanceSource from '../src/algorithms/math/euclidean-distance/euclideanDistance.js?raw';
 import matrixSource from '../src/algorithms/math/matrix/Matrix.js?raw';
 import hornerSource from '../src/algorithms/math/horner-method/hornerMethod.js?raw';
@@ -20,7 +21,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm, TextAlgorithm, Algorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner, traceMatrix, traceDistance } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition, traceLiuHui, traceFloat, traceFactors, traceComplex, traceRadian, tracePower, traceHorner, traceMatrix, traceDistance, traceRoot } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -350,4 +351,20 @@ export const distanceLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: Algorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson, matrixLesson, distanceLesson];
+export const rootLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'square-root', usesStart: true, target: 6,
+  name: { ko: '뉴턴 방법으로 제곱근 구하기', en: 'Square root by Newton’s method' },
+  summary: { ko: '추정값과 n/추정값의 평균으로 제곱근에 수렴합니다. 계산이 안정된 뒤 원하는 소수 자릿수로 반올림합니다.', en: 'Average the estimate with n divided by that estimate to converge to the square root. Round to the requested decimal places after convergence.' },
+  source: algorithmCode(rootSource), example: [2], time: 'O(iterations)',
+  targetLabel: { ko: '소수 자릿수', en: 'Decimal places' },
+  inputHint: { ko: '0 또는 0.000001–999의 실수 하나 · 소수 자릿수 0–6', en: 'One real number: zero or 0.000001–999 · zero to six decimal places' },
+  run: (values, tolerance) => traceRoot(values, tolerance),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['추정값 1에서 시작', 'n이 0이면 바로 0을 반환합니다. 양수는 추정값 1로 시작하며 x²=n의 해를 찾습니다.'] : ['Start at estimate one', 'Zero returns zero immediately. For positive n, start at one and solve x²=n.'];
+    if (step.type === 'update') return ko ? ['추정값과 n/x의 평균', `${v.expression}. 둘의 평균은 이전 값보다 해에 가까워지며, 제곱 오차를 표에서 확인할 수 있습니다.`] : ['Average the estimate and n/x', `${v.expression}. Averaging brings the estimate closer to the root; inspect its squared error in the table.`];
+    return ko ? ['수렴 후 반올림', `${v.expression}. 추정값 변화가 부동소수점 정밀도 이내가 되면 종료하고 소수 ${v.tolerance}자리로 반올림합니다.`] : ['Round after convergence', `${v.expression}. Stop when the change falls within floating-point precision, then round to ${v.tolerance} decimal places.`];
+  },
+};
+
+export const mathAlgorithms: Algorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson, liuLesson, floatLesson, factorsLesson, complexLesson, radianLesson, powerLesson, hornerLesson, matrixLesson, distanceLesson, rootLesson];
