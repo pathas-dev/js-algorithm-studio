@@ -1,6 +1,6 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
-  tracePascal,
+  tracePascal, tracePartition,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -89,4 +89,13 @@ it('builds Pascal rows from their two parents with immutable snapshots', () => {
   expect(JSON.parse(steps[0].variables.triangle)).toEqual([[1]]);
   expect(tracePascal([0]).at(-1).variables.result).toBe('1');
   expect(() => tracePascal([13])).toThrow('pascal-input');
+});
+
+it('counts unordered partitions with repeatable summands and the empty sum', () => {
+  expect(tracePartition([6]).at(-1).variables.result).toBe(11);
+  expect(tracePartition([0]).at(-1).variables.result).toBe(1);
+  const steps = tracePartition([4]);
+  expect(JSON.parse(steps[0].variables.dpMatrix)[1][1]).toBeNull();
+  expect(steps.at(-1).variables.result).toBe(5);
+  expect(() => tracePartition([-1])).toThrow('partition-input');
 });

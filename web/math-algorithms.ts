@@ -1,3 +1,4 @@
+import partitionSource from '../src/algorithms/math/integer-partition/integerPartition.js?raw';
 import pascalSource from '../src/algorithms/math/pascal-triangle/pascalTriangleRecursive.js?raw';
 import powerTwoSource from '../src/algorithms/math/is-power-of-two/isPowerOfTwo.js?raw';
 import sieveSource from '../src/algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes.js?raw';
@@ -8,7 +9,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal, tracePartition } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -167,4 +168,20 @@ export const pascalLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson];
+export const partitionLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'integer-partition',
+  name: { ko: '정수 분할', en: 'Integer partition' },
+  summary: { ko: '양의 정수들의 합으로 n을 만드는 경우의 수입니다. 순서는 구분하지 않고 같은 수를 여러 번 사용할 수 있습니다.', en: 'Count ways to express n as a sum of positive integers. Order does not matter; repeated summands are allowed.' },
+  source: algorithmCode(partitionSource), example: [6], time: 'O(n²)',
+  inputHint: { ko: '정수 하나 · 0–12 · 0의 분할은 빈 합 한 가지', en: 'One integer · 0–12 · zero has one empty partition' },
+  run: (values) => tracePartition(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['빈 합에서 시작', '합 0은 빈 합 한 가지입니다. 사용 가능한 수가 없으면 양의 합은 만들 수 없어 첫 행은 0입니다.'] : ['Start with the empty sum', 'There is one empty sum for zero. With no available positive summands, every positive sum has zero ways.'];
+    if (step.type === 'copy') return ko ? ['큰 수는 사용할 수 없음', `합 ${v.column}보다 큰 ${v.row}는 쓸 수 없어 바로 위의 경우의 수를 복사합니다.`] : ['The summand is too large', `${v.row} exceeds the sum ${v.column}, so copy the count from the row above.`];
+    if (step.type === 'cell-sum') return ko ? ['포함하지 않은 경우 + 포함한 경우', `${v.row}를 쓰지 않는 위 칸과, 한 번 쓰고 남은 합 ${Number(v.column) - Number(v.row)}을 만드는 같은 행의 칸을 더합니다. 같은 행을 참조하므로 반복 사용도 셉니다.`] : ['Exclude it + include it', `Add the row above (without ${v.row}) and the same row at remainder ${Number(v.column) - Number(v.row)} (including ${v.row}). The same-row reference allows repetitions.`];
+    return ko ? ['분할 경우의 수 완성', `${v.row}의 정수 분할은 ${v.result}가지입니다. 덧셈 순서만 다른 표현은 같은 분할입니다.`] : ['Partition count ready', `${v.row} has ${v.result} partitions. Different summand orders count as the same partition.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson, partitionLesson];

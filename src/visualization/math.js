@@ -1,3 +1,4 @@
+import integerPartition from '../algorithms/math/integer-partition/integerPartition';
 import pascalTriangleRecursive from '../algorithms/math/pascal-triangle/pascalTriangleRecursive';
 import isPowerOfTwo from '../algorithms/math/is-power-of-two/isPowerOfTwo';
 import sieveOfEratosthenes from '../algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes';
@@ -155,5 +156,15 @@ export function tracePascal(values) {
     },
   });
   if (row === 0) steps[steps.length - 1].code = 'return [1];';
+  return steps;
+}
+
+export function tracePartition(values) {
+  const [number] = values;
+  if (values.length !== 1 || !Number.isInteger(number) || number < 0 || number > 12) {
+    throw new Error('partition-input');
+  }
+  const steps = [];
+  integerPartition(number, (step) => steps.push(step));
   return steps;
 }

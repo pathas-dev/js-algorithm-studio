@@ -52,6 +52,7 @@ export default function stepAction(algorithm, step, language, title, index, leng
   } else if (algorithm.category === 'math') {
     evidence = typeof v.result === 'number' && Math.abs(v.result) >= 1e6
       ? `≈ ${v.result.toExponential(2)}` : `= ${v.result}`;
+    if (v.mode === 'partition') evidence = type === 'done' ? `= ${v.result}` : `dp[${v.row}, ${v.column}]`;
     if (v.mode === 'pascal') evidence = `row = ${v.row}`;
     if (v.mode === 'power-two' && v.result === '—') evidence = `n = ${v.current}`;
     if (v.mode === 'sieve') evidence = type === 'done' ? `count = ${v.count}` : `n = ${v.maxNumber}`;
