@@ -1,3 +1,4 @@
+import maximumSource from '../src/algorithms/sets/maximum-subarray/dpMaximumSubarray.js?raw';
 import scsSource from '../src/algorithms/sets/shortest-common-supersequence/shortestCommonSupersequence.js?raw';
 import lisSource from '../src/algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence.js?raw';
 import combinationSource from '../src/algorithms/sets/combinations/combineWithoutRepetitions.js?raw';
@@ -7,7 +8,7 @@ import shuffleSource from '../src/algorithms/sets/fisher-yates/fisherYates.js?ra
 import type { Algorithm, TextAlgorithm, NumericAlgorithm } from './algorithms';
 import source from '../src/algorithms/sets/cartesian-product/cartesianProduct.js?raw';
 import { algorithmCode } from '../src/visualization/playback';
-import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence } from '../src/visualization/collections';
+import traceCartesian, { traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence, traceMaximumSubarray } from '../src/visualization/collections';
 
 export const cartesianLesson: TextAlgorithm = {
   id: 'cartesian-product', category: 'sets', inputMode: 'text',
@@ -125,4 +126,21 @@ export const supersequenceLesson: TextAlgorithm = {
   },
 };
 
-export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson, lisLesson, supersequenceLesson];
+export const maximumLesson: NumericAlgorithm = {
+  ...shuffleLesson, id: 'maximum-subarray',
+  name: { ko: '최대 구간합', en: 'Maximum subarray' },
+  summary: { ko: '연속 구간의 합이 가장 큰 부분 배열을 찾습니다. 현재 합이 음수면 버리고 새로 시작하며 지금까지의 최선 구간은 초록색으로 표시합니다.', en: 'Find a contiguous subarray with maximum sum. Discard a negative running sum and restart; green marks the best interval found so far.' },
+  source: algorithmCode(maximumSource), example: [-2, 1, -3, 4, -1, 2, 1, -5, 4], time: 'O(n)',
+  inputHint: { ko: '숫자 최대 32개 · 음수 허용 · 비어 있지 않은 입력은 비어 있지 않은 구간 반환', en: 'At most 32 numbers · negatives allowed · nonempty input returns a nonempty interval' },
+  run: (values) => traceMaximumSubarray(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['최댓값은 음의 무한대에서 시작', '모든 값이 음수여도 가장 큰 음수 하나를 선택해야 하므로 최댓값을 0으로 시작하지 않습니다. 빈 입력은 빈 결과입니다.'] : ['Initialize the best sum to negative infinity', 'All-negative input must select its largest negative item, so do not start the best sum at zero. Empty input returns empty.'];
+    if (step.type === 'add') return ko ? ['현재 연속 구간에 다음 값 더하기', `${v.index}번 값을 더한 현재 합은 ${v.currentSum}입니다. 최선 합 ${v.maxSum}보다 큰지 확인한 뒤 갱신합니다.`] : ['Extend the current contiguous interval', `After adding position ${v.index}, running sum is ${v.currentSum}. Compare it against best sum ${v.maxSum} before updating.`];
+    if (step.type === 'best') return ko ? ['더 좋은 구간 저장', `[${v.maxStartIndex}, ${v.maxEndIndex}]의 합 ${v.maxSum}이 새 최선입니다. 동일한 합은 기존 구간을 유지합니다.`] : ['Save a better interval', `Interval [${v.maxStartIndex}, ${v.maxEndIndex}] has new best sum ${v.maxSum}. Ties retain the existing interval.`];
+    if (step.type === 'reset') return ko ? ['음수 구간을 버리고 새로 시작', `음수 누적 합은 이후 구간의 합을 줄이므로 0으로 초기화했습니다. 다음 시작 위치는 ${v.currentStartIndex}이며 지금까지의 최선 구간은 보존합니다.`] : ['Discard the negative prefix and restart', `A negative running sum would reduce later intervals, so reset to zero. Next start is ${v.currentStartIndex}; retain the best interval.`];
+    return ko ? ['최대 합 연속 구간 완성', v.maxSum === '−∞' ? '빈 입력이라 선택할 구간이 없습니다.' : `최대 합 ${v.maxSum}, 구간 [${v.maxStartIndex}, ${v.maxEndIndex}], 값 [${v.result}]입니다. 원소를 건너뛰지 않는 연속 구간입니다.`] : ['Maximum-sum contiguous interval ready', v.maxSum === '−∞' ? 'Empty input has no interval to select.' : `Sum ${v.maxSum}, interval [${v.maxStartIndex}, ${v.maxEndIndex}], values [${v.result}]. The interval is contiguous; no items are skipped.`];
+  },
+};
+
+export const collectionAlgorithms: Algorithm[] = [cartesianLesson, shuffleLesson, powerSetLesson, permutationLesson, combinationLesson, lisLesson, supersequenceLesson, maximumLesson];

@@ -1,5 +1,6 @@
 import traceCartesian, {
   traceShuffle, tracePowerSet, tracePermutations, traceCombinations, traceLis, traceSupersequence,
+  traceMaximumSubarray,
 } from '../collections';
 
 it('creates unique ordered pairs and handles an empty set', () => {
@@ -71,4 +72,13 @@ it('merges around the LCS preserving repeated and Unicode characters', () => {
   expect(traceSupersequence(['', '']).at(-1).variables.count).toBe(0);
   expect(traceSupersequence(['😀a', '😀b']).at(-1).variables.count).toBe(3);
   expect(traceSupersequence(['aaa', 'aa']).at(-1).variables.result).toBe('aaa');
+});
+
+it('retains the best contiguous interval through resets and all-negative inputs', () => {
+  const steps = traceMaximumSubarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]);
+  expect(steps.at(-1).variables.result).toBe('4, -1, 2, 1');
+  expect(steps.at(-1).variables.maxSum).toBe(6);
+  expect(traceMaximumSubarray([-3, -1, -2]).at(-1).variables.result).toBe('-1');
+  expect(traceMaximumSubarray([0, 0]).at(-1).variables.result).toBe('0');
+  expect(traceMaximumSubarray([]).at(-1).variables.result).toBe('∅');
 });

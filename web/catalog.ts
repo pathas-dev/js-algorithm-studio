@@ -112,7 +112,6 @@ type CatalogCategory = typeof catalogCategories[number]['id'];
 
 // Planned visualizations from README.ko-KR.md; these entries have no runnable lesson.
 export const plannedAlgorithms: { id: string; category: CatalogCategory; name: Record<Language, string> }[] = [
-  {"id": "planned-algorithms-sets-maximum-subarray", "category": "sets", "name": {"ko": "최대 구간합", "en": "Maximum subarray problem"}},
   {"id": "planned-algorithms-sets-combination-sum", "category": "sets", "name": {"ko": "조합 합", "en": "Combination Sum Problem"}},
   {"id": "planned-algorithms-tree-depth-first-search", "category": "tree", "name": {"ko": "트리 깊이 우선 탐색", "en": "Tree Depth-First Search (DFS)"}},
   {"id": "planned-algorithms-tree-breadth-first-search", "category": "tree", "name": {"ko": "트리 너비 우선 탐색", "en": "Tree Breadth-First Search (BFS)"}},

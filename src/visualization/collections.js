@@ -1,3 +1,4 @@
+import dpMaximumSubarray from '../algorithms/sets/maximum-subarray/dpMaximumSubarray';
 import shortestCommonSupersequence from '../algorithms/sets/shortest-common-supersequence/shortestCommonSupersequence';
 import dpLongestIncreasingSubsequence from '../algorithms/sets/longest-increasing-subsequence/dpLongestIncreasingSubsequence';
 import combineWithoutRepetitions from '../algorithms/sets/combinations/combineWithoutRepetitions';
@@ -106,6 +107,17 @@ export function traceSupersequence(inputs) {
     variables: {
       ...step.variables, mode: 'scs', inputs: JSON.stringify(sets),
     },
+  }));
+  return steps;
+}
+
+export function traceMaximumSubarray(values) {
+  if (values.length > 32 || !values.every(Number.isFinite)) throw new Error('limit');
+  const steps = [];
+  dpMaximumSubarray(values, (step) => steps.push({
+    ...step,
+    array: step.array.map((value, id) => ({ value, id })),
+    variables: { ...step.variables, mode: 'maximum-subarray' },
   }));
   return steps;
 }
