@@ -153,6 +153,8 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'kmeans-input': t('2차원 점 1–16개와 군집 수 1–6(점 개수 이하)을 입력하세요. 좌표 범위는 −20–20입니다.', 'Enter 1–16 two-dimensional points and k=1–6, no greater than point count; coordinates −20–20.'),
+    'kmeans-convergence': t('100회 안에 수렴하지 않았습니다. 좌표나 군집 수를 바꿔주세요.', 'No convergence within 100 iterations. Change coordinates or cluster count.'),
     'knn-input': t('학습 점 [x,y,라벨] 배열과 질의 [x,y,k]를 입력하세요. 좌표 −20–20, 라벨 0–5, k는 점 개수 이하입니다.', 'Enter training [x,y,label] rows and query [x,y,k]. Coordinates −20–20, labels 0–5, k no larger than point count.'),
     'hill-input': t('영문 평문 1–4글자, 키는 평문 길이²개의 영문자로 입력하세요.', 'Enter 1–4 English plaintext letters and exactly length² key letters.'),
     'caesar-input': t('문자 1–24칸과 정수 이동 −100–100을 입력하세요.', 'Enter 1–24 character units and an integer shift from −100 to 100.'),

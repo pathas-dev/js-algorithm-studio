@@ -1,3 +1,4 @@
+import recordStep from '../../../utils/trace/recordStep';
 import * as mtrx from '../../math/matrix/Matrix';
 import euclideanDistance from '../../math/euclidean-distance/euclideanDistance';
 
@@ -6,11 +7,13 @@ import euclideanDistance from '../../math/euclidean-distance/euclideanDistance';
  *
  * @param {number[][]} data - array of dataSet points, i.e. [[0, 1], [3, 4], [5, 7]]
  * @param {number} k - number of clusters
+ * @param {function} [stepCallback]
  * @return {number[]} - the class of the point
  */
 export default function KMeans(
   data,
   k = 1,
+  stepCallback = undefined,
 ) {
   if (!data) {
     throw new Error('The data is empty');
@@ -31,8 +34,20 @@ export default function KMeans(
   // Vector data points' classes. The value of -1 means that no class has bee assigned yet.
   const classes = Array(data.length).fill(-1);
 
+  let iteration = 0;
+  const state = (current = -1, cluster = -1) => ({
+    iteration,
+    current,
+    cluster,
+    centers: JSON.stringify(clusterCenters),
+    labels: JSON.stringify(classes),
+    distances: JSON.stringify(distances),
+  });
+  recordStep(stepCallback, 'start', [], [], () => state(), 'const clusterCenters = data.slice(0, k)');
   let iterate = true;
   while (iterate) {
+    iteration += 1;
+    if (iteration > 100) throw new Error('kmeans-convergence');
     iterate = false;
 
     // Calculate and store the distance of each data point from each cluster.
@@ -54,11 +69,20 @@ export default function KMeans(
       }
 
       classes[dataIndex] = closestClusterIdx;
+      recordStep(
+        stepCallback,
+        'assign',
+        [],
+        [],
+        () => state(dataIndex),
+        'classes[dataIndex] = closestClusterIdx',
+      );
     }
 
     // Recalculate cluster centroid values via all dimensions of the points under it.
     for (let clusterIndex = 0; clusterIndex < k; clusterIndex += 1) {
       // Reset cluster center coordinates since we need to recalculate them.
+      const previousCenter = clusterCenters[clusterIndex];
       clusterCenters[clusterIndex] = Array(dataDim).fill(0);
       let clusterSize = 0;
       for (let dataIndex = 0; dataIndex < data.length; dataIndex += 1) {
@@ -71,15 +95,36 @@ export default function KMeans(
           }
         }
       }
+      if (clusterSize === 0) {
+        clusterCenters[clusterIndex] = previousCenter;
+        recordStep(
+          stepCallback,
+          'empty-cluster',
+          [],
+          [],
+          () => state(-1, clusterIndex),
+          'clusterCenters[clusterIndex] = previousCenter',
+        );
+      } else {
       // Calculate the average for each cluster center coordinate.
-      for (let dimensionIndex = 0; dimensionIndex < dataDim; dimensionIndex += 1) {
-        clusterCenters[clusterIndex][dimensionIndex] = parseFloat(Number(
-          clusterCenters[clusterIndex][dimensionIndex] / clusterSize,
-        ).toFixed(2));
+        for (let dimensionIndex = 0; dimensionIndex < dataDim; dimensionIndex += 1) {
+          clusterCenters[clusterIndex][dimensionIndex] = parseFloat(Number(
+            clusterCenters[clusterIndex][dimensionIndex] / clusterSize,
+          ).toFixed(2));
+        }
+        recordStep(
+          stepCallback,
+          'centroid',
+          [],
+          [],
+          () => state(-1, clusterIndex),
+          'clusterCenters[clusterIndex][dimensionIndex] / clusterSize',
+        );
       }
     }
   }
 
+  recordStep(stepCallback, 'done', [], [], () => state(), 'return classes');
   // Return the clusters assigned.
   return classes;
 }

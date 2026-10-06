@@ -1,5 +1,6 @@
+import meansSource from '../src/algorithms/ml/k-means/kMeans.js?raw';
 import source from '../src/algorithms/ml/knn/kNN.js?raw';
-import traceKnn from '../src/visualization/machine-learning';
+import traceKnn, { traceKmeans } from '../src/visualization/machine-learning';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, TextAlgorithm } from './algorithms';
 
@@ -21,4 +22,23 @@ const knn: TextAlgorithm = {
   },
 };
 
-export const machineLearningAlgorithms: Algorithm[] = [knn];
+const kmeans: TextAlgorithm = {
+  id: 'k-means', category: 'ml', inputMode: 'text',
+  example: ['[[1,1],[8,8],[2,3],[3,2],[7,6],[6,8]]', '2'],
+  name: { ko: 'K 평균 군집화', en: 'k-means clustering' }, time: 'O(tnk)',
+  summary: { ko: '처음 k개 점을 중심으로 삼고 가장 가까운 중심에 점을 배정합니다. 각 군집의 평균으로 중심을 옮긴 뒤 배정이 바뀌지 않을 때까지 반복합니다.', en: 'Initialize centers with the first k points. Assign each point to its nearest center, move centers to cluster means, and repeat until assignments stop changing.' },
+  inputLabels: [{ ko: '점 · [x,y] JSON', en: 'Points · [x,y] JSON' }, { ko: '군집 수 k', en: 'Cluster count k' }],
+  inputHint: { ko: '점 1–16개 · 좌표 −20–20 · k=1–6, 점 개수 이하 · 첫 k개 점으로 초기화 · 최대 100회', en: '1–16 points · coordinates −20–20 · k=1–6, no more than point count · first k points initialize centers · at most 100 iterations' },
+  source: algorithmCode(meansSource), run: traceKmeans,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['처음 k개 점으로 중심 초기화', `k=${v.k}개의 중심을 정했습니다. 아직 배정하지 않은 점은 회색이며, 중심은 +로 표시합니다.`] : ['Initialize centers from the first k points', `Set k=${v.k} centers. Gray points are unassigned; + marks each center.`];
+    if (step.type === 'assign') return ko ? ['가장 가까운 중심에 점 배정', `${v.iteration}회차에서 P${v.current}의 거리를 비교했습니다. 소수 2자리 거리의 최솟값을 고르며 동률은 작은 군집 번호가 우선입니다.`] : ['Assign the point to its nearest center', `In iteration ${v.iteration}, compare P${v.current} distances rounded to two decimals. Ties select the lowest cluster index.`];
+    if (step.type === 'centroid') return ko ? ['군집 평균으로 중심 이동', `군집 ${v.cluster}에 속한 점들의 x, y 평균을 각각 계산했습니다. 중심 좌표도 소수 2자리로 반올림합니다.`] : ['Move the center to the cluster mean', `Average x and y of points in cluster ${v.cluster}. Center coordinates are also rounded to two decimals.`];
+    if (step.type === 'empty-cluster') return ko ? ['빈 군집은 이전 중심 유지', `군집 ${v.cluster}에 배정된 점이 없어 평균을 구할 수 없습니다. 0으로 나누는 대신 이전 중심을 보존합니다.`] : ['Keep the previous center for an empty cluster', `Cluster ${v.cluster} has no assigned points. Preserve its previous center rather than dividing by zero.`];
+    return ko ? ['배정이 유지되어 군집화 완료', `${v.iteration}회 반복 후 점별 군집은 [${v.result}]입니다. 초기 중심과 반올림에 영향을 받으며 최적 군집을 보장하지 않습니다.`] : ['Assignments stabilized · clustering ready', `After ${v.iteration} iterations, assignments are [${v.result}]. Initialization and rounding affect the result; a global optimum is not guaranteed.`];
+  },
+};
+
+export const machineLearningAlgorithms: Algorithm[] = [knn, kmeans];
+

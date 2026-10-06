@@ -1,3 +1,4 @@
+import KMeans from '../algorithms/ml/k-means/kMeans';
 import kNN from '../algorithms/ml/knn/kNN';
 
 export default function traceKnn(values) {
@@ -44,5 +45,26 @@ export default function traceKnn(values) {
     (step) => save(step.type, step.variables, step.code),
   );
   save('done', { result }, 'return topClass');
+  return steps;
+}
+
+export function traceKmeans(values) {
+  let points;
+  const k = Number(values[1]);
+  try { points = JSON.parse(values[0]); } catch (_) { throw new Error('kmeans-input'); }
+  if (!Array.isArray(points) || !points.length || points.length > 16
+    || !points.every((row) => Array.isArray(row) && row.length === 2
+      && row.every((value) => Number.isFinite(value) && Math.abs(value) <= 20))
+    || !Number.isInteger(k) || k < 1 || k > Math.min(6, points.length)) {
+    throw new Error('kmeans-input');
+  }
+  const steps = [];
+  const result = KMeans(points, k, (step) => steps.push({
+    ...step,
+    variables: {
+      ...step.variables, mode: 'kmeans', points: JSON.stringify(points), k,
+    },
+  }));
+  steps.at(-1).variables.result = result.join(', ');
   return steps;
 }
