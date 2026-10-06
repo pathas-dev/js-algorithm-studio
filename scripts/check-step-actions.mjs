@@ -8,11 +8,13 @@ const server = await createServer({
 try {
   const { algorithms } = await server.ssrLoadModule('/algorithms.ts');
   const { default: action } = await server.ssrLoadModule('/@fs/' + process.cwd() + '/src/visualization/step-action.js');
+  assert.equal(new Set(algorithms.map((algorithm) => algorithm.id)).size, algorithms.length, 'Duplicate lesson id');
   let checked = 0;
   for (const algorithm of algorithms) {
     const steps = algorithm.run(algorithm.example, algorithm.target, algorithm.graphEdges, algorithm.graphDirected, algorithm.operations);
     for (const language of ['ko', 'en']) {
       for (const [index, step] of steps.entries()) {
+        assert(!step.code || algorithm.source.includes(step.code), `${algorithm.id}: missing source ${step.code}`);
         const [title] = algorithm.explain(step, language);
         const parts = action(algorithm, step, language, title, index, steps.length);
         assert.equal(parts.length, 3);

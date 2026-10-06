@@ -41,4 +41,3 @@ const kmeans: TextAlgorithm = {
 };
 
 export const machineLearningAlgorithms: Algorithm[] = [knn, kmeans];
-

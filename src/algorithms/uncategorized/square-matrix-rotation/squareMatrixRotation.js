@@ -13,7 +13,7 @@ export default function squareMatrixRotation(originalMatrix, stepCallback = unde
     'start',
     [],
     [],
-    { matrix: JSON.stringify(matrix) },
+    () => ({ matrix: JSON.stringify(matrix) }),
     'const matrix = originalMatrix.slice()',
   );
 
@@ -33,13 +33,13 @@ export default function squareMatrixRotation(originalMatrix, stepCallback = unde
         'transpose',
         [],
         [],
-        {
+        () => ({
           row: rowIndex,
           column: columnIndex,
           otherRow: columnIndex,
           otherColumn: rowIndex,
           matrix: JSON.stringify(matrix),
-        },
+        }),
         'matrix[columnIndex][rowIndex],',
       );
     }
@@ -56,16 +56,16 @@ export default function squareMatrixRotation(originalMatrix, stepCallback = unde
         matrix[rowIndex][columnIndex],
         matrix[rowIndex][matrix.length - columnIndex - 1],
       ];
-      recordStep(stepCallback, 'reverse-row', [], [], {
+      recordStep(stepCallback, 'reverse-row', [], [], () => ({
         row: rowIndex,
         column: columnIndex,
         otherRow: rowIndex,
         otherColumn: matrix.length - columnIndex - 1,
         matrix: JSON.stringify(matrix),
-      }, 'matrix[rowIndex][matrix.length - columnIndex - 1],');
+      }), 'matrix[rowIndex][matrix.length - columnIndex - 1],');
     }
   }
 
-  recordStep(stepCallback, 'done', [], [], { matrix: JSON.stringify(matrix) }, 'return matrix');
+  recordStep(stepCallback, 'done', [], [], () => ({ matrix: JSON.stringify(matrix) }), 'return matrix');
   return matrix;
 }

@@ -101,11 +101,11 @@ const fillEncodeFence = ({
     direction,
   });
 
-  recordStep(stepCallback, 'place', [], [], {
+  recordStep(stepCallback, 'place', [], [], () => ({
     currentRail,
     letter,
     column: fence.flat().length,
-  }, 'const [letter, ...nextChars] = chars');
+  }), 'const [letter, ...nextChars] = chars');
 
   return fillEncodeFence({
     fence: fence.map(addCharToRail(currentRail, letter)),

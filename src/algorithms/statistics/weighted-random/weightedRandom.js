@@ -31,8 +31,9 @@ export default function weightedRandom(
     throw new Error('Items must not be empty');
   }
 
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
   if (!weights.every((weight) => Number.isFinite(weight) && weight >= 0)
-    || weights.reduce((sum, weight) => sum + weight, 0) <= 0) {
+    || !Number.isFinite(totalWeight) || totalWeight <= 0) {
     throw new Error('Weights must be finite, nonnegative, and have a positive sum');
   }
 
@@ -43,10 +44,10 @@ export default function weightedRandom(
   const cumulativeWeights = [];
   for (let i = 0; i < weights.length; i += 1) {
     cumulativeWeights[i] = weights[i] + (cumulativeWeights[i - 1] || 0);
-    recordStep(stepCallback, 'prefix', [], [], {
+    recordStep(stepCallback, 'prefix', [], [], () => ({
       current: i,
       cumulative: JSON.stringify(cumulativeWeights),
-    }, 'cumulativeWeights[i] = weights[i] + (cumulativeWeights[i - 1] || 0)');
+    }), 'cumulativeWeights[i] = weights[i] + (cumulativeWeights[i - 1] || 0)');
   }
 
   // Getting the random number in a range of [0...sum(weights)]
@@ -55,8 +56,12 @@ export default function weightedRandom(
   // - maxCumulativeWeight = 8
   // - range for the random number is [0...8]
   const maxCumulativeWeight = cumulativeWeights[cumulativeWeights.length - 1];
-  const randomNumber = maxCumulativeWeight * random();
-  recordStep(stepCallback, 'draw', [], [], { randomNumber }, 'const randomNumber = maxCumulativeWeight * random()');
+  const draw = random();
+  if (!Number.isFinite(draw) || draw < 0 || draw >= 1) {
+    throw new Error('Random draw must be in [0, 1)');
+  }
+  const randomNumber = maxCumulativeWeight * draw;
+  recordStep(stepCallback, 'draw', [], [], { randomNumber }, 'const randomNumber = maxCumulativeWeight * draw');
 
   // Picking the random item based on its weight.
   // The items with higher weight will be picked more often.
@@ -65,8 +70,9 @@ export default function weightedRandom(
       current: itemIndex,
       randomNumber,
       boundary: cumulativeWeights[itemIndex],
-    }, 'if (cumulativeWeights[itemIndex] > randomNumber)');
-    if (cumulativeWeights[itemIndex] > randomNumber) {
+      probabilityBoundary: cumulativeWeights[itemIndex] / maxCumulativeWeight,
+    }, 'if (cumulativeWeights[itemIndex] / maxCumulativeWeight > draw)');
+    if (cumulativeWeights[itemIndex] / maxCumulativeWeight > draw) {
       return {
         item: items[itemIndex],
         index: itemIndex,

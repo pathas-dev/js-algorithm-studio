@@ -11,4 +11,7 @@ it('selects half-open weight intervals and never selects a zero-weight item', ()
   expect(() => traceWeighted(['[["A",0]]', '0'])).toThrow('weighted-input');
   expect(() => traceWeighted(['[["A",1]]', '1'])).toThrow('weighted-input');
   expect(() => weightedRandom(['A'], [-1])).toThrow('Weights must');
+  expect(weightedRandom(['tiny'], [Number.MIN_VALUE], undefined, () => 0.9).item).toBe('tiny');
+  expect(() => weightedRandom(['A', 'B'], [1e308, 1e308])).toThrow('Weights must');
+  expect(() => weightedRandom(['A'], [1], undefined, () => 1)).toThrow('Random draw');
 });

@@ -32,10 +32,10 @@ export default function kNN(
       label: labels[i],
       index: i,
     });
-    recordStep(stepCallback, 'distance', [], [], {
+    recordStep(stepCallback, 'distance', [], [], () => ({
       current: i,
       distances: JSON.stringify(distances),
-    }, 'dist: euclideanDistance([dataSet[i]], [toClassify])');
+    }), 'dist: euclideanDistance([dataSet[i]], [toClassify])');
   }
 
   // Sort distances list (from closer point to further ones).
@@ -47,10 +47,10 @@ export default function kNN(
     return a.dist < b.dist ? -1 : 1;
   }).slice(0, k);
 
-  recordStep(stepCallback, 'nearest', [], [], {
+  recordStep(stepCallback, 'nearest', [], [], () => ({
     nearest: JSON.stringify(kNearest),
     distances: JSON.stringify(distances),
-  }, '}).slice(0, k)');
+  }), '}).slice(0, k)');
 
   // Count the number of instances of each class in top k members.
   const labelsCounter = {};
@@ -66,12 +66,12 @@ export default function kNN(
       topClassCount = labelsCounter[kNearest[i].label];
       topClass = kNearest[i].label;
     }
-    recordStep(stepCallback, 'vote', [], [], {
+    recordStep(stepCallback, 'vote', [], [], () => ({
       current: kNearest[i].index,
       topClass,
       counts: JSON.stringify(labelsCounter),
       topClassCount,
-    }, 'if (labelsCounter[kNearest[i].label] > topClassCount)');
+    }), 'if (labelsCounter[kNearest[i].label] > topClassCount)');
   }
 
   // Return the class with highest count.
