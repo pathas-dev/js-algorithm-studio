@@ -1,5 +1,6 @@
 import traceBits, {
   traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo,
+  tracePascal,
 } from '../math';
 
 it('applies bit operations independently and validates the input', () => {
@@ -80,4 +81,12 @@ it('accepts 2^0 and reaches one by exact halving, rejecting odd factors', () => 
   expect(tracePowerTwo([32]).at(-1).variables.result).toBe(true);
   expect(tracePowerTwo([12]).at(-1).variables.current).toBe(3);
   expect(tracePowerTwo([12]).at(-1).variables.result).toBe(false);
+});
+
+it('builds Pascal rows from their two parents with immutable snapshots', () => {
+  const steps = tracePascal([6]);
+  expect(JSON.parse(steps.at(-1).variables.triangle)[6]).toEqual([1, 6, 15, 20, 15, 6, 1]);
+  expect(JSON.parse(steps[0].variables.triangle)).toEqual([[1]]);
+  expect(tracePascal([0]).at(-1).variables.result).toBe('1');
+  expect(() => tracePascal([13])).toThrow('pascal-input');
 });

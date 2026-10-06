@@ -1,3 +1,4 @@
+import pascalSource from '../src/algorithms/math/pascal-triangle/pascalTriangleRecursive.js?raw';
 import powerTwoSource from '../src/algorithms/math/is-power-of-two/isPowerOfTwo.js?raw';
 import sieveSource from '../src/algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes.js?raw';
 import lcmSource from '../src/algorithms/math/least-common-multiple/leastCommonMultiple.js?raw';
@@ -7,7 +8,7 @@ import fibonacciSource from '../src/algorithms/math/fibonacci/fibonacciNth.js?ra
 import factorialSource from '../src/algorithms/math/factorial/factorial.js?raw';
 import type { NumericAlgorithm } from './algorithms';
 import { algorithmCode } from '../src/visualization/playback';
-import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo } from '../src/visualization/math';
+import traceBits, { traceFactorial, traceFibonacci, tracePrimality, traceGcd, traceLcm, traceSieve, tracePowerTwo, tracePascal } from '../src/visualization/math';
 import getBitSource from '../src/algorithms/math/bits/getBit.js?raw';
 import setBitSource from '../src/algorithms/math/bits/setBit.js?raw';
 import clearBitSource from '../src/algorithms/math/bits/clearBit.js?raw';
@@ -150,4 +151,20 @@ export const powerTwoLesson: NumericAlgorithm = {
   },
 };
 
-export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson];
+export const pascalLesson: NumericAlgorithm = {
+  ...factorialLesson, id: 'pascal-triangle',
+  name: { ko: '파스칼 삼각형', en: "Pascal's triangle" },
+  summary: { ko: '각 칸은 바로 위의 두 칸의 합입니다. 삼각형 바깥은 0으로 취급하므로 양끝은 항상 1입니다.', en: 'Each cell sums the two cells above it. Values outside the triangle are zero, so both edges remain one.' },
+  source: algorithmCode(pascalSource), example: [6], time: 'O(n²)',
+  inputLabels: [{ ko: '마지막 행 번호 · 0부터', en: 'Last row index · zero based' }, { ko: '', en: '' }],
+  inputHint: { ko: '정수 하나 · 행 번호 0–12', en: 'One integer · row index 0–12' },
+  run: (values) => tracePascal(values),
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'base') return ko ? ['첫 행은 1', '0번 행의 유일한 값은 1입니다. 재귀 호출이 여기서 끝나고 다음 행을 계산합니다.'] : ['The first row is one', 'Row zero contains one. Recursion stops here, then computes successive rows.'];
+    if (step.type === 'add') return ko ? ['위의 두 칸 더하기', `${v.row}번 행, ${v.column}번 칸: ${v.expression}. 삼각형 바깥의 값은 0입니다.`] : ['Add the two cells above', `Row ${v.row}, column ${v.column}: ${v.expression}. Values outside the triangle are zero.`];
+    return ko ? ['파스칼 삼각형 완성', `${v.row}번 행은 (a+b)^${v.row}의 이항계수입니다. 양끝은 1이고 좌우가 대칭입니다.`] : ['Pascal triangle ready', `Row ${v.row} contains the binomial coefficients of (a+b)^${v.row}. Both edges are one and the row is symmetric.`];
+  },
+};
+
+export const mathAlgorithms: NumericAlgorithm[] = [bits, factorialLesson, fibonacciLesson, primalityLesson, gcdLesson, lcmLesson, sieveLesson, powerTwoLesson, pascalLesson];

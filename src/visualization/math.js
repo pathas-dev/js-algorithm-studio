@@ -1,3 +1,4 @@
+import pascalTriangleRecursive from '../algorithms/math/pascal-triangle/pascalTriangleRecursive';
 import isPowerOfTwo from '../algorithms/math/is-power-of-two/isPowerOfTwo';
 import sieveOfEratosthenes from '../algorithms/math/sieve-of-eratosthenes/sieveOfEratosthenes';
 import leastCommonMultiple from '../algorithms/math/least-common-multiple/leastCommonMultiple';
@@ -116,5 +117,43 @@ export function tracePowerTwo(values) {
   isPowerOfTwo(values[0], (step) => steps.push({
     ...step, variables: { ...step.variables, mode: 'power-two' },
   }));
+  return steps;
+}
+
+export function tracePascal(values) {
+  const [row] = values;
+  if (values.length !== 1 || !Number.isInteger(row) || row < 0 || row > 12) {
+    throw new Error('pascal-input');
+  }
+  const steps = [];
+  const triangle = [];
+  const result = pascalTriangleRecursive(row, (step) => {
+    triangle[step.variables.row] = step.array;
+    steps.push({
+      ...step,
+      array: [],
+      variables: {
+        ...step.variables,
+        result: '—',
+        mode: 'pascal',
+        triangle: JSON.stringify(triangle),
+        expression: step.variables.expression || 'C(0, 0) = 1',
+      },
+    });
+  });
+  steps.push({
+    type: 'done',
+    array: [],
+    indices: [],
+    code: 'return currentLine;',
+    variables: {
+      mode: 'pascal',
+      row,
+      triangle: JSON.stringify(triangle),
+      result: result.join(', '),
+      expression: `C(${row}, k)`,
+    },
+  });
+  if (row === 0) steps[steps.length - 1].code = 'return [1];';
   return steps;
 }
