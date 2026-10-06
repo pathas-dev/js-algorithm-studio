@@ -1,8 +1,9 @@
+import rainSource from '../src/algorithms/uncategorized/rain-terraces/dpRainTerraces.js?raw';
 import pathsSource from '../src/algorithms/uncategorized/unique-paths/dpUniquePaths.js?raw';
 import jumpSource from '../src/algorithms/uncategorized/jump-game/greedyJumpGame.js?raw';
 import rotationSource from '../src/algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation.js?raw';
 import hanoiSource from '../src/algorithms/uncategorized/hanoi-tower/hanoiTower.js?raw';
-import traceHanoi, { traceRotation, traceJump, tracePaths } from '../src/visualization/puzzles';
+import traceHanoi, { traceRotation, traceJump, tracePaths, traceRain } from '../src/visualization/puzzles';
 import { algorithmCode } from '../src/visualization/playback';
 import type { Algorithm, NumericAlgorithm, TextAlgorithm } from './algorithms';
 
@@ -71,4 +72,21 @@ const paths: NumericAlgorithm = {
   },
 };
 
-export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths];
+const rain: NumericAlgorithm = {
+  id: 'rain-terraces', category: 'other', example: [0,1,0,2,1,0,1,3,2,1,2,1], usesStart: false, singleInput: true,
+  name: { ko: '빗물 담기 문제', en: 'Trapping rain water' }, time: 'O(n)',
+  summary: { ko: '각 위치 왼쪽·오른쪽의 최대 높이를 미리 기록합니다. 둘 중 낮은 벽 높이에서 현재 지형 높이를 빼면 이 칸에 고이는 물의 양입니다.', en: 'Precompute the maximum heights to each position’s left and right. The lower wall minus the current terrain height gives water stored at that position.' },
+  inputLabels: [{ ko: '지형 높이', en: 'Terrain heights' }, { ko: '', en: '' }],
+  inputHint: { ko: '정수 높이 1–18개 · 높이 0–12 · 칸 너비는 모두 1', en: '1–18 integer heights · values 0–12 · every cell has unit width' },
+  source: algorithmCode(rainSource), run: traceRain,
+  explain(step, language) {
+    const ko = language === 'ko'; const v = step.variables;
+    if (step.type === 'start') return ko ? ['양쪽 벽의 최대 높이 준비', '지형을 바꾸지 않고 왼쪽 최대, 오른쪽 최대, 각 칸의 물 높이를 별도로 저장합니다.'] : ['Prepare maximum walls on both sides', 'Keep the terrain unchanged and separately store left maxima, right maxima and water heights.'];
+    if (step.type === 'left-max') return ko ? ['왼쪽에서 현재까지 최대 높이 기록', `위치 ${v.current}의 왼쪽 최대는 현재 높이와 직전 왼쪽 최대 중 큰 값입니다. 자기 위치도 포함합니다.`] : ['Record the maximum from the left', `At ${v.current}, take the larger of this height and the preceding left maximum, including the current position.`];
+    if (step.type === 'right-max') return ko ? ['오른쪽에서 현재까지 최대 높이 기록', `위치 ${v.current}의 오른쪽 최대는 현재 높이와 다음 오른쪽 최대 중 큰 값입니다. 오른쪽 끝부터 계산합니다.`] : ['Record the maximum from the right', `At ${v.current}, take the larger of this height and the next right maximum, scanning from the right edge.`];
+    if (step.type === 'water') return ko ? ['낮은 벽을 기준으로 물 높이 계산', `위치 ${v.current}의 수면 한계는 ${v.currentTerraceBoundary}입니다. 이 값에서 지형 높이를 뺀 만큼만 고이며 누적 물은 ${v.waterAmount}입니다.`] : ['Use the lower wall for water height', `Position ${v.current} has waterline limit ${v.currentTerraceBoundary}. Subtract terrain height; accumulated water is ${v.waterAmount}.`];
+    return ko ? ['전체 빗물 양 계산 완료', `총 ${v.result} 단위의 물이 고입니다. 양끝이나 단조롭게 오르내리는 지형은 양쪽 벽이 없으므로 물이 고이지 않습니다.`] : ['Total trapped water ready', `Total water: ${v.result} units. Edges and monotonic terrain cannot hold water without bounding walls on both sides.`];
+  },
+};
+
+export const puzzleAlgorithms: Algorithm[] = [hanoi, rotation, jump, paths, rain];

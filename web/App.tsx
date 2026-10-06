@@ -156,6 +156,7 @@ export default function App() {
   }
 
   const errors: Record<string, string> = {
+    'rain-input': t('지형 높이는 정수 1–18개, 각 값 0–12로 입력하세요.', 'Enter 1–18 integer terrain heights from 0 to 12.'),
     'paths-input': t('격자 폭과 높이는 각각 정수 1–10으로 입력하세요.', 'Enter integer grid width and height from 1 to 10.'),
     'jump-input': t('최대 점프는 정수 1–18개, 각 값 0–12로 입력하세요.', 'Enter 1–18 maximum-jump integers, each from 0 to 12.'),
     'rotation-input': t('1–6행의 정방 JSON 행렬을 입력하세요. 숫자는 −999–999입니다.', 'Enter a square JSON matrix of 1–6 rows; values −999–999.'),

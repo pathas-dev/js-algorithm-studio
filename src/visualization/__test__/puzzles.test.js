@@ -1,4 +1,6 @@
-import traceHanoi, { traceRotation, traceJump, tracePaths } from '../puzzles';
+import traceHanoi, {
+  traceRotation, traceJump, tracePaths, traceRain,
+} from '../puzzles';
 
 it('moves Hanoi discs legally and reaches the destination in 2^n−1 moves', () => {
   [1, 3, 6].forEach((n) => {
@@ -38,4 +40,14 @@ it('counts unique grid paths by adding independent upper and left entries', () =
   expect(tracePaths([1], 10).at(-1).variables.result).toBe(1);
   expect(tracePaths([10], 1).at(-1).variables.result).toBe(1);
   expect(() => tracePaths([0], 1)).toThrow('paths-input');
+});
+
+it('traps water using the lower of the two maximum walls', () => {
+  const steps = traceRain([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]);
+  expect(steps.at(-1).variables.result).toBe(6);
+  expect(JSON.parse(steps.at(-1).variables.water)).toEqual([0, 0, 1, 0, 1, 2, 1, 0, 0, 1, 0, 0]);
+  expect(traceRain([3, 0, 3]).at(-1).variables.result).toBe(3);
+  expect(traceRain([1, 2, 3]).at(-1).variables.result).toBe(0);
+  expect(traceRain([0]).at(-1).variables.result).toBe(0);
+  expect(() => traceRain([-1])).toThrow('rain-input');
 });

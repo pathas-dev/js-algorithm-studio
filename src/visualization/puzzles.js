@@ -1,3 +1,4 @@
+import dpRainTerraces from '../algorithms/uncategorized/rain-terraces/dpRainTerraces';
 import dpUniquePaths from '../algorithms/uncategorized/unique-paths/dpUniquePaths';
 import greedyJumpGame from '../algorithms/uncategorized/jump-game/greedyJumpGame';
 import squareMatrixRotation from '../algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation';
@@ -107,6 +108,20 @@ export function tracePaths(values, height) {
       rows: JSON.stringify(Array.from({ length: height }, (_, i) => String(i))),
       columns: JSON.stringify(Array.from({ length: width }, (_, i) => String(i))),
     },
+  }));
+  return steps;
+}
+
+export function traceRain(values) {
+  if (!values.length || values.length > 18
+    || !values.every((value) => Number.isInteger(value) && value >= 0 && value <= 12)) {
+    throw new Error('rain-input');
+  }
+  const steps = [];
+  dpRainTerraces(values, (step) => steps.push({
+    ...step,
+    array: step.array.map((value, id) => ({ value, id })),
+    variables: { ...step.variables, mode: 'rain' },
   }));
   return steps;
 }
