@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T15:48:43.943033+00:00",
+  "generatedAt": "2026-10-07T21:07:29.902576Z",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -1033,12 +1033,12 @@
       {
         "name": "bubble-view-transition",
         "value": "depth += (target - depth) * (1 - exp(-min(delta, 0.1) * 7))",
-        "purpose": "Bubble native view radios ease between front-facing and shallow orthographic angle. Default 3D; 2D flattens z to 0.01 and hides rings. Landing explicitly selects static space planets in 3D with demand rendering."
+        "purpose": "Bubble native view radios ease between front-facing and shallow orthographic angle. Default 3D; 2D flattens z to 0.01 and hides rings while shader terrain rotates without turning geometry edge-on. Landing holds its array in 3D with visible autonomous axial rotation; offscreen or hidden documents use demand rendering."
       },
       {
         "name": "bubble-background",
-        "value": "domain-warped nebula; sparse star twinkle; faint swap ripple; planet rotation 0.045 radians/second",
-        "purpose": "Bubble execution: near-black, green/mauve nebula, sparse stars and faint local swap ripple. Rotation, nebula, stars, dust and semicircle swaps share cumulative playback clock/speed; pause/hidden tabs freeze authored motion and seek/edit/reset restore deterministic states. No physics engine. Reduced motion or scene failure uses the static array renderer."
+        "value": "domain-warped nebula; sparse star twinkle; faint swap ripple; axial angle = max(0,timeMs)/1000 × 0.045 × (0.85 + id%5 × 0.08) + id × 0.8",
+        "purpose": "Bubble execution sphere rotation in 3D or local shader terrain rotation in 2D shares cumulative playback clock/speed with nebula, stars, dust and swaps. Rings, numeric labels and centres do not rotate. Pause/hidden tabs freeze motion; seek/edit/reset restores deterministic states. Landing uses an autonomous visible/non-hidden clock with delta capped at 0.1s. Reduced motion or scene failure uses the static array renderer; no physics engine."
       },
       {
         "name": "clay-damped-spring",
@@ -1053,12 +1053,22 @@
       {
         "name": "complexity-star-fade",
         "value": "1000ms; 1 - (1 - elapsed)^3",
-        "purpose": "Demand-rendered opacity fade; first render/reduced motion show final clusters. Stable workStar positions, shared 6.5-unit camera and minimum 4px point-size rule; final draw range equals exact model count up to 8128."
+        "purpose": "Visible count changes fade opacity; first render, offscreen and reduced motion resolve to final exact count. Stable workStar positions, shared 6.5-unit camera and minimum 4px point-size rule remain unchanged up to 8128 stars. Visible non-hidden scenes render continuously for local surface spin; offscreen/reduced scenes render on demand. Idle spin does not rewrite the alpha buffer."
       },
       {
         "name": "loading-moon",
         "value": "22s linear infinite",
-        "purpose": "Decorative native moon rotation; disabled for reduced motion, no fake delay."
+        "purpose": "Decorative native moon orbit; paused offscreen or in a hidden document and disabled for reduced motion, no fake delay."
+      },
+      {
+        "name": "complexity-star-spin",
+        "value": "angle = visibleSeconds × 0.12 × 0.85 × (0.85 + seed × 0.3) + seed × 2π",
+        "purpose": "Each point shader rotates its asymmetric bright surface patch around its own fixed centre. Seed comes from stable position; delta is capped at 0.1s. Exact counts, geometry and shared scale remain unchanged. Visibility/document-hidden and reduced-motion gates stop the clock; no group revolution or physical-astronomy claim."
+      },
+      {
+        "name": "loading-planet-spin",
+        "value": "110s linear infinite",
+        "purpose": "Sage/ochre surface patches rotate beneath fixed inset lighting, using loading shade at 50% and ochre at 40%. Visibility/document-hidden gates pause CSS animation; reduced motion stops it."
       }
     ],
     "breakpoints": [
@@ -1153,9 +1163,9 @@
     {
       "name": "Native loading orbit",
       "kind": "custom",
-      "description": "Root Suspense status with native 76px planet, tilted ellipse and 22s moon. Independent WebGL SpaceSky has this static CSS fallback.",
+      "description": "Root Suspense status with a native 76px planet, 110s local surface rotation, tilted ellipse and 22s moon. Visibility/document-hidden gates pause motion; reduced motion stops it. Independent WebGL SpaceSky has this static CSS fallback.",
       "html": "<div class=\"ds-loading\"><div class=\"ds-orbit\" aria-hidden=\"true\"><span class=\"ds-planet\"></span><span class=\"ds-moon\"></span></div><div class=\"ds-status\" role=\"status\" aria-live=\"polite\"><p>Gathering a little universe…</p><span>Loading…</span></div></div>",
-      "css": ".ds-loading{background:radial-gradient(ellipse at 75% 30%,#202e28,transparent 70%),radial-gradient(ellipse at 25% 75%,#29222b,#0b1012 75%);color:#e2e7d9;text-align:center;padding:24px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-orbit{position:relative;width:230px;height:170px;margin:0 auto 28px}.ds-orbit::before{content:\"\";position:absolute;inset:38px 10px;border:1px solid #b7a07e;border-radius:50%;transform:rotate(-28deg);opacity:.6}.ds-planet{position:absolute;width:76px;height:76px;left:77px;top:47px;background:#9bb7a5;border-radius:50%;box-shadow:inset -18px -12px 28px #31463b}.ds-moon{position:absolute;inset:0;animation:ds-loading-orbit 22s linear infinite}.ds-moon::after{content:\"\";position:absolute;left:23px;top:50px;width:7px;height:7px;border-radius:50%;background:#b7a07e}.ds-status p{margin:0 0 10px;font-size:19px;font-weight:450;letter-spacing:-.02em}.ds-status>span{font-size:13px;color:#a3b0a7}@keyframes ds-loading-orbit{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.ds-moon{animation:none}}"
+      "css": ".ds-loading{background:radial-gradient(ellipse at 75% 30%,#202e28,transparent 70%),radial-gradient(ellipse at 25% 75%,#29222b,#0b1012 75%);color:#e2e7d9;text-align:center;padding:24px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-orbit{position:relative;width:230px;height:170px;margin:0 auto 28px}.ds-orbit::before{content:\"\";position:absolute;inset:38px 10px;border:1px solid #b7a07e;border-radius:50%;transform:rotate(-28deg);opacity:.6}.ds-planet{position:absolute;width:76px;height:76px;left:77px;top:47px;background:#9bb7a5;border-radius:50%;box-shadow:inset -18px -12px 28px #31463b;overflow:hidden}.ds-planet::before{content:\"\";position:absolute;inset:-20%;background:radial-gradient(ellipse at 30% 35%,#31463b80,transparent 35%),radial-gradient(ellipse at 65% 70%,#b7a07e66,transparent 40%);animation:ds-loading-spin 110s linear infinite}.ds-orbit:not([data-spinning=\"true\"]) .ds-moon,.ds-orbit:not([data-spinning=\"true\"]) .ds-planet::before{animation-play-state:paused}.ds-moon{position:absolute;inset:0;animation:ds-loading-orbit 22s linear infinite}.ds-moon::after{content:\"\";position:absolute;left:23px;top:50px;width:7px;height:7px;border-radius:50%;background:#b7a07e}.ds-status p{margin:0 0 10px;font-size:19px;font-weight:450;letter-spacing:-.02em}.ds-status>span{font-size:13px;color:#a3b0a7}@keyframes ds-loading-spin{to{transform:rotate(360deg)}}@keyframes ds-loading-orbit{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.ds-moon,.ds-planet::before{animation:none}}"
     },
     {
       "name": "Bubble view switch",

@@ -5,7 +5,8 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import type { Item, Step } from './algorithms';
 import type { BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
-import { springProgress, planetRadius, planetSpacing, orbitalSwap } from './bubble-motion';
+import { springProgress, planetRadius, planetSpacing, orbitalSwap, axialAngle } from './bubble-motion';
+import { useSceneVisibility } from './use-scene-visibility';
 import './bubble.css';
 
 type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; still?: boolean; world?: 'clay' | 'space' };
@@ -96,11 +97,12 @@ function Backdrop({ step, clock, world, spacing }: Pick<Props, 'step' | 'clock' 
   return <mesh material={material} frustumCulled={false} renderOrder={-10}><planeGeometry args={[2, 2]} /></mesh>;
 }
 
-function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world, spacing }: { item: Item; index: number; maximum: number; spacing: number; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world'>) {
+function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world, spacing, still, visible }: { item: Item; index: number; maximum: number; spacing: number; visible: boolean; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world' | 'still'>) {
   const mesh = useRef<Mesh>(null);
   const ring = useRef<Mesh>(null);
   const space = world === 'space';
   const radius = planetRadius(item.value, maximum);
+  const spinTime = useRef(0);
   const number = useRef<Sprite>(null);
   const text = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -121,7 +123,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
   const { camera, size } = useThree();
   const anchor = useMemo(() => new Vector3(), []);
   const stoneHeight = height(item, maximum);
-  const uniforms = useMemo(() => ({ uErosion: { value: 0 }, uStoneHeight: { value: space ? radius * 2 : stoneHeight }, uPlanetRadius: { value: radius }, uPlanetSeed: { value: item.id } }), [stoneHeight, space, radius, item.id]);
+  const uniforms = useMemo(() => ({ uErosion: { value: 0 }, uStoneHeight: { value: space ? radius * 2 : stoneHeight }, uPlanetRadius: { value: radius }, uPlanetSeed: { value: item.id }, uPlanetSpin: { value: 0 } }), [stoneHeight, space, radius, item.id]);
   const geometry = useMemo(() => {
     if (space) return new SphereGeometry(radius, 48, 32);
     const shape = new RoundedBoxGeometry(0.78, stoneHeight, 0.7, 4, Math.min(0.065, stoneHeight / 3));
@@ -144,7 +146,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
         uniform float uStoneHeight;
         float clayNoise(vec3 p) { return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
         ${space ? `
-        uniform float uPlanetRadius, uPlanetSeed;
+        uniform float uPlanetRadius, uPlanetSeed, uPlanetSpin;
         float planetNoise(vec3 p) {
           vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
           return mix(mix(mix(clayNoise(i),clayNoise(i+vec3(1,0,0)),f.x),mix(clayNoise(i+vec3(0,1,0)),clayNoise(i+vec3(1,1,0)),f.x),f.y),
@@ -157,13 +159,15 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
         diffuseColor.rgb *= 0.97 + grain * 0.045;
         ${space ? `
         vec3 surface=vClay/uPlanetRadius;
+        float c=cos(uPlanetSpin), s=sin(uPlanetSpin);
+        surface=vec3(c*surface.x+s*surface.z,surface.y,-s*surface.x+c*surface.z);
         float terrain=planetNoise(surface*4.0+vec3(uPlanetSeed));
         float strata=planetNoise(surface*19.0+terrain*2.0);
         diffuseColor.rgb *= 0.45+terrain*0.65+strata*0.2+grain*0.04;
         ` : ''}
       `);
     };
-    clay.customProgramCacheKey = () => space ? 'bubble-planets-v2' : 'bubble-clay-v2';
+    clay.customProgramCacheKey = () => space ? 'bubble-planets-v3' : 'bubble-clay-v2';
     return clay;
   }, [uniforms, space, radius, item.id]);
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
@@ -171,8 +175,9 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
   const warm = useMemo(() => new Color(space ? '#d6b476' : '#ba9469'), [space]);
   const swap = useMemo(() => new Color(space ? '#afa0be' : '#a79aab'), [space]);
   const settled = useMemo(() => new Color(space ? '#8faf9d' : '#74886d'), [space]);
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!mesh.current) return;
+    if (still && visible) spinTime.current += Math.min(delta, 0.1) * 1000;
     const state = clock.current;
     const from = previous.array.findIndex((entry) => entry.id === item.id);
     const moving = step.type === 'swap' && state.animate && from !== index;
@@ -184,7 +189,9 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     const [planetX, orbit] = orbitalSwap(oldX, nextX, time);
     if (space) mesh.current.position.set(planetX, 0.55 + (view === '2d' ? orbit : 0), view === '3d' ? orbit : 0);
     else mesh.current.position.set(oldX + (nextX - oldX) * progress, Math.sign(item.value || 1) * stoneHeight / 2 + arc * 0.035, arc * (from < index ? 0.85 : -0.85));
-    if (space) mesh.current.rotation.y = view === '3d' ? state.time / 1000 * 0.045 + item.id * 0.8 : 0;
+    const spin = axialAngle(still ? spinTime.current : state.time, item.id);
+    if (space) mesh.current.rotation.y = view === '3d' ? spin : 0;
+    uniforms.uPlanetSpin.value = space && view === '2d' ? spin : 0;
     mesh.current.rotation.z = (space ? 0 : arc) * (from < index ? -0.045 : 0.045);
     mesh.current.scale.z = view === '2d' ? 0.01 : 1;
     uniforms.uErosion.value = Math.max(0, Math.min(1, erosion(state)));
@@ -281,6 +288,7 @@ export class SceneBoundary extends Component<{ children: ReactNode; fallback: Re
 
 export default function BubbleScene({ step, previous, clock, language, reduced, view, still = false, world = 'clay' }: Props) {
   const [lost, setLost] = useState(false);
+  const { sceneRef, visible } = useSceneVisibility(still && world === 'space' && !reduced && !lost);
   const labels = useRef(new Map<number, HTMLLIElement>());
   const maximum = Math.max(1, ...step.array.map((item) => Math.abs(item.value)));
   const spacing = world === 'space' ? planetSpacing(step.array.map((item) => item.value), maximum) : 1.12;
@@ -288,12 +296,12 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
   const slotWidth = Math.max(world === 'space' ? 72 : 36, ...step.array.map((item) => String(item.value).length * 9 + 16));
   const fallback = <ArrayView step={step} language={language} />;
   if (reduced || lost) return fallback;
-  return <div className="bubble-art" data-view={view} data-world={world}>
+  return <div ref={sceneRef} className="bubble-art" data-view={view} data-world={world} data-spinning={still ? visible : undefined}>
     <div className="bubble-art-scroll">
       <div className="bubble-art-frame" style={{ minWidth: Math.max(280, step.array.length * slotWidth) }}>
         <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
           <div className="bubble-canvas" aria-hidden="true">
-            <Canvas orthographic frameloop={still ? 'demand' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, 5.1, 10], zoom: 60 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => {
+            <Canvas orthographic frameloop={still && !visible ? 'demand' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, 5.1, 10], zoom: 60 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => {
               gl.shadowMap.type = VSMShadowMap;
               gl.setClearColor(world === 'space' ? '#0b1012' : '#f0efe7');
               gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
@@ -306,7 +314,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
               <mesh visible={world !== 'space' && view === '3d'} rotation={[-Math.PI / 2, 0, 0]} position={[0, signed ? -3.3 : -0.015, 0]} receiveShadow>
                 <planeGeometry args={[100, 100]} /><shadowMaterial color="#41503e" opacity={0.14} />
               </mesh>
-              {step.array.map((item, index) => <Stone spacing={spacing} key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
+              {step.array.map((item, index) => <Stone still={still} visible={visible} spacing={spacing} key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
               <Dust spacing={spacing} step={step} maximum={maximum} clock={clock} world={world} />
             </Canvas>
           </div>

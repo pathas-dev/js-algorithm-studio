@@ -5,7 +5,6 @@ export function springProgress(value: number) {
   return 1 - Math.exp(-6 * value) * (Math.cos(8 * value) + 0.75 * Math.sin(8 * value));
 }
 
-// Identical blocks: volume, rather than a normalized height, represents work.
 // Stable 3D positions: more work adds equal stars without resizing existing ones.
 export function workStar(index: number): [number, number, number] {
   if (index === 0) return [0, 0, 0];
@@ -25,3 +24,6 @@ export function orbitalSwap(from: number, to: number, time: number): [number, nu
   const angle = Math.max(0, Math.min(1, time)) * Math.PI;
   return [from + (to - from) * (1 - Math.cos(angle)) / 2, (to - from) * Math.sin(angle) / 2];
 }
+
+// Stable phases and slightly different axial rates; never changes a body's centre.
+export const axialAngle = (timeMs: number, id: number, rate = 0.045) => Math.max(0, timeMs) / 1000 * rate * (0.85 + id % 5 * 0.08) + id * 0.8;

@@ -8,13 +8,16 @@ body { margin: 0; background: #f5f7f2; color: #1a3028; }
 .studio-loading .loading-brand { font-size: 18px; color: inherit; font-weight: 450; }
 .loading-orbit { position: relative; width: 230px; height: 170px; margin: 40px 0 28px; }
 .loading-orbit::before { content: ''; position: absolute; inset: 38px 10px; border: 1px solid #b7a07e; border-radius: 50%; transform: rotate(-28deg); opacity: .6; }
-.loading-planet { position: absolute; width: 76px; height: 76px; left: 77px; top: 47px; background: #9bb7a5; border-radius: 50%; box-shadow: inset -18px -12px 28px #31463b; }
+.loading-planet { position: absolute; width: 76px; height: 76px; left: 77px; top: 47px; background: #9bb7a5; border-radius: 50%; box-shadow: inset -18px -12px 28px #31463b; overflow: hidden; }
+.loading-planet::before { content: ''; position: absolute; inset: -20%; background: radial-gradient(ellipse at 30% 35%, #31463b80, transparent 35%), radial-gradient(ellipse at 65% 70%, #b7a07e66, transparent 40%); animation: loading-spin 110s linear infinite; }
+.loading-orbit:not([data-spinning="true"]) .loading-moon, .loading-orbit:not([data-spinning="true"]) .loading-planet::before { animation-play-state: paused; }
+@keyframes loading-spin { to { transform: rotate(360deg); } }
 .loading-moon { position: absolute; inset: 0; animation: loading-orbit 22s linear infinite; }
 .loading-moon::after { content: ''; position: absolute; left: 23px; top: 50px; width: 7px; height: 7px; border-radius: 50%; background: #b7a07e; }
 .loading-status p { margin: 0 0 10px; font-size: 19px; font-weight: 450; letter-spacing: -.02em; }
 .loading-status > span { font-size: 13px; color: #a3b0a7; }
 @keyframes loading-orbit { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .loading-moon { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .loading-moon, .loading-planet::before { animation: none; } }
 h1 { letter-spacing: -.03em; text-wrap: balance; }
 button:focus-visible, a:focus-visible { outline: 3px solid #087f5b; outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {

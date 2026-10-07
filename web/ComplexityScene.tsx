@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, OrthographicCamera, ShaderMaterial } from 'three';
 import { SceneBoundary } from './BubbleScene';
-import { workStar } from './bubble-motion';
+import { workStar, axialAngle } from './bubble-motion';
+import { useSceneVisibility } from './use-scene-visibility';
 
 function Camera() {
   const { camera, size } = useThree();
@@ -15,7 +16,7 @@ function Camera() {
   return null;
 }
 
-function Cluster({ count, color, reduced }: { count: number; color: string; reduced: boolean }) {
+function Cluster({ count, color, reduced, visible }: { count: number; color: string; reduced: boolean; visible: boolean }) {
   const { camera, gl, invalidate } = useThree();
   const geometry = useMemo(() => {
     const cloud = new BufferGeometry();
@@ -27,31 +28,43 @@ function Cluster({ count, color, reduced }: { count: number; color: string; redu
   }, []);
   const material = useMemo(() => new ShaderMaterial({
     transparent: true, depthWrite: false, blending: AdditiveBlending,
-    uniforms: { color: { value: new Color(color) }, pointSize: { value: 4 } },
-    vertexShader: `attribute float alpha; varying float vAlpha; uniform float pointSize;
-      void main(){vAlpha=alpha; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); gl_PointSize=pointSize;}`,
-    fragmentShader: `uniform vec3 color; varying float vAlpha;
-      void main(){float r=length(gl_PointCoord-0.5); float glow=exp(-r*r*18.0); float core=1.0-smoothstep(0.06,0.20,r);
+    uniforms: { color: { value: new Color(color) }, pointSize: { value: 4 }, uSpin: { value: 0 } },
+    vertexShader: `attribute float alpha; varying float vAlpha, vSeed; uniform float pointSize;
+      void main(){vAlpha=alpha; vSeed=fract(sin(dot(position,vec3(12.9,78.2,37.7)))*43758.5); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); gl_PointSize=pointSize;}`,
+    fragmentShader: `uniform vec3 color; uniform float uSpin; varying float vAlpha, vSeed;
+      void main(){
+        vec2 p=gl_PointCoord-0.5;
+        float angle=uSpin*(0.85+vSeed*0.3)+vSeed*6.283185;
+        float c=cos(angle), s=sin(angle);
+        vec2 surface=mat2(c,-s,s,c)*p;
+        float r=length(p), glow=exp(-r*r*18.0);
+        float core=exp(-dot(surface-vec2(0.07,0.025),surface-vec2(0.07,0.025))*130.0);
         gl_FragColor=vec4(mix(color,vec3(1.0),core*0.5),vAlpha*(glow*0.5+core*0.5));
         #include <colorspace_fragment>
       }`,
   }), [color]);
+  const spinTime = useRef(0);
   const currentCount = useRef(0);
-  const motion = useRef({ start: new Float32Array(8128), elapsed: 1, total: 0 });
+  const motion = useRef({ start: new Float32Array(8128), elapsed: 1, total: 0, dirty: true });
   useEffect(() => {
-    motion.current = { start: new Float32Array(geometry.getAttribute('alpha').array), elapsed: reduced || currentCount.current === 0 ? 1 : 0, total: Math.max(count, currentCount.current) };
+    motion.current = { start: new Float32Array(geometry.getAttribute('alpha').array), elapsed: reduced || currentCount.current === 0 ? 1 : 0, total: Math.max(count, currentCount.current), dirty: true };
     invalidate();
   }, [count, reduced, geometry, invalidate]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   useEffect(() => () => material.dispose(), [material]);
   useFrame((_, delta) => {
     const state = motion.current;
-    state.elapsed = Math.min(1, state.elapsed + Math.min(delta, 0.1));
-    const progress = 1 - (1 - state.elapsed) ** 3;
-    const alpha = geometry.getAttribute('alpha') as BufferAttribute;
-    for (let i = 0; i < state.total; i += 1) alpha.setX(i, state.start[i] + ((i < count ? 1 : 0) - state.start[i]) * progress);
-    alpha.needsUpdate = true;
-    geometry.setDrawRange(0, state.elapsed === 1 ? count : state.total);
+    if (state.dirty || state.elapsed < 1) {
+      state.elapsed = reduced || !visible ? 1 : Math.min(1, state.elapsed + Math.min(delta, 0.1));
+      const progress = 1 - (1 - state.elapsed) ** 3;
+      const alpha = geometry.getAttribute('alpha') as BufferAttribute;
+      for (let i = 0; i < state.total; i += 1) alpha.setX(i, state.start[i] + ((i < count ? 1 : 0) - state.start[i]) * progress);
+      alpha.needsUpdate = true;
+      geometry.setDrawRange(0, state.elapsed === 1 ? count : state.total);
+      state.dirty = false;
+    }
+    if (visible && !reduced) spinTime.current += Math.min(delta, 0.1) * 1000;
+    material.uniforms.uSpin.value = axialAngle(spinTime.current, 0, 0.12);
     material.uniforms.pointSize.value = Math.max(4, (camera as OrthographicCamera).zoom * 0.16) * gl.getPixelRatio();
     currentCount.current = state.elapsed === 1 ? count : state.total;
     if (state.elapsed < 1) invalidate();
@@ -61,15 +74,16 @@ function Cluster({ count, color, reduced }: { count: number; color: string; redu
 
 export default function ComplexityScene({ count, color, reduced }: { count: number; color: string; reduced: boolean }) {
   const [lost, setLost] = useState(false);
+  const { sceneRef, visible } = useSceneVisibility(!reduced && !lost);
   const fallback = <div className="complexity-unavailable" />;
-  return <div className="complexity-stage" data-star-count={count} aria-hidden="true">{lost ? fallback : <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
-    <Canvas orthographic frameloop="demand" dpr={[1, 1.5]} camera={{ position: [0, 2.4, 6], zoom: 32 }} gl={{ alpha: true, antialias: true }} onCreated={({ camera, gl }) => {
+  return <div ref={sceneRef} className="complexity-stage" data-star-count={count} data-spinning={visible} aria-hidden="true">{lost ? fallback : <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
+    <Canvas orthographic frameloop={visible ? 'always' : 'demand'} dpr={[1, 1.5]} camera={{ position: [0, 2.4, 6], zoom: 32 }} gl={{ alpha: true, antialias: true }} onCreated={({ camera, gl }) => {
       camera.lookAt(0, 0, 0);
       gl.setClearColor('#0b1012', 0);
       gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
     }}>
       <Camera />
-      <Cluster count={count} color={color} reduced={reduced} />
+      <Cluster count={count} color={color} reduced={reduced} visible={visible} />
     </Canvas>
   </SceneBoundary>}</div>;
 }
