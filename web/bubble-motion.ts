@@ -6,9 +6,12 @@ export function springProgress(value: number) {
 }
 
 // Identical blocks: volume, rather than a normalized height, represents work.
-export function workBlock(index: number, count: number): [number, number, number] {
-  const side = Math.ceil(Math.cbrt(count));
-  return [(index % side - (side - 1) / 2) * 0.16, (Math.floor(index / (side * side)) + 0.5) * 0.16, (Math.floor(index / side) % side - (side - 1) / 2) * 0.16];
+// Stable 3D positions: more work adds equal stars without resizing existing ones.
+export function workStar(index: number): [number, number, number] {
+  if (index === 0) return [0, 0, 0];
+  const radius = Math.cbrt(index) * 0.14;
+  const angle = index * 2.399963229728653;
+  return [Math.cos(angle) * radius, Math.sin(index * Math.SQRT2) * radius * 0.45, Math.sin(angle) * radius];
 }
 
 // Visual minimum keeps zero and small magnitudes visible; signed labels carry the exact value.

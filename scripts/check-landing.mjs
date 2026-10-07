@@ -10,6 +10,7 @@ const server = await createServer({
 });
 try {
   const { default: Landing } = await server.ssrLoadModule('/Landing.tsx');
+  const { default: LoadingScreen } = await server.ssrLoadModule('/LoadingScreen.tsx');
   const { default: App } = await server.ssrLoadModule('/App.tsx');
   const { algorithms } = await server.ssrLoadModule('/algorithms.ts');
   const { lessonTaglines } = await server.ssrLoadModule('/lesson-copy.ts');
@@ -19,7 +20,11 @@ try {
   );
   for (const language of ['ko', 'en']) {
     globalThis.location = new URL(`http://localhost/?lang=${language}`);
+    const loading = render(LoadingScreen);
+    assert(loading.includes('role="status"'), 'Loading status stays accessible');
+    assert(loading.includes(language === 'ko' ? '작은 우주를 모으는 중' : 'Gathering a little universe'), 'Loading follows the selected language');
     const landing = render(Landing);
+    assert(landing.includes(language === 'ko' ? '같은 크기의 별 하나' : 'Each identically sized star'), 'Explain the star model honestly');
     assert(landing.includes('496'), 'Default n=32 must show 496 pair comparisons');
     const ids = [...new Set([...landing.matchAll(/\?lesson=([^&"]+)/g)].map((match) => match[1]))];
     assert.equal(ids.length, 5, 'All five landing destinations must be present');

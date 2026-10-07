@@ -1,82 +1,75 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { InstancedMesh, Object3D, OrthographicCamera } from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, OrthographicCamera, ShaderMaterial } from 'three';
 import { SceneBoundary } from './BubbleScene';
-import { springProgress, workBlock } from './bubble-motion';
+import { workStar } from './bubble-motion';
 
 function Camera() {
   const { camera, size } = useThree();
   useEffect(() => {
     const ortho = camera as OrthographicCamera;
-    ortho.zoom = Math.min(size.width / 5, size.height / 5.3);
-    ortho.lookAt(0, 1.35, 0);
+    ortho.zoom = Math.min(size.width / 6.5, size.height / 6.5);
+    ortho.lookAt(0, 0, 0);
     ortho.updateProjectionMatrix();
   }, [camera, size.width, size.height]);
   return null;
 }
 
-function Pile({ count, color, reduced }: { count: number; color: string; reduced: boolean }) {
-  const mesh = useRef<InstancedMesh>(null);
-  const dummy = useMemo(() => new Object3D(), []);
-  const { invalidate } = useThree();
-  const current = useRef({ positions: new Float32Array(8128 * 3), scales: new Float32Array(8128), count: 0 });
-  const motion = useRef({ start: new Float32Array(), scales: new Float32Array(), target: new Float32Array(), count: 0, elapsed: 1 });
+function Cluster({ count, color, reduced }: { count: number; color: string; reduced: boolean }) {
+  const { camera, gl, invalidate } = useThree();
+  const geometry = useMemo(() => {
+    const cloud = new BufferGeometry();
+    const positions = new Float32Array(8128 * 3);
+    for (let i = 0; i < 8128; i += 1) positions.set(workStar(i), i * 3);
+    cloud.setAttribute('position', new BufferAttribute(positions, 3));
+    cloud.setAttribute('alpha', new BufferAttribute(new Float32Array(8128), 1));
+    return cloud;
+  }, []);
+  const material = useMemo(() => new ShaderMaterial({
+    transparent: true, depthWrite: false, blending: AdditiveBlending,
+    uniforms: { color: { value: new Color(color) }, pointSize: { value: 4 } },
+    vertexShader: `attribute float alpha; varying float vAlpha; uniform float pointSize;
+      void main(){vAlpha=alpha; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); gl_PointSize=pointSize;}`,
+    fragmentShader: `uniform vec3 color; varying float vAlpha;
+      void main(){float r=length(gl_PointCoord-0.5); float glow=exp(-r*r*18.0); float core=1.0-smoothstep(0.06,0.20,r);
+        gl_FragColor=vec4(mix(color,vec3(1.0),core*0.5),vAlpha*(glow*0.5+core*0.5));
+        #include <colorspace_fragment>
+      }`,
+  }), [color]);
+  const currentCount = useRef(0);
+  const motion = useRef({ start: new Float32Array(8128), elapsed: 1, total: 0 });
   useEffect(() => {
-    const total = Math.max(count, current.current.count);
-    const start = current.current.positions.slice();
-    const scales = current.current.scales.slice();
-    const target = new Float32Array(total * 3);
-    for (let i = 0; i < total; i += 1) {
-      const point = i < count ? workBlock(i, count) : Array.from(start.subarray(i * 3, i * 3 + 3));
-      target.set(point, i * 3);
-      if (i >= current.current.count) start.set([point[0], point[1] + 0.65, point[2] + 0.25], i * 3);
-    }
-    motion.current = { start, scales, target, count: total, elapsed: reduced || current.current.count === 0 ? 1 : 0 };
+    motion.current = { start: new Float32Array(geometry.getAttribute('alpha').array), elapsed: reduced || currentCount.current === 0 ? 1 : 0, total: Math.max(count, currentCount.current) };
     invalidate();
-  }, [count, reduced, invalidate]);
+  }, [count, reduced, geometry, invalidate]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(() => () => material.dispose(), [material]);
   useFrame((_, delta) => {
-    if (!mesh.current) return;
     const state = motion.current;
     state.elapsed = Math.min(1, state.elapsed + Math.min(delta, 0.1));
-    const progress = springProgress(state.elapsed);
-    mesh.current.count = state.elapsed === 1 ? count : state.count;
-    for (let i = 0; i < state.count; i += 1) {
-      const scale = Math.max(0, state.scales[i] + ((i < count ? 1 : 0) - state.scales[i]) * progress);
-      for (let axis = 0; axis < 3; axis += 1) {
-        const offset = i * 3 + axis;
-        current.current.positions[offset] = state.start[offset] + (state.target[offset] - state.start[offset]) * progress;
-      }
-      dummy.position.fromArray(current.current.positions, i * 3);
-      dummy.scale.setScalar(scale);
-      dummy.updateMatrix();
-      mesh.current.setMatrixAt(i, dummy.matrix);
-      current.current.scales[i] = scale;
-    }
-    current.current.count = mesh.current.count;
-    mesh.current.instanceMatrix.needsUpdate = true;
+    const progress = 1 - (1 - state.elapsed) ** 3;
+    const alpha = geometry.getAttribute('alpha') as BufferAttribute;
+    for (let i = 0; i < state.total; i += 1) alpha.setX(i, state.start[i] + ((i < count ? 1 : 0) - state.start[i]) * progress);
+    alpha.needsUpdate = true;
+    geometry.setDrawRange(0, state.elapsed === 1 ? count : state.total);
+    material.uniforms.pointSize.value = Math.max(4, (camera as OrthographicCamera).zoom * 0.16) * gl.getPixelRatio();
+    currentCount.current = state.elapsed === 1 ? count : state.total;
     if (state.elapsed < 1) invalidate();
   });
-  return <instancedMesh ref={mesh} args={[undefined, undefined, 8128]} frustumCulled={false} castShadow>
-    <boxGeometry args={[0.145, 0.145, 0.145]} />
-    <meshStandardMaterial color={color} roughness={0.93} metalness={0} />
-  </instancedMesh>;
+  return <points geometry={geometry} material={material} frustumCulled={false} />;
 }
 
 export default function ComplexityScene({ count, color, reduced }: { count: number; color: string; reduced: boolean }) {
   const [lost, setLost] = useState(false);
   const fallback = <div className="complexity-unavailable" />;
-  return <div className="complexity-stage" aria-hidden="true">{lost ? fallback : <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
-    <Canvas orthographic frameloop="demand" shadows dpr={[1, 1.5]} camera={{ position: [4, 4.5, 6], zoom: 42 }} onCreated={({ camera, gl }) => {
-      camera.lookAt(0, 1.35, 0);
-      gl.setClearColor('#f0efe7');
+  return <div className="complexity-stage" data-star-count={count} aria-hidden="true">{lost ? fallback : <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
+    <Canvas orthographic frameloop="demand" dpr={[1, 1.5]} camera={{ position: [0, 2.4, 6], zoom: 32 }} gl={{ alpha: true, antialias: true }} onCreated={({ camera, gl }) => {
+      camera.lookAt(0, 0, 0);
+      gl.setClearColor('#0b1012', 0);
       gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
     }}>
       <Camera />
-      <ambientLight intensity={1.2} color="#f5efe3" />
-      <directionalLight position={[-3, 10, 4]} intensity={2.8} color="#fff6e6" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-4} shadow-camera-right={4} shadow-camera-top={4} shadow-camera-bottom={-4} shadow-bias={-0.0004} />
-      <directionalLight position={[4, 3, -3]} intensity={0.8} color="#b9c9b5" />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow><planeGeometry args={[100, 100]} /><shadowMaterial color="#41503e" opacity={0.14} /></mesh>
-      <Pile count={count} color={color} reduced={reduced} />
+      <Cluster count={count} color={color} reduced={reduced} />
     </Canvas>
   </SceneBoundary>}</div>;
 }

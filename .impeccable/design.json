@@ -1,116 +1,376 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T15:14:56.533011+00:00",
+  "generatedAt": "2026-10-07T15:48:43.943033+00:00",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
       "primary": {
         "role": "primary",
-        "displayName": "Incumbent Green"
+        "displayName": "Incumbent Green",
+        "tonalRamp": [
+          "oklch(15% 0.0887 167.36)",
+          "oklch(26% 0.0887 167.36)",
+          "oklch(38% 0.0887 167.36)",
+          "oklch(49% 0.0887 167.36)",
+          "oklch(61% 0.0887 167.36)",
+          "oklch(72% 0.0887 167.36)",
+          "oklch(84% 0.0887 167.36)",
+          "oklch(95% 0.0887 167.36)"
+        ]
       },
       "paper": {
         "role": "neutral",
-        "displayName": "Light Paper"
+        "displayName": "Light Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0069 124.45)",
+          "oklch(26% 0.0069 124.45)",
+          "oklch(38% 0.0069 124.45)",
+          "oklch(49% 0.0069 124.45)",
+          "oklch(61% 0.0069 124.45)",
+          "oklch(72% 0.0069 124.45)",
+          "oklch(84% 0.0069 124.45)",
+          "oklch(95% 0.0069 124.45)"
+        ]
       },
       "sage-surface": {
         "role": "neutral",
-        "displayName": "Selected Sage"
+        "displayName": "Selected Sage",
+        "tonalRamp": [
+          "oklch(15% 0.0135 134.90)",
+          "oklch(26% 0.0135 134.90)",
+          "oklch(38% 0.0135 134.90)",
+          "oklch(49% 0.0135 134.90)",
+          "oklch(61% 0.0135 134.90)",
+          "oklch(72% 0.0135 134.90)",
+          "oklch(84% 0.0135 134.90)",
+          "oklch(95% 0.0135 134.90)"
+        ]
       },
       "canvas": {
         "role": "neutral",
-        "displayName": "Light Sage Canvas"
+        "displayName": "Light Sage Canvas",
+        "tonalRamp": [
+          "oklch(15% 0.0102 131.36)",
+          "oklch(26% 0.0102 131.36)",
+          "oklch(38% 0.0102 131.36)",
+          "oklch(49% 0.0102 131.36)",
+          "oklch(61% 0.0102 131.36)",
+          "oklch(72% 0.0102 131.36)",
+          "oklch(84% 0.0102 131.36)",
+          "oklch(95% 0.0102 131.36)"
+        ]
       },
       "quiet-action": {
         "role": "primary",
-        "displayName": "Quiet Sage Action"
+        "displayName": "Quiet Sage Action",
+        "tonalRamp": [
+          "oklch(15% 0.0158 139.44)",
+          "oklch(26% 0.0158 139.44)",
+          "oklch(38% 0.0158 139.44)",
+          "oklch(49% 0.0158 139.44)",
+          "oklch(61% 0.0158 139.44)",
+          "oklch(72% 0.0158 139.44)",
+          "oklch(84% 0.0158 139.44)",
+          "oklch(95% 0.0158 139.44)"
+        ]
       },
       "bar": {
         "role": "neutral",
-        "displayName": "Muted Sage Bar"
+        "displayName": "Muted Sage Bar",
+        "tonalRamp": [
+          "oklch(15% 0.0333 140.97)",
+          "oklch(26% 0.0333 140.97)",
+          "oklch(38% 0.0333 140.97)",
+          "oklch(49% 0.0333 140.97)",
+          "oklch(61% 0.0333 140.97)",
+          "oklch(72% 0.0333 140.97)",
+          "oklch(84% 0.0333 140.97)",
+          "oklch(95% 0.0333 140.97)"
+        ]
       },
       "bar-comparison": {
         "role": "secondary",
-        "displayName": "Quiet Comparison Amber"
+        "displayName": "Quiet Comparison Amber",
+        "tonalRamp": [
+          "oklch(15% 0.0998 71.89)",
+          "oklch(26% 0.0998 71.89)",
+          "oklch(38% 0.0998 71.89)",
+          "oklch(49% 0.0998 71.89)",
+          "oklch(61% 0.0998 71.89)",
+          "oklch(72% 0.0998 71.89)",
+          "oklch(84% 0.0998 71.89)",
+          "oklch(95% 0.0998 71.89)"
+        ]
       },
       "bar-swap": {
         "role": "secondary",
-        "displayName": "Quiet Swap Lilac"
+        "displayName": "Quiet Swap Lilac",
+        "tonalRamp": [
+          "oklch(15% 0.0585 309.21)",
+          "oklch(26% 0.0585 309.21)",
+          "oklch(38% 0.0585 309.21)",
+          "oklch(49% 0.0585 309.21)",
+          "oklch(61% 0.0585 309.21)",
+          "oklch(72% 0.0585 309.21)",
+          "oklch(84% 0.0585 309.21)",
+          "oklch(95% 0.0585 309.21)"
+        ]
       },
       "bar-settled": {
         "role": "secondary",
-        "displayName": "Quiet Settled Green"
+        "displayName": "Quiet Settled Green",
+        "tonalRamp": [
+          "oklch(15% 0.0580 150.41)",
+          "oklch(26% 0.0580 150.41)",
+          "oklch(38% 0.0580 150.41)",
+          "oklch(49% 0.0580 150.41)",
+          "oklch(61% 0.0580 150.41)",
+          "oklch(72% 0.0580 150.41)",
+          "oklch(84% 0.0580 150.41)",
+          "oklch(95% 0.0580 150.41)"
+        ]
       },
       "comparison": {
         "role": "secondary",
-        "displayName": "Incumbent Comparison Orange"
+        "displayName": "Incumbent Comparison Orange",
+        "tonalRamp": [
+          "oklch(15% 0.1215 67.53)",
+          "oklch(26% 0.1215 67.53)",
+          "oklch(38% 0.1215 67.53)",
+          "oklch(49% 0.1215 67.53)",
+          "oklch(61% 0.1215 67.53)",
+          "oklch(72% 0.1215 67.53)",
+          "oklch(84% 0.1215 67.53)",
+          "oklch(95% 0.1215 67.53)"
+        ]
       },
       "matched": {
         "role": "secondary",
-        "displayName": "Matched Blue"
+        "displayName": "Matched Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0919 237.16)",
+          "oklch(26% 0.0919 237.16)",
+          "oklch(38% 0.0919 237.16)",
+          "oklch(49% 0.0919 237.16)",
+          "oklch(61% 0.0919 237.16)",
+          "oklch(72% 0.0919 237.16)",
+          "oklch(84% 0.0919 237.16)",
+          "oklch(95% 0.0919 237.16)"
+        ]
       },
       "bubble-paper": {
         "role": "neutral",
-        "displayName": "Retained Clay Renderer: Warm Paper"
+        "displayName": "Retained Clay Renderer: Warm Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0095 93.57)",
+          "oklch(26% 0.0095 93.57)",
+          "oklch(38% 0.0095 93.57)",
+          "oklch(49% 0.0095 93.57)",
+          "oklch(61% 0.0095 93.57)",
+          "oklch(72% 0.0095 93.57)",
+          "oklch(84% 0.0095 93.57)",
+          "oklch(95% 0.0095 93.57)"
+        ]
       },
       "bubble-canvas": {
         "role": "neutral",
-        "displayName": "Clay Scene: Warm Scene Canvas"
+        "displayName": "Legacy Clay Renderer: Warm Scene Canvas",
+        "tonalRamp": [
+          "oklch(15% 0.0107 100.83)",
+          "oklch(26% 0.0107 100.83)",
+          "oklch(38% 0.0107 100.83)",
+          "oklch(49% 0.0107 100.83)",
+          "oklch(61% 0.0107 100.83)",
+          "oklch(72% 0.0107 100.83)",
+          "oklch(84% 0.0107 100.83)",
+          "oklch(95% 0.0107 100.83)"
+        ]
       },
       "bubble-ink": {
         "role": "neutral",
-        "displayName": "Clay Scene: Value Ink"
+        "displayName": "Legacy Clay Renderer: Value Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0350 140.41)",
+          "oklch(26% 0.0350 140.41)",
+          "oklch(38% 0.0350 140.41)",
+          "oklch(49% 0.0350 140.41)",
+          "oklch(61% 0.0350 140.41)",
+          "oklch(72% 0.0350 140.41)",
+          "oklch(84% 0.0350 140.41)",
+          "oklch(95% 0.0350 140.41)"
+        ]
       },
       "bubble-caption": {
         "role": "neutral",
-        "displayName": "Retained Clay Renderer: Quiet Caption"
+        "displayName": "Retained Clay Renderer: Quiet Caption",
+        "tonalRamp": [
+          "oklch(15% 0.0227 126.14)",
+          "oklch(26% 0.0227 126.14)",
+          "oklch(38% 0.0227 126.14)",
+          "oklch(49% 0.0227 126.14)",
+          "oklch(61% 0.0227 126.14)",
+          "oklch(72% 0.0227 126.14)",
+          "oklch(84% 0.0227 126.14)",
+          "oklch(95% 0.0227 126.14)"
+        ]
       },
       "bubble-loop-ink": {
         "role": "neutral",
-        "displayName": "Retained Clay Renderer: Loop Label"
+        "displayName": "Retained Clay Renderer: Loop Label",
+        "tonalRamp": [
+          "oklch(15% 0.0313 143.40)",
+          "oklch(26% 0.0313 143.40)",
+          "oklch(38% 0.0313 143.40)",
+          "oklch(49% 0.0313 143.40)",
+          "oklch(61% 0.0313 143.40)",
+          "oklch(72% 0.0313 143.40)",
+          "oklch(84% 0.0313 143.40)",
+          "oklch(95% 0.0313 143.40)"
+        ]
       },
       "bubble-action": {
         "role": "primary",
-        "displayName": "Retained Clay Renderer: Quiet Sage Action"
+        "displayName": "Retained Clay Renderer: Quiet Sage Action",
+        "tonalRamp": [
+          "oklch(15% 0.0194 122.85)",
+          "oklch(26% 0.0194 122.85)",
+          "oklch(38% 0.0194 122.85)",
+          "oklch(49% 0.0194 122.85)",
+          "oklch(61% 0.0194 122.85)",
+          "oklch(72% 0.0194 122.85)",
+          "oklch(84% 0.0194 122.85)",
+          "oklch(95% 0.0194 122.85)"
+        ]
       },
       "bubble-action-hover": {
         "role": "primary",
-        "displayName": "Retained Clay Renderer: Quiet Sage Hover"
+        "displayName": "Retained Clay Renderer: Quiet Sage Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0261 128.79)",
+          "oklch(26% 0.0261 128.79)",
+          "oklch(38% 0.0261 128.79)",
+          "oklch(49% 0.0261 128.79)",
+          "oklch(61% 0.0261 128.79)",
+          "oklch(72% 0.0261 128.79)",
+          "oklch(84% 0.0261 128.79)",
+          "oklch(95% 0.0261 128.79)"
+        ]
       },
       "bubble-stone": {
         "role": "neutral",
-        "displayName": "Clay Scene: Grey-Green Clay"
+        "displayName": "Legacy Clay Renderer: Grey-Green Clay",
+        "tonalRamp": [
+          "oklch(15% 0.0382 137.51)",
+          "oklch(26% 0.0382 137.51)",
+          "oklch(38% 0.0382 137.51)",
+          "oklch(49% 0.0382 137.51)",
+          "oklch(61% 0.0382 137.51)",
+          "oklch(72% 0.0382 137.51)",
+          "oklch(84% 0.0382 137.51)",
+          "oklch(95% 0.0382 137.51)"
+        ]
       },
       "bubble-comparison": {
         "role": "secondary",
-        "displayName": "Clay Scene: Comparison Amber"
+        "displayName": "Legacy Clay Renderer: Comparison Amber",
+        "tonalRamp": [
+          "oklch(15% 0.0740 69.57)",
+          "oklch(26% 0.0740 69.57)",
+          "oklch(38% 0.0740 69.57)",
+          "oklch(49% 0.0740 69.57)",
+          "oklch(61% 0.0740 69.57)",
+          "oklch(72% 0.0740 69.57)",
+          "oklch(84% 0.0740 69.57)",
+          "oklch(95% 0.0740 69.57)"
+        ]
       },
       "bubble-swap": {
         "role": "secondary",
-        "displayName": "Clay Scene: Swap Lilac"
+        "displayName": "Legacy Clay Renderer: Swap Lilac",
+        "tonalRamp": [
+          "oklch(15% 0.0285 318.22)",
+          "oklch(26% 0.0285 318.22)",
+          "oklch(38% 0.0285 318.22)",
+          "oklch(49% 0.0285 318.22)",
+          "oklch(61% 0.0285 318.22)",
+          "oklch(72% 0.0285 318.22)",
+          "oklch(84% 0.0285 318.22)",
+          "oklch(95% 0.0285 318.22)"
+        ]
       },
       "bubble-settled": {
         "role": "secondary",
-        "displayName": "Clay Scene: Settled Green"
+        "displayName": "Legacy Clay Renderer: Settled Green",
+        "tonalRamp": [
+          "oklch(15% 0.0463 137.62)",
+          "oklch(26% 0.0463 137.62)",
+          "oklch(38% 0.0463 137.62)",
+          "oklch(49% 0.0463 137.62)",
+          "oklch(61% 0.0463 137.62)",
+          "oklch(72% 0.0463 137.62)",
+          "oklch(84% 0.0463 137.62)",
+          "oklch(95% 0.0463 137.62)"
+        ]
       },
       "bubble-dust": {
         "role": "neutral",
-        "displayName": "Shared Scene: Drifting Dust"
+        "displayName": "Shared Scene: Drifting Dust",
+        "tonalRamp": [
+          "oklch(15% 0.0422 86.02)",
+          "oklch(26% 0.0422 86.02)",
+          "oklch(38% 0.0422 86.02)",
+          "oklch(49% 0.0422 86.02)",
+          "oklch(61% 0.0422 86.02)",
+          "oklch(72% 0.0422 86.02)",
+          "oklch(84% 0.0422 86.02)",
+          "oklch(95% 0.0422 86.02)"
+        ]
       },
       "bubble-ambient-light": {
         "role": "neutral",
-        "displayName": "Clay Scene: Warm Ambient Light"
+        "displayName": "Legacy Clay Renderer: Warm Ambient Light",
+        "tonalRamp": [
+          "oklch(15% 0.0172 84.59)",
+          "oklch(26% 0.0172 84.59)",
+          "oklch(38% 0.0172 84.59)",
+          "oklch(49% 0.0172 84.59)",
+          "oklch(61% 0.0172 84.59)",
+          "oklch(72% 0.0172 84.59)",
+          "oklch(84% 0.0172 84.59)",
+          "oklch(95% 0.0172 84.59)"
+        ]
       },
       "bubble-key-light": {
         "role": "neutral",
-        "displayName": "Clay Scene: Warm Key Light"
+        "displayName": "Legacy Clay Renderer: Warm Key Light",
+        "tonalRamp": [
+          "oklch(15% 0.0232 82.12)",
+          "oklch(26% 0.0232 82.12)",
+          "oklch(38% 0.0232 82.12)",
+          "oklch(49% 0.0232 82.12)",
+          "oklch(61% 0.0232 82.12)",
+          "oklch(72% 0.0232 82.12)",
+          "oklch(84% 0.0232 82.12)",
+          "oklch(95% 0.0232 82.12)"
+        ]
       },
       "bubble-fill-light": {
         "role": "neutral",
-        "displayName": "Clay Scene: Cool Fill Light"
+        "displayName": "Legacy Clay Renderer: Cool Fill Light",
+        "tonalRamp": [
+          "oklch(15% 0.0326 139.43)",
+          "oklch(26% 0.0326 139.43)",
+          "oklch(38% 0.0326 139.43)",
+          "oklch(49% 0.0326 139.43)",
+          "oklch(61% 0.0326 139.43)",
+          "oklch(72% 0.0326 139.43)",
+          "oklch(84% 0.0326 139.43)",
+          "oklch(95% 0.0326 139.43)"
+        ]
       },
       "space-ground": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Observatory Ground",
+        "displayName": "Observatory: Observatory Ground",
         "tonalRamp": [
           "oklch(15% 0.0089 224.11)",
           "oklch(26% 0.0089 224.11)",
@@ -124,7 +384,7 @@
       },
       "space-surface": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Observatory Panel",
+        "displayName": "Observatory: Observatory Panel",
         "tonalRamp": [
           "oklch(15% 0.0111 217.00)",
           "oklch(26% 0.0111 217.00)",
@@ -138,7 +398,7 @@
       },
       "space-ink": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Cream Ink",
+        "displayName": "Observatory: Cream Ink",
         "tonalRamp": [
           "oklch(15% 0.0194 122.85)",
           "oklch(26% 0.0194 122.85)",
@@ -152,7 +412,7 @@
       },
       "space-muted": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Muted Green-Grey",
+        "displayName": "Observatory: Muted Green-Grey",
         "tonalRamp": [
           "oklch(15% 0.0193 155.68)",
           "oklch(26% 0.0193 155.68)",
@@ -166,7 +426,7 @@
       },
       "space-line": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Quiet Border",
+        "displayName": "Observatory: Quiet Border",
         "tonalRamp": [
           "oklch(15% 0.0180 179.51)",
           "oklch(26% 0.0180 179.51)",
@@ -180,7 +440,7 @@
       },
       "space-accent": {
         "role": "primary",
-        "displayName": "Bubble Trial: Sage Accent",
+        "displayName": "Observatory: Sage Accent",
         "tonalRamp": [
           "oklch(15% 0.0399 157.12)",
           "oklch(26% 0.0399 157.12)",
@@ -194,7 +454,7 @@
       },
       "space-selected": {
         "role": "primary",
-        "displayName": "Bubble Trial: Selected Sage",
+        "displayName": "Observatory: Selected Sage",
         "tonalRamp": [
           "oklch(15% 0.0255 162.81)",
           "oklch(26% 0.0255 162.81)",
@@ -208,7 +468,7 @@
       },
       "space-hover": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Hover Surface",
+        "displayName": "Observatory: Hover Surface",
         "tonalRamp": [
           "oklch(15% 0.0201 169.17)",
           "oklch(26% 0.0201 169.17)",
@@ -222,7 +482,7 @@
       },
       "space-action-hover": {
         "role": "primary",
-        "displayName": "Bubble Trial: Action Hover",
+        "displayName": "Observatory: Action Hover",
         "tonalRamp": [
           "oklch(15% 0.0335 155.97)",
           "oklch(26% 0.0335 155.97)",
@@ -236,7 +496,7 @@
       },
       "space-olive": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Worn Olive",
+        "displayName": "Observatory: Worn Olive",
         "tonalRamp": [
           "oklch(15% 0.0271 164.01)",
           "oklch(26% 0.0271 164.01)",
@@ -250,7 +510,7 @@
       },
       "space-ochre": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Worn Ochre",
+        "displayName": "Observatory: Worn Ochre",
         "tonalRamp": [
           "oklch(15% 0.0541 77.39)",
           "oklch(26% 0.0541 77.39)",
@@ -264,7 +524,7 @@
       },
       "space-mauve": {
         "role": "neutral",
-        "displayName": "Bubble Trial: Worn Mauve",
+        "displayName": "Observatory: Worn Mauve",
         "tonalRamp": [
           "oklch(15% 0.0336 308.85)",
           "oklch(26% 0.0336 308.85)",
@@ -278,7 +538,7 @@
       },
       "space-comparison": {
         "role": "secondary",
-        "displayName": "Bubble Trial: Comparison Amber",
+        "displayName": "Observatory: Comparison Amber",
         "tonalRamp": [
           "oklch(15% 0.0890 81.83)",
           "oklch(26% 0.0890 81.83)",
@@ -292,7 +552,7 @@
       },
       "space-swap": {
         "role": "secondary",
-        "displayName": "Bubble Trial: Swap Lilac",
+        "displayName": "Observatory: Swap Lilac",
         "tonalRamp": [
           "oklch(15% 0.0458 307.76)",
           "oklch(26% 0.0458 307.76)",
@@ -306,7 +566,7 @@
       },
       "space-settled": {
         "role": "secondary",
-        "displayName": "Bubble Trial: Settled Green",
+        "displayName": "Observatory: Settled Green",
         "tonalRamp": [
           "oklch(15% 0.0436 160.46)",
           "oklch(26% 0.0436 160.46)",
@@ -316,6 +576,412 @@
           "oklch(72% 0.0436 160.46)",
           "oklch(84% 0.0436 160.46)",
           "oklch(95% 0.0436 160.46)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0319 168.93)",
+          "oklch(26% 0.0319 168.93)",
+          "oklch(38% 0.0319 168.93)",
+          "oklch(49% 0.0319 168.93)",
+          "oklch(61% 0.0319 168.93)",
+          "oklch(72% 0.0319 168.93)",
+          "oklch(84% 0.0319 168.93)",
+          "oklch(95% 0.0319 168.93)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "quiet-action-hover": {
+        "role": "neutral",
+        "displayName": "Quiet Action Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0240 139.44)",
+          "oklch(26% 0.0240 139.44)",
+          "oklch(38% 0.0240 139.44)",
+          "oklch(49% 0.0240 139.44)",
+          "oklch(61% 0.0240 139.44)",
+          "oklch(72% 0.0240 139.44)",
+          "oklch(84% 0.0240 139.44)",
+          "oklch(95% 0.0240 139.44)"
+        ]
+      },
+      "quiet-ink": {
+        "role": "neutral",
+        "displayName": "Quiet Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0417 156.90)",
+          "oklch(26% 0.0417 156.90)",
+          "oklch(38% 0.0417 156.90)",
+          "oklch(49% 0.0417 156.90)",
+          "oklch(61% 0.0417 156.90)",
+          "oklch(72% 0.0417 156.90)",
+          "oklch(84% 0.0417 156.90)",
+          "oklch(95% 0.0417 156.90)"
+        ]
+      },
+      "selected-ink": {
+        "role": "neutral",
+        "displayName": "Selected Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0492 159.52)",
+          "oklch(26% 0.0492 159.52)",
+          "oklch(38% 0.0492 159.52)",
+          "oklch(49% 0.0492 159.52)",
+          "oklch(61% 0.0492 159.52)",
+          "oklch(72% 0.0492 159.52)",
+          "oklch(84% 0.0492 159.52)",
+          "oklch(95% 0.0492 159.52)"
+        ]
+      },
+      "muted-text": {
+        "role": "neutral",
+        "displayName": "Muted Text",
+        "tonalRamp": [
+          "oklch(15% 0.0329 157.72)",
+          "oklch(26% 0.0329 157.72)",
+          "oklch(38% 0.0329 157.72)",
+          "oklch(49% 0.0329 157.72)",
+          "oklch(61% 0.0329 157.72)",
+          "oklch(72% 0.0329 157.72)",
+          "oklch(84% 0.0329 157.72)",
+          "oklch(95% 0.0329 157.72)"
+        ]
+      },
+      "lesson-muted": {
+        "role": "neutral",
+        "displayName": "Lesson Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0306 155.28)",
+          "oklch(26% 0.0306 155.28)",
+          "oklch(38% 0.0306 155.28)",
+          "oklch(49% 0.0306 155.28)",
+          "oklch(61% 0.0306 155.28)",
+          "oklch(72% 0.0306 155.28)",
+          "oklch(84% 0.0306 155.28)",
+          "oklch(95% 0.0306 155.28)"
+        ]
+      },
+      "disclosure-text": {
+        "role": "neutral",
+        "displayName": "Disclosure Text",
+        "tonalRamp": [
+          "oklch(15% 0.0430 155.31)",
+          "oklch(26% 0.0430 155.31)",
+          "oklch(38% 0.0430 155.31)",
+          "oklch(49% 0.0430 155.31)",
+          "oklch(61% 0.0430 155.31)",
+          "oklch(72% 0.0430 155.31)",
+          "oklch(84% 0.0430 155.31)",
+          "oklch(95% 0.0430 155.31)"
+        ]
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Divider",
+        "tonalRamp": [
+          "oklch(15% 0.0162 148.39)",
+          "oklch(26% 0.0162 148.39)",
+          "oklch(38% 0.0162 148.39)",
+          "oklch(49% 0.0162 148.39)",
+          "oklch(61% 0.0162 148.39)",
+          "oklch(72% 0.0162 148.39)",
+          "oklch(84% 0.0162 148.39)",
+          "oklch(95% 0.0162 148.39)"
+        ]
+      },
+      "timeline": {
+        "role": "neutral",
+        "displayName": "Timeline",
+        "tonalRamp": [
+          "oklch(15% 0.0523 150.30)",
+          "oklch(26% 0.0523 150.30)",
+          "oklch(38% 0.0523 150.30)",
+          "oklch(49% 0.0523 150.30)",
+          "oklch(61% 0.0523 150.30)",
+          "oklch(72% 0.0523 150.30)",
+          "oklch(84% 0.0523 150.30)",
+          "oklch(95% 0.0523 150.30)"
+        ]
+      },
+      "swap": {
+        "role": "neutral",
+        "displayName": "Swap",
+        "tonalRamp": [
+          "oklch(15% 0.0901 300.13)",
+          "oklch(26% 0.0901 300.13)",
+          "oklch(38% 0.0901 300.13)",
+          "oklch(49% 0.0901 300.13)",
+          "oklch(61% 0.0901 300.13)",
+          "oklch(72% 0.0901 300.13)",
+          "oklch(84% 0.0901 300.13)",
+          "oklch(95% 0.0901 300.13)"
+        ]
+      },
+      "settled": {
+        "role": "neutral",
+        "displayName": "Settled",
+        "tonalRamp": [
+          "oklch(15% 0.0840 165.20)",
+          "oklch(26% 0.0840 165.20)",
+          "oklch(38% 0.0840 165.20)",
+          "oklch(49% 0.0840 165.20)",
+          "oklch(61% 0.0840 165.20)",
+          "oklch(72% 0.0840 165.20)",
+          "oklch(84% 0.0840 165.20)",
+          "oklch(95% 0.0840 165.20)"
+        ]
+      },
+      "code-bg": {
+        "role": "neutral",
+        "displayName": "Code Bg",
+        "tonalRamp": [
+          "oklch(15% 0.0204 168.84)",
+          "oklch(26% 0.0204 168.84)",
+          "oklch(38% 0.0204 168.84)",
+          "oklch(49% 0.0204 168.84)",
+          "oklch(61% 0.0204 168.84)",
+          "oklch(72% 0.0204 168.84)",
+          "oklch(84% 0.0204 168.84)",
+          "oklch(95% 0.0204 168.84)"
+        ]
+      },
+      "code-text": {
+        "role": "neutral",
+        "displayName": "Code Text",
+        "tonalRamp": [
+          "oklch(15% 0.0117 153.67)",
+          "oklch(26% 0.0117 153.67)",
+          "oklch(38% 0.0117 153.67)",
+          "oklch(49% 0.0117 153.67)",
+          "oklch(61% 0.0117 153.67)",
+          "oklch(72% 0.0117 153.67)",
+          "oklch(84% 0.0117 153.67)",
+          "oklch(95% 0.0117 153.67)"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus",
+        "tonalRamp": [
+          "oklch(15% 0.1098 164.67)",
+          "oklch(26% 0.1098 164.67)",
+          "oklch(38% 0.1098 164.67)",
+          "oklch(49% 0.1098 164.67)",
+          "oklch(61% 0.1098 164.67)",
+          "oklch(72% 0.1098 164.67)",
+          "oklch(84% 0.1098 164.67)",
+          "oklch(95% 0.1098 164.67)"
+        ]
+      },
+      "space-landing-action": {
+        "role": "primary",
+        "displayName": "Space Landing Action",
+        "tonalRamp": [
+          "oklch(15% 0.0332 161.02)",
+          "oklch(26% 0.0332 161.02)",
+          "oklch(38% 0.0332 161.02)",
+          "oklch(49% 0.0332 161.02)",
+          "oklch(61% 0.0332 161.02)",
+          "oklch(72% 0.0332 161.02)",
+          "oklch(84% 0.0332 161.02)",
+          "oklch(95% 0.0332 161.02)"
+        ]
+      },
+      "space-landing-hover": {
+        "role": "primary",
+        "displayName": "Space Landing Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0323 168.50)",
+          "oklch(26% 0.0323 168.50)",
+          "oklch(38% 0.0323 168.50)",
+          "oklch(49% 0.0323 168.50)",
+          "oklch(61% 0.0323 168.50)",
+          "oklch(72% 0.0323 168.50)",
+          "oklch(84% 0.0323 168.50)",
+          "oklch(95% 0.0323 168.50)"
+        ]
+      },
+      "space-control-line": {
+        "role": "neutral",
+        "displayName": "Space Control Line",
+        "tonalRamp": [
+          "oklch(15% 0.0272 167.43)",
+          "oklch(26% 0.0272 167.43)",
+          "oklch(38% 0.0272 167.43)",
+          "oklch(49% 0.0272 167.43)",
+          "oklch(61% 0.0272 167.43)",
+          "oklch(72% 0.0272 167.43)",
+          "oklch(84% 0.0272 167.43)",
+          "oklch(95% 0.0272 167.43)"
+        ]
+      },
+      "space-preview": {
+        "role": "neutral",
+        "displayName": "Space Preview",
+        "tonalRamp": [
+          "oklch(15% 0.0089 224.11)",
+          "oklch(26% 0.0089 224.11)",
+          "oklch(38% 0.0089 224.11)",
+          "oklch(49% 0.0089 224.11)",
+          "oklch(61% 0.0089 224.11)",
+          "oklch(72% 0.0089 224.11)",
+          "oklch(84% 0.0089 224.11)",
+          "oklch(95% 0.0089 224.11)"
+        ]
+      },
+      "space-lab": {
+        "role": "neutral",
+        "displayName": "Space Lab",
+        "tonalRamp": [
+          "oklch(15% 0.0089 224.11)",
+          "oklch(26% 0.0089 224.11)",
+          "oklch(38% 0.0089 224.11)",
+          "oklch(49% 0.0089 224.11)",
+          "oklch(61% 0.0089 224.11)",
+          "oklch(72% 0.0089 224.11)",
+          "oklch(84% 0.0089 224.11)",
+          "oklch(95% 0.0089 224.11)"
+        ]
+      },
+      "sky-base": {
+        "role": "neutral",
+        "displayName": "Sky Base",
+        "tonalRamp": [
+          "oklch(15% 0.0091 224.12)",
+          "oklch(26% 0.0091 224.12)",
+          "oklch(38% 0.0091 224.12)",
+          "oklch(49% 0.0091 224.12)",
+          "oklch(61% 0.0091 224.12)",
+          "oklch(72% 0.0091 224.12)",
+          "oklch(84% 0.0091 224.12)",
+          "oklch(95% 0.0091 224.12)"
+        ]
+      },
+      "sky-green": {
+        "role": "secondary",
+        "displayName": "Sky Green",
+        "tonalRamp": [
+          "oklch(15% 0.0334 165.44)",
+          "oklch(26% 0.0334 165.44)",
+          "oklch(38% 0.0334 165.44)",
+          "oklch(49% 0.0334 165.44)",
+          "oklch(61% 0.0334 165.44)",
+          "oklch(72% 0.0334 165.44)",
+          "oklch(84% 0.0334 165.44)",
+          "oklch(95% 0.0334 165.44)"
+        ]
+      },
+      "sky-mauve": {
+        "role": "secondary",
+        "displayName": "Sky Mauve",
+        "tonalRamp": [
+          "oklch(15% 0.0280 326.17)",
+          "oklch(26% 0.0280 326.17)",
+          "oklch(38% 0.0280 326.17)",
+          "oklch(49% 0.0280 326.17)",
+          "oklch(61% 0.0280 326.17)",
+          "oklch(72% 0.0280 326.17)",
+          "oklch(84% 0.0280 326.17)",
+          "oklch(95% 0.0280 326.17)"
+        ]
+      },
+      "sky-star": {
+        "role": "secondary",
+        "displayName": "Sky Star",
+        "tonalRamp": [
+          "oklch(15% 0.0334 137.84)",
+          "oklch(26% 0.0334 137.84)",
+          "oklch(38% 0.0334 137.84)",
+          "oklch(49% 0.0334 137.84)",
+          "oklch(61% 0.0334 137.84)",
+          "oklch(72% 0.0334 137.84)",
+          "oklch(84% 0.0334 137.84)",
+          "oklch(95% 0.0334 137.84)"
+        ]
+      },
+      "sky-still-green": {
+        "role": "neutral",
+        "displayName": "Sky Still Green",
+        "tonalRamp": [
+          "oklch(15% 0.0219 166.63)",
+          "oklch(26% 0.0219 166.63)",
+          "oklch(38% 0.0219 166.63)",
+          "oklch(49% 0.0219 166.63)",
+          "oklch(61% 0.0219 166.63)",
+          "oklch(72% 0.0219 166.63)",
+          "oklch(84% 0.0219 166.63)",
+          "oklch(95% 0.0219 166.63)"
+        ]
+      },
+      "sky-still-mauve": {
+        "role": "neutral",
+        "displayName": "Sky Still Mauve",
+        "tonalRamp": [
+          "oklch(15% 0.0193 318.66)",
+          "oklch(26% 0.0193 318.66)",
+          "oklch(38% 0.0193 318.66)",
+          "oklch(49% 0.0193 318.66)",
+          "oklch(61% 0.0193 318.66)",
+          "oklch(72% 0.0193 318.66)",
+          "oklch(84% 0.0193 318.66)",
+          "oklch(95% 0.0193 318.66)"
+        ]
+      },
+      "loading-planet-shadow": {
+        "role": "neutral",
+        "displayName": "Loading Planet Shadow",
+        "tonalRamp": [
+          "oklch(15% 0.0325 161.46)",
+          "oklch(26% 0.0325 161.46)",
+          "oklch(38% 0.0325 161.46)",
+          "oklch(49% 0.0325 161.46)",
+          "oklch(61% 0.0325 161.46)",
+          "oklch(72% 0.0325 161.46)",
+          "oklch(84% 0.0325 161.46)",
+          "oklch(95% 0.0325 161.46)"
+        ]
+      },
+      "favicon-planet-shadow": {
+        "role": "neutral",
+        "displayName": "Favicon Planet Shadow",
+        "tonalRamp": [
+          "oklch(15% 0.0424 163.81)",
+          "oklch(26% 0.0424 163.81)",
+          "oklch(38% 0.0424 163.81)",
+          "oklch(49% 0.0424 163.81)",
+          "oklch(61% 0.0424 163.81)",
+          "oklch(72% 0.0424 163.81)",
+          "oklch(84% 0.0424 163.81)",
+          "oklch(95% 0.0424 163.81)"
+        ]
+      },
+      "star-constant": {
+        "role": "secondary",
+        "displayName": "Star Constant",
+        "tonalRamp": [
+          "oklch(15% 0.0360 161.19)",
+          "oklch(26% 0.0360 161.19)",
+          "oklch(38% 0.0360 161.19)",
+          "oklch(49% 0.0360 161.19)",
+          "oklch(61% 0.0360 161.19)",
+          "oklch(72% 0.0360 161.19)",
+          "oklch(84% 0.0360 161.19)",
+          "oklch(95% 0.0360 161.19)"
         ]
       }
     },
@@ -350,7 +1016,12 @@
       {
         "name": "bubble-floor",
         "value": "VSMShadowMap; shadow-radius: 8; shadow-blurSamples: 16; ShadowMaterial opacity: 0.14",
-        "purpose": "Retained clay renderer and static landing preview only. Transparent shadow-only floor uses bubble-ink; clay columns do not receive shadows and stop casting at erosion >= 0.3. Clay 3D casts soft contact shadows; 2D has no object shadows. Big O uses the same floor opacity and ink with its own shadow map. The Bubble space trial hides the floor and disables sphere shadow casting."
+        "purpose": "Optional legacy clay renderer only: transparent shadow-only floor; columns stop casting at erosion >= 0.3. Active landing and Bubble select space, hiding the floor and disabling sphere shadows. Big O stars have no contact shadows."
+      },
+      {
+        "name": "loading-planet",
+        "value": "inset -18px -12px 28px #31463b",
+        "purpose": "Small native loading planet only; primary UI remains flat."
       }
     ],
     "motion": [
@@ -362,17 +1033,32 @@
       {
         "name": "bubble-view-transition",
         "value": "depth += (target - depth) * (1 - exp(-min(delta, 0.1) * 7))",
-        "purpose": "Bubble trial native 2D/3D radios ease the orthographic camera between front-facing and a shallow fixed angle. Default 3D; 2D flattens sphere depth to z scale 0.01 and hides rings. The landing preview retains static clay columns in 3D with demand rendering."
+        "purpose": "Bubble native view radios ease between front-facing and shallow orthographic angle. Default 3D; 2D flattens z to 0.01 and hides rings. Landing explicitly selects static space planets in 3D with demand rendering."
       },
       {
         "name": "bubble-background",
         "value": "domain-warped nebula; sparse star twinkle; faint swap ripple; planet rotation 0.045 radians/second",
-        "purpose": "Bubble-only space world: procedural near-black, green and mauve nebula with sparse stars. Planet rotation, nebula, stars, dust and spring swaps use the existing cumulative playback clock and speed; pause and hidden tabs freeze authored motion, seek/edit/reset restore deterministic states. No physics or orbital engine. Landing retains the grey-green clay wash. No external bitmap assets or dependencies; reduced motion or WebGL failure uses the static array renderer."
+        "purpose": "Bubble execution: near-black, green/mauve nebula, sparse stars and faint local swap ripple. Rotation, nebula, stars, dust and semicircle swaps share cumulative playback clock/speed; pause/hidden tabs freeze authored motion and seek/edit/reset restore deterministic states. No physics engine. Reduced motion or scene failure uses the static array renderer."
       },
       {
         "name": "clay-damped-spring",
         "value": "1 - exp(-6t) * (cos(8t) + 0.75sin(8t)); exact endpoints 0 and 1",
-        "purpose": "Shared analytical spring: bubble swaps over 1400ms on the playback clock; Big O size changes over 1000ms with demand rendering. Big O first render and reduced motion use static final piles."
+        "purpose": "Optional legacy clay swap interpolation only, over 1400ms on playback clock. Space planets use orbitalSwap semicircles; Big O uses a separate cubic opacity fade."
+      },
+      {
+        "name": "native-space-sky",
+        "value": "uTime × 0.035 domain warp; sin(uTime × 0.28 + seed) twinkle",
+        "purpose": "Independent native WebGL highp landing/loading sky, DPR cap 1.5, ResizeObserver and resource cleanup. Hidden RAF stops, reduced motion is still, shader failure/context loss uses static CSS sky."
+      },
+      {
+        "name": "complexity-star-fade",
+        "value": "1000ms; 1 - (1 - elapsed)^3",
+        "purpose": "Demand-rendered opacity fade; first render/reduced motion show final clusters. Stable workStar positions, shared 6.5-unit camera and minimum 4px point-size rule; final draw range equals exact model count up to 8128."
+      },
+      {
+        "name": "loading-moon",
+        "value": "22s linear infinite",
+        "purpose": "Decorative native moon rotation; disabled for reduced motion, no fake delay."
       }
     ],
     "breakpoints": [
@@ -393,12 +1079,12 @@
       {
         "name": "focus-outline",
         "value": "3px solid #087f5b; outline-offset: 3px",
-        "purpose": "Visible keyboard focus on buttons and links."
+        "purpose": "Visible focus on other light algorithm lessons."
       },
       {
-        "name": "bubble-space-focus",
+        "name": "observatory-focus",
         "value": "3px solid #9bb7a5; outline-offset: 3px (2px on enlargement buttons)",
-        "purpose": "Bubble-only visible focus against observatory ground, including native view controls and input."
+        "purpose": "Bubble and landing focus against dark ground; Bubble enlargement offset 2px, landing range offset 4px."
       }
     ]
   },
@@ -414,31 +1100,31 @@
     {
       "name": "Language control",
       "kind": "button",
-      "description": "Outlined landing language switch.",
+      "description": "Outlined observatory language switch.",
       "html": "<button class=\"ds-language\">English</button>",
-      "css": ".ds-language{background:transparent;border:1px solid #bdcbbf;border-radius:8px;padding:8px 12px;color:#254c3a;cursor:pointer;font-family:\"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-language:focus-visible{outline:3px solid #087f5b;outline-offset:3px;}"
+      "css": ".ds-language{background:transparent;border:1px solid #3e5149;border-radius:8px;padding:8px 12px;color:#9bb7a5;cursor:pointer;font-family:\"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-language:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px;}"
     },
     {
       "name": "Header navigation",
       "kind": "nav",
-      "description": "Quiet anchor navigation.",
+      "description": "Muted observatory anchor navigation.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a href=\"#warmup\">Big O</a><a href=\"#use-cases\">Familiar things</a></nav>",
-      "css": ".ds-nav{display:flex;gap:28px;font:13px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-nav a{color:#365442;text-decoration:none;text-underline-offset:5px}.ds-nav a:hover{text-decoration:underline}.ds-nav a:focus-visible{outline:3px solid #087f5b;outline-offset:3px;}"
+      "css": ".ds-nav{display:flex;gap:28px;font:13px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-nav a{color:#a3b0a7;text-decoration:none;text-underline-offset:5px}.ds-nav a:hover{text-decoration:underline}.ds-nav a:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px;}"
     },
     {
       "name": "Complexity input",
       "kind": "input",
-      "description": "Native range with green accent and readable count.",
+      "description": "Native powers-of-two range; exact input n and counters.",
       "html": "<label class=\"ds-range\">Input size <strong>n = 32</strong><input type=\"range\" min=\"1\" max=\"7\" value=\"5\" aria-label=\"Input size\" aria-valuetext=\"n = 32\"></label>",
-      "css": ".ds-range{display:flex;align-items:center;gap:20px;font:13px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif;color:#1a3028}.ds-range strong{font:16px ui-monospace,monospace;font-variant-numeric:tabular-nums}.ds-range input{accent-color:#196d53;min-width:0;cursor:pointer}.ds-range input:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
+      "css": ".ds-range{display:flex;align-items:center;gap:20px;font:13px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif;color:#e2e7d9}.ds-range strong{font:16px ui-monospace,monospace;font-variant-numeric:tabular-nums}.ds-range input{accent-color:#9bb7a5;min-width:0;cursor:pointer}.ds-range input:focus-visible{outline:3px solid #9bb7a5;outline-offset:4px}"
     },
     {
       "name": "Complexity lab surface",
       "kind": "card",
       "refersTo": "landing-lab",
-      "description": "Warm bordered model comparison surface. Four desktop columns, two mobile; exact equal-sized 0.145 blocks on a 0.16 lattice represent 1, ceil(log2(n)), n and n(n−1)/2 up to 8128. Accessible counts remain beside demand-rendered clay piles.",
-      "html": "<section class=\"ds-lab\"><strong>O(n)</strong><output aria-label=\"O(n) model operations\">32</output><p>Each identically sized block represents one model operation. Growth model, not measured runtime.</p></section>",
-      "css": ".ds-lab{background:#f0efe7;border:1px solid #d5dfd6;border-radius:16px;padding:28px 32px 20px;color:#1a3028;font-family:\"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-lab strong{font:16px ui-monospace,monospace}.ds-lab p{color:#526459;font-size:12px;line-height:1.8;margin:20px 0 0}.ds-lab output{display:block;font:18px ui-monospace,monospace;font-variant-numeric:tabular-nums;color:#41503e;margin-top:8px}"
+      "description": "Translucent lab: four equal-size star clusters share stable 3D positions and 6.5 camera units. Exact formulas/counters: 1, ceil(log2(n)), n and n(n−1)/2, up to 8128. Static sample: O(n), n=8.",
+      "html": "<section class=\"ds-lab\"><strong>O(n)</strong><output aria-label=\"O(n) model operations\">8</output><div class=\"ds-cluster\" aria-hidden=\"true\"><span class=\"ds-star\" style=\"left:calc(50% + 0.00px);top:calc(50% + 0.00px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -3.30px);top:calc(50% + -0.73px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + 0.49px);top:calc(50% + -2.81px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + 3.93px);top:calc(50% + 4.31px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -7.00px);top:calc(50% + 1.28px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + 6.46px);top:calc(50% + -3.79px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -2.11px);top:calc(50% + 0.17px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -3.95px);top:calc(50% + -1.19px)\"></span></div><p>Each identically sized star represents one model operation. Growth model, not measured runtime.</p></section>",
+      "css": ".ds-lab{background:rgba(11,16,18,.7);border:1px solid #2c3936;border-radius:16px;padding:28px 32px 20px;color:#e2e7d9;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lab strong{font:500 15px ui-monospace,monospace}.ds-lab p{color:#a3b0a7;font-size:12px;line-height:1.8;margin:20px 0 0}.ds-lab output{display:block;font:18px ui-monospace,monospace;font-variant-numeric:tabular-nums;margin-top:8px}.ds-cluster{position:relative;height:160px}.ds-star{position:absolute;width:4px;height:4px;border-radius:50%;background:radial-gradient(circle,#fff 6%,#d6b476 25%,transparent 70%);transform:translate(-50%,-50%)}"
     },
     {
       "name": "Native code disclosure",
@@ -457,22 +1143,22 @@
       "css": ".ds-canvas{background:#eef2eb;color:#1a3028;border:0;border-radius:12px;padding:24px 28px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-canvas p{margin:0;font-size:14px;font-weight:450;color:#4c6755}.ds-evidence{padding-top:24px;font:500 15px ui-monospace,SFMono-Regular,Consolas,monospace}@media(max-width:650px){.ds-canvas{padding:20px 16px}}"
     },
     {
-      "name": "Selected lesson",
-      "kind": "nav",
-      "description": "Quiet catalog row with a sage current-page treatment.",
-      "html": "<nav class=\"ds-catalog\" aria-label=\"Algorithms\"><button class=\"ds-lesson\" aria-current=\"page\">Bubble sort</button></nav>",
-      "css": ".ds-catalog{font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson{display:flex;justify-content:space-between;gap:10px;width:100%;border:0;border-radius:9px;padding:11px 14px;background:#e8eee5;color:#365745;text-align:left;cursor:pointer;font:450 14px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson:hover{background:#e8eee5}.ds-lesson:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
+      "name": "Observatory watch action",
+      "kind": "button",
+      "refersTo": "landing-primary",
+      "description": "Landing invitation to Bubble: dark sage fill and cream ink.",
+      "html": "<a class=\"ds-watch\" href=\"?lesson=bubble-sort&amp;lang=en\">Just watch <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></a>",
+      "css": ".ds-watch{display:inline-flex;align-items:center;justify-content:center;gap:18px;background:#263b30;color:#e2e7d9;border-radius:9px;padding:14px 19px;text-decoration:none;font:500 14px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif;transition:background .2s}.ds-watch:hover{background:#354c43}.ds-watch:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px}@media(prefers-reduced-motion:reduce){.ds-watch{transition:none}}"
     },
     {
-      "name": "Bubble-only slow loop",
-      "kind": "input",
-      "refersTo": "bubble-loop",
-      "description": "Bubble observatory native opt-out checkbox beside the caption. Labels: 천천히 반복 / Slow loop. Playback controls remain below the artwork.",
-      "html": "<div class=\"ds-space-sample\"><label class=\"ds-bubble-loop\"><input type=\"checkbox\" checked>Slow loop</label></div>",
-      "css": ".ds-space-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-loop{display:flex;gap:8px;align-items:center;color:#a3b0a7;font:13px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif;cursor:pointer}.ds-bubble-loop input{accent-color:#9bb7a5;width:16px;height:16px}.ds-bubble-loop input:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px}"
+      "name": "Native loading orbit",
+      "kind": "custom",
+      "description": "Root Suspense status with native 76px planet, tilted ellipse and 22s moon. Independent WebGL SpaceSky has this static CSS fallback.",
+      "html": "<div class=\"ds-loading\"><div class=\"ds-orbit\" aria-hidden=\"true\"><span class=\"ds-planet\"></span><span class=\"ds-moon\"></span></div><div class=\"ds-status\" role=\"status\" aria-live=\"polite\"><p>Gathering a little universe…</p><span>Loading…</span></div></div>",
+      "css": ".ds-loading{background:radial-gradient(ellipse at 75% 30%,#202e28,transparent 70%),radial-gradient(ellipse at 25% 75%,#29222b,#0b1012 75%);color:#e2e7d9;text-align:center;padding:24px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-orbit{position:relative;width:230px;height:170px;margin:0 auto 28px}.ds-orbit::before{content:\"\";position:absolute;inset:38px 10px;border:1px solid #b7a07e;border-radius:50%;transform:rotate(-28deg);opacity:.6}.ds-planet{position:absolute;width:76px;height:76px;left:77px;top:47px;background:#9bb7a5;border-radius:50%;box-shadow:inset -18px -12px 28px #31463b}.ds-moon{position:absolute;inset:0;animation:ds-loading-orbit 22s linear infinite}.ds-moon::after{content:\"\";position:absolute;left:23px;top:50px;width:7px;height:7px;border-radius:50%;background:#b7a07e}.ds-status p{margin:0 0 10px;font-size:19px;font-weight:450;letter-spacing:-.02em}.ds-status>span{font-size:13px;color:#a3b0a7}@keyframes ds-loading-orbit{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.ds-moon{animation:none}}"
     },
     {
-      "name": "Bubble-only view switch",
+      "name": "Bubble view switch",
       "kind": "input",
       "description": "Bubble observatory native 2D/3D radios with 3D selected by default; front-facing 2D flattens spheres and hides rings. Changes preserve the running trace; disabled while editing. Enlarge/Fullscreen retains native requestFullscreen, enlarged fallback, active focus trap and Escape return focus; transport stays beneath the artwork.",
       "html": "<div class=\"ds-space-view-sample\"><fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset></div>",
@@ -480,18 +1166,25 @@
     }
   ],
   "narrative": {
-    "overview": "The approved concept uses green accents, light paper, muted sage surfaces and lighter headings across the landing and lessons. Playful Korean/English introductions invite watching; exact algorithm summaries and step evidence support closer reading. The execution canvas leads, with source code available below when curiosity calls.\n\nThe user-approved first Bubble-sort trial is a scoped exception: a low-light observatory with worn numbered planets, sparse stars and a diffuse nebula. It retains the existing reading order, type, trace and controls. This approval does not change the global paper identity, favicon, landing clay columns, Big O blocks or other lessons.",
+    "northStar": "Low-light observatory",
+    "overview": "The user-approved observatory now covers landing, loading, favicon, Big O and Bubble sort (2026-10-08). Numbered worn planets, sparse stars and diffuse green/mauve nebula make watching the invitation. Existing Korean/English product names, lighter type, precise evidence and reading order remain. The shared world extends the original Bubble direction (seed 7554e619); its surface expressions are recorded in `.impeccable/surfaces/bubble-space.md` and `.impeccable/surfaces/landing-space.md`.\n\nOther algorithm lessons retain their light paper, muted sage surfaces, established layouts and execution colors. The observatory approval is scoped to the named surfaces; it does not invert every lesson. Playful bilingual introductions invite watching, while exact summaries, model formulas and step evidence support closer reading. Source code stays available below the execution canvas when curiosity calls.",
     "keyCharacteristics": [
-      "Light paper, sage actions and restrained borders outside the Bubble-only trial.",
-      "A scoped low-light observatory for Bubble sort, with exact signed numbers and fixed slots.",
+      "Low-light observatory on landing, loading, favicon, Big O and Bubble sort.",
+      "Light paper and sage actions on other algorithm lessons.",
+      "Worn numbered planets, procedural atmosphere and equally sized model stars.",
       "Lighter headings and quiet bilingual copy.",
       "Visible execution with code closed until requested.",
       "Monospaced values and distinct execution states."
     ],
     "rules": [
       {
+        "name": "The Scoped World Rule",
+        "body": "Apply the observatory to landing, loading, favicon, Big O and Bubble sort; other algorithm lessons keep their incumbent light palette and layout.",
+        "section": "colors"
+      },
+      {
         "name": "The Shared Scale Rule",
-        "body": "Big O comparison scenes use identical block geometry and the same camera units: more work means more blocks, never a normalized height or a larger individual block.",
+        "body": "Big O comparison scenes use the same star-size rule, stable coordinates and camera units: more work means more stars, never normalized cluster size or larger individual stars.",
         "section": "elevation"
       },
       {
@@ -506,12 +1199,12 @@
       }
     ],
     "dos": [
-      "Do use the Korean and English product names and preserve the incumbent favicon.",
+      "Do preserve the Korean and English product names and use the approved orbital SVG/ICO identity mark.",
       "Do keep Korean and English copy readable at narrow widths.",
       "Do place playful taglines alongside exact summaries and step explanations.",
       "Do lead with execution and keep code available through a closed native disclosure.",
       "Do pair execution colors with textual or numeric evidence.",
-      "Do keep the observatory palette and planetary geometry scoped to the approved Bubble trial.",
+      "Do scope the observatory to landing, loading, favicon, Big O and Bubble sort while retaining other lessons’ light palette and layout.",
       "Do treat printed signed Bubble values and fixed indices as authoritative over illustrative geometry."
     ],
     "donts": [

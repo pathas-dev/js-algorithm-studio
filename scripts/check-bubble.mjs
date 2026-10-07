@@ -4,7 +4,7 @@ const server = await createServer({ configFile: 'web/vite.config.mts', server: {
 try {
   const { initialBubblePlayback, bubblePlaybackReducer: reduce, advanceBubblePlayback: advance } = await server.ssrLoadModule('/bubble-playback.ts');
   const { bubble } = await server.ssrLoadModule('/algorithms.ts');
-  const { springProgress, workBlock, planetRadius, planetSpacing, orbitalSwap } = await server.ssrLoadModule('/bubble-motion.ts');
+  const { springProgress, workStar, planetRadius, planetSpacing, orbitalSwap } = await server.ssrLoadModule('/bubble-motion.ts');
   assert.equal(planetRadius(0, 8), 0.13);
   assert.equal(planetRadius(-3, 8), planetRadius(3, 8));
   assert.equal(planetRadius(8, 8), 0.53);
@@ -32,10 +32,10 @@ try {
   assert.equal(springProgress(1), 1);
   assert(springProgress(0.4) > 1, 'damped swaps have a small settling overshoot');
   for (const count of [1, 7, 128, 8128]) {
-    const cells = Array.from({ length: count }, (_, index) => workBlock(index, count));
-    assert.equal(new Set(cells.map((cell) => cell.join(','))).size, count, 'one distinct block per operation');
-    assert(cells.every((cell) => cell.every(Number.isFinite) && cell[1] > 0));
-    assert(Math.max(...cells.map((cell) => cell[1])) <= 3.4, 'maximum model fits the shared camera');
+    const cells = Array.from({ length: count }, (_, index) => workStar(index));
+    assert.equal(new Set(cells.map((cell) => cell.join(','))).size, count, 'one distinct star per operation');
+    assert(cells.every((cell) => cell.every(Number.isFinite) && Math.hypot(...cell) < 3.2));
+    assert.deepEqual(cells[0], [0, 0, 0]);
   }
   let state = reduce(initialBubblePlayback(3), { type: 'toggle' });
   state = advance(state, 2799);

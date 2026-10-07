@@ -1,6 +1,6 @@
 # Bubble-sort observatory trial
 
-Mode: Experience. User approved “우주 컨셉”, planets/stars and the proposed first bubble trial (2026-10-08). This pins the visual direction and supersedes the clay palette for this lesson only. Existing layout, language, exact numerical traces, timing and interactions are preserved. Landing and other lessons remain incumbent until the user judges this trial.
+Mode: Experience. User approved “우주 컨셉”, planets/stars and the proposed first bubble trial (2026-10-08). This pins the visual direction and supersedes the clay palette for Bubble sort. Existing layout, language, exact numerical traces, timing and interactions are preserved. On 2026-10-08 the user extended this approved world to landing, loading, favicon and Big O; see landing-space.md. Other algorithm lessons retain their incumbent light palette and layout.
 
 THESIS: Watch numbered planets exchange fixed observation slots and settle into order.
 OWN-WORLD: Low-light observatory; near-black #0b1012 sky, worn olive/ochre/mauve surfaces, muted cream #e2e7d9 numbers, sparse stars and diffuse slow nebula. Real Three.js spheres, directional lighting and depth-tested value sprites; no external bitmap assets.
