@@ -195,6 +195,8 @@ The artwork reuses the exact bubble-sort trace and stable item identities. A nat
 
 At (1×), each trace step lasts (2.8s), with a swap interpolating over (1.4s). The sorted array holds for (6s), erodes to restrained dust for (6s), and reforms the original input over (3s). The native “천천히 반복” / “Slow loop” checkbox opts out of this cycle. Pause freezes the shared clock; seeking or editing restores an exact, fully formed trace state. Keep bilingual captions, numerical labels and keyboard controls alongside the scene.
 
+Both views share a full-canvas shader wash behind the columns, blending the existing bubble canvas, clay and ink colors. Layered domain-warped noise drifts slowly through grey-green folds, with a quiet centre and edges fading into the canvas. Swaps add a faint local ripple at the camera-projected active pair; erosion and reformation loosen the flow. The background follows cumulative playback time and speed, freezes while paused or hidden, and returns to a deterministic state on seek, input edit or reset. It uses no raster assets or additional dependencies.
+
 Three.js/Fiber loads lazily through the bubble scene. Reduced motion, scene failure or WebGL context loss uses the existing static array renderer; exact trace controls remain available. These scene primitives extend bubble sort only and do not establish a new palette, depth or motion rule for other lessons.
 
 ## Do's and Don'ts

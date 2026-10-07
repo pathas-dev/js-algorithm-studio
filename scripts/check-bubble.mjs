@@ -7,12 +7,14 @@ try {
   let state = reduce(initialBubblePlayback(3), { type: 'toggle' });
   state = advance(state, 2799);
   assert.equal(state.index, 0);
+  assert.equal(state.time, 2799);
   state = advance(state, 1);
   assert.equal(state.index, 1);
   state = reduce(state, { type: 'speed', speed: 2 });
   state = advance(state, 1400);
   assert.equal(state.index, 2);
   assert.equal(state.phase, 'hold');
+  assert.equal(state.time, 5600, 'background time continues across steps and follows speed');
   state = reduce(state, { type: 'speed', speed: 1 });
   for (const phase of ['hold', 'erode', 'form']) {
     assert.equal(state.phase, phase);
@@ -28,6 +30,7 @@ try {
   const sought = reduce({ ...state, phase: 'erode', elapsed: 2000 }, { type: 'seek', index: 1 });
   assert.equal(sought.phase, 'sort');
   assert.equal(sought.elapsed, 0);
+  assert.equal(sought.time, 2800, 'seeking restores a deterministic background snapshot');
   assert.equal(sought.animate, false);
   assert.equal(sought.playing, false);
   const stopped = advance(reduce(initialBubblePlayback(2), { type: 'loop', loop: false }), 10000);
@@ -35,6 +38,9 @@ try {
   const oneRun = advance(reduce(stopped, { type: 'toggle' }), 2800);
   assert.equal(oneRun.index, 1);
   assert.equal(oneRun.playing, false);
+  assert.equal(oneRun.time, 2800);
+  const overshot = advance(reduce(stopped, { type: 'toggle' }), 10000);
+  assert.equal(overshot.time, 2800, 'finite playback stops its background at the final step');
   const loopOff = reduce({ ...state, phase: 'erode' }, { type: 'loop', loop: false });
   assert.equal(loopOff.index, 2);
   assert.equal(loopOff.phase, 'sort');
@@ -54,6 +60,7 @@ try {
     assert.equal(cycled.index, 0);
     assert.equal(cycled.phase, 'sort');
     assert.equal(cycled.playing, true);
+    assert.equal(cycled.time, total, 'background time stays continuous through erosion and reformation');
   }
   console.log('Checked slow timing, all loop phases, pause/resume, speed, seeking, loop off, reduced motion, and four input shapes.');
 } finally { await server.close(); }

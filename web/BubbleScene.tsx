@@ -1,6 +1,6 @@
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial, Vector3 } from 'three';
+import { BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial, Vector2, Vector3 } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Item, Step } from './algorithms';
 import type { BubblePlayback } from './bubble-playback';
@@ -31,6 +31,57 @@ function Camera({ count, signed, view }: { count: number; signed: boolean } & Pi
     camera.updateMatrixWorld();
   }, -1);
   return null;
+}
+
+function Backdrop({ step, clock }: Pick<Props, 'step' | 'clock'>) {
+  const { camera, size } = useThree();
+  const anchor = useMemo(() => new Vector3(), []);
+  const material = useMemo(() => new ShaderMaterial({
+    depthTest: false, depthWrite: false,
+    uniforms: { uTime: { value: 0 }, uAspect: { value: 1 }, uRelease: { value: 0 }, uRipple: { value: 0 }, uCenter: { value: new Vector2(0.5, 0.4) }, uPaper: { value: new Color('#f0efe7') }, uClay: { value: new Color('#91a28b') }, uInk: { value: new Color('#41503e') } },
+    vertexShader: 'varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position.xy,1.0,1.0);}',
+    fragmentShader: `
+      varying vec2 vUv;
+      uniform float uTime, uAspect, uRelease, uRipple;
+      uniform vec2 uCenter;
+      uniform vec3 uPaper, uClay, uInk;
+      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float noise(vec2 p){
+        vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
+        return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);
+      }
+      float field(vec2 p){return noise(p)*0.57+noise(p*2.07+3.1)*0.29+noise(p*4.13+7.6)*0.14;}
+      void main(){
+        vec2 p=(vUv-0.5)*vec2(min(uAspect,3.0),1.0)*2.7;
+        float t=uTime*0.11;
+        vec2 drift=vec2(field(p+vec2(t,-t*0.7)),field(p+vec2(-t*0.6,t)+9.2));
+        float wash=field(p+drift*(1.6+uRelease*1.2)+vec2(t*0.3,-t*0.22));
+        float folds=field(p-drift*1.2-vec2(t*0.25,0.0)+14.3);
+        float quiet=smoothstep(0.15,0.65,length((vUv-vec2(0.5,0.48))*vec2(1.4,1.0)));
+        float edge=smoothstep(0.0,0.14,min(min(vUv.x,1.0-vUv.x),min(vUv.y,1.0-vUv.y)));
+        vec3 color=mix(uPaper,uClay,smoothstep(0.3,0.75,wash)*(0.13+quiet*0.3));
+        color=mix(color,uInk,smoothstep(0.45,0.8,folds)*(0.012+uRelease*0.025));
+        float distance=length((vUv-uCenter)*vec2(uAspect,1.0));
+        float ring=exp(-pow((distance-uRipple*0.65)*17.0,2.0))*sin(uRipple*3.14159);
+        color=mix(color,uClay,ring*0.065);
+        color=mix(uPaper,color,edge);
+        gl_FragColor=vec4(color,1.0);
+        #include <colorspace_fragment>
+      }`,
+  }), []);
+  useEffect(() => () => material.dispose(), [material]);
+  useFrame(() => {
+    const state = clock.current;
+    const uniforms = material.uniforms;
+    uniforms.uTime.value = state.time / 1000;
+    uniforms.uAspect.value = size.width / size.height;
+    uniforms.uRelease.value = Math.sin(Math.PI * Math.max(0, Math.min(1, erosion(state))));
+    uniforms.uRipple.value = state.phase === 'sort' && step.type === 'swap' && state.animate ? Math.min(1, state.elapsed / 2800) : 0;
+    const middle = step.indices.length ? step.indices.reduce((sum, index) => sum + index, 0) / step.indices.length : (step.array.length - 1) / 2;
+    anchor.set(position(middle, step.array.length), 0, 0).project(camera);
+    uniforms.uCenter.value.set((anchor.x + 1) / 2, (anchor.y + 1) / 2);
+  });
+  return <mesh material={material} frustumCulled={false} renderOrder={-10}><planeGeometry args={[2, 2]} /></mesh>;
 }
 
 function Stone({ item, index, step, previous, clock, maximum, labels, signed, view }: { item: Item; index: number; maximum: number; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view'>) {
@@ -186,6 +237,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
               gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
             }}>
               <Camera count={step.array.length} signed={signed} view={view} />
+              <Backdrop step={step} clock={clock} />
               <ambientLight intensity={1.2} color="#f5efe3" />
               <directionalLight position={[-3, 10, 4]} intensity={2.8} color="#fff6e6" castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-Math.max(8, step.array.length * 0.65)} shadow-camera-right={Math.max(8, step.array.length * 0.65)} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-radius={8} shadow-blurSamples={16} />
               <directionalLight position={[4, 3, -3]} intensity={0.8} color="#b9c9b5" />

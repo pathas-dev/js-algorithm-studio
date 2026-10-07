@@ -3,7 +3,7 @@ export const BUBBLE_PHASE_MS = { hold: 6000, erode: 6000, form: 3000 };
 export type BubblePhase = 'sort' | keyof typeof BUBBLE_PHASE_MS;
 export type BubblePlayback = {
   index: number; length: number; speed: number; playing: boolean;
-  phase: BubblePhase; elapsed: number; loop: boolean; animate: boolean; reduced: boolean;
+  phase: BubblePhase; elapsed: number; time: number; loop: boolean; animate: boolean; reduced: boolean;
 };
 export type BubbleAction =
   | { type: 'reset'; length: number }
@@ -14,21 +14,24 @@ export type BubbleAction =
   | { type: 'reduced'; reduced: boolean };
 
 export function initialBubblePlayback(length: number): BubblePlayback {
-  return { index: 0, length, speed: 1, playing: false, phase: 'sort', elapsed: 0, loop: true, animate: false, reduced: false };
+  return { index: 0, length, speed: 1, playing: false, phase: 'sort', elapsed: 0, time: 0, loop: true, animate: false, reduced: false };
 }
 
 export function bubblePlaybackReducer(state: BubblePlayback, action: BubbleAction): BubblePlayback {
   switch (action.type) {
-    case 'reset': return { ...state, index: 0, length: action.length, playing: false, phase: 'sort', elapsed: 0, animate: false };
-    case 'seek': return { ...state, index: Math.max(0, Math.min(state.length - 1, action.index)), playing: false, phase: 'sort', elapsed: 0, animate: false };
+    case 'reset': return { ...state, index: 0, length: action.length, playing: false, phase: 'sort', elapsed: 0, time: 0, animate: false };
+    case 'seek': {
+      const index = Math.max(0, Math.min(state.length - 1, action.index));
+      return { ...state, index, playing: false, phase: 'sort', elapsed: 0, time: index * BUBBLE_STEP_MS, animate: false };
+    }
     case 'toggle':
       if (!state.playing && state.phase === 'sort' && state.index === state.length - 1) {
-        return { ...state, index: 0, elapsed: 0, playing: true, animate: false };
+        return { ...state, index: 0, elapsed: 0, time: 0, playing: true, animate: false };
       }
       return { ...state, playing: !state.playing };
     case 'speed': return { ...state, speed: action.speed };
     case 'loop': return !action.loop && state.phase !== 'sort'
-      ? { ...state, loop: false, index: state.length - 1, phase: 'sort', playing: false, elapsed: 0, animate: false }
+      ? { ...state, loop: false, index: state.length - 1, phase: 'sort', playing: false, elapsed: 0, time: (state.length - 1) * BUBBLE_STEP_MS, animate: false }
       : { ...state, loop: action.loop };
     case 'reduced': return { ...state, reduced: action.reduced, phase: 'sort', elapsed: 0, animate: false };
   }
@@ -37,7 +40,7 @@ export function bubblePlaybackReducer(state: BubblePlayback, action: BubbleActio
 // One clock drives both the trace and its visual epilogue. Seeking bypasses the epilogue.
 export function advanceBubblePlayback(state: BubblePlayback, delta: number): BubblePlayback {
   if (!state.playing) return state;
-  let next = { ...state, elapsed: state.elapsed + delta * state.speed };
+  let next = { ...state, elapsed: state.elapsed + delta * state.speed, time: state.time + delta * state.speed };
   let duration = next.phase === 'sort' ? BUBBLE_STEP_MS : BUBBLE_PHASE_MS[next.phase];
   while (next.elapsed >= duration && next.playing) {
     next.elapsed -= duration;
@@ -58,5 +61,6 @@ export function advanceBubblePlayback(state: BubblePlayback, delta: number): Bub
     } else next.phase = 'sort';
     duration = next.phase === 'sort' ? BUBBLE_STEP_MS : BUBBLE_PHASE_MS[next.phase];
   }
+  if (!next.playing) { next.time -= next.elapsed; next.elapsed = 0; }
   return next;
 }
