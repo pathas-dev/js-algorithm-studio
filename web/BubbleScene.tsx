@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { BufferAttribute, BufferGeometry, CanvasTexture, Color, Sprite, SpriteMaterial, SRGBColorSpace, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial, SphereGeometry, DoubleSide, Vector2, Vector3 } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Item, Step } from './algorithms';
-import type { BubblePlayback } from './bubble-playback';
+import { BUBBLE_SWAP_MS, type BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
 import { springProgress, planetRadius, planetSpacing, orbitalSwap, axialAngle } from './bubble-motion';
 import { useSceneVisibility } from './use-scene-visibility';
@@ -181,7 +181,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     const state = clock.current;
     const from = previous.array.findIndex((entry) => entry.id === item.id);
     const moving = step.type === 'swap' && state.animate && from !== index;
-    const time = moving ? Math.min(1, state.elapsed / 1400) : 1;
+    const time = moving ? Math.min(1, state.elapsed / BUBBLE_SWAP_MS) : 1;
     const progress = springProgress(time);
     const arc = moving ? Math.sin(time * Math.PI) : 0;
     const oldX = position(from < 0 ? index : from, step.array.length, spacing);
@@ -197,7 +197,8 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     uniforms.uErosion.value = Math.max(0, Math.min(1, erosion(state)));
     const active = step.indices.includes(index);
     const isSettled = index >= Number(step.variables.sortedFrom ?? step.array.length);
-    material.color.copy(active ? step.type === 'swap' ? swap : warm : isSettled ? settled : base);
+    const color = active ? step.type === 'swap' ? swap : warm : isSettled ? settled : base;
+    material.color.lerp(color, space ? 1 - Math.exp(-Math.min(delta, 0.1) * 8) : 1);
     material.emissive.copy(material.color);
     material.emissiveIntensity = view === '2d' ? 0.4 : space ? 0.025 : 0;
     // Shadows fade with the object, avoiding a solid ghost after erosion.

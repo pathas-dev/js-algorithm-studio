@@ -22,7 +22,7 @@ export default function Landing() {
   const [size, setSize] = useState(32);
   const reduced = Boolean(useReducedMotion());
   const { sceneRef, visible } = useSceneVisibility(!reduced);
-  const { playback, dispatch, clock: previewClock } = useBubblePlayback(preview.length, visible && !reduced, !reduced);
+  const { playback, dispatch, clock: previewClock } = useBubblePlayback(preview, visible && !reduced, !reduced);
   const step = preview[playback.index];
   const previous = preview[Math.max(0, playback.index - 1)];
   const pair = step.indices.map((index) => (step.type === 'swap' ? previous : step).array[index].value);

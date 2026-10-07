@@ -1,16 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
+import type { Step } from './algorithms';
 import { advanceBubblePlayback, bubblePlaybackReducer, initialBubblePlayback, type BubbleAction } from './bubble-playback';
 
-export default function useBubblePlayback(length: number, active: boolean, autoplay = false) {
-  const [playback, setPlayback] = useState(() => ({ ...initialBubblePlayback(length), playing: autoplay }));
+export default function useBubblePlayback(steps: Step[], active: boolean, autoplay = false) {
+  const [playback, setPlayback] = useState(() => autoplay
+    ? bubblePlaybackReducer(initialBubblePlayback(steps.length), { type: 'toggle' })
+    : initialBubblePlayback(steps.length));
   const clock = useRef(playback);
   const reduced = Boolean(useReducedMotion());
   const dispatch = (action: BubbleAction) => {
-    clock.current = bubblePlaybackReducer(clock.current, action);
+    clock.current = bubblePlaybackReducer(clock.current, action.type === 'toggle'
+      ? { ...action, swap: steps[clock.current.index]?.type === 'swap' }
+      : action);
     setPlayback(clock.current);
   };
   useEffect(() => {
+    if (clock.current.reduced === reduced) return;
     clock.current = bubblePlaybackReducer(clock.current, { type: 'reduced', reduced });
     setPlayback(clock.current);
   }, [reduced]);

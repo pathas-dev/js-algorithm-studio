@@ -25,8 +25,8 @@ export function orbitalSwap(from: number, to: number, time: number): [number, nu
   return [from + (to - from) * (1 - Math.cos(angle)) / 2, (to - from) * Math.sin(angle) / 2];
 }
 
-// Small/medium/large planets turn in 4/5/6 seconds; IDs keep a stable phase.
+// Small/medium/large planets turn in 8/10/12 seconds; IDs keep a stable phase.
 export function axialAngle(timeMs: number, id: number, radius = 0.33) {
-  const period = 4 + Math.max(0, Math.min(1, (radius - 0.13) / 0.4)) * 2;
+  const period = 8 + Math.max(0, Math.min(1, (radius - 0.13) / 0.4)) * 4;
   return Math.max(0, timeMs) / 1000 * Math.PI * 2 / period + id * 0.8;
 }

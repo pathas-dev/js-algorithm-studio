@@ -10,7 +10,7 @@ try {
     assert.equal(axialAngle(-100, id), axialAngle(0, id));
     const first = axialAngle(1000, id) - axialAngle(0, id);
     assert(Math.abs(axialAngle(2000, id) - axialAngle(1000, id) - first) < 1e-12, 'axial spin has constant speed');
-    for (const [radius, period] of [[0.13, 4], [0.33, 5], [0.53, 6]]) {
+    for (const [radius, period] of [[0.13, 8], [0.33, 10], [0.53, 12]]) {
       assert(Math.abs(axialAngle(period * 1000, id, radius) - id * 0.8 - Math.PI * 2) < 1e-12, 'larger bodies have a longer rotation period');
     }
   }
@@ -48,17 +48,28 @@ try {
     assert(cells.every((cell) => cell.every(Number.isFinite) && Math.hypot(...cell) < 3.2));
     assert.deepEqual(cells[0], [0, 0, 0]);
   }
-  let state = reduce(initialBubblePlayback(3), { type: 'toggle' });
+  let state = reduce(initialBubblePlayback(4), { type: 'toggle' });
+  assert.equal(state.index, 1, 'play immediately starts the first pending action');
+  assert.equal(state.elapsed, 0);
+  assert.equal(state.animate, true);
   state = advance(state, 2799);
-  assert.equal(state.index, 0);
-  assert.equal(state.time, 2799);
-  state = advance(state, 1);
   assert.equal(state.index, 1);
+  assert.equal(state.time, 5599);
+  state = advance(state, 1);
+  assert.equal(state.index, 2);
+  const halfway = reduce(advance(state, 700), { type: 'toggle' });
+  assert.deepEqual(advance(halfway, 20000), halfway);
+  assert.deepEqual(reduce(halfway, { type: 'toggle', swap: true }), { ...halfway, playing: true }, 'an unfinished swap resumes without skipping or resetting its progress');
+  assert.equal(reduce(halfway, { type: 'toggle' }).index, 3, 'a comparison has no spatial animation to finish, so resume starts its pending action immediately');
+  const dwell = reduce(advance(state, 1800), { type: 'toggle' });
+  const continued = reduce(dwell, { type: 'toggle' });
+  assert.equal(continued.index, 3, 'resume bypasses a completed action’s idle tail');
+  assert.equal(continued.elapsed, 0);
   state = reduce(state, { type: 'speed', speed: 2 });
   state = advance(state, 1400);
-  assert.equal(state.index, 2);
+  assert.equal(state.index, 3);
   assert.equal(state.phase, 'hold');
-  assert.equal(state.time, 5600, 'background time continues across steps and follows speed');
+  assert.equal(state.time, 8400, 'background time continues across steps and follows speed');
   state = reduce(state, { type: 'speed', speed: 1 });
   for (const phase of ['hold', 'erode', 'form']) {
     assert.equal(state.phase, phase);
@@ -77,6 +88,9 @@ try {
   assert.equal(sought.time, 2800, 'seeking restores a deterministic background snapshot');
   assert.equal(sought.animate, false);
   assert.equal(sought.playing, false);
+  const afterSeek = reduce(sought, { type: 'toggle' });
+  assert.equal(afterSeek.index, 2, 'play after seeking starts the next action immediately');
+  assert.equal(afterSeek.elapsed, 0);
   const stopped = advance(reduce(initialBubblePlayback(2), { type: 'loop', loop: false }), 10000);
   assert.equal(stopped.index, 0); // Paused states never advance.
   const oneRun = advance(reduce(stopped, { type: 'toggle' }), 2800);
@@ -86,7 +100,7 @@ try {
   const overshot = advance(reduce(stopped, { type: 'toggle' }), 10000);
   assert.equal(overshot.time, 2800, 'finite playback stops its background at the final step');
   const loopOff = reduce({ ...state, phase: 'erode' }, { type: 'loop', loop: false });
-  assert.equal(loopOff.index, 2);
+  assert.equal(loopOff.index, 3);
   assert.equal(loopOff.phase, 'sort');
   assert.equal(loopOff.playing, false);
   const reduced = advance({ ...initialBubblePlayback(2), playing: true, reduced: true }, 8800);

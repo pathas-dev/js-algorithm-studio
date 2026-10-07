@@ -1,4 +1,5 @@
 export const BUBBLE_STEP_MS = 2800;
+export const BUBBLE_SWAP_MS = 1400;
 export const BUBBLE_PHASE_MS = { hold: 6000, erode: 6000, form: 3000 };
 export type BubblePhase = 'sort' | keyof typeof BUBBLE_PHASE_MS;
 export type BubblePlayback = {
@@ -8,7 +9,7 @@ export type BubblePlayback = {
 export type BubbleAction =
   | { type: 'reset'; length: number }
   | { type: 'seek'; index: number }
-  | { type: 'toggle' }
+  | { type: 'toggle'; swap?: boolean }
   | { type: 'speed'; speed: number }
   | { type: 'loop'; loop: boolean }
   | { type: 'reduced'; reduced: boolean };
@@ -24,11 +25,16 @@ export function bubblePlaybackReducer(state: BubblePlayback, action: BubbleActio
       const index = Math.max(0, Math.min(state.length - 1, action.index));
       return { ...state, index, playing: false, phase: 'sort', elapsed: 0, time: index * BUBBLE_STEP_MS, animate: false };
     }
-    case 'toggle':
-      if (!state.playing && state.phase === 'sort' && state.index === state.length - 1) {
-        return { ...state, index: 0, elapsed: 0, time: 0, playing: true, animate: false };
-      }
-      return { ...state, playing: !state.playing };
+    case 'toggle': {
+      if (state.playing || state.phase !== 'sort') return { ...state, playing: !state.playing };
+      const ready = state.index === state.length - 1
+        ? { ...state, index: 0, elapsed: 0, time: 0, playing: true, animate: false }
+        : { ...state, playing: true };
+      // Start the pending action now; a paused swap resumes at its exact position.
+      return !action.swap || !ready.animate || ready.elapsed >= BUBBLE_SWAP_MS
+        ? advanceBubblePlayback(ready, (BUBBLE_STEP_MS - ready.elapsed) / ready.speed)
+        : ready;
+    }
     case 'speed': return { ...state, speed: action.speed };
     case 'loop': return !action.loop && state.phase !== 'sort'
       ? { ...state, loop: false, index: state.length - 1, phase: 'sort', playing: false, elapsed: 0, time: (state.length - 1) * BUBBLE_STEP_MS, animate: false }

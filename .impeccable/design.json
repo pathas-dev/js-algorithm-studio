@@ -1028,7 +1028,7 @@
       {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Opposing semicircles exchange at constant path speed over 1.4s: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes the trace, nebula, twinkle and dust while independent axial rotation continues. Seek/edit restores exact trace geometry without resetting axial time. Reduced motion uses the static array renderer."
+        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Opposing semicircles exchange at constant path speed over 1.4s: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes the trace, nebula, twinkle and dust while independent axial rotation continues. Seek/edit restores exact trace geometry without resetting axial time. Reduced motion uses the static array renderer. Explicit play starts the next pending action after entry, seeking, any paused comparison or a completed swap’s idle tail; animated unfinished swaps resume at their exact progress."
       },
       {
         "name": "bubble-view-transition",
@@ -1072,8 +1072,8 @@
       },
       {
         "name": "bubble-planet-spin",
-        "value": "period = 4 + clamp((radius − 0.13) / 0.4, 0, 1) × 2 seconds; angle = visibleSeconds × 2π / period + id × 0.8; delta ≤ 0.1s",
-        "purpose": "Every visible space planet rotates independently before playback and while sorting is paused, with a five-second baseline: small planets turn in 4s, medium in 5s and large in 6s. Speed follows rendered radius, not item ID; IDs retain only stable phases. 3D spins the actual sphere about y; 2D spins shader terrain while flattened geometry stays front-facing. Rings, numeric labels and fixed slot centres do not spin. Playback speed, pause, seek and trace reset do not control or reset axial time. Offscreen, hidden-document and reduced-motion gates stop nonessential motion."
+        "value": "period = 8 + clamp((radius − 0.13) / 0.4, 0, 1) × 4 seconds; angle = visibleSeconds × 2π / period + id × 0.8; delta ≤ 0.1s",
+        "purpose": "Every visible space planet rotates independently before playback and while sorting is paused, with a ten-second baseline: small planets turn in 8s, medium in 10s and large in 12s. Speed follows rendered radius, not item ID; IDs retain only stable phases. 3D spins the actual sphere about y; 2D spins shader terrain while flattened geometry stays front-facing. Rings, numeric labels and fixed slot centres do not spin. Playback speed, pause, seek and trace reset do not control or reset axial time. Offscreen, hidden-document and reduced-motion gates stop nonessential motion."
       },
       {
         "name": "landing-preview-playback",
@@ -1089,6 +1089,11 @@
         "name": "complexity-star-pulse",
         "value": "alpha multiplier = 0.72 + 0.28 × sin(seconds × 0.9 + seed × 2π)",
         "purpose": "Seeded shader brightness pulse makes every cluster, including the one-star model, visibly alive. It multiplies the count-fade alpha without rewriting its buffer or changing exact draw count. Uses the same visibility/document-hidden/reduced-motion gates as cluster rotation."
+      },
+      {
+        "name": "bubble-color-transition",
+        "value": "1 - exp(-min(delta, 0.1) * 8)",
+        "purpose": "Space planet colors ease between the existing neutral, comparison, swap and settled palette in about 375ms to 95%; emissive and rings follow the interpolated color. Static reduced-motion array fallback is unchanged."
       }
     ],
     "breakpoints": [

@@ -93,7 +93,7 @@ export default function App() {
     }
   }
   const [standardPlayback, standardDispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
-  const ambient = useBubblePlayback(steps.length, isBubble);
+  const ambient = useBubblePlayback(steps, isBubble);
   const playback = isBubble ? ambient.playback : standardPlayback;
   const dispatch = isBubble ? ambient.dispatch : standardDispatch;
   const step = steps[playback.index];
