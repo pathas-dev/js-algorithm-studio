@@ -63,3 +63,69 @@
   .bubble-studio .bubble-expanded .canvas-card { padding: 10px; }
   .bubble-studio .bubble-expanded .bubble-canvas { height: max(240px, calc(100dvh - 370px)); }
 }
+
+/* Bubble-only observatory trial. Other lessons and the clay landing stay independent. */
+body:has(.space-studio) { background: #0b1012; }
+.space-studio {
+  --space-ground: #0b1012;
+  --space-surface: #141b1d;
+  --space-ink: #e2e7d9;
+  --space-muted: #a3b0a7;
+  --space-line: #2c3936;
+  --space-accent: #9bb7a5;
+  --mantine-color-text: var(--space-ink);
+  --mantine-color-dimmed: var(--space-muted);
+  --mantine-color-body: var(--space-ground);
+  color-scheme: dark;
+  background: var(--space-ground);
+  color: var(--space-ink);
+  scrollbar-color: #54685d var(--space-ground);
+}
+.space-studio ::selection { color: #0b1012; background: #9bb7a5; }
+.space-studio .brand, .space-studio h1, .space-studio .action-name, .space-studio .action-evidence,
+.space-studio .action-decision, .space-studio .step-counter strong { color: var(--space-ink); }
+.space-studio .lesson-heading .lesson-tagline { color: #c9d2c6; }
+.space-studio .lesson-heading .lesson-intro, .space-studio .header-note, .space-studio .catalog-label,
+.space-studio .lesson-heading .mantine-Badge-root, .space-studio .studio-footer,
+.space-studio .step-counter, .space-studio .legend, .space-studio .bubble-caption,
+.space-studio .bubble-loop, .space-studio .bubble-index, .space-studio .bubble-empty,
+.space-studio .bubble-size-button, .space-studio .lesson-code summary,
+.space-studio .why-button, .space-studio .inline-input-editor p,
+.space-studio .canvas-card > .mantine-Group-root > p,
+.space-studio .canvas-card > .mantine-Group-root .mantine-Badge-root { color: var(--space-muted); }
+.space-studio .studio-header, .space-studio .playback-card, .space-studio .inline-input-editor,
+.space-studio .lesson-code, .space-studio .bubble-view-switch { border-color: var(--space-line); }
+.space-studio .algorithm-button { color: var(--space-muted); }
+.space-studio .algorithm-button.selected { color: var(--space-ink); background: #1d2a25; }
+.space-studio .algorithm-button:hover, .space-studio .editable-array:hover,
+.space-studio .bubble-size-button:hover { background: #1d2a25; }
+.space-studio .canvas-card, .space-studio .bubble-expanded { background: var(--space-ground); }
+.space-studio .canvas-card { padding-inline: 20px; }
+.space-studio .bubble-view-switch span { color: var(--space-muted); }
+.space-studio .bubble-view-switch input:checked + span { background: #26362e; color: var(--space-ink); }
+.space-studio .bubble-view-switch input:hover + span { background: #1d2a25; }
+.space-studio .bubble-loop input, .space-studio .timeline { accent-color: var(--space-accent); }
+.space-studio .bubble-index::before { background: #54685d; }
+.space-studio .bubble-art-scroll { scrollbar-color: #54685d var(--space-ground); }
+.space-studio .play-button { color: var(--space-ink); background: #26362e; }
+.space-studio .play-button:hover { background: #34483b; }
+.space-studio .transport-button { color: var(--space-accent); }
+.space-studio .transport-button:disabled { color: #607268; }
+.space-studio .editable-array { color: var(--space-ink); }
+.space-studio .mantine-Input-input { color: var(--space-ink); background: var(--space-surface); border-color: var(--space-line); caret-color: var(--space-accent); }
+.space-studio .mantine-Input-input::placeholder { color: var(--space-muted); }
+.space-studio .mantine-InputWrapper-label, .space-studio .mantine-InputWrapper-description { color: var(--space-muted); }
+.space-studio .studio-header button { color: var(--space-ink); background: var(--space-surface); border-color: var(--space-line); }
+.space-studio .dot.comparing { background: #d6b476; }
+.space-studio .dot.swapping { background: #afa0be; }
+.space-studio .dot.settled { background: #8faf9d; }
+.space-studio .bar-label, .space-studio .array-index, .space-studio .empty-array { color: var(--space-ink); }
+.space-studio .array-chart::before { border-color: var(--space-line); }
+.space-studio .bar { background: #82968c; }
+.space-studio .comparing .bar { background: #d6b476; }
+.space-studio .swapping .bar { background: #afa0be; }
+.space-studio .settled .bar { background: #8faf9d; }
+.space-studio :focus-visible { outline-color: #9bb7a5; }
+.space-studio .bubble-view-switch input:focus-visible + span { outline-color: #9bb7a5; }
+.space-why { background: #141b1d; color: #e2e7d9; border-color: #2c3936; }
+.space-why p, .space-why .mantine-Badge-root, .space-why .mantine-Button-root { color: #c9d2c6; }

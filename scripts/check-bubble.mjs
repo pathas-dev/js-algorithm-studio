@@ -4,7 +4,12 @@ const server = await createServer({ configFile: 'web/vite.config.mts', server: {
 try {
   const { initialBubblePlayback, bubblePlaybackReducer: reduce, advanceBubblePlayback: advance } = await server.ssrLoadModule('/bubble-playback.ts');
   const { bubble } = await server.ssrLoadModule('/algorithms.ts');
-  const { springProgress, workBlock } = await server.ssrLoadModule('/bubble-motion.ts');
+  const { springProgress, workBlock, planetRadius } = await server.ssrLoadModule('/bubble-motion.ts');
+  assert.equal(planetRadius(0, 8), 0.13);
+  assert.equal(planetRadius(-3, 8), planetRadius(3, 8));
+  assert.equal(planetRadius(8, 8), 0.53);
+  assert(planetRadius(3, 8) > planetRadius(1, 8));
+  assert(Number.isFinite(planetRadius(0, 1)));
   assert.equal(springProgress(0), 0);
   assert.equal(springProgress(1), 1);
   assert(springProgress(0.4) > 1, 'damped swaps have a small settling overshoot');

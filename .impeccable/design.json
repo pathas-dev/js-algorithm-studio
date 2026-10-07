@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T14:45:23.175588+00:00",
+  "generatedAt": "2026-10-07T15:14:56.533011+00:00",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -50,7 +50,7 @@
       },
       "bubble-paper": {
         "role": "neutral",
-        "displayName": "Bubble only: Warm Paper"
+        "displayName": "Retained Clay Renderer: Warm Paper"
       },
       "bubble-canvas": {
         "role": "neutral",
@@ -62,19 +62,19 @@
       },
       "bubble-caption": {
         "role": "neutral",
-        "displayName": "Bubble only: Quiet Caption"
+        "displayName": "Retained Clay Renderer: Quiet Caption"
       },
       "bubble-loop-ink": {
         "role": "neutral",
-        "displayName": "Bubble only: Loop Label"
+        "displayName": "Retained Clay Renderer: Loop Label"
       },
       "bubble-action": {
         "role": "primary",
-        "displayName": "Bubble only: Quiet Sage Action"
+        "displayName": "Retained Clay Renderer: Quiet Sage Action"
       },
       "bubble-action-hover": {
         "role": "primary",
-        "displayName": "Bubble only: Quiet Sage Hover"
+        "displayName": "Retained Clay Renderer: Quiet Sage Hover"
       },
       "bubble-stone": {
         "role": "neutral",
@@ -94,7 +94,7 @@
       },
       "bubble-dust": {
         "role": "neutral",
-        "displayName": "Bubble only: Drifting Dust"
+        "displayName": "Shared Scene: Drifting Dust"
       },
       "bubble-ambient-light": {
         "role": "neutral",
@@ -107,6 +107,216 @@
       "bubble-fill-light": {
         "role": "neutral",
         "displayName": "Clay Scene: Cool Fill Light"
+      },
+      "space-ground": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Observatory Ground",
+        "tonalRamp": [
+          "oklch(15% 0.0089 224.11)",
+          "oklch(26% 0.0089 224.11)",
+          "oklch(38% 0.0089 224.11)",
+          "oklch(49% 0.0089 224.11)",
+          "oklch(61% 0.0089 224.11)",
+          "oklch(72% 0.0089 224.11)",
+          "oklch(84% 0.0089 224.11)",
+          "oklch(95% 0.0089 224.11)"
+        ]
+      },
+      "space-surface": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Observatory Panel",
+        "tonalRamp": [
+          "oklch(15% 0.0111 217.00)",
+          "oklch(26% 0.0111 217.00)",
+          "oklch(38% 0.0111 217.00)",
+          "oklch(49% 0.0111 217.00)",
+          "oklch(61% 0.0111 217.00)",
+          "oklch(72% 0.0111 217.00)",
+          "oklch(84% 0.0111 217.00)",
+          "oklch(95% 0.0111 217.00)"
+        ]
+      },
+      "space-ink": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Cream Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0194 122.85)",
+          "oklch(26% 0.0194 122.85)",
+          "oklch(38% 0.0194 122.85)",
+          "oklch(49% 0.0194 122.85)",
+          "oklch(61% 0.0194 122.85)",
+          "oklch(72% 0.0194 122.85)",
+          "oklch(84% 0.0194 122.85)",
+          "oklch(95% 0.0194 122.85)"
+        ]
+      },
+      "space-muted": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Muted Green-Grey",
+        "tonalRamp": [
+          "oklch(15% 0.0193 155.68)",
+          "oklch(26% 0.0193 155.68)",
+          "oklch(38% 0.0193 155.68)",
+          "oklch(49% 0.0193 155.68)",
+          "oklch(61% 0.0193 155.68)",
+          "oklch(72% 0.0193 155.68)",
+          "oklch(84% 0.0193 155.68)",
+          "oklch(95% 0.0193 155.68)"
+        ]
+      },
+      "space-line": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Quiet Border",
+        "tonalRamp": [
+          "oklch(15% 0.0180 179.51)",
+          "oklch(26% 0.0180 179.51)",
+          "oklch(38% 0.0180 179.51)",
+          "oklch(49% 0.0180 179.51)",
+          "oklch(61% 0.0180 179.51)",
+          "oklch(72% 0.0180 179.51)",
+          "oklch(84% 0.0180 179.51)",
+          "oklch(95% 0.0180 179.51)"
+        ]
+      },
+      "space-accent": {
+        "role": "primary",
+        "displayName": "Bubble Trial: Sage Accent",
+        "tonalRamp": [
+          "oklch(15% 0.0399 157.12)",
+          "oklch(26% 0.0399 157.12)",
+          "oklch(38% 0.0399 157.12)",
+          "oklch(49% 0.0399 157.12)",
+          "oklch(61% 0.0399 157.12)",
+          "oklch(72% 0.0399 157.12)",
+          "oklch(84% 0.0399 157.12)",
+          "oklch(95% 0.0399 157.12)"
+        ]
+      },
+      "space-selected": {
+        "role": "primary",
+        "displayName": "Bubble Trial: Selected Sage",
+        "tonalRamp": [
+          "oklch(15% 0.0255 162.81)",
+          "oklch(26% 0.0255 162.81)",
+          "oklch(38% 0.0255 162.81)",
+          "oklch(49% 0.0255 162.81)",
+          "oklch(61% 0.0255 162.81)",
+          "oklch(72% 0.0255 162.81)",
+          "oklch(84% 0.0255 162.81)",
+          "oklch(95% 0.0255 162.81)"
+        ]
+      },
+      "space-hover": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Hover Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0201 169.17)",
+          "oklch(26% 0.0201 169.17)",
+          "oklch(38% 0.0201 169.17)",
+          "oklch(49% 0.0201 169.17)",
+          "oklch(61% 0.0201 169.17)",
+          "oklch(72% 0.0201 169.17)",
+          "oklch(84% 0.0201 169.17)",
+          "oklch(95% 0.0201 169.17)"
+        ]
+      },
+      "space-action-hover": {
+        "role": "primary",
+        "displayName": "Bubble Trial: Action Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0335 155.97)",
+          "oklch(26% 0.0335 155.97)",
+          "oklch(38% 0.0335 155.97)",
+          "oklch(49% 0.0335 155.97)",
+          "oklch(61% 0.0335 155.97)",
+          "oklch(72% 0.0335 155.97)",
+          "oklch(84% 0.0335 155.97)",
+          "oklch(95% 0.0335 155.97)"
+        ]
+      },
+      "space-olive": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Worn Olive",
+        "tonalRamp": [
+          "oklch(15% 0.0271 164.01)",
+          "oklch(26% 0.0271 164.01)",
+          "oklch(38% 0.0271 164.01)",
+          "oklch(49% 0.0271 164.01)",
+          "oklch(61% 0.0271 164.01)",
+          "oklch(72% 0.0271 164.01)",
+          "oklch(84% 0.0271 164.01)",
+          "oklch(95% 0.0271 164.01)"
+        ]
+      },
+      "space-ochre": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Worn Ochre",
+        "tonalRamp": [
+          "oklch(15% 0.0541 77.39)",
+          "oklch(26% 0.0541 77.39)",
+          "oklch(38% 0.0541 77.39)",
+          "oklch(49% 0.0541 77.39)",
+          "oklch(61% 0.0541 77.39)",
+          "oklch(72% 0.0541 77.39)",
+          "oklch(84% 0.0541 77.39)",
+          "oklch(95% 0.0541 77.39)"
+        ]
+      },
+      "space-mauve": {
+        "role": "neutral",
+        "displayName": "Bubble Trial: Worn Mauve",
+        "tonalRamp": [
+          "oklch(15% 0.0336 308.85)",
+          "oklch(26% 0.0336 308.85)",
+          "oklch(38% 0.0336 308.85)",
+          "oklch(49% 0.0336 308.85)",
+          "oklch(61% 0.0336 308.85)",
+          "oklch(72% 0.0336 308.85)",
+          "oklch(84% 0.0336 308.85)",
+          "oklch(95% 0.0336 308.85)"
+        ]
+      },
+      "space-comparison": {
+        "role": "secondary",
+        "displayName": "Bubble Trial: Comparison Amber",
+        "tonalRamp": [
+          "oklch(15% 0.0890 81.83)",
+          "oklch(26% 0.0890 81.83)",
+          "oklch(38% 0.0890 81.83)",
+          "oklch(49% 0.0890 81.83)",
+          "oklch(61% 0.0890 81.83)",
+          "oklch(72% 0.0890 81.83)",
+          "oklch(84% 0.0890 81.83)",
+          "oklch(95% 0.0890 81.83)"
+        ]
+      },
+      "space-swap": {
+        "role": "secondary",
+        "displayName": "Bubble Trial: Swap Lilac",
+        "tonalRamp": [
+          "oklch(15% 0.0458 307.76)",
+          "oklch(26% 0.0458 307.76)",
+          "oklch(38% 0.0458 307.76)",
+          "oklch(49% 0.0458 307.76)",
+          "oklch(61% 0.0458 307.76)",
+          "oklch(72% 0.0458 307.76)",
+          "oklch(84% 0.0458 307.76)",
+          "oklch(95% 0.0458 307.76)"
+        ]
+      },
+      "space-settled": {
+        "role": "secondary",
+        "displayName": "Bubble Trial: Settled Green",
+        "tonalRamp": [
+          "oklch(15% 0.0436 160.46)",
+          "oklch(26% 0.0436 160.46)",
+          "oklch(38% 0.0436 160.46)",
+          "oklch(49% 0.0436 160.46)",
+          "oklch(61% 0.0436 160.46)",
+          "oklch(72% 0.0436 160.46)",
+          "oklch(84% 0.0436 160.46)",
+          "oklch(95% 0.0436 160.46)"
+        ]
       }
     },
     "typographyMeta": {
@@ -140,24 +350,24 @@
       {
         "name": "bubble-floor",
         "value": "VSMShadowMap; shadow-radius: 8; shadow-blurSamples: 16; ShadowMaterial opacity: 0.14",
-        "purpose": "Bubble lesson and static landing preview. Transparent shadow-only floor uses bubble-ink; clay columns do not receive shadows and stop casting at erosion >= 0.3. Default 3D casts soft contact shadows; retained 2D has no object shadows. Big O uses the same floor opacity and ink with its own shadow map."
+        "purpose": "Retained clay renderer and static landing preview only. Transparent shadow-only floor uses bubble-ink; clay columns do not receive shadows and stop casting at erosion >= 0.3. Clay 3D casts soft contact shadows; 2D has no object shadows. Big O uses the same floor opacity and ink with its own shadow map. The Bubble space trial hides the floor and disables sphere shadow casting."
       }
     ],
     "motion": [
       {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort playback. Analytical damped spring moves swaps through opposing ±0.85 depth arcs, 0.035 lift and ±0.045-radian tilt. Native CanvasTexture value sprites are depth-tested, retain a minimum screen scale and fade with erosion; accessible DOM values and stationary projected indices remain. Both views share the Canvas and trace clock; switching does not reset or pause playback. Pause freezes the shared clock, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
+        "purpose": "Bubble-sort playback. Analytical damped spring moves planets through opposing ±0.85 depth arcs, 0.08 lift and ±0.045-radian tilt (retained clay lift: 0.035). Native CanvasTexture value sprites are depth-tested, retain a minimum screen scale and fade with erosion; accessible signed DOM values and stationary projected indices remain authoritative. Both views share the Canvas and trace clock; switching does not reset or pause playback. Pause freezes the shared clock, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
       },
       {
         "name": "bubble-view-transition",
         "value": "depth += (target - depth) * (1 - exp(-min(delta, 0.1) * 7))",
-        "purpose": "Bubble lesson native 2D/3D radios ease the orthographic camera between front-facing and a shallow fixed angle; no continuous orbit. Default 3D; retained 2D flattens column depth to z scale 0.01. The landing preview is static 3D with demand rendering."
+        "purpose": "Bubble trial native 2D/3D radios ease the orthographic camera between front-facing and a shallow fixed angle. Default 3D; 2D flattens sphere depth to z scale 0.01 and hides rings. The landing preview retains static clay columns in 3D with demand rendering."
       },
       {
         "name": "bubble-background",
-        "value": "slow domain-warped drift; faint swap ripple; relaxed erosion/reformation flow",
-        "purpose": "Bubble lesson and static landing preview. A full-canvas shader behind both views blends bubble-canvas, bubble-stone and bubble-ink with a quiet centre and fading edges. The ripple follows the camera-projected active pair. Cumulative playback time and speed drive the wash; pause and hidden tabs freeze it, while seek/edit/reset restore a deterministic state. Reduced motion, scene failure or WebGL context loss uses the existing static array renderer."
+        "value": "domain-warped nebula; sparse star twinkle; faint swap ripple; planet rotation 0.045 radians/second",
+        "purpose": "Bubble-only space world: procedural near-black, green and mauve nebula with sparse stars. Planet rotation, nebula, stars, dust and spring swaps use the existing cumulative playback clock and speed; pause and hidden tabs freeze authored motion, seek/edit/reset restore deterministic states. No physics or orbital engine. Landing retains the grey-green clay wash. No external bitmap assets or dependencies; reduced motion or WebGL failure uses the static array renderer."
       },
       {
         "name": "clay-damped-spring",
@@ -184,6 +394,11 @@
         "name": "focus-outline",
         "value": "3px solid #087f5b; outline-offset: 3px",
         "purpose": "Visible keyboard focus on buttons and links."
+      },
+      {
+        "name": "bubble-space-focus",
+        "value": "3px solid #9bb7a5; outline-offset: 3px (2px on enlargement buttons)",
+        "purpose": "Bubble-only visible focus against observatory ground, including native view controls and input."
       }
     ]
   },
@@ -193,7 +408,7 @@
       "kind": "button",
       "refersTo": "button-primary",
       "description": "Sage invitation to watch; shared with lesson playback.",
-      "html": "<a class=\"ds-primary\" href=\"?lesson=bubble-sort&amp;lang=en\">Just watch <span aria-hidden=\"true\">→</span></a>",
+      "html": "<a class=\"ds-primary\" href=\"?lesson=bubble-sort&amp;lang=en\">Just watch</a>",
       "css": ".ds-primary{display:inline-flex;align-items:center;gap:18px;background:#e2eae0;color:#344e3e;border-radius:9px;padding:14px 19px;text-decoration:none;font:500 14px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif;transition:background .2s}.ds-primary:hover{background:#d3dfd0}.ds-primary:focus-visible{outline:3px solid #087f5b;outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
     },
     {
@@ -245,29 +460,30 @@
       "name": "Selected lesson",
       "kind": "nav",
       "description": "Quiet catalog row with a sage current-page treatment.",
-      "html": "<nav class=\"ds-catalog\" aria-label=\"Algorithms\"><button class=\"ds-lesson\" aria-current=\"page\">Bubble sort<span aria-hidden=\"true\">↗</span></button></nav>",
-      "css": ".ds-catalog{font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson{display:flex;justify-content:space-between;gap:10px;width:100%;border:0;border-radius:9px;padding:11px 14px;background:#e8eee5;color:#365745;text-align:left;cursor:pointer;font:450 14px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson span{opacity:.65}.ds-lesson:hover{background:#e8eee5}.ds-lesson:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
+      "html": "<nav class=\"ds-catalog\" aria-label=\"Algorithms\"><button class=\"ds-lesson\" aria-current=\"page\">Bubble sort</button></nav>",
+      "css": ".ds-catalog{font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson{display:flex;justify-content:space-between;gap:10px;width:100%;border:0;border-radius:9px;padding:11px 14px;background:#e8eee5;color:#365745;text-align:left;cursor:pointer;font:450 14px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson:hover{background:#e8eee5}.ds-lesson:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
     },
     {
       "name": "Bubble-only slow loop",
       "kind": "input",
       "refersTo": "bubble-loop",
-      "description": "Native opt-out checkbox beside the bubble scene caption. Labels: 천천히 반복 / Slow loop. Playback controls remain below the artwork.",
-      "html": "<label class=\"ds-bubble-loop\"><input type=\"checkbox\" checked>Slow loop</label>",
-      "css": ".ds-bubble-loop{display:flex;gap:8px;align-items:center;color:#526151;font:13px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif;cursor:pointer}.ds-bubble-loop input{accent-color:#74886d;width:16px;height:16px}.ds-bubble-loop input:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
+      "description": "Bubble observatory native opt-out checkbox beside the caption. Labels: 천천히 반복 / Slow loop. Playback controls remain below the artwork.",
+      "html": "<div class=\"ds-space-sample\"><label class=\"ds-bubble-loop\"><input type=\"checkbox\" checked>Slow loop</label></div>",
+      "css": ".ds-space-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-loop{display:flex;gap:8px;align-items:center;color:#a3b0a7;font:13px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif;cursor:pointer}.ds-bubble-loop input{accent-color:#9bb7a5;width:16px;height:16px}.ds-bubble-loop input:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px}"
     },
     {
       "name": "Bubble-only view switch",
       "kind": "input",
-      "description": "Native 2D/3D radios with 3D selected by default. Group labels: 보기 방식 / View mode. Changes preserve the running trace; disabled while editing input. Adjacent Enlarge/Fullscreen controls use native requestFullscreen with enlarged fallback, an active focus trap, Escape returning native fullscreen to the enlarged view, and enlarged Escape closing with return focus; transport stays beneath the artwork.",
-      "html": "<fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset>",
-      "css": ".ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #d8dccf;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#526151;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#e2e7d9;color:#41503e}.ds-bubble-view input:hover+span{background:#d4ddcb}.ds-bubble-view input:focus-visible+span{outline:3px solid #087f5b;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
+      "description": "Bubble observatory native 2D/3D radios with 3D selected by default; front-facing 2D flattens spheres and hides rings. Changes preserve the running trace; disabled while editing. Enlarge/Fullscreen retains native requestFullscreen, enlarged fallback, active focus trap and Escape return focus; transport stays beneath the artwork.",
+      "html": "<div class=\"ds-space-view-sample\"><fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset></div>",
+      "css": ".ds-space-view-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #2c3936;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#a3b0a7;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#26362e;color:#e2e7d9}.ds-bubble-view input:hover+span{background:#1d2a25}.ds-bubble-view input:focus-visible+span{outline:3px solid #9bb7a5;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
     }
   ],
   "narrative": {
-    "overview": "The approved concept uses green accents, light paper, muted sage surfaces and lighter headings across the landing and lessons. Playful Korean/English introductions invite watching; exact algorithm summaries and step evidence support closer reading. The execution canvas leads, with source code available below when curiosity calls.",
+    "overview": "The approved concept uses green accents, light paper, muted sage surfaces and lighter headings across the landing and lessons. Playful Korean/English introductions invite watching; exact algorithm summaries and step evidence support closer reading. The execution canvas leads, with source code available below when curiosity calls.\n\nThe user-approved first Bubble-sort trial is a scoped exception: a low-light observatory with worn numbered planets, sparse stars and a diffuse nebula. It retains the existing reading order, type, trace and controls. This approval does not change the global paper identity, favicon, landing clay columns, Big O blocks or other lessons.",
     "keyCharacteristics": [
-      "Light paper, sage actions and restrained borders.",
+      "Light paper, sage actions and restrained borders outside the Bubble-only trial.",
+      "A scoped low-light observatory for Bubble sort, with exact signed numbers and fixed slots.",
       "Lighter headings and quiet bilingual copy.",
       "Visible execution with code closed until requested.",
       "Monospaced values and distinct execution states."
@@ -282,6 +498,11 @@
         "name": "The Model Evidence Rule",
         "body": "Pair geometric work counts with their exact formulas and the model caption; never describe them as measured runtime.",
         "section": "components"
+      },
+      {
+        "name": "The Printed Value Rule",
+        "body": "Bubble planet geometry is illustrative; exact signed numbers and fixed numeric slots are the algorithm evidence. Rings and exchange arcs do not describe astronomical measurements or simulated physics.",
+        "section": "components"
       }
     ],
     "dos": [
@@ -289,9 +510,12 @@
       "Do keep Korean and English copy readable at narrow widths.",
       "Do place playful taglines alongside exact summaries and step explanations.",
       "Do lead with execution and keep code available through a closed native disclosure.",
-      "Do pair execution colors with textual or numeric evidence."
+      "Do pair execution colors with textual or numeric evidence.",
+      "Do keep the observatory palette and planetary geometry scoped to the approved Bubble trial.",
+      "Do treat printed signed Bubble values and fixed indices as authoritative over illustrative geometry."
     ],
     "donts": [
+      "Don't present Bubble rings or swap arcs as astronomical measurements or physical simulation.",
       "Don't present the Big O growth model as measured runtime.",
       "Don't collapse comparison, swap, settled and matched lesson states into one accent.",
       "Don't turn precise input constraints or error messages into jokes."
