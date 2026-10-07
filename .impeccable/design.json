@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T09:07:37.174316+00:00",
+  "generatedAt": "2026-10-07T10:06:08.080849+00:00",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -47,6 +47,66 @@
       "matched": {
         "role": "secondary",
         "displayName": "Matched Blue"
+      },
+      "bubble-paper": {
+        "role": "neutral",
+        "displayName": "Bubble only: Warm Paper"
+      },
+      "bubble-canvas": {
+        "role": "neutral",
+        "displayName": "Bubble only: Warm Scene Canvas"
+      },
+      "bubble-ink": {
+        "role": "neutral",
+        "displayName": "Bubble only: Value Ink"
+      },
+      "bubble-caption": {
+        "role": "neutral",
+        "displayName": "Bubble only: Quiet Caption"
+      },
+      "bubble-loop-ink": {
+        "role": "neutral",
+        "displayName": "Bubble only: Loop Label"
+      },
+      "bubble-action": {
+        "role": "primary",
+        "displayName": "Bubble only: Quiet Sage Action"
+      },
+      "bubble-action-hover": {
+        "role": "primary",
+        "displayName": "Bubble only: Quiet Sage Hover"
+      },
+      "bubble-stone": {
+        "role": "neutral",
+        "displayName": "Bubble only: Grey-Green Clay"
+      },
+      "bubble-comparison": {
+        "role": "secondary",
+        "displayName": "Bubble only: Comparison Amber"
+      },
+      "bubble-swap": {
+        "role": "secondary",
+        "displayName": "Bubble only: Swap Lilac"
+      },
+      "bubble-settled": {
+        "role": "secondary",
+        "displayName": "Bubble only: Settled Green"
+      },
+      "bubble-dust": {
+        "role": "neutral",
+        "displayName": "Bubble only: Drifting Dust"
+      },
+      "bubble-ambient-light": {
+        "role": "neutral",
+        "displayName": "Bubble only: Warm Ambient Light"
+      },
+      "bubble-key-light": {
+        "role": "neutral",
+        "displayName": "Bubble only: Warm Key Light"
+      },
+      "bubble-fill-light": {
+        "role": "neutral",
+        "displayName": "Bubble only: Cool Fill Light"
       }
     },
     "typographyMeta": {
@@ -76,6 +136,11 @@
         "name": "step-explanation",
         "value": "var(--mantine-shadow-md)",
         "purpose": "Transient Mantine explanation popover; primary surfaces remain flat."
+      },
+      {
+        "name": "bubble-floor",
+        "value": "VSMShadowMap; shadow-radius: 4; shadow-blurSamples: 8",
+        "purpose": "Bubble-sort artwork only. Floor receives shadows; clay columns do not receive them and stop casting at erosion >= 0.3."
       }
     ],
     "motion": [
@@ -83,6 +148,11 @@
         "name": "meter-growth",
         "value": "transform .3s cubic-bezier(.16,1,.3,1)",
         "purpose": "Complexity meter growth; disabled for reduced motion."
+      },
+      {
+        "name": "bubble-daydream",
+        "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
+        "purpose": "Bubble-sort only. Smoothstep swaps share the trace clock; pause freezes motion, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
       }
     ],
     "breakpoints": [
@@ -167,6 +237,14 @@
       "description": "Quiet catalog row with a sage current-page treatment.",
       "html": "<nav class=\"ds-catalog\" aria-label=\"Algorithms\"><button class=\"ds-lesson\" aria-current=\"page\">Bubble sort<span aria-hidden=\"true\">↗</span></button></nav>",
       "css": ".ds-catalog{font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson{display:flex;justify-content:space-between;gap:10px;width:100%;border:0;border-radius:9px;padding:11px 14px;background:#e8eee5;color:#365745;text-align:left;cursor:pointer;font:450 14px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lesson span{opacity:.65}.ds-lesson:hover{background:#e8eee5}.ds-lesson:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
+    },
+    {
+      "name": "Bubble-only slow loop",
+      "kind": "input",
+      "refersTo": "bubble-loop",
+      "description": "Native opt-out checkbox beside the bubble scene caption. Labels: 천천히 반복 / Slow loop. Playback controls remain below the artwork.",
+      "html": "<label class=\"ds-bubble-loop\"><input type=\"checkbox\" checked>Slow loop</label>",
+      "css": ".ds-bubble-loop{display:flex;gap:8px;align-items:center;color:#526151;font:13px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif;cursor:pointer}.ds-bubble-loop input{accent-color:#74886d;width:16px;height:16px}.ds-bubble-loop input:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
     }
   ],
   "narrative": {

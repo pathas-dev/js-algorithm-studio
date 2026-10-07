@@ -1,0 +1,32 @@
+.bubble-studio { background: #f6f4ed; }
+.bubble-studio > main { margin-top: 24px; }
+.bubble-studio .lesson { display: flex; flex-direction: column; }
+.bubble-studio .lesson-heading { order: 0; margin-bottom: 22px; }
+.bubble-studio .lesson-panels { display: contents; }
+.bubble-studio .canvas-card { order: 1; margin-bottom: 18px; }
+.bubble-studio .playback-card { order: 2; }
+.bubble-studio .step-action { order: 3; }
+.bubble-studio .lesson-code { order: 4; }
+.bubble-studio .canvas-card { background: #f0efe7; padding: 22px 28px; }
+.bubble-studio .canvas-card > .mantine-Group-root { gap: 12px; }
+.bubble-studio .lesson-tagline { max-width: 34ch; }
+.bubble-studio .bubble-caption { color: #666c5e; font-size: 13px; line-height: 1.7; margin: 0; }
+.bubble-studio .bubble-loop { display: flex; gap: 8px; align-items: center; color: #526151; font-size: 13px; cursor: pointer; }
+.bubble-loop input { accent-color: #74886d; width: 16px; height: 16px; }
+.bubble-loop input:focus-visible { outline: 3px solid #087f5b; outline-offset: 3px; }
+.bubble-art-scroll { overflow-x: auto; scrollbar-color: #aab3a0 #f0efe7; scrollbar-width: thin; }
+.bubble-art-frame { position: relative; }
+.bubble-canvas { height: 350px; margin-top: 8px; }
+.bubble-values { list-style: none; margin: 0 auto; padding: 0 0 14px; display: flex; justify-content: center; gap: 0; color: #41503e; }
+.bubble-values li { flex: 1; min-width: 0; text-align: center; font: 14px ui-monospace, monospace; }
+.bubble-values small { display: block; margin-top: 7px; color: #687361; font-size: 11px; }
+.bubble-empty { text-align: center; color: #586b5e; padding: 0 16px 24px; }
+.bubble-studio .inline-input-editor { border-color: #d8dccf; }
+.bubble-studio .legend { padding-top: 8px; }
+.bubble-studio .play-button { background: #e2e7d9; color: #41503e; }
+.bubble-studio .play-button:hover { background: #d4ddcb; }
+@media (max-width: 650px) {
+  .bubble-studio .canvas-card { padding: 20px 14px; }
+  .bubble-canvas { height: 320px; }
+  .bubble-studio .bubble-caption { max-width: 24ch; }
+}

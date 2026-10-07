@@ -28,6 +28,22 @@ colors:
   code-bg: "#17241f"
   code-text: "#e6eee8"
   focus: "#087f5b"
+  # Bubble-sort only: approved 3D daydream extension.
+  bubble-paper: "#f6f4ed"
+  bubble-canvas: "#f0efe7"
+  bubble-ink: "#41503e"
+  bubble-caption: "#666c5e"
+  bubble-loop-ink: "#526151"
+  bubble-action: "#e2e7d9"
+  bubble-action-hover: "#d4ddcb"
+  bubble-stone: "#91a28b"
+  bubble-comparison: "#ba9469"
+  bubble-swap: "#a79aab"
+  bubble-settled: "#74886d"
+  bubble-dust: "#a5987c"
+  bubble-ambient-light: "#f5efe3"
+  bubble-key-light: "#fff6e6"
+  bubble-fill-light: "#b9c9b5"
 typography:
   display:
     fontFamily: '"Pretendard", "Noto Sans KR", system-ui, sans-serif'
@@ -100,6 +116,14 @@ components:
     backgroundColor: "{colors.code-bg}"
     textColor: "{colors.code-text}"
     rounded: "{rounded.code}"
+  bubble-canvas:
+    backgroundColor: "{colors.bubble-canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.canvas}"
+    padding: "22px 28px"
+  bubble-loop:
+    textColor: "{colors.bubble-loop-ink}"
+    typography: "{typography.label}"
 ---
 
 # Design System: 이젠 아무래도 좋을 알고리즘
@@ -116,6 +140,8 @@ The approved concept uses green accents, light paper, muted sage surfaces and li
 
 This document records `web/main.tsx`, `web/styles.css`, `web/idle.css` and `web/landing.css`. The incumbent favicon remains the identity asset.
 
+The approved bubble-sort extension below records `web/bubble.css`, `web/BubbleScene.tsx`, `web/bubble-playback.ts`, `web/useBubblePlayback.ts` and their integration in `web/App.tsx`. Every `bubble-*` token and scene rule applies only to bubble sort; the shared design and other lessons retain their existing treatment.
+
 ## Colors
 
 Green remains the underlying accent; pale sage now carries primary actions. Paper, white and the light canvas separate content without heavy contrast. Selected text, explanation links and muted copy use related green neutrals.
@@ -123,6 +149,8 @@ Green remains the underlying accent; pale sage now carries primary actions. Pape
 Array and landing-preview bars use the quieter bar palette. Comparison, swap and settled retain distinct hues; matched bars remain blue. Incumbent comparison, swap, settled and matched tokens continue in legends, graph, matrix and other lesson states. Keep these contextual palettes rather than flattening every state to sage.
 
 Dark code surfaces retain their existing reading contrast and green active-line evidence.
+
+Bubble sort alone uses warm paper and a warmer canvas, grey-green stone, muted amber comparison, lilac swap and deeper green settled states. Dust and warm/cool illumination belong to the scene materials; light tokens are shader inputs rather than flat UI swatches. Subtle seeded lightness variation and grain keep the clay tactile. Values, indices and exact step evidence accompany the material colors.
 
 ## Typography
 
@@ -144,6 +172,8 @@ Canvas padding becomes (20px 16px) on mobile. Array charts use a (225px) height,
 
 Primary surfaces are flat: thin dividers and tonal layering provide separation without shadows. White distinguishes the Big O lab; sage holds execution and the closing invitation. The detailed step-explanation popover retains its Mantine medium shadow as a transient overlay.
 
+Bubble sort alone adds real shallow 3D depth: a fixed orthographic view of tapered, softly rounded clay columns, matte material (roughness 0.93, metalness 0), warm key light and soft floor shadows. The floor receives shadows; columns do not. Columns stop casting once erosion reaches (0.3), avoiding solid ghost shadows during dissolution. Keep this depth inside the execution artwork.
+
 ## Shapes
 
 Controls remain gently rounded. Lesson canvases and dark code panels use their respective radii; landing surfaces use the larger landing radius. Playback and disclosure wrappers are flat, divided by horizontal rules. Array bars use smaller curved tops and subtly curved bottoms; landing-preview bars use (5px 5px 0 0). Complexity meters use (3px) corners.
@@ -158,6 +188,14 @@ Controls remain gently rounded. Lesson canvases and dark code panels use their r
 - Step explanation: “궁금하다면” / “Curious?” opens the precise explanation and relevant variables.
 
 Meter transitions use (0.3s) with `cubic-bezier(.16,1,.3,1)`. Global reduced-motion handling suppresses animation and transitions; lesson motion respects the user's preference. Buttons, links, timeline and disclosure summary retain a (3px) focus outline with a (3px) offset.
+
+### Bubble sort only: 3D daydream
+
+The artwork reuses the exact bubble-sort trace and stable item identities. Signed values retain their direction and readable DOM value/index labels. Its frame is (350px) high, or (320px) below (650px); long arrays scroll horizontally. The warmer canvas uses its scoped padding, becoming (20px 14px) on mobile. Input editing sits below the artwork; transport, native timeline and speed controls follow the canvas, before exact step evidence and the closed code disclosure.
+
+At (1×), each trace step lasts (2.8s), with a swap interpolating over (1.4s). The sorted array holds for (6s), erodes to restrained dust for (6s), and reforms the original input over (3s). The native “천천히 반복” / “Slow loop” checkbox opts out of this cycle. Pause freezes the shared clock; seeking or editing restores an exact, fully formed trace state. Keep bilingual captions, numerical labels and keyboard controls alongside the scene.
+
+Three.js/Fiber loads lazily through the bubble scene. Reduced motion, scene failure or WebGL context loss uses the existing static array renderer; exact trace controls remain available. These scene primitives extend bubble sort only and do not establish a new palette, depth or motion rule for other lessons.
 
 ## Do's and Don'ts
 
