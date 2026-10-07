@@ -10,10 +10,12 @@ try {
     assert.equal(axialAngle(-100, id), axialAngle(0, id));
     const first = axialAngle(1000, id) - axialAngle(0, id);
     assert(Math.abs(axialAngle(2000, id) - axialAngle(1000, id) - first) < 1e-12, 'axial spin has constant speed');
-    assert(Math.abs(axialAngle(2000, id, 0.12) - id * 0.8 - first * 2 * 0.12 / 0.22) < 1e-12);
+    for (const [radius, period] of [[0.13, 4], [0.33, 5], [0.53, 6]]) {
+      assert(Math.abs(axialAngle(period * 1000, id, radius) - id * 0.8 - Math.PI * 2) < 1e-12, 'larger bodies have a longer rotation period');
+    }
   }
-  assert.notEqual(axialAngle(1000, 0), axialAngle(1000, 1) - 0.8, 'individual bodies have different rates');
-  assert(axialAngle(4000, 0) - axialAngle(0, 0) > 0.7, 'a paused planet has a visibly rotating surface within four seconds of its independent clock');
+  assert(axialAngle(1000, 0, 0.13) > axialAngle(1000, 0, 0.33));
+  assert(axialAngle(1000, 0, 0.33) > axialAngle(1000, 0, 0.53));
   assert.equal(planetRadius(0, 8), 0.13);
   assert.equal(planetRadius(-3, 8), planetRadius(3, 8));
   assert.equal(planetRadius(8, 8), 0.53);

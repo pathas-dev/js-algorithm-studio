@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, OrthographicCamera, ShaderMaterial, type Points } from 'three';
 import { SceneBoundary } from './BubbleScene';
-import { workStar, axialAngle } from './bubble-motion';
+import { workStar } from './bubble-motion';
 import { useSceneVisibility } from './use-scene-visibility';
 
 function Camera() {
@@ -69,7 +69,7 @@ function Cluster({ count, color, reduced, visible }: { count: number; color: str
     const seconds = spinTime.current / 1000;
     if (cluster.current) cluster.current.rotation.set(Math.sin(seconds * 0.22) * 0.18, seconds * 0.18, Math.sin(seconds * 0.16) * 0.05);
     material.uniforms.uTime.value = seconds;
-    material.uniforms.uSpin.value = axialAngle(spinTime.current, 0, 0.12);
+    material.uniforms.uSpin.value = seconds * 0.102;
     material.uniforms.pointSize.value = Math.max(4, (camera as OrthographicCamera).zoom * 0.16) * gl.getPixelRatio();
     currentCount.current = state.elapsed === 1 ? count : state.total;
     if (state.elapsed < 1) invalidate();

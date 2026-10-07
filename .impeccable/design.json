@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T21:27:53.112299Z",
+  "generatedAt": "2026-10-07T21:31:41.202263Z",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -1072,8 +1072,8 @@
       },
       {
         "name": "bubble-planet-spin",
-        "value": "angle = visibleSeconds × 0.22 × (0.85 + id%5 × 0.08) + id × 0.8; delta ≤ 0.1s",
-        "purpose": "Every visible space planet rotates independently before playback and while sorting is paused, about 24–34s per turn. 3D spins the actual sphere about y; 2D spins shader terrain while flattened geometry stays front-facing. Rings, numeric labels and fixed slot centres do not spin. Playback speed, pause, seek and trace reset do not control or reset axial time. Offscreen, hidden-document and reduced-motion gates stop nonessential motion."
+        "value": "period = 4 + clamp((radius − 0.13) / 0.4, 0, 1) × 2 seconds; angle = visibleSeconds × 2π / period + id × 0.8; delta ≤ 0.1s",
+        "purpose": "Every visible space planet rotates independently before playback and while sorting is paused, with a five-second baseline: small planets turn in 4s, medium in 5s and large in 6s. Speed follows rendered radius, not item ID; IDs retain only stable phases. 3D spins the actual sphere about y; 2D spins shader terrain while flattened geometry stays front-facing. Rings, numeric labels and fixed slot centres do not spin. Playback speed, pause, seek and trace reset do not control or reset axial time. Offscreen, hidden-document and reduced-motion gates stop nonessential motion."
       },
       {
         "name": "landing-preview-playback",

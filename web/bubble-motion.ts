@@ -25,5 +25,8 @@ export function orbitalSwap(from: number, to: number, time: number): [number, nu
   return [from + (to - from) * (1 - Math.cos(angle)) / 2, (to - from) * Math.sin(angle) / 2];
 }
 
-// Stable phases and slightly different axial rates; never changes a body's centre.
-export const axialAngle = (timeMs: number, id: number, rate = 0.22) => Math.max(0, timeMs) / 1000 * rate * (0.85 + id % 5 * 0.08) + id * 0.8;
+// Small/medium/large planets turn in 4/5/6 seconds; IDs keep a stable phase.
+export function axialAngle(timeMs: number, id: number, radius = 0.33) {
+  const period = 4 + Math.max(0, Math.min(1, (radius - 0.13) / 0.4)) * 2;
+  return Math.max(0, timeMs) / 1000 * Math.PI * 2 / period + id * 0.8;
+}

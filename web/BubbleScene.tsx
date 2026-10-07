@@ -189,7 +189,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     const [planetX, orbit] = orbitalSwap(oldX, nextX, time);
     if (space) mesh.current.position.set(planetX, 0.55 + (view === '2d' ? orbit : 0), view === '3d' ? orbit : 0);
     else mesh.current.position.set(oldX + (nextX - oldX) * progress, Math.sign(item.value || 1) * stoneHeight / 2 + arc * 0.035, arc * (from < index ? 0.85 : -0.85));
-    const spin = axialAngle(spinTime.current, item.id);
+    const spin = axialAngle(spinTime.current, item.id, radius);
     if (space) mesh.current.rotation.y = view === '3d' ? spin : 0;
     uniforms.uPlanetSpin.value = space && view === '2d' ? spin : 0;
     mesh.current.rotation.z = (space ? 0 : arc) * (from < index ? -0.045 : 0.045);
