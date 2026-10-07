@@ -28,8 +28,7 @@
 .bubble-canvas { height: 350px; margin-top: 8px; }
 .bubble-values { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; pointer-events: none; color: #41503e; }
 .bubble-values li { font: 15px ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-.bubble-value, .bubble-index { position: absolute; top: 0; left: 0; white-space: nowrap; }
-.bubble-value { font-weight: 500; }
+.bubble-index { position: absolute; top: 0; left: 0; white-space: nowrap; }
 .bubble-index { color: #666c5e; font-size: 11px; }
 .bubble-index::before { content: ''; display: block; width: 1px; height: 5px; margin: 0 auto 6px; background: #aab3a0; }
 .bubble-empty { text-align: center; color: #586b5e; padding: 0 16px 24px; }
@@ -41,4 +40,26 @@
   .bubble-studio .canvas-card { padding: 20px 14px; }
   .bubble-canvas { height: 320px; }
   .bubble-studio .bubble-caption { max-width: 24ch; }
+}
+
+.bubble-size-button { border: 0; border-radius: 6px; background: transparent; color: #526151; padding: 10px 8px; font: inherit; font-size: 12px; cursor: pointer; }
+.bubble-size-button:hover { background: #e2e7d9; }
+.bubble-size-button:focus-visible { outline: 3px solid #087f5b; outline-offset: 2px; }
+.bubble-size-button:disabled { opacity: .5; cursor: default; }
+.bubble-studio .bubble-expanded { position: fixed; inset: 0; z-index: 150; padding: 18px 28px; overflow: auto; background: #f6f4ed; }
+.bubble-studio .bubble-expanded .lesson-heading { margin-bottom: 8px; }
+.bubble-studio .bubble-expanded .lesson-heading h1 { font-size: 26px; }
+.bubble-studio .bubble-expanded .lesson-tagline,
+.bubble-studio .bubble-expanded .lesson-intro,
+.bubble-studio .bubble-expanded .step-action,
+.bubble-studio .bubble-expanded .lesson-code,
+.bubble-studio .bubble-expanded .inline-input-editor { display: none; }
+.bubble-studio .bubble-expanded .canvas-card { padding: 12px 18px; margin-bottom: 10px; }
+.bubble-studio .bubble-expanded .bubble-canvas { height: max(260px, calc(100dvh - 285px)); }
+.bubble-studio .bubble-expanded .playback-card { margin: 0; }
+@media (max-width: 650px) {
+  .bubble-scene-controls { gap: 8px; }
+  .bubble-studio .bubble-expanded { padding: 12px; }
+  .bubble-studio .bubble-expanded .canvas-card { padding: 10px; }
+  .bubble-studio .bubble-expanded .bubble-canvas { height: max(240px, calc(100dvh - 370px)); }
 }

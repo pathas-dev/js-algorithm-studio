@@ -24,10 +24,10 @@
 .demo-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: 13px; color: #3c5848; }
 .demo-code, .demo-pair { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 .demo-code { border-radius: 6px; padding: 5px 10px; background: #d2dfcf; }
-.demo-bars { display: flex; align-items: flex-end; justify-content: center; gap: 16px; height: 195px; padding-bottom: 20px; border-bottom: 1px solid #c4d1bf; }
-.demo-bar { width: 40px; flex: 1; min-width: 0; max-width: 40px; background: #b4c5b1; border-radius: 5px 5px 0 0; position: relative; }
-.demo-bar.comparing { background: #c59455; }
-.demo-bar span { position: absolute; top: -25px; width: 100%; text-align: center; font-family: ui-monospace, monospace; font-size: 13px; }
+.intro-demo { background: #f0efe7; }
+.demo-scene { pointer-events: none; }
+.demo-scene .bubble-canvas, .demo-loading { height: 235px; }
+.demo-scene .bubble-index { display: none; }
 .demo-explanation { padding: 19px 0 21px; }
 .demo-pair { display: flex; align-items: center; gap: 15px; font-weight: 500; font-size: 19px; }
 .demo-explanation p { margin: 8px 0 0; color: #4d6255; font-size: 13px; }
@@ -43,14 +43,16 @@
 .lab-control strong { font-family: ui-monospace, monospace; font-size: 16px; font-variant-numeric: tabular-nums; }
 .lab-control input { accent-color: #196d53; flex: 1; min-width: 0; cursor: pointer; }
 .lab-control > span { font-size: 12px; color: #526459; }
-.complexity-row { display: grid; grid-template-columns: 270px 1fr 70px; gap: 16px; padding: 13px 0; align-items: center; }
-.complexity-label { display: flex; align-items: baseline; gap: 16px; }
-.complexity-label strong { min-width: 80px; font-family: ui-monospace, monospace; font-size: 16px; }
-.complexity-label span { font-size: 12px; color: #526459; }
-.complexity-meter { height: 10px; border-radius: 3px; background: #edf0eb; overflow: hidden; }
-.complexity-meter div { height: 100%; border-radius: 3px; transform-origin: left; transition: transform .3s cubic-bezier(.16,1,.3,1); }
-.complexity-row output { text-align: right; font-size: 19px; font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-.complexity-row small { grid-column: 1 / -1; color: #526459; font-size: 12px; margin-top: -8px; }
+.complexity-lab { background: #f0efe7; }
+.complexity-rows { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.complexity-row { min-width: 0; }
+.complexity-label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.complexity-label strong { font-family: ui-monospace, monospace; font-size: 15px; font-weight: 500; }
+.complexity-row output { font: 18px ui-monospace, monospace; font-variant-numeric: tabular-nums; color: #41503e; }
+.complexity-stage { height: 210px; margin: 8px 0; }
+.complexity-name, .complexity-row small { display: block; font-size: 12px; line-height: 1.7; color: #526459; }
+.complexity-name { color: #41503e; margin-bottom: 4px; }
+.complexity-lab input:focus-visible { outline: 3px solid #087f5b; outline-offset: 4px; }
 .lab-caption { color: #526459; font-size: 12px; line-height: 1.8; margin: 20px 0 0; }
 .warmup-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 26px; }
 .warmup-notes p { margin: 0; font-size: 13px; color: #4d6255; line-height: 1.9; }
@@ -66,7 +68,6 @@
 .landing-start p { margin: 10px 0 0; font-size: 14px; color: #4d6255; }
 .landing-start .landing-primary { flex-shrink: 0; }
 .landing-footer { display: flex; justify-content: space-between; gap: 24px; border-top: 1px solid #d5dfd6; padding: 24px 0; font-size: 12px; color: #526459; }
-@media (max-width: 900px) { .landing { padding: 0 28px; } .landing-intro { gap: 32px; padding: 56px 0; } .intro-demo { padding: 20px 20px 0; } .demo-bars { gap: 10px; } .section-intro { gap: 32px; } .use-case { grid-template-columns: 160px 1fr 120px; gap: 24px; } .complexity-row { grid-template-columns: 230px 1fr 64px; } }
+@media (max-width: 900px) { .landing { padding: 0 28px; } .landing-intro { gap: 32px; padding: 56px 0; } .intro-demo { padding: 20px 20px 0; } .section-intro { gap: 32px; } .use-case { grid-template-columns: 160px 1fr 120px; gap: 24px; } .complexity-rows { gap: 14px; } }
 @media (max-width: 650px) { .landing { padding: 0 20px; } .landing-header { padding: 18px 0; gap: 12px; } .landing-header .brand { font-size: 15px; gap: 8px; } .landing-header nav { gap: 0; } .landing-header nav a { display: none; } .landing-header button { font-size: 12px; padding: 6px 8px; } .landing-intro { grid-template-columns: 1fr; gap: 36px; padding: 44px 0; } .landing h1 { font-size: 36px; } .intro-copy, .intro-demo { min-width: 0; }
-.intro-copy > p { font-size: 15px; } .intro-links { gap: 18px; } .section-intro { grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; } .landing-warmup, .landing-use-cases { padding: 36px 0; } .complexity-lab { padding: 20px 18px; } .lab-control { flex-wrap: wrap; gap: 14px; } .lab-control label { width: 100%; justify-content: space-between; } .complexity-row { grid-template-columns: 1fr 56px; gap: 12px; } .complexity-label { grid-column: 1 / -1; gap: 10px; flex-wrap: wrap; } .complexity-meter { grid-column: 1; } .complexity-row small { margin-top: -4px; } .warmup-notes { grid-template-columns: 1fr; gap: 20px; } .use-case { grid-template-columns: 1fr auto; gap: 10px 16px; padding: 22px 0; } .use-case h3 { font-size: 18px; } .use-case p { grid-column: 1 / -1; grid-row: 2; font-size: 13px; } .use-case > span { font-size: 12px; } .landing-start { flex-direction: column; align-items: flex-start; padding: 24px; gap: 22px; margin-bottom: 36px; } .landing-start h2 { font-size: 24px; } .landing-footer { flex-direction: column; gap: 8px; } }
-@media (prefers-reduced-motion: reduce) { .complexity-meter div { transition: none; } }
+.intro-copy > p { font-size: 15px; } .intro-links { gap: 18px; } .section-intro { grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; } .landing-warmup, .landing-use-cases { padding: 36px 0; } .complexity-lab { padding: 20px 18px; } .lab-control { flex-wrap: wrap; gap: 14px; } .lab-control label { width: 100%; justify-content: space-between; } .complexity-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 14px; } .complexity-label { flex-wrap: wrap; } .complexity-stage { height: 180px; } .warmup-notes { grid-template-columns: 1fr; gap: 20px; } .use-case { grid-template-columns: 1fr auto; gap: 10px 16px; padding: 22px 0; } .use-case h3 { font-size: 18px; } .use-case p { grid-column: 1 / -1; grid-row: 2; font-size: 13px; } .use-case > span { font-size: 12px; } .landing-start { flex-direction: column; align-items: flex-start; padding: 24px; gap: 22px; margin-bottom: 36px; } .landing-start h2 { font-size: 24px; } .landing-footer { flex-direction: column; gap: 8px; } }

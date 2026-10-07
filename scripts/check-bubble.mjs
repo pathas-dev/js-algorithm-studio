@@ -4,6 +4,16 @@ const server = await createServer({ configFile: 'web/vite.config.mts', server: {
 try {
   const { initialBubblePlayback, bubblePlaybackReducer: reduce, advanceBubblePlayback: advance } = await server.ssrLoadModule('/bubble-playback.ts');
   const { bubble } = await server.ssrLoadModule('/algorithms.ts');
+  const { springProgress, workBlock } = await server.ssrLoadModule('/bubble-motion.ts');
+  assert.equal(springProgress(0), 0);
+  assert.equal(springProgress(1), 1);
+  assert(springProgress(0.4) > 1, 'damped swaps have a small settling overshoot');
+  for (const count of [1, 7, 128, 8128]) {
+    const cells = Array.from({ length: count }, (_, index) => workBlock(index, count));
+    assert.equal(new Set(cells.map((cell) => cell.join(','))).size, count, 'one distinct block per operation');
+    assert(cells.every((cell) => cell.every(Number.isFinite) && cell[1] > 0));
+    assert(Math.max(...cells.map((cell) => cell[1])) <= 3.4, 'maximum model fits the shared camera');
+  }
   let state = reduce(initialBubblePlayback(3), { type: 'toggle' });
   state = advance(state, 2799);
   assert.equal(state.index, 0);

@@ -7,8 +7,8 @@ import LinkedListView from './LinkedListView';
 import TreeView from './TreeView';
 import CollectionView from './CollectionView';
 import MathView from './MathView';
-import { lazy, Suspense, useEffect, useReducer, useState } from 'react';
-import { Badge, Button, Group, NativeSelect, Paper, Popover, Text, Textarea, TextInput, Title } from '@mantine/core';
+import { lazy, Suspense, useEffect, useReducer, useRef, useState } from 'react';
+import { Badge, Button, FocusTrap, Group, NativeSelect, Paper, Popover, Text, Textarea, TextInput, Title } from '@mantine/core';
 import { MotionConfig } from 'motion/react';
 import { MAX_VALUES, parseTarget, parseValues, playbackReducer } from '../src/visualization/playback';
 import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
@@ -59,7 +59,39 @@ export default function App() {
   const [whyOpen, setWhyOpen] = useState(false);
   const [steps, setSteps] = useState(() => initial.inputMode === 'text' || initial.inputMode === 'words' ? initial.run(initial.example, undefined, undefined, undefined, initial.operations) : initial.run(initial.example, initial.target, initial.graphEdges, initial.graphDirected, initial.operations));
   const isBubble = algorithm.id === 'bubble-sort';
-  const [bubbleView, setBubbleView] = useState<'2d' | '3d'>('2d');
+  const [bubbleView, setBubbleView] = useState<'2d' | '3d'>('3d');
+  const [expanded, setExpanded] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const lessonRef = useRef<HTMLDivElement>(null);
+  const enlargeRef = useRef<HTMLButtonElement>(null);
+  const focusedView = isBubble && (expanded || fullscreen);
+  useEffect(() => {
+    const changed = () => setFullscreen(document.fullscreenElement === lessonRef.current);
+    document.addEventListener('fullscreenchange', changed);
+    return () => document.removeEventListener('fullscreenchange', changed);
+  }, []);
+  useEffect(() => {
+    if (!focusedView) return;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const close = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !document.fullscreenElement) setExpanded(false);
+    };
+    window.addEventListener('keydown', close);
+    return () => {
+      document.body.style.overflow = overflow;
+      window.removeEventListener('keydown', close);
+      enlargeRef.current?.focus({ preventScroll: true });
+    };
+  }, [focusedView]);
+  async function toggleFullscreen() {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else {
+      setExpanded(true);
+      try { await lessonRef.current?.requestFullscreen(); }
+      catch { /* Enlarged view remains available when native fullscreen is unsupported. */ }
+    }
+  }
   const [standardPlayback, standardDispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
   const ambient = useBubblePlayback(steps.length, isBubble);
   const playback = isBubble ? ambient.playback : standardPlayback;
@@ -296,7 +328,7 @@ export default function App() {
               </div>)}
               <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
-            <div className="lesson">
+            <FocusTrap active={focusedView}><div ref={lessonRef} className={`lesson${focusedView ? ' bubble-expanded' : ''}`} role={focusedView ? 'dialog' : undefined} aria-modal={focusedView || undefined} aria-label={focusedView ? t('버블 정렬 크게 보기', 'Enlarged bubble sort') : undefined}>
               <div className="lesson-heading">
                 <div><Group gap="sm"><Title order={1}>{algorithm.name[language]}</Title></Group>
                   <Text className="lesson-tagline">{lessonTaglines[algorithm.id][language]}</Text>
@@ -338,6 +370,8 @@ export default function App() {
                     {isBubble && <Group justify="space-between" mb="sm">
                       <p className="bubble-caption" data-testid="bubble-phase" data-phase={ambient.playback.phase}>{ambient.playback.phase === 'erode' ? t('잠깐의 질서가, 천천히 흩어집니다.', 'A little order, slowly drifting away.') : ambient.playback.phase === 'form' ? t('같은 숫자들이, 다시 모입니다.', 'The same numbers gather again.') : ambient.playback.phase === 'hold' ? t('제자리에 도착했습니다. 잠깐 그대로.', 'In their places. Stay a little while.') : t('서두를 일 없는, 작은 자리 바꿈.', 'Small exchanges, with nowhere to rush.')}</p>
                       <div className="bubble-scene-controls">
+                        <button ref={enlargeRef} data-autofocus className="bubble-size-button" disabled={editingInput} aria-expanded={focusedView} onClick={() => { if (fullscreen) void document.exitFullscreen(); setExpanded(!focusedView); }}>{focusedView ? t('작게 보기', 'Shrink view') : t('크게 보기', 'Enlarge view')}</button>
+                        <button className="bubble-size-button" disabled={editingInput} onClick={() => void toggleFullscreen()}>{fullscreen ? t('전체화면 종료', 'Exit fullscreen') : t('전체화면', 'Fullscreen')}</button>
                         <fieldset className="bubble-view-switch" disabled={editingInput}>
                           <legend className="sr-only">{t('보기 방식', 'View mode')}</legend>
                           {(['2d', '3d'] as const).map((view) => <label key={view}><input type="radio" name="bubble-view" value={view} checked={bubbleView === view} onChange={() => setBubbleView(view)} /><span>{view.toUpperCase()}</span></label>)}
@@ -382,7 +416,7 @@ export default function App() {
                 <details className="lesson-code" key={algorithm.id}><summary>{t('코드도 궁금하다면', 'If you’re curious about the code')}<span>JavaScript</span></summary><CodePanel source={algorithm.source} activeCode={step.code} language={language} /></details>
               </div>
 
-            </div>
+            </div></FocusTrap>
           </div>
         </main>
         <footer className="studio-footer">{t('아무것도 외우지 않았어도, 잘 구경했습니다.', 'Nothing memorized. Time well spent.')}</footer>

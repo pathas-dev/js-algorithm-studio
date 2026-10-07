@@ -1,13 +1,14 @@
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial, Vector2, Vector3 } from 'three';
+import { BufferAttribute, BufferGeometry, CanvasTexture, Color, Sprite, SpriteMaterial, SRGBColorSpace, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial, Vector2, Vector3 } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Item, Step } from './algorithms';
 import type { BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
+import { springProgress } from './bubble-motion';
 import './bubble.css';
 
-type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d' };
+type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; still?: boolean };
 type Labels = RefObject<Map<number, HTMLLIElement>>;
 const ease = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 const seed = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
@@ -86,6 +87,23 @@ function Backdrop({ step, clock }: Pick<Props, 'step' | 'clock'>) {
 
 function Stone({ item, index, step, previous, clock, maximum, labels, signed, view }: { item: Item; index: number; maximum: number; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view'>) {
   const mesh = useRef<Mesh>(null);
+  const number = useRef<Sprite>(null);
+  const text = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(96, String(item.value).length * 48);
+    canvas.height = 80;
+    const context = canvas.getContext('2d')!;
+    context.font = '52px ui-monospace, monospace';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillStyle = '#41503e';
+    context.fillText(String(item.value), canvas.width / 2, canvas.height / 2);
+    const texture = new CanvasTexture(canvas);
+    texture.colorSpace = SRGBColorSpace;
+    const material = new SpriteMaterial({ map: texture, depthTest: true, depthWrite: false, transparent: true, alphaTest: 0.05, toneMapped: false });
+    return { texture, material, width: canvas.width / canvas.height * 0.38 };
+  }, [item.value]);
+  useEffect(() => () => { text.texture.dispose(); text.material.dispose(); }, [text]);
   const { camera, size } = useThree();
   const anchor = useMemo(() => new Vector3(), []);
   const stoneHeight = height(item, maximum);
@@ -130,10 +148,12 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     const state = clock.current;
     const from = previous.array.findIndex((entry) => entry.id === item.id);
     const moving = step.type === 'swap' && state.animate && from !== index;
-    const progress = moving ? ease(state.elapsed / 1400) : 1;
+    const time = moving ? Math.min(1, state.elapsed / 1400) : 1;
+    const progress = springProgress(time);
+    const arc = moving ? Math.sin(time * Math.PI) : 0;
     const oldX = position(from < 0 ? index : from, step.array.length);
-    mesh.current.position.set(oldX + (position(index, step.array.length) - oldX) * progress, Math.sign(item.value || 1) * stoneHeight / 2, moving ? Math.sin(progress * Math.PI) * (from < index ? 0.7 : -0.7) : 0);
-    mesh.current.rotation.z = moving ? Math.sin(progress * Math.PI) * (from < index ? -0.025 : 0.025) : 0;
+    mesh.current.position.set(oldX + (position(index, step.array.length) - oldX) * progress, Math.sign(item.value || 1) * stoneHeight / 2 + arc * 0.035, arc * (from < index ? 0.85 : -0.85));
+    mesh.current.rotation.z = arc * (from < index ? -0.045 : 0.045);
     mesh.current.scale.z = view === '2d' ? 0.01 : 1;
     uniforms.uErosion.value = Math.max(0, Math.min(1, erosion(state)));
     const active = step.indices.includes(index);
@@ -144,18 +164,19 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     // Shadows fade with the object, avoiding a solid ghost after erosion.
     mesh.current.castShadow = view === '3d' && uniforms.uErosion.value < 0.3;
     const label = labels.current.get(item.id);
-    const valueLabel = label?.querySelector<HTMLElement>('.bubble-value');
+    if (number.current) {
+      const labelScale = Math.max(1, 60 / (camera as OrthographicCamera).zoom);
+      number.current.scale.set(text.width * labelScale, 0.38 * labelScale, 1);
+      number.current.position.set(mesh.current.position.x, Math.sign(item.value || 1) * (stoneHeight + 0.3) + arc * 0.035, mesh.current.position.z + (view === '3d' ? 0.36 : 0.01));
+      text.material.opacity = 1 - ease(uniforms.uErosion.value);
+    }
     const indexLabel = label?.querySelector<HTMLElement>('.bubble-index');
-    if (valueLabel && indexLabel) {
-      const sign = Math.sign(item.value || 1);
-      anchor.set(mesh.current.position.x, sign * (stoneHeight + 0.3), mesh.current.position.z).project(camera);
-      valueLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${(1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
-      valueLabel.style.opacity = String(1 - ease(uniforms.uErosion.value));
+    if (indexLabel) {
       anchor.set(position(index, step.array.length), signed ? -4.4 : -0.55, 0).project(camera);
       indexLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${(1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
     }
   });
-  return <mesh ref={mesh} geometry={geometry} material={material} castShadow position={[position(index, step.array.length), Math.sign(item.value || 1) * stoneHeight / 2, 0]} />;
+  return <><mesh ref={mesh} geometry={geometry} material={material} castShadow position={[position(index, step.array.length), Math.sign(item.value || 1) * stoneHeight / 2, 0]} /><sprite ref={number} material={text.material} scale={[text.width, 0.38, 1]} /></>;
 }
 
 function Dust({ step, maximum, clock }: Pick<Props, 'step' | 'clock'> & { maximum: number }) {
@@ -211,14 +232,14 @@ function Dust({ step, maximum, clock }: Pick<Props, 'step' | 'clock'> & { maximu
   return <points ref={points} geometry={geometry.cloud} material={material} frustumCulled={false} />;
 }
 
-class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode; onError: () => void }, { failed: boolean }> {
+export class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode; onError: () => void }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch() { this.props.onError(); }
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-export default function BubbleScene({ step, previous, clock, language, reduced, view }: Props) {
+export default function BubbleScene({ step, previous, clock, language, reduced, view, still = false }: Props) {
   const [lost, setLost] = useState(false);
   const labels = useRef(new Map<number, HTMLLIElement>());
   const maximum = Math.max(1, ...step.array.map((item) => Math.abs(item.value)));
@@ -231,7 +252,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
       <div className="bubble-art-frame" style={{ minWidth: Math.max(280, step.array.length * slotWidth) }}>
         <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
           <div className="bubble-canvas" aria-hidden="true">
-            <Canvas orthographic shadows dpr={[1, 1.5]} camera={{ position: [0, 5.1, 10], zoom: 60 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => {
+            <Canvas orthographic frameloop={still ? 'demand' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, 5.1, 10], zoom: 60 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => {
               gl.shadowMap.type = VSMShadowMap;
               gl.setClearColor('#f0efe7');
               gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
@@ -250,7 +271,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
           </div>
         </SceneBoundary>
         <ol className="bubble-values" aria-label={language === 'ko' ? '현재 배열' : 'Current array'}>
-          {step.array.map((item, index) => <li key={item.id} ref={(node) => { if (node) labels.current.set(item.id, node); else labels.current.delete(item.id); }} aria-label={language === 'ko' ? `인덱스 ${index}, 값 ${item.value}` : `Index ${index}, value ${item.value}`}><span className="bubble-value">{item.value}</span><small className="bubble-index">[{index}]</small></li>)}
+          {step.array.map((item, index) => <li key={item.id} ref={(node) => { if (node) labels.current.set(item.id, node); else labels.current.delete(item.id); }} aria-label={language === 'ko' ? `인덱스 ${index}, 값 ${item.value}` : `Index ${index}, value ${item.value}`}><span className="sr-only">{item.value}</span><small className="bubble-index">[{index}]</small></li>)}
         </ol>
         {!step.array.length && <p className="bubble-empty">{language === 'ko' ? '빈 배열 · 잠깐 쉬어갑니다.' : 'An empty array. A moment of rest.'}</p>}
       </div>

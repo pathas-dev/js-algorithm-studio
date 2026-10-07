@@ -1,4 +1,10 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { useReducedMotion } from 'motion/react';
+import type { Step } from './algorithms';
+import { initialBubblePlayback } from './bubble-playback';
+const BubbleScene = lazy(() => import('./BubbleScene'));
+const ComplexityScene = lazy(() => import('./ComplexityScene'));
+const preview: Step = { array: [3, 5, 2, 4, 1, 6].map((value, id) => ({ value, id })), type: 'compare', indices: [1, 2], variables: {}, code: '' };
 import './landing.css';
 
 type Language = 'ko' | 'en';
@@ -12,6 +18,8 @@ const examples = [
 export default function Landing() {
   const [language, setLanguage] = useState<Language>(new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ko');
   const [size, setSize] = useState(32);
+  const previewClock = useRef(initialBubblePlayback(1));
+  const reduced = Boolean(useReducedMotion());
   const ko = language === 'ko';
   const t = (korean: string, english: string) => ko ? korean : english;
   const lesson = (id: string) => `?lesson=${id}&lang=${language}`;
@@ -24,10 +32,10 @@ export default function Landing() {
     history.replaceState(null, '', url);
   }, [language]);
   const models = [
-    { notation: 'O(1)', count: 1, name: t('배열의 특정 위치 읽기', 'Read an array index'), note: t('입력이 늘어도 일정', 'Constant as input grows'), color: '#536a5c' },
-    { notation: 'O(log n)', count: Math.ceil(Math.log2(size)), name: t('이진 탐색', 'Binary search'), note: t('탐색 범위를 절반씩 줄이기', 'Halve the search space'), color: '#277957' },
-    { notation: 'O(n)', count: size, name: t('배열을 한 번 훑기', 'Scan an array once'), note: t('입력 크기에 비례', 'Proportional to input size'), color: '#9a651d' },
-    { notation: 'O(n²)', count: size * (size - 1) / 2, name: t('버블 정렬 · 최악의 비교', 'Bubble sort · worst-case comparisons'), note: t('입력이 커질수록 빠르게 증가', 'Grows rapidly with input size'), color: '#ad5437' },
+    { notation: 'O(1)', count: 1, name: t('배열의 특정 위치 읽기', 'Read an array index'), note: t('입력이 늘어도 일정', 'Constant as input grows'), color: '#91a28b' },
+    { notation: 'O(log n)', count: Math.ceil(Math.log2(size)), name: t('이진 탐색', 'Binary search'), note: t('탐색 범위를 절반씩 줄이기', 'Halve the search space'), color: '#74886d' },
+    { notation: 'O(n)', count: size, name: t('배열을 한 번 훑기', 'Scan an array once'), note: t('입력 크기에 비례', 'Proportional to input size'), color: '#ba9469' },
+    { notation: 'O(n²)', count: size * (size - 1) / 2, name: t('버블 정렬 · 최악의 비교', 'Bubble sort · worst-case comparisons'), note: t('입력이 커질수록 빠르게 증가', 'Grows rapidly with input size'), color: '#a79aab' },
   ];
   return <div className="landing">
     <a className="landing-skip" href="#warmup">{t('구경할 거리로 건너뛰기', 'Skip to things to explore')}</a>
@@ -47,7 +55,7 @@ export default function Landing() {
         </div>
         <a className="intro-demo" href={lesson('bubble-sort')} aria-label={t('버블 정렬 시각화 열기', 'Open the bubble sort visualization')}>
           <div className="demo-heading"><span>{t('옆자리와 잠깐 얘기하는 중', 'A brief chat with the neighbor')}</span><span className="demo-code">5 &gt; 2</span></div>
-          <div className="demo-bars" aria-hidden="true">{[3, 5, 2, 4, 1, 6].map((value, index) => <div key={index} className={index === 1 || index === 2 ? 'demo-bar comparing' : 'demo-bar'} style={{ height: `${value * 25}px` }}><span>{value}</span></div>)}</div>
+          <div className="demo-scene" aria-hidden="true"><Suspense fallback={<div className="demo-loading" />}><BubbleScene step={preview} previous={preview} clock={previewClock} language={language} reduced={reduced} view="3d" still /></Suspense></div>
           <div className="demo-explanation"><span className="demo-pair">[5, 2] <Arrow /> [2, 5]</span><p>{t('왼쪽 값이 더 크면 자리를 바꿉니다.', 'Swap them when the left value is larger.')}</p></div>
           <div className="demo-bottom"><span>{t('이러다 보면, 제자리에 갑니다.', 'Keep at it. They find their places.')}</span><Arrow /></div>
         </a>
@@ -56,8 +64,8 @@ export default function Landing() {
         <div className="section-intro"><h2 id="big-o-title">{t('입력이 늘어나면,', 'When there’s more input,')}<br />{t('바빠지는 방식도 제각각.', 'everyone gets busy differently.')}</h2><p>{t('슬라이더를 움직이면 할 일이 얼마나 늘어나는지 보입니다. Big O는 입력이 커질 때 시간이나 공간이 늘어나는 상한 표기입니다. 초 단위의 속도는 아니고요.', 'Move the slider to see how the work grows. Big O is an upper bound on how time or space grows with input size. It isn’t a speed in seconds.')}</p></div>
         <div className="complexity-lab">
           <div className="lab-control"><label htmlFor="input-size">{t('입력 크기', 'Input size')} <strong>n = {size}</strong></label><input id="input-size" type="range" min="1" max="7" value={Math.log2(size)} aria-valuetext={`n = ${size}`} onChange={(event) => setSize(2 ** Number(event.target.value))} /><span>2–128</span></div>
-          <div className="complexity-rows">{models.map((model) => <div className="complexity-row" key={model.notation}><div className="complexity-label"><strong>{model.notation}</strong><span>{model.name}</span></div><div className="complexity-meter"><div style={{ transform: `scaleX(${model.count / 8128})`, backgroundColor: model.color }} /></div><output aria-label={`${model.notation} ${t('모형 연산 수', 'model operations')}`}>{model.count.toLocaleString(language)}</output><small>{model.note}</small></div>)}</div>
-          <p className="lab-caption">{t('막대는 같은 축의 단순 연산 모형입니다: 1, ⌈log₂ n⌉, n, n(n−1)/2. 실제 실행 시간이나 모든 구현의 정확한 연산 수는 아닙니다.', 'Bars use simple operation models on a shared scale: 1, ⌈log₂ n⌉, n, n(n−1)/2. They are not measured runtimes or exact counts for every implementation.')}</p>
+          <div className="complexity-rows">{models.map((model) => <div className="complexity-row" key={model.notation}><div className="complexity-label"><strong>{model.notation}</strong><output aria-label={`${model.notation} ${t('모형 연산 수', 'model operations')}`}>{model.count.toLocaleString(language)}</output></div><Suspense fallback={<div className="complexity-stage" />}><ComplexityScene count={model.count} color={model.color} reduced={reduced} /></Suspense><span className="complexity-name">{model.name}</span><small>{model.note}</small></div>)}</div>
+          <p className="lab-caption">{t('같은 크기의 블록 하나는 모형 연산 한 번입니다: 1, ⌈log₂ n⌉, n, n(n−1)/2. 실제 실행 시간이나 모든 구현의 정확한 연산 수는 아닙니다.', 'Each identically sized block represents one model operation: 1, ⌈log₂ n⌉, n, n(n−1)/2. They are not measured runtimes or exact counts for every implementation.')}</p>
         </div>
         <div className="warmup-notes"><p><strong>{t('몇 가지 사정은 있습니다', 'There are a few conditions')}</strong>{t('이진 탐색은 정렬된 데이터가 필요합니다. 버블 정렬의 O(n²)는 최악의 경우이며, 조기 종료를 쓰면 이미 정렬된 배열은 O(n)입니다.', 'Binary search needs sorted data. Bubble sort is O(n²) in the worst case; early exit makes an already sorted array O(n).')}</p><p><strong>{t('걸리는 품과 차지하는 자리', 'The work it takes, the room it uses')}</strong>{t('계산이 적다고 자리도 적게 쓰는 건 아닙니다. 병합 정렬은 보통 O(n log n) 시간과 O(n) 추가 공간을 사용합니다.', 'Less computation doesn’t always mean less room. Merge sort typically uses O(n log n) time and O(n) auxiliary space.')}</p></div>
       </section>

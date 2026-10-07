@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T13:55:45.385670+00:00",
+  "generatedAt": "2026-10-07T14:45:23.175588+00:00",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -54,11 +54,11 @@
       },
       "bubble-canvas": {
         "role": "neutral",
-        "displayName": "Bubble only: Warm Scene Canvas"
+        "displayName": "Clay Scene: Warm Scene Canvas"
       },
       "bubble-ink": {
         "role": "neutral",
-        "displayName": "Bubble only: Value Ink"
+        "displayName": "Clay Scene: Value Ink"
       },
       "bubble-caption": {
         "role": "neutral",
@@ -78,19 +78,19 @@
       },
       "bubble-stone": {
         "role": "neutral",
-        "displayName": "Bubble only: Grey-Green Clay"
+        "displayName": "Clay Scene: Grey-Green Clay"
       },
       "bubble-comparison": {
         "role": "secondary",
-        "displayName": "Bubble only: Comparison Amber"
+        "displayName": "Clay Scene: Comparison Amber"
       },
       "bubble-swap": {
         "role": "secondary",
-        "displayName": "Bubble only: Swap Lilac"
+        "displayName": "Clay Scene: Swap Lilac"
       },
       "bubble-settled": {
         "role": "secondary",
-        "displayName": "Bubble only: Settled Green"
+        "displayName": "Clay Scene: Settled Green"
       },
       "bubble-dust": {
         "role": "neutral",
@@ -98,15 +98,15 @@
       },
       "bubble-ambient-light": {
         "role": "neutral",
-        "displayName": "Bubble only: Warm Ambient Light"
+        "displayName": "Clay Scene: Warm Ambient Light"
       },
       "bubble-key-light": {
         "role": "neutral",
-        "displayName": "Bubble only: Warm Key Light"
+        "displayName": "Clay Scene: Warm Key Light"
       },
       "bubble-fill-light": {
         "role": "neutral",
-        "displayName": "Bubble only: Cool Fill Light"
+        "displayName": "Clay Scene: Cool Fill Light"
       }
     },
     "typographyMeta": {
@@ -140,29 +140,29 @@
       {
         "name": "bubble-floor",
         "value": "VSMShadowMap; shadow-radius: 8; shadow-blurSamples: 16; ShadowMaterial opacity: 0.14",
-        "purpose": "Bubble-sort 3D artwork only. Transparent shadow-only floor uses bubble-ink; clay columns do not receive shadows and stop casting at erosion >= 0.3. Default 2D has no object shadows."
+        "purpose": "Bubble lesson and static landing preview. Transparent shadow-only floor uses bubble-ink; clay columns do not receive shadows and stop casting at erosion >= 0.3. Default 3D casts soft contact shadows; retained 2D has no object shadows. Big O uses the same floor opacity and ink with its own shadow map."
       }
     ],
     "motion": [
       {
-        "name": "meter-growth",
-        "value": "transform .3s cubic-bezier(.16,1,.3,1)",
-        "purpose": "Complexity meter growth; disabled for reduced motion."
-      },
-      {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort only. Both views share the Canvas and trace clock; switching does not reset or pause playback. Smoothstep swaps move projected DOM values with each column; value opacity is 1 - smoothstep(erosion). Pause freezes the trace clock, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
+        "purpose": "Bubble-sort playback. Analytical damped spring moves swaps through opposing ±0.85 depth arcs, 0.035 lift and ±0.045-radian tilt. Native CanvasTexture value sprites are depth-tested, retain a minimum screen scale and fade with erosion; accessible DOM values and stationary projected indices remain. Both views share the Canvas and trace clock; switching does not reset or pause playback. Pause freezes the shared clock, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
       },
       {
         "name": "bubble-view-transition",
         "value": "depth += (target - depth) * (1 - exp(-min(delta, 0.1) * 7))",
-        "purpose": "Bubble-sort only. Native 2D/3D radios ease the orthographic camera from front-facing to a shallow fixed angle; no continuous orbit. Default 2D flattens column depth to z scale 0.01."
+        "purpose": "Bubble lesson native 2D/3D radios ease the orthographic camera between front-facing and a shallow fixed angle; no continuous orbit. Default 3D; retained 2D flattens column depth to z scale 0.01. The landing preview is static 3D with demand rendering."
       },
       {
         "name": "bubble-background",
         "value": "slow domain-warped drift; faint swap ripple; relaxed erosion/reformation flow",
-        "purpose": "Bubble-sort only. A full-canvas shader behind both views blends bubble-canvas, bubble-stone and bubble-ink with a quiet centre and fading edges. The ripple follows the camera-projected active pair. Cumulative playback time and speed drive the wash; pause and hidden tabs freeze it, while seek/edit/reset restore a deterministic state. Reduced motion, scene failure or WebGL context loss uses the existing static array renderer."
+        "purpose": "Bubble lesson and static landing preview. A full-canvas shader behind both views blends bubble-canvas, bubble-stone and bubble-ink with a quiet centre and fading edges. The ripple follows the camera-projected active pair. Cumulative playback time and speed drive the wash; pause and hidden tabs freeze it, while seek/edit/reset restore a deterministic state. Reduced motion, scene failure or WebGL context loss uses the existing static array renderer."
+      },
+      {
+        "name": "clay-damped-spring",
+        "value": "1 - exp(-6t) * (cos(8t) + 0.75sin(8t)); exact endpoints 0 and 1",
+        "purpose": "Shared analytical spring: bubble swaps over 1400ms on the playback clock; Big O size changes over 1000ms with demand rendering. Big O first render and reduced motion use static final piles."
       }
     ],
     "breakpoints": [
@@ -221,9 +221,9 @@
       "name": "Complexity lab surface",
       "kind": "card",
       "refersTo": "landing-lab",
-      "description": "White bordered model comparison surface.",
-      "html": "<section class=\"ds-lab\"><strong>O(n)</strong><p>Growth model, not measured runtime.</p></section>",
-      "css": ".ds-lab{background:#fff;border:1px solid #d5dfd6;border-radius:16px;padding:28px 32px 20px;color:#1a3028;font-family:\"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-lab strong{font:16px ui-monospace,monospace}.ds-lab p{color:#526459;font-size:12px;line-height:1.8;margin:20px 0 0}"
+      "description": "Warm bordered model comparison surface. Four desktop columns, two mobile; exact equal-sized 0.145 blocks on a 0.16 lattice represent 1, ceil(log2(n)), n and n(n−1)/2 up to 8128. Accessible counts remain beside demand-rendered clay piles.",
+      "html": "<section class=\"ds-lab\"><strong>O(n)</strong><output aria-label=\"O(n) model operations\">32</output><p>Each identically sized block represents one model operation. Growth model, not measured runtime.</p></section>",
+      "css": ".ds-lab{background:#f0efe7;border:1px solid #d5dfd6;border-radius:16px;padding:28px 32px 20px;color:#1a3028;font-family:\"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif}.ds-lab strong{font:16px ui-monospace,monospace}.ds-lab p{color:#526459;font-size:12px;line-height:1.8;margin:20px 0 0}.ds-lab output{display:block;font:18px ui-monospace,monospace;font-variant-numeric:tabular-nums;color:#41503e;margin-top:8px}"
     },
     {
       "name": "Native code disclosure",
@@ -259,8 +259,8 @@
     {
       "name": "Bubble-only view switch",
       "kind": "input",
-      "description": "Native 2D/3D radios with 2D selected by default. Group labels: 보기 방식 / View mode. Changes preserve the running trace; disabled while editing input.",
-      "html": "<fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\" checked><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\"><span>3D</span></label></fieldset>",
+      "description": "Native 2D/3D radios with 3D selected by default. Group labels: 보기 방식 / View mode. Changes preserve the running trace; disabled while editing input. Adjacent Enlarge/Fullscreen controls use native requestFullscreen with enlarged fallback, an active focus trap, Escape returning native fullscreen to the enlarged view, and enlarged Escape closing with return focus; transport stays beneath the artwork.",
+      "html": "<fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset>",
       "css": ".ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #d8dccf;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#526151;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#e2e7d9;color:#41503e}.ds-bubble-view input:hover+span{background:#d4ddcb}.ds-bubble-view input:focus-visible+span{outline:3px solid #087f5b;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
     }
   ],
@@ -272,7 +272,18 @@
       "Visible execution with code closed until requested.",
       "Monospaced values and distinct execution states."
     ],
-    "rules": [],
+    "rules": [
+      {
+        "name": "The Shared Scale Rule",
+        "body": "Big O comparison scenes use identical block geometry and the same camera units: more work means more blocks, never a normalized height or a larger individual block.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Model Evidence Rule",
+        "body": "Pair geometric work counts with their exact formulas and the model caption; never describe them as measured runtime.",
+        "section": "components"
+      }
+    ],
     "dos": [
       "Do use the Korean and English product names and preserve the incumbent favicon.",
       "Do keep Korean and English copy readable at narrow widths.",
