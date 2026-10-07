@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T21:07:29.902576Z",
+  "generatedAt": "2026-10-07T21:27:53.112299Z",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -1028,17 +1028,17 @@
       {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Opposing semicircles exchange at constant path speed over 1.4s: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes motion, seek/edit restores exact geometry. Reduced motion uses the static array renderer."
+        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Opposing semicircles exchange at constant path speed over 1.4s: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes the trace, nebula, twinkle and dust while independent axial rotation continues. Seek/edit restores exact trace geometry without resetting axial time. Reduced motion uses the static array renderer."
       },
       {
         "name": "bubble-view-transition",
         "value": "depth += (target - depth) * (1 - exp(-min(delta, 0.1) * 7))",
-        "purpose": "Bubble native view radios ease between front-facing and shallow orthographic angle. Default 3D; 2D flattens z to 0.01 and hides rings while shader terrain rotates without turning geometry edge-on. Landing holds its array in 3D with visible autonomous axial rotation; offscreen or hidden documents use demand rendering."
+        "purpose": "Bubble native view radios ease between front-facing and shallow orthographic angle. Default 3D; 2D flattens z to 0.01 and hides rings while shader terrain rotates without turning geometry edge-on. Landing runs the actual trace in 3D. All space scenes render continuously while visible; offscreen or hidden documents use demand rendering."
       },
       {
         "name": "bubble-background",
-        "value": "domain-warped nebula; sparse star twinkle; faint swap ripple; axial angle = max(0,timeMs)/1000 × 0.045 × (0.85 + id%5 × 0.08) + id × 0.8",
-        "purpose": "Bubble execution sphere rotation in 3D or local shader terrain rotation in 2D shares cumulative playback clock/speed with nebula, stars, dust and swaps. Rings, numeric labels and centres do not rotate. Pause/hidden tabs freeze motion; seek/edit/reset restores deterministic states. Landing uses an autonomous visible/non-hidden clock with delta capped at 0.1s. Reduced motion or scene failure uses the static array renderer; no physics engine."
+        "value": "domain-warped nebula; sparse star twinkle; faint swap ripple",
+        "purpose": "Bubble scene nebula, twinkle, dust and swaps share cumulative playback clock and speed. Pause freezes that trace clock; seek/edit/reset restores deterministic trace states. Independent planet axial rotation continues while visible, regardless of playback. Reduced motion or scene failure uses the static array renderer; no physics engine."
       },
       {
         "name": "clay-damped-spring",
@@ -1053,7 +1053,7 @@
       {
         "name": "complexity-star-fade",
         "value": "1000ms; 1 - (1 - elapsed)^3",
-        "purpose": "Visible count changes fade opacity; first render, offscreen and reduced motion resolve to final exact count. Stable workStar positions, shared 6.5-unit camera and minimum 4px point-size rule remain unchanged up to 8128 stars. Visible non-hidden scenes render continuously for local surface spin; offscreen/reduced scenes render on demand. Idle spin does not rewrite the alpha buffer."
+        "purpose": "Visible count changes fade opacity; first render, offscreen and reduced motion resolve to the final exact count and draw range. Stable local workStar coordinates, shared 6.5-unit camera and minimum 4px point-size rule remain unchanged up to 8128 stars. Visible non-hidden scenes render continuously for cluster turn/tilt, brightness pulse and local surface spin; offscreen/reduced scenes render on demand. Idle motion does not rewrite the count-fade alpha buffer."
       },
       {
         "name": "loading-moon",
@@ -1063,12 +1063,32 @@
       {
         "name": "complexity-star-spin",
         "value": "angle = visibleSeconds × 0.12 × 0.85 × (0.85 + seed × 0.3) + seed × 2π",
-        "purpose": "Each point shader rotates its asymmetric bright surface patch around its own fixed centre. Seed comes from stable position; delta is capped at 0.1s. Exact counts, geometry and shared scale remain unchanged. Visibility/document-hidden and reduced-motion gates stop the clock; no group revolution or physical-astronomy claim."
+        "purpose": "Each point shader rotates its asymmetric bright surface patch around its point centre; the rendered cluster also turns and tilts. Seed comes from stable local position. Exact counts, local geometry and shared scale remain unchanged. Visibility/document-hidden and reduced-motion gates stop the local clock, with delta capped at 0.1s; no physical-astronomy claim."
       },
       {
         "name": "loading-planet-spin",
         "value": "110s linear infinite",
         "purpose": "Sage/ochre surface patches rotate beneath fixed inset lighting, using loading shade at 50% and ochre at 40%. Visibility/document-hidden gates pause CSS animation; reduced motion stops it."
+      },
+      {
+        "name": "bubble-planet-spin",
+        "value": "angle = visibleSeconds × 0.22 × (0.85 + id%5 × 0.08) + id × 0.8; delta ≤ 0.1s",
+        "purpose": "Every visible space planet rotates independently before playback and while sorting is paused, about 24–34s per turn. 3D spins the actual sphere about y; 2D spins shader terrain while flattened geometry stays front-facing. Rings, numeric labels and fixed slot centres do not spin. Playback speed, pause, seek and trace reset do not control or reset axial time. Offscreen, hidden-document and reduced-motion gates stop nonessential motion."
+      },
+      {
+        "name": "landing-preview-playback",
+        "value": "actual bubble.run([3,5,2,4,1,6]); 1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
+        "purpose": "Shared useBubblePlayback enables autoplay for the landing preview only; lesson default remains stopped. Preview starts on visible entry and loops the real trace. Bilingual native pause/resume control is outside the lesson link; pausing sorting leaves independent axial spin running. Comparison operators, swap before/after pairs and explanations follow the actual current step. Visibility/document-hidden gate playback; reduced motion does not autoplay or show the pause control."
+      },
+      {
+        "name": "complexity-cluster-motion",
+        "value": "Euler x = sin(seconds × 0.22) × 0.18; y = seconds × 0.18; z = sin(seconds × 0.16) × 0.05",
+        "purpose": "Rendered Points group turns and tilts around its fixed centre; stable local star coordinates yield moving projected positions. Counts, radii, equal point-size rule and shared camera remain unchanged up to 8128 stars. Visible non-hidden time advances with delta capped at 0.1s; offscreen/reduced scenes render on demand."
+      },
+      {
+        "name": "complexity-star-pulse",
+        "value": "alpha multiplier = 0.72 + 0.28 × sin(seconds × 0.9 + seed × 2π)",
+        "purpose": "Seeded shader brightness pulse makes every cluster, including the one-star model, visibly alive. It multiplies the count-fade alpha without rewriting its buffer or changing exact draw count. Uses the same visibility/document-hidden/reduced-motion gates as cluster rotation."
       }
     ],
     "breakpoints": [
@@ -1132,7 +1152,7 @@
       "name": "Complexity lab surface",
       "kind": "card",
       "refersTo": "landing-lab",
-      "description": "Translucent lab: four equal-size star clusters share stable 3D positions and 6.5 camera units. Exact formulas/counters: 1, ceil(log2(n)), n and n(n−1)/2, up to 8128. Static sample: O(n), n=8.",
+      "description": "Translucent lab: four clusters share stable local 3D positions, equal point-size rule and 6.5 camera units. Their rendered groups turn and tilt, stars pulse and bright patches spin. Exact formulas/counters: 1, ceil(log2(n)), n and n(n−1)/2, up to 8128. Static sample: O(n), n=8.",
       "html": "<section class=\"ds-lab\"><strong>O(n)</strong><output aria-label=\"O(n) model operations\">8</output><div class=\"ds-cluster\" aria-hidden=\"true\"><span class=\"ds-star\" style=\"left:calc(50% + 0.00px);top:calc(50% + 0.00px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -3.30px);top:calc(50% + -0.73px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + 0.49px);top:calc(50% + -2.81px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + 3.93px);top:calc(50% + 4.31px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -7.00px);top:calc(50% + 1.28px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + 6.46px);top:calc(50% + -3.79px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -2.11px);top:calc(50% + 0.17px)\"></span><span class=\"ds-star\" style=\"left:calc(50% + -3.95px);top:calc(50% + -1.19px)\"></span></div><p>Each identically sized star represents one model operation. Growth model, not measured runtime.</p></section>",
       "css": ".ds-lab{background:rgba(11,16,18,.7);border:1px solid #2c3936;border-radius:16px;padding:28px 32px 20px;color:#e2e7d9;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-lab strong{font:500 15px ui-monospace,monospace}.ds-lab p{color:#a3b0a7;font-size:12px;line-height:1.8;margin:20px 0 0}.ds-lab output{display:block;font:18px ui-monospace,monospace;font-variant-numeric:tabular-nums;margin-top:8px}.ds-cluster{position:relative;height:160px}.ds-star{position:absolute;width:4px;height:4px;border-radius:50%;background:radial-gradient(circle,#fff 6%,#d6b476 25%,transparent 70%);transform:translate(-50%,-50%)}"
     },
@@ -1173,6 +1193,13 @@
       "description": "Bubble observatory native 2D/3D radios with 3D selected by default; front-facing 2D flattens spheres and hides rings. Changes preserve the running trace; disabled while editing. Enlarge/Fullscreen retains native requestFullscreen, enlarged fallback, active focus trap and Escape return focus; transport stays beneath the artwork.",
       "html": "<div class=\"ds-space-view-sample\"><fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset></div>",
       "css": ".ds-space-view-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #2c3936;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#a3b0a7;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#26362e;color:#e2e7d9}.ds-bubble-view input:hover+span{background:#1d2a25}.ds-bubble-view input:focus-visible+span{outline:3px solid #9bb7a5;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
+    },
+    {
+      "name": "Landing sorting pause",
+      "kind": "button",
+      "description": "Separate bilingual native pause/resume control outside the preview’s lesson link; stops sorting while visible planets keep spinning. Hidden for reduced motion. Reuses observatory colors and compact rounding.",
+      "html": "<button class=\"ds-preview-pause\" type=\"button\">Pause sorting</button>",
+      "css": ".ds-preview-pause{flex-shrink:0;padding:6px 9px;border:1px solid #2c3936;border-radius:6px;background:transparent;color:#a3b0a7;font:13px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif;cursor:pointer}.ds-preview-pause:hover{background:#263b30;color:#e2e7d9}.ds-preview-pause:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px}"
     }
   ],
   "narrative": {
@@ -1194,7 +1221,7 @@
       },
       {
         "name": "The Shared Scale Rule",
-        "body": "Big O comparison scenes use the same star-size rule, stable coordinates and camera units: more work means more stars, never normalized cluster size or larger individual stars.",
+        "body": "Big O comparison scenes use the same star-size rule, stable local coordinates and camera units: more work means more stars, never normalized cluster size or larger individual stars.",
         "section": "elevation"
       },
       {

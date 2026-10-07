@@ -26,6 +26,7 @@ try {
     const landing = render(Landing);
     assert(landing.includes(language === 'ko' ? '같은 크기의 별 하나' : 'Each identically sized star'), 'Explain the star model honestly');
     assert(landing.includes('496'), 'Default n=32 must show 496 pair comparisons');
+    assert(landing.includes(language === 'ko' ? '정렬 멈추기' : 'Pause sorting'), 'Landing sorting starts automatically with a separate pause control');
     const ids = [...new Set([...landing.matchAll(/\?lesson=([^&"]+)/g)].map((match) => match[1]))];
     assert.equal(ids.length, 5, 'All five landing destinations must be present');
     for (const id of ids) {

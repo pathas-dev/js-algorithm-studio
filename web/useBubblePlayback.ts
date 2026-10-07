@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { advanceBubblePlayback, bubblePlaybackReducer, initialBubblePlayback, type BubbleAction } from './bubble-playback';
 
-export default function useBubblePlayback(length: number, active: boolean) {
-  const [playback, setPlayback] = useState(() => initialBubblePlayback(length));
+export default function useBubblePlayback(length: number, active: boolean, autoplay = false) {
+  const [playback, setPlayback] = useState(() => ({ ...initialBubblePlayback(length), playing: autoplay }));
   const clock = useRef(playback);
   const reduced = Boolean(useReducedMotion());
   const dispatch = (action: BubbleAction) => {

@@ -1,10 +1,11 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
-import type { Step } from './algorithms';
-import { initialBubblePlayback } from './bubble-playback';
+import { bubble } from './algorithms';
+import useBubblePlayback from './useBubblePlayback';
+import { useSceneVisibility } from './use-scene-visibility';
 const BubbleScene = lazy(() => import('./BubbleScene'));
 const ComplexityScene = lazy(() => import('./ComplexityScene'));
-const preview: Step = { array: [3, 5, 2, 4, 1, 6].map((value, id) => ({ value, id })), type: 'compare', indices: [1, 2], variables: {}, code: '' };
+const preview = bubble.run([3, 5, 2, 4, 1, 6]);
 import SpaceSky from './SpaceSky';
 import './landing.css';
 
@@ -19,8 +20,12 @@ const examples = [
 export default function Landing() {
   const [language, setLanguage] = useState<Language>(new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ko');
   const [size, setSize] = useState(32);
-  const previewClock = useRef(initialBubblePlayback(1));
   const reduced = Boolean(useReducedMotion());
+  const { sceneRef, visible } = useSceneVisibility(!reduced);
+  const { playback, dispatch, clock: previewClock } = useBubblePlayback(preview.length, visible && !reduced, !reduced);
+  const step = preview[playback.index];
+  const previous = preview[Math.max(0, playback.index - 1)];
+  const pair = step.indices.map((index) => (step.type === 'swap' ? previous : step).array[index].value);
   const ko = language === 'ko';
   const t = (korean: string, english: string) => ko ? korean : english;
   const lesson = (id: string) => `?lesson=${id}&lang=${language}`;
@@ -55,12 +60,14 @@ export default function Landing() {
           <p>{t('AI가 짜준다는데. 면접이 아니라면 외울 일도 없는데. 그래도 숫자가 제자리를 찾아가는 건 조금 볼 만합니다.', 'AI can write it. You might never need to memorize it. Still, there’s something nice about numbers finding their places.')}</p>
           <div className="intro-links"><a className="landing-primary" href={lesson('bubble-sort')}>{t('그냥 구경하기', 'Just watch')}<Arrow /></a><a className="landing-text-link" href="#warmup">{t('얼마나 바쁜지 보기', 'See how much work it is')}<Arrow /></a></div>
         </div>
-        <a className="intro-demo" href={lesson('bubble-sort')} aria-label={t('버블 정렬 시각화 열기', 'Open the bubble sort visualization')}>
-          <div className="demo-heading"><span>{t('이웃 궤도를 살펴보는 중', 'Observing neighboring orbits')}</span><span className="demo-code">5 &gt; 2</span></div>
-          <div className="demo-scene" aria-hidden="true"><Suspense fallback={<div className="demo-loading" />}><BubbleScene step={preview} previous={preview} clock={previewClock} language={language} reduced={reduced} view="3d" world="space" still /></Suspense></div>
-          <div className="demo-explanation"><span className="demo-pair">[5, 2] <Arrow /> [2, 5]</span><p>{t('왼쪽 값이 더 크면 자리를 바꿉니다.', 'Swap them when the left value is larger.')}</p></div>
-          <div className="demo-bottom"><span>{t('이러다 보면, 제자리에 갑니다.', 'Keep at it. They find their places.')}</span><Arrow /></div>
-        </a>
+        <div className="intro-demo">
+          <div className="demo-heading"><span>{t('이웃 궤도를 살펴보는 중', 'Observing neighboring orbits')}</span>{!reduced && <button className="demo-pause" onClick={() => dispatch({ type: 'toggle' })}>{playback.playing ? t('정렬 멈추기', 'Pause sorting') : t('정렬 이어보기', 'Resume sorting')}</button>}</div>
+          <a className="demo-open" href={lesson('bubble-sort')} aria-label={t('버블 정렬 시각화 열기', 'Open the bubble sort visualization')}>
+            <div ref={sceneRef} className="demo-scene" data-playing={visible && playback.playing} aria-hidden="true"><Suspense fallback={<div className="demo-loading" />}><BubbleScene step={step} previous={previous} clock={previewClock} language={language} reduced={reduced} view="3d" world="space" /></Suspense></div>
+            <div className="demo-explanation"><span className="demo-pair">{pair.length === 2 ? step.type === 'swap' ? <><span>[{pair.join(', ')}]</span><Arrow /><span>[{[...pair].reverse().join(', ')}]</span></> : `${pair[0]} ${pair[0] > pair[1] ? '>' : '≤'} ${pair[1]}` : `[${step.array.map((item) => item.value).join(', ')}]`}</span><p>{bubble.explain(step, language)[0]}</p></div>
+            <div className="demo-bottom"><span>{t('이러다 보면, 제자리에 갑니다.', 'Keep at it. They find their places.')}</span><Arrow /></div>
+          </a>
+        </div>
       </section>
       <section className="landing-warmup" id="warmup" aria-labelledby="big-o-title">
         <div className="section-intro"><h2 id="big-o-title">{t('입력이 늘어나면,', 'When there’s more input,')}<br />{t('바빠지는 방식도 제각각.', 'everyone gets busy differently.')}</h2><p>{t('입력이 늘면 별도 모입니다. 별 하나는 모형 연산 한 번입니다. Big O는 입력이 커질 때 시간이나 공간이 늘어나는 상한 표기입니다. 초 단위의 속도는 아니고요.', 'As input grows, stars gather. One star is one model operation. Big O is an upper bound on how time or space grows with input size. It isn’t a speed in seconds.')}</p></div>

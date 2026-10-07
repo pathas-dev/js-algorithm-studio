@@ -20,10 +20,12 @@
 .landing-text-link { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #a3b0a7; text-decoration: none; }
 .landing-text-link:hover { text-decoration: underline; }
 .intro-demo { display: block; text-decoration: none; color: #e2e7d9; border-radius: 16px; background: #141b1d; padding: 26px 30px 0; }
-.intro-demo:hover .demo-bottom { color: #9bb7a5; }
+.demo-open { display: block; color: inherit; text-decoration: none; }
+.demo-open:hover .demo-bottom { color: #9bb7a5; }
 .demo-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: 13px; color: #a3b0a7; }
-.demo-code, .demo-pair { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
-.demo-code { border-radius: 6px; padding: 5px 10px; background: #263b30; }
+.demo-pair { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.demo-pause { flex-shrink: 0; padding: 6px 9px; border: 1px solid #2c3936; border-radius: 6px; background: transparent; color: #a3b0a7; font: inherit; cursor: pointer; }
+.demo-pause:hover { background: #263b30; color: #e2e7d9; }
 .intro-demo { background: rgba(11, 16, 18, .65); }
 .demo-scene { pointer-events: none; }
 .demo-scene .bubble-canvas, .demo-loading { height: 235px; }

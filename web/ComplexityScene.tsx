@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, OrthographicCamera, ShaderMaterial } from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, OrthographicCamera, ShaderMaterial, type Points } from 'three';
 import { SceneBoundary } from './BubbleScene';
 import { workStar, axialAngle } from './bubble-motion';
 import { useSceneVisibility } from './use-scene-visibility';
@@ -17,6 +17,7 @@ function Camera() {
 }
 
 function Cluster({ count, color, reduced, visible }: { count: number; color: string; reduced: boolean; visible: boolean }) {
+  const cluster = useRef<Points>(null);
   const { camera, gl, invalidate } = useThree();
   const geometry = useMemo(() => {
     const cloud = new BufferGeometry();
@@ -28,10 +29,10 @@ function Cluster({ count, color, reduced, visible }: { count: number; color: str
   }, []);
   const material = useMemo(() => new ShaderMaterial({
     transparent: true, depthWrite: false, blending: AdditiveBlending,
-    uniforms: { color: { value: new Color(color) }, pointSize: { value: 4 }, uSpin: { value: 0 } },
+    uniforms: { color: { value: new Color(color) }, pointSize: { value: 4 }, uSpin: { value: 0 }, uTime: { value: 0 } },
     vertexShader: `attribute float alpha; varying float vAlpha, vSeed; uniform float pointSize;
       void main(){vAlpha=alpha; vSeed=fract(sin(dot(position,vec3(12.9,78.2,37.7)))*43758.5); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); gl_PointSize=pointSize;}`,
-    fragmentShader: `uniform vec3 color; uniform float uSpin; varying float vAlpha, vSeed;
+    fragmentShader: `uniform vec3 color; uniform float uSpin, uTime; varying float vAlpha, vSeed;
       void main(){
         vec2 p=gl_PointCoord-0.5;
         float angle=uSpin*(0.85+vSeed*0.3)+vSeed*6.283185;
@@ -39,7 +40,8 @@ function Cluster({ count, color, reduced, visible }: { count: number; color: str
         vec2 surface=mat2(c,-s,s,c)*p;
         float r=length(p), glow=exp(-r*r*18.0);
         float core=exp(-dot(surface-vec2(0.07,0.025),surface-vec2(0.07,0.025))*130.0);
-        gl_FragColor=vec4(mix(color,vec3(1.0),core*0.5),vAlpha*(glow*0.5+core*0.5));
+        float pulse=0.72+0.28*sin(uTime*0.9+vSeed*6.283185);
+        gl_FragColor=vec4(mix(color,vec3(1.0),core*0.5),vAlpha*(glow*0.5+core*0.5)*pulse);
         #include <colorspace_fragment>
       }`,
   }), [color]);
@@ -64,12 +66,15 @@ function Cluster({ count, color, reduced, visible }: { count: number; color: str
       state.dirty = false;
     }
     if (visible && !reduced) spinTime.current += Math.min(delta, 0.1) * 1000;
+    const seconds = spinTime.current / 1000;
+    if (cluster.current) cluster.current.rotation.set(Math.sin(seconds * 0.22) * 0.18, seconds * 0.18, Math.sin(seconds * 0.16) * 0.05);
+    material.uniforms.uTime.value = seconds;
     material.uniforms.uSpin.value = axialAngle(spinTime.current, 0, 0.12);
     material.uniforms.pointSize.value = Math.max(4, (camera as OrthographicCamera).zoom * 0.16) * gl.getPixelRatio();
     currentCount.current = state.elapsed === 1 ? count : state.total;
     if (state.elapsed < 1) invalidate();
   });
-  return <points geometry={geometry} material={material} frustumCulled={false} />;
+  return <points ref={cluster} geometry={geometry} material={material} frustumCulled={false} />;
 }
 
 export default function ComplexityScene({ count, color, reduced }: { count: number; color: string; reduced: boolean }) {

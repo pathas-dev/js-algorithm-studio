@@ -10,9 +10,10 @@ try {
     assert.equal(axialAngle(-100, id), axialAngle(0, id));
     const first = axialAngle(1000, id) - axialAngle(0, id);
     assert(Math.abs(axialAngle(2000, id) - axialAngle(1000, id) - first) < 1e-12, 'axial spin has constant speed');
-    assert(Math.abs(axialAngle(2000, id, 0.12) - id * 0.8 - first * 2 * 0.12 / 0.045) < 1e-12);
+    assert(Math.abs(axialAngle(2000, id, 0.12) - id * 0.8 - first * 2 * 0.12 / 0.22) < 1e-12);
   }
   assert.notEqual(axialAngle(1000, 0), axialAngle(1000, 1) - 0.8, 'individual bodies have different rates');
+  assert(axialAngle(4000, 0) - axialAngle(0, 0) > 0.7, 'a paused planet has a visibly rotating surface within four seconds of its independent clock');
   assert.equal(planetRadius(0, 8), 0.13);
   assert.equal(planetRadius(-3, 8), planetRadius(3, 8));
   assert.equal(planetRadius(8, 8), 0.53);

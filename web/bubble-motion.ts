@@ -26,4 +26,4 @@ export function orbitalSwap(from: number, to: number, time: number): [number, nu
 }
 
 // Stable phases and slightly different axial rates; never changes a body's centre.
-export const axialAngle = (timeMs: number, id: number, rate = 0.045) => Math.max(0, timeMs) / 1000 * rate * (0.85 + id % 5 * 0.08) + id * 0.8;
+export const axialAngle = (timeMs: number, id: number, rate = 0.22) => Math.max(0, timeMs) / 1000 * rate * (0.85 + id % 5 * 0.08) + id * 0.8;

@@ -4,7 +4,7 @@ Mode: Experience. User approved “우주 컨셉”, planets/stars and the propo
 
 THESIS: Watch numbered planets exchange fixed observation slots and settle into order.
 OWN-WORLD: Low-light observatory; near-black #0b1012 sky, worn olive/ochre/mauve surfaces, muted cream #e2e7d9 numbers, sparse stars and diffuse slow nebula. Real Three.js spheres, directional lighting and depth-tested value sprites; no external bitmap assets.
-STORY: Compare neighboring planets, pass along opposing depth arcs, settle, hold, disperse into dust and reform. The established shared playback clock freezes every authored motion on pause.
+STORY: Compare neighboring planets, pass along opposing depth arcs, settle, hold, disperse into dust and reform. Pausing freezes the sorting trace and its nebula/dust; visible planets keep turning independently.
 FIRST VIEWPORT: Existing title and precise explanation lead directly to the planetary array. Fixed slot indices remain legible; quiet controls match the sky. Expanded mode foregrounds the observation.
 FORM: Direction seed 7554e619 assigned index6. The user-pinned space metaphor governs materials. The established reading topology and exact slot/trace navigation govern composition; this is a directly coded, reversible visual trial, not a comp reproduction.
 
@@ -12,4 +12,4 @@ Grounded directions considered for the trial: quiet observatory, planetary atlas
 
 Geometry is illustrative: absolute magnitude drives planet diameter with a minimum visible diameter; printed signed values remain authoritative. Orbital rings identify the heavenly-body treatment, not measured astronomical paths or physical simulation. User refinement (2026-10-08): reserve the largest ring envelope plus 0.28 world units in every fixed slot. Opposing semicircle swaps run at constant path speed over 1.4 seconds, using depth in 3D and vertical clearance in 2D; they remain deterministic.
 
-User refinement (2026-10-08): planets have deterministic individual axial rates/phases. In 3D the actual sphere spins; in 2D the shader surface rotates while the flattened geometry stays front-facing. Labels, rings and fixed slot centres do not spin. Execution spin follows the established playback clock and freezes on pause.
+User correction (2026-10-08): planetary rotation must be visible even before playback and while sorting is paused. Every visible space scene uses an independent local axial clock, with individual rates of 0.22 × (0.85 + id % 5 × 0.08) radians/second (about 24–34 seconds per turn). In 3D the actual sphere spins; in 2D the shader surface rotates while flattened geometry stays front-facing. Labels, rings and fixed slot centres do not spin. Offscreen, hidden-document and reduced-motion gates stop nonessential motion. Playback speed, seeking and pausing affect the trace, not axial rotation.
