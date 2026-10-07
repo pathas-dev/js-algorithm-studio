@@ -13,3 +13,12 @@ export function workBlock(index: number, count: number): [number, number, number
 
 // Visual minimum keeps zero and small magnitudes visible; signed labels carry the exact value.
 export const planetRadius = (value: number, maximum: number) => Math.max(0.13, Math.abs(value) / maximum * 0.53);
+
+// Reserve the largest possible ring envelope in every fixed slot, even after reordering.
+export const planetSpacing = (values: number[], maximum: number) => Math.max(1.12, ...values.map((value) => planetRadius(value, maximum) * 3.4 + 0.28));
+
+// Opposing semicircles keep the pair a slot apart at constant angular/path speed.
+export function orbitalSwap(from: number, to: number, time: number): [number, number] {
+  const angle = Math.max(0, Math.min(1, time)) * Math.PI;
+  return [from + (to - from) * (1 - Math.cos(angle)) / 2, (to - from) * Math.sin(angle) / 2];
+}

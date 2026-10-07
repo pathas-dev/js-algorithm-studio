@@ -357,7 +357,7 @@
       {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort playback. Analytical damped spring moves planets through opposing ±0.85 depth arcs, 0.08 lift and ±0.045-radian tilt (retained clay lift: 0.035). Native CanvasTexture value sprites are depth-tested, retain a minimum screen scale and fade with erosion; accessible signed DOM values and stationary projected indices remain authoritative. Both views share the Canvas and trace clock; switching does not reset or pause playback. Pause freezes the shared clock, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
+        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Opposing semicircles exchange at constant path speed over 1.4s: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes motion, seek/edit restores exact geometry. Reduced motion uses the static array renderer."
       },
       {
         "name": "bubble-view-transition",

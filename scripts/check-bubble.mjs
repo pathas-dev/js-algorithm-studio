@@ -4,12 +4,30 @@ const server = await createServer({ configFile: 'web/vite.config.mts', server: {
 try {
   const { initialBubblePlayback, bubblePlaybackReducer: reduce, advanceBubblePlayback: advance } = await server.ssrLoadModule('/bubble-playback.ts');
   const { bubble } = await server.ssrLoadModule('/algorithms.ts');
-  const { springProgress, workBlock, planetRadius } = await server.ssrLoadModule('/bubble-motion.ts');
+  const { springProgress, workBlock, planetRadius, planetSpacing, orbitalSwap } = await server.ssrLoadModule('/bubble-motion.ts');
   assert.equal(planetRadius(0, 8), 0.13);
   assert.equal(planetRadius(-3, 8), planetRadius(3, 8));
   assert.equal(planetRadius(8, 8), 0.53);
   assert(planetRadius(3, 8) > planetRadius(1, 8));
   assert(Number.isFinite(planetRadius(0, 1)));
+  for (const values of [[8, 8, 8], [-3, 0, 2.5, -3, 8], [0, 0], Array(32).fill(9)]) {
+    const maximum = Math.max(1, ...values.map(Math.abs));
+    const spacing = planetSpacing(values, maximum);
+    const envelope = Math.max(...values.map((value) => planetRadius(value, maximum) * 1.7));
+    let previousPoint = orbitalSwap(0, spacing, 0);
+    let distance;
+    for (let i = 1; i <= 100; i += 1) {
+      const a = orbitalSwap(0, spacing, i / 100);
+      const b = orbitalSwap(spacing, 0, i / 100);
+      assert(Math.hypot(a[0] - b[0], a[1] - b[1]) > envelope * 2, 'ring envelopes never intersect during a swap');
+      const traveled = Math.hypot(a[0] - previousPoint[0], a[1] - previousPoint[1]);
+      if (distance !== undefined) assert(Math.abs(traveled - distance) < 1e-12, 'equal time slices travel equal distances');
+      distance = traveled;
+      previousPoint = a;
+    }
+    assert.deepEqual(orbitalSwap(0, spacing, 0), [0, 0]);
+    assert.equal(orbitalSwap(0, spacing, 1)[0], spacing);
+  }
   assert.equal(springProgress(0), 0);
   assert.equal(springProgress(1), 1);
   assert(springProgress(0.4) > 1, 'damped swaps have a small settling overshoot');

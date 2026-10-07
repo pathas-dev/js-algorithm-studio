@@ -5,7 +5,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import type { Item, Step } from './algorithms';
 import type { BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
-import { springProgress, planetRadius } from './bubble-motion';
+import { springProgress, planetRadius, planetSpacing, orbitalSwap } from './bubble-motion';
 import './bubble.css';
 
 type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; still?: boolean; world?: 'clay' | 'space' };
@@ -13,18 +13,18 @@ type Labels = RefObject<Map<number, HTMLLIElement>>;
 const ease = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 const seed = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
 const erosion = (state: BubblePlayback) => state.phase === 'erode' ? state.elapsed / 6000 : state.phase === 'form' ? 1 - state.elapsed / 3000 : 0;
-const position = (index: number, length: number) => (index - (length - 1) / 2) * 1.12;
+const position = (index: number, length: number, spacing = 1.12) => (index - (length - 1) / 2) * spacing;
 const height = (item: Item, maximum: number) => Math.max(0.16, Math.abs(item.value) / maximum * 3.2);
 
-function Camera({ count, signed, view, world }: { count: number; signed: boolean } & Pick<Props, 'view' | 'world'>) {
+function Camera({ count, spacing, signed, view, world }: { count: number; spacing: number; signed: boolean } & Pick<Props, 'view' | 'world'>) {
   const { camera, size } = useThree();
   const depth = useRef(view === '3d' ? 1 : 0);
   const target = useMemo(() => new Vector3(0, world === 'space' ? 0.55 : signed ? 0 : 1.25, 0), [signed, world]);
   useEffect(() => {
     const ortho = camera as OrthographicCamera;
-    ortho.zoom = Math.min(size.width / Math.max(7.8, count * 1.12 + 1.8), size.height / (world === 'space' ? 4.6 : signed ? 9.6 : 5.5));
+    ortho.zoom = Math.min(size.width / Math.max(7.8, count * spacing + 1.8), size.height / (world === 'space' ? 4.6 : signed ? 9.6 : 5.5));
     ortho.updateProjectionMatrix();
-  }, [camera, size.width, size.height, count, signed, world]);
+  }, [camera, size.width, size.height, count, spacing, signed, world]);
   useFrame((_, delta) => {
     depth.current += ((view === '3d' ? 1 : 0) - depth.current) * (1 - Math.exp(-Math.min(delta, 0.1) * 7));
     camera.position.set(-2.2 * depth.current, target.y + 3.5 * depth.current, 12);
@@ -34,7 +34,7 @@ function Camera({ count, signed, view, world }: { count: number; signed: boolean
   return null;
 }
 
-function Backdrop({ step, clock, world }: Pick<Props, 'step' | 'clock' | 'world'>) {
+function Backdrop({ step, clock, world, spacing }: Pick<Props, 'step' | 'clock' | 'world'> & { spacing: number }) {
   const { camera, size } = useThree();
   const anchor = useMemo(() => new Vector3(), []);
   const material = useMemo(() => new ShaderMaterial({
@@ -90,13 +90,13 @@ function Backdrop({ step, clock, world }: Pick<Props, 'step' | 'clock' | 'world'
     uniforms.uRelease.value = Math.sin(Math.PI * Math.max(0, Math.min(1, erosion(state))));
     uniforms.uRipple.value = state.phase === 'sort' && step.type === 'swap' && state.animate ? Math.min(1, state.elapsed / 2800) : 0;
     const middle = step.indices.length ? step.indices.reduce((sum, index) => sum + index, 0) / step.indices.length : (step.array.length - 1) / 2;
-    anchor.set(position(middle, step.array.length), 0, 0).project(camera);
+    anchor.set(position(middle, step.array.length, spacing), 0, 0).project(camera);
     uniforms.uCenter.value.set((anchor.x + 1) / 2, (anchor.y + 1) / 2);
   });
   return <mesh material={material} frustumCulled={false} renderOrder={-10}><planeGeometry args={[2, 2]} /></mesh>;
 }
 
-function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world }: { item: Item; index: number; maximum: number; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world'>) {
+function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world, spacing }: { item: Item; index: number; maximum: number; spacing: number; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world'>) {
   const mesh = useRef<Mesh>(null);
   const ring = useRef<Mesh>(null);
   const space = world === 'space';
@@ -179,10 +179,13 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     const time = moving ? Math.min(1, state.elapsed / 1400) : 1;
     const progress = springProgress(time);
     const arc = moving ? Math.sin(time * Math.PI) : 0;
-    const oldX = position(from < 0 ? index : from, step.array.length);
-    mesh.current.position.set(oldX + (position(index, step.array.length) - oldX) * progress, (space ? 0.55 : Math.sign(item.value || 1) * stoneHeight / 2) + arc * (space ? 0.08 : 0.035), arc * (from < index ? 0.85 : -0.85));
-    if (space) mesh.current.rotation.y = state.time / 1000 * 0.045 + item.id * 0.8;
-    mesh.current.rotation.z = arc * (from < index ? -0.045 : 0.045);
+    const oldX = position(from < 0 ? index : from, step.array.length, spacing);
+    const nextX = position(index, step.array.length, spacing);
+    const [planetX, orbit] = orbitalSwap(oldX, nextX, time);
+    if (space) mesh.current.position.set(planetX, 0.55 + (view === '2d' ? orbit : 0), view === '3d' ? orbit : 0);
+    else mesh.current.position.set(oldX + (nextX - oldX) * progress, Math.sign(item.value || 1) * stoneHeight / 2 + arc * 0.035, arc * (from < index ? 0.85 : -0.85));
+    if (space) mesh.current.rotation.y = view === '3d' ? state.time / 1000 * 0.045 + item.id * 0.8 : 0;
+    mesh.current.rotation.z = (space ? 0 : arc) * (from < index ? -0.045 : 0.045);
     mesh.current.scale.z = view === '2d' ? 0.01 : 1;
     uniforms.uErosion.value = Math.max(0, Math.min(1, erosion(state)));
     const active = step.indices.includes(index);
@@ -209,14 +212,14 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     }
     const indexLabel = label?.querySelector<HTMLElement>('.bubble-index');
     if (indexLabel) {
-      anchor.set(position(index, step.array.length), signed && !space ? -4.4 : -0.55, 0).project(camera);
+      anchor.set(position(index, step.array.length, spacing), signed && !space ? -4.4 : -0.55 - (space ? spacing / 2 : 0), 0).project(camera);
       indexLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${(1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
     }
   });
-  return <><mesh ref={mesh} geometry={geometry} material={material} castShadow position={[position(index, step.array.length), Math.sign(item.value || 1) * stoneHeight / 2, 0]} />{space && item.id % 3 === 0 && <mesh ref={ring}><ringGeometry args={[radius * 1.3, radius * 1.7, 80]} /><meshStandardMaterial color="#82968c" side={DoubleSide} transparent opacity={0.25} depthWrite={false} roughness={1} /></mesh>}<sprite ref={number} material={text.material} scale={[text.width, 0.38, 1]} /></>;
+  return <><mesh ref={mesh} geometry={geometry} material={material} castShadow position={[position(index, step.array.length, spacing), Math.sign(item.value || 1) * stoneHeight / 2, 0]} />{space && item.id % 3 === 0 && <mesh ref={ring}><ringGeometry args={[radius * 1.3, radius * 1.7, 80]} /><meshStandardMaterial color="#82968c" side={DoubleSide} transparent opacity={0.25} depthWrite={false} roughness={1} /></mesh>}<sprite ref={number} material={text.material} scale={[text.width, 0.38, 1]} /></>;
 }
 
-function Dust({ step, maximum, clock, world }: Pick<Props, 'step' | 'clock' | 'world'> & { maximum: number }) {
+function Dust({ step, maximum, clock, world, spacing }: Pick<Props, 'step' | 'clock' | 'world'> & { maximum: number; spacing: number }) {
   const points = useRef<Points>(null);
   const { size } = useThree();
   const perStone = size.width < 500 ? 36 : 72;
@@ -229,7 +232,7 @@ function Dust({ step, maximum, clock, world }: Pick<Props, 'step' | 'clock' | 'w
       const index = i % step.array.length;
       const item = step.array[index];
       const y = seed(i + item.id * 17);
-      origins[i * 3] = position(index, step.array.length) + (seed(i + 3) - 0.5) * 0.76;
+      origins[i * 3] = position(index, step.array.length, spacing) + (seed(i + 3) - 0.5) * 0.76;
       origins[i * 3 + 1] = world === 'space' ? 0.55 + (y - 0.5) * Math.max(0.26, Math.abs(item.value) / maximum * 1.06) : y * height(item, maximum) * Math.sign(item.value || 1);
       origins[i * 3 + 2] = (seed(i + 9) - 0.5) * 0.66;
       heights[i] = y;
@@ -238,7 +241,7 @@ function Dust({ step, maximum, clock, world }: Pick<Props, 'step' | 'clock' | 'w
     cloud.setAttribute('position', new BufferAttribute(positions, 3));
     cloud.setAttribute('alpha', new BufferAttribute(new Float32Array(count), 1));
     return { cloud, origins, heights, count };
-  }, [step.array, maximum, perStone, world]);
+  }, [step.array, maximum, perStone, world, spacing]);
   const material = useMemo(() => new ShaderMaterial({
     transparent: true, depthWrite: false,
     uniforms: { color: { value: new Color('#a5987c') }, pointSize: { value: size.width < 500 ? 2.3 : 2.8 } },
@@ -280,8 +283,9 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
   const [lost, setLost] = useState(false);
   const labels = useRef(new Map<number, HTMLLIElement>());
   const maximum = Math.max(1, ...step.array.map((item) => Math.abs(item.value)));
+  const spacing = world === 'space' ? planetSpacing(step.array.map((item) => item.value), maximum) : 1.12;
   const signed = step.array.some((item) => item.value < 0);
-  const slotWidth = Math.max(36, ...step.array.map((item) => String(item.value).length * 9 + 16));
+  const slotWidth = Math.max(world === 'space' ? 72 : 36, ...step.array.map((item) => String(item.value).length * 9 + 16));
   const fallback = <ArrayView step={step} language={language} />;
   if (reduced || lost) return fallback;
   return <div className="bubble-art" data-view={view} data-world={world}>
@@ -294,16 +298,16 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
               gl.setClearColor(world === 'space' ? '#0b1012' : '#f0efe7');
               gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
             }}>
-              <Camera count={step.array.length} signed={signed} view={view} world={world} />
-              <Backdrop step={step} clock={clock} world={world} />
+              <Camera spacing={spacing} count={step.array.length} signed={signed} view={view} world={world} />
+              <Backdrop spacing={spacing} step={step} clock={clock} world={world} />
               <ambientLight intensity={world === 'space' ? 0.55 : 1.2} color="#f5efe3" />
               <directionalLight position={[-3, 10, 4]} intensity={world === 'space' ? 3.8 : 2.8} color="#fff6e6" castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-Math.max(8, step.array.length * 0.65)} shadow-camera-right={Math.max(8, step.array.length * 0.65)} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-radius={8} shadow-blurSamples={16} />
               <directionalLight position={[4, 3, -3]} intensity={world === 'space' ? 1.1 : 0.8} color="#b9c9b5" />
               <mesh visible={world !== 'space' && view === '3d'} rotation={[-Math.PI / 2, 0, 0]} position={[0, signed ? -3.3 : -0.015, 0]} receiveShadow>
                 <planeGeometry args={[100, 100]} /><shadowMaterial color="#41503e" opacity={0.14} />
               </mesh>
-              {step.array.map((item, index) => <Stone key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
-              <Dust step={step} maximum={maximum} clock={clock} world={world} />
+              {step.array.map((item, index) => <Stone spacing={spacing} key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
+              <Dust spacing={spacing} step={step} maximum={maximum} clock={clock} world={world} />
             </Canvas>
           </div>
         </SceneBoundary>
