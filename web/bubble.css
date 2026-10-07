@@ -14,12 +14,24 @@
 .bubble-studio .bubble-loop { display: flex; gap: 8px; align-items: center; color: #526151; font-size: 13px; cursor: pointer; }
 .bubble-loop input { accent-color: #74886d; width: 16px; height: 16px; }
 .bubble-loop input:focus-visible { outline: 3px solid #087f5b; outline-offset: 3px; }
+.bubble-scene-controls { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.bubble-view-switch { display: flex; gap: 2px; padding: 3px; margin: 0; border: 1px solid #d8dccf; border-radius: 9px; }
+.bubble-view-switch label { position: relative; cursor: pointer; }
+.bubble-view-switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.bubble-view-switch span { display: block; padding: 8px 12px; border-radius: 6px; color: #526151; font-size: 12px; font-weight: 550; }
+.bubble-view-switch input:checked + span { background: #e2e7d9; color: #41503e; }
+.bubble-view-switch input:hover + span { background: #d4ddcb; }
+.bubble-view-switch input:focus-visible + span { outline: 3px solid #087f5b; outline-offset: 3px; }
+.bubble-view-switch:disabled { opacity: 0.5; }
 .bubble-art-scroll { overflow-x: auto; scrollbar-color: #aab3a0 #f0efe7; scrollbar-width: thin; }
 .bubble-art-frame { position: relative; }
 .bubble-canvas { height: 350px; margin-top: 8px; }
-.bubble-values { list-style: none; margin: 0 auto; padding: 0 0 14px; display: flex; justify-content: center; gap: 0; color: #41503e; }
-.bubble-values li { flex: 1; min-width: 0; text-align: center; font: 14px ui-monospace, monospace; }
-.bubble-values small { display: block; margin-top: 7px; color: #687361; font-size: 11px; }
+.bubble-values { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; pointer-events: none; color: #41503e; }
+.bubble-values li { font: 15px ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.bubble-value, .bubble-index { position: absolute; top: 0; left: 0; white-space: nowrap; }
+.bubble-value { font-weight: 500; }
+.bubble-index { color: #666c5e; font-size: 11px; }
+.bubble-index::before { content: ''; display: block; width: 1px; height: 5px; margin: 0 auto 6px; background: #aab3a0; }
 .bubble-empty { text-align: center; color: #586b5e; padding: 0 16px 24px; }
 .bubble-studio .inline-input-editor { border-color: #d8dccf; }
 .bubble-studio .legend { padding-top: 8px; }

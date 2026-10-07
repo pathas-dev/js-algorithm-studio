@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T10:06:08.080849+00:00",
+  "generatedAt": "2026-10-07T11:21:39.106780+00:00",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -139,8 +139,8 @@
       },
       {
         "name": "bubble-floor",
-        "value": "VSMShadowMap; shadow-radius: 4; shadow-blurSamples: 8",
-        "purpose": "Bubble-sort artwork only. Floor receives shadows; clay columns do not receive them and stop casting at erosion >= 0.3."
+        "value": "VSMShadowMap; shadow-radius: 8; shadow-blurSamples: 16; ShadowMaterial opacity: 0.14",
+        "purpose": "Bubble-sort 3D artwork only. Transparent shadow-only floor uses bubble-ink; clay columns do not receive shadows and stop casting at erosion >= 0.3. Default 2D has no object shadows."
       }
     ],
     "motion": [
@@ -152,7 +152,12 @@
       {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort only. Smoothstep swaps share the trace clock; pause freezes motion, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
+        "purpose": "Bubble-sort only. Both views share the Canvas and trace clock; switching does not reset or pause playback. Smoothstep swaps move projected DOM values with each column; value opacity is 1 - smoothstep(erosion). Pause freezes the trace clock, seek/edit restores exact geometry, Slow loop opts out. Reduced motion uses the static array renderer."
+      },
+      {
+        "name": "bubble-view-transition",
+        "value": "depth += (target - depth) * (1 - exp(-min(delta, 0.1) * 7))",
+        "purpose": "Bubble-sort only. Native 2D/3D radios ease the orthographic camera from front-facing to a shallow fixed angle; no continuous orbit. Default 2D flattens column depth to z scale 0.01."
       }
     ],
     "breakpoints": [
@@ -245,6 +250,13 @@
       "description": "Native opt-out checkbox beside the bubble scene caption. Labels: 천천히 반복 / Slow loop. Playback controls remain below the artwork.",
       "html": "<label class=\"ds-bubble-loop\"><input type=\"checkbox\" checked>Slow loop</label>",
       "css": ".ds-bubble-loop{display:flex;gap:8px;align-items:center;color:#526151;font:13px \"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif;cursor:pointer}.ds-bubble-loop input{accent-color:#74886d;width:16px;height:16px}.ds-bubble-loop input:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
+    },
+    {
+      "name": "Bubble-only view switch",
+      "kind": "input",
+      "description": "Native 2D/3D radios with 2D selected by default. Group labels: 보기 방식 / View mode. Changes preserve the running trace; disabled while editing input.",
+      "html": "<fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\" checked><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\"><span>3D</span></label></fieldset>",
+      "css": ".ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #d8dccf;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#526151;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#e2e7d9;color:#41503e}.ds-bubble-view input:hover+span{background:#d4ddcb}.ds-bubble-view input:focus-visible+span{outline:3px solid #087f5b;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
     }
   ],
   "narrative": {

@@ -28,7 +28,7 @@ colors:
   code-bg: "#17241f"
   code-text: "#e6eee8"
   focus: "#087f5b"
-  # Bubble-sort only: approved 3D daydream extension.
+  # Bubble-sort only: approved 2D/3D daydream extension.
   bubble-paper: "#f6f4ed"
   bubble-canvas: "#f0efe7"
   bubble-ink: "#41503e"
@@ -172,7 +172,7 @@ Canvas padding becomes (20px 16px) on mobile. Array charts use a (225px) height,
 
 Primary surfaces are flat: thin dividers and tonal layering provide separation without shadows. White distinguishes the Big O lab; sage holds execution and the closing invitation. The detailed step-explanation popover retains its Mantine medium shadow as a transient overlay.
 
-Bubble sort alone adds real shallow 3D depth: a fixed orthographic view of tapered, softly rounded clay columns, matte material (roughness 0.93, metalness 0), warm key light and soft floor shadows. The floor receives shadows; columns do not. Columns stop casting once erosion reaches (0.3), avoiding solid ghost shadows during dissolution. Keep this depth inside the execution artwork.
+Bubble sort defaults to a front-facing orthographic 2D view, flattening the clay depth (z scale 0.01) with no object shadows. The optional 3D view settles into a fixed shallow angle, revealing tapered, softly rounded columns with matte material (roughness 0.93, metalness 0), fine restrained grain and warm key light. A transparent shadow-only floor (opacity 0.14) adds short, soft contact shadows without an opaque plane. The floor receives shadows; columns do not. Columns stop casting once erosion reaches (0.3), avoiding solid ghost shadows during dissolution. Keep this depth inside the execution artwork.
 
 ## Shapes
 
@@ -189,9 +189,9 @@ Controls remain gently rounded. Lesson canvases and dark code panels use their r
 
 Meter transitions use (0.3s) with `cubic-bezier(.16,1,.3,1)`. Global reduced-motion handling suppresses animation and transitions; lesson motion respects the user's preference. Buttons, links, timeline and disclosure summary retain a (3px) focus outline with a (3px) offset.
 
-### Bubble sort only: 3D daydream
+### Bubble sort only: 2D/3D daydream
 
-The artwork reuses the exact bubble-sort trace and stable item identities. Signed values retain their direction and readable DOM value/index labels. Its frame is (350px) high, or (320px) below (650px); long arrays scroll horizontally. The warmer canvas uses its scoped padding, becoming (20px 14px) on mobile. Input editing sits below the artwork; transport, native timeline and speed controls follow the canvas, before exact step evidence and the closed code disclosure.
+The artwork reuses the exact bubble-sort trace and stable item identities. A native radio switch selects 2D (default) or 3D; switching keeps the same Canvas and playback clock without resetting or pausing the trace. Columns use a restrained rounded silhouette (width 0.78, depth 0.7, maximum corner radius 0.065). Projected DOM values follow each moving column above its upper end, or below the lower end for negative values, and fade with erosion. Stationary bracketed slot indices (`[index]`) and tiny ticks sit beneath the scene, with extra clearance for signed arrays. Korean and English accessible labels identify both index and value. Its frame is (350px) high, or (320px) below (650px); long arrays scroll horizontally. The warmer canvas uses its scoped padding, becoming (20px 14px) on mobile. Input editing sits below the artwork; transport, native timeline and speed controls follow the canvas, before exact step evidence and the closed code disclosure.
 
 At (1×), each trace step lasts (2.8s), with a swap interpolating over (1.4s). The sorted array holds for (6s), erodes to restrained dust for (6s), and reforms the original input over (3s). The native “천천히 반복” / “Slow loop” checkbox opts out of this cycle. Pause freezes the shared clock; seeking or editing restores an exact, fully formed trace state. Keep bilingual captions, numerical labels and keyboard controls alongside the scene.
 

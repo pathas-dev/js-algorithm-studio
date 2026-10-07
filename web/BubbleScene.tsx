@@ -1,38 +1,46 @@
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial } from 'three';
+import { BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial, Vector3 } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Item, Step } from './algorithms';
 import type { BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
 import './bubble.css';
 
-type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean };
+type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d' };
+type Labels = RefObject<Map<number, HTMLLIElement>>;
 const ease = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 const seed = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
 const erosion = (state: BubblePlayback) => state.phase === 'erode' ? state.elapsed / 6000 : state.phase === 'form' ? 1 - state.elapsed / 3000 : 0;
 const position = (index: number, length: number) => (index - (length - 1) / 2) * 1.12;
 const height = (item: Item, maximum: number) => Math.max(0.16, Math.abs(item.value) / maximum * 3.2);
 
-function Camera({ count, signed, onWidth }: { count: number; signed: boolean; onWidth: (width: number) => void }) {
+function Camera({ count, signed, view }: { count: number; signed: boolean } & Pick<Props, 'view'>) {
   const { camera, size } = useThree();
+  const depth = useRef(view === '3d' ? 1 : 0);
+  const target = useMemo(() => new Vector3(0, signed ? 0 : 1.25, 0), [signed]);
   useEffect(() => {
     const ortho = camera as OrthographicCamera;
-    ortho.zoom = Math.min(size.width / Math.max(8.5, count * 1.12 + 1.7), size.height / (signed ? 8.2 : 6.2));
-    ortho.position.set(0, signed ? 4.2 : 5.1, 10);
-    ortho.lookAt(0, signed ? 0 : 1.3, 0);
+    ortho.zoom = Math.min(size.width / Math.max(7.8, count * 1.12 + 1.8), size.height / (signed ? 9.6 : 5.5));
     ortho.updateProjectionMatrix();
-    onWidth(ortho.zoom * count * 1.12);
-  }, [camera, size.width, size.height, count, signed, onWidth]);
+  }, [camera, size.width, size.height, count, signed]);
+  useFrame((_, delta) => {
+    depth.current += ((view === '3d' ? 1 : 0) - depth.current) * (1 - Math.exp(-Math.min(delta, 0.1) * 7));
+    camera.position.set(-2.2 * depth.current, target.y + 3.5 * depth.current, 12);
+    camera.lookAt(target);
+    camera.updateMatrixWorld();
+  }, -1);
   return null;
 }
 
-function Stone({ item, index, step, previous, clock, maximum }: { item: Item; index: number; maximum: number } & Pick<Props, 'step' | 'previous' | 'clock'>) {
+function Stone({ item, index, step, previous, clock, maximum, labels, signed, view }: { item: Item; index: number; maximum: number; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view'>) {
   const mesh = useRef<Mesh>(null);
+  const { camera, size } = useThree();
+  const anchor = useMemo(() => new Vector3(), []);
   const stoneHeight = height(item, maximum);
   const uniforms = useMemo(() => ({ uErosion: { value: 0 }, uStoneHeight: { value: stoneHeight } }), [stoneHeight]);
   const geometry = useMemo(() => {
-    const shape = new RoundedBoxGeometry(0.72, stoneHeight, 0.62, 3, Math.min(0.085, stoneHeight / 3));
+    const shape = new RoundedBoxGeometry(0.78, stoneHeight, 0.7, 4, Math.min(0.065, stoneHeight / 3));
     const vertices = shape.getAttribute('position');
     for (let i = 0; i < vertices.count; i += 1) {
       const taper = 1 - (vertices.getY(i) / stoneHeight + 0.5) * (0.035 + seed(item.id) * 0.025);
@@ -52,13 +60,13 @@ function Stone({ item, index, step, previous, clock, maximum }: { item: Item; in
         uniform float uStoneHeight;
         float clayNoise(vec3 p) { return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
       `).replace('#include <color_fragment>', `#include <color_fragment>
-        float grain = clayNoise(floor(vClay * 120.0));
+        float grain = clayNoise(floor(vClay * 180.0));
         float edge = (vClay.y / uStoneHeight + 0.5) * 0.82 + clayNoise(floor(vClay * 18.0)) * 0.18;
         if (uErosion > 0.0 && edge > 1.0 - uErosion) discard;
-        diffuseColor.rgb *= 0.94 + grain * 0.1;
+        diffuseColor.rgb *= 0.97 + grain * 0.045;
       `);
     };
-    clay.customProgramCacheKey = () => 'bubble-clay-v1';
+    clay.customProgramCacheKey = () => 'bubble-clay-v2';
     return clay;
   }, [uniforms]);
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
@@ -75,14 +83,26 @@ function Stone({ item, index, step, previous, clock, maximum }: { item: Item; in
     const oldX = position(from < 0 ? index : from, step.array.length);
     mesh.current.position.set(oldX + (position(index, step.array.length) - oldX) * progress, Math.sign(item.value || 1) * stoneHeight / 2, moving ? Math.sin(progress * Math.PI) * (from < index ? 0.7 : -0.7) : 0);
     mesh.current.rotation.z = moving ? Math.sin(progress * Math.PI) * (from < index ? -0.025 : 0.025) : 0;
+    mesh.current.scale.z = view === '2d' ? 0.01 : 1;
     uniforms.uErosion.value = Math.max(0, Math.min(1, erosion(state)));
     const active = step.indices.includes(index);
     const isSettled = index >= Number(step.variables.sortedFrom ?? step.array.length);
     material.color.copy(active ? step.type === 'swap' ? swap : warm : isSettled ? settled : base);
-    material.emissive.copy(active ? warm : base);
-    material.emissiveIntensity = active ? 0.055 + Math.sin(Math.min(1, state.elapsed / 2800) * Math.PI) * 0.045 : 0;
+    material.emissive.copy(material.color);
+    material.emissiveIntensity = view === '2d' ? 0.4 : 0;
     // Shadows fade with the object, avoiding a solid ghost after erosion.
-    mesh.current.castShadow = uniforms.uErosion.value < 0.3;
+    mesh.current.castShadow = view === '3d' && uniforms.uErosion.value < 0.3;
+    const label = labels.current.get(item.id);
+    const valueLabel = label?.querySelector<HTMLElement>('.bubble-value');
+    const indexLabel = label?.querySelector<HTMLElement>('.bubble-index');
+    if (valueLabel && indexLabel) {
+      const sign = Math.sign(item.value || 1);
+      anchor.set(mesh.current.position.x, sign * (stoneHeight + 0.3), mesh.current.position.z).project(camera);
+      valueLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${(1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
+      valueLabel.style.opacity = String(1 - ease(uniforms.uErosion.value));
+      anchor.set(position(index, step.array.length), signed ? -4.4 : -0.55, 0).project(camera);
+      indexLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${(1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
+    }
   });
   return <mesh ref={mesh} geometry={geometry} material={material} castShadow position={[position(index, step.array.length), Math.sign(item.value || 1) * stoneHeight / 2, 0]} />;
 }
@@ -140,43 +160,45 @@ function Dust({ step, maximum, clock }: Pick<Props, 'step' | 'clock'> & { maximu
   return <points ref={points} geometry={geometry.cloud} material={material} frustumCulled={false} />;
 }
 
-class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode; onError: () => void }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onError(); }
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-export default function BubbleScene({ step, previous, clock, language, reduced }: Props) {
+export default function BubbleScene({ step, previous, clock, language, reduced, view }: Props) {
   const [lost, setLost] = useState(false);
-  const [labelWidth, setLabelWidth] = useState<number>();
+  const labels = useRef(new Map<number, HTMLLIElement>());
   const maximum = Math.max(1, ...step.array.map((item) => Math.abs(item.value)));
   const signed = step.array.some((item) => item.value < 0);
+  const slotWidth = Math.max(36, ...step.array.map((item) => String(item.value).length * 9 + 16));
   const fallback = <ArrayView step={step} language={language} />;
   if (reduced || lost) return fallback;
-  return <div className="bubble-art">
+  return <div className="bubble-art" data-view={view}>
     <div className="bubble-art-scroll">
-      <div className="bubble-art-frame" style={{ minWidth: Math.max(280, step.array.length * 36) }}>
-        <SceneBoundary fallback={fallback}>
+      <div className="bubble-art-frame" style={{ minWidth: Math.max(280, step.array.length * slotWidth) }}>
+        <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
           <div className="bubble-canvas" aria-hidden="true">
             <Canvas orthographic shadows dpr={[1, 1.5]} camera={{ position: [0, 5.1, 10], zoom: 60 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => {
               gl.shadowMap.type = VSMShadowMap;
               gl.setClearColor('#f0efe7');
               gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
             }}>
-              <Camera count={step.array.length} signed={signed} onWidth={setLabelWidth} />
-              <ambientLight intensity={1.6} color="#f5efe3" />
-              <directionalLight position={[-4, 7, 5]} intensity={3.2} color="#fff6e6" castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-Math.max(8, step.array.length * 0.65)} shadow-camera-right={Math.max(8, step.array.length * 0.65)} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-radius={4} shadow-blurSamples={8} />
-              <directionalLight position={[4, 3, -3]} intensity={0.6} color="#b9c9b5" />
-              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, signed ? -3.3 : -0.015, 0]} receiveShadow>
-                <planeGeometry args={[100, 100]} /><meshStandardMaterial color="#f0efe7" roughness={1} />
+              <Camera count={step.array.length} signed={signed} view={view} />
+              <ambientLight intensity={1.2} color="#f5efe3" />
+              <directionalLight position={[-3, 10, 4]} intensity={2.8} color="#fff6e6" castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-Math.max(8, step.array.length * 0.65)} shadow-camera-right={Math.max(8, step.array.length * 0.65)} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-radius={8} shadow-blurSamples={16} />
+              <directionalLight position={[4, 3, -3]} intensity={0.8} color="#b9c9b5" />
+              <mesh visible={view === '3d'} rotation={[-Math.PI / 2, 0, 0]} position={[0, signed ? -3.3 : -0.015, 0]} receiveShadow>
+                <planeGeometry args={[100, 100]} /><shadowMaterial color="#41503e" opacity={0.14} />
               </mesh>
-              {step.array.map((item, index) => <Stone key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} />)}
+              {step.array.map((item, index) => <Stone key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} />)}
               <Dust step={step} maximum={maximum} clock={clock} />
             </Canvas>
           </div>
         </SceneBoundary>
-        <ol className="bubble-values" style={{ width: labelWidth }} aria-label={language === 'ko' ? '현재 배열' : 'Current array'}>
-          {step.array.map((item, index) => <li key={item.id} aria-label={`${index}: ${item.value}`}><span>{item.value}</span><small>{index}</small></li>)}
+        <ol className="bubble-values" aria-label={language === 'ko' ? '현재 배열' : 'Current array'}>
+          {step.array.map((item, index) => <li key={item.id} ref={(node) => { if (node) labels.current.set(item.id, node); else labels.current.delete(item.id); }} aria-label={language === 'ko' ? `인덱스 ${index}, 값 ${item.value}` : `Index ${index}, value ${item.value}`}><span className="bubble-value">{item.value}</span><small className="bubble-index">[{index}]</small></li>)}
         </ol>
         {!step.array.length && <p className="bubble-empty">{language === 'ko' ? '빈 배열 · 잠깐 쉬어갑니다.' : 'An empty array. A moment of rest.'}</p>}
       </div>
