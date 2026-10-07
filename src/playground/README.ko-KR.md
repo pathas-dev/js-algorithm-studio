@@ -9,5 +9,5 @@
 ## 예제·수식·시각 자료
 
 ```
-npm test -- -t 'playground'
+pnpm test -t 'playground'
 ```

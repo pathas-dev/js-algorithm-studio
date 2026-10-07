@@ -41,18 +41,18 @@
 
 ## 로컬 실행
 
-Node.js **22.12 이상**, npm **10 이상**이 필요합니다.
+Node.js **22.12 이상**, pnpm **10.34.3**이 필요합니다.
 
 ```sh
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 터미널에 표시되는 로컬 주소를 엽니다. 프로덕션 결과는 다음 명령으로 확인합니다.
 
 ```sh
-npm run build
-npm run preview
+pnpm build
+pnpm preview
 ```
 
 `build`는 타입 검사 후 `dist`를 생성합니다. 위 명령은 로컬에서만 실행되며 Git 푸시나 배포를 수행하지 않습니다.
@@ -92,17 +92,17 @@ npm run preview
 React·TypeScript·Vite로 구성하고, Mantine으로 UI, Motion으로 애니메이션, Shiki로 소스 구문 강조를 처리합니다. 기존 알고리즘에 선택적인 단계 기록을 연결하며 시각화용 알고리즘을 복제하지 않습니다.
 
 ```sh
-npm run check:docs
-npm run lint
-npm run build
-npm run coverage -- --runInBand
+pnpm check:docs
+pnpm lint
+pnpm build
+pnpm coverage --runInBand
 ```
 
 Jest는 알고리즘·단계 기록·입력 검증·재생 로직을 검사합니다. React 화면은 실제 브라우저에서 별도로 점검하며, 해당 화면의 DOM 테스트 커버리지는 Jest 수치에 포함하지 않습니다. 최신 검사 결과는 [개발 계획](DEVELOPMENT_PLAN.md)에 기록합니다.
 
 ## Vercel 배포 준비
 
-[vercel.json](vercel.json)에 Vite 프레임워크, `npm ci`, `npm run build`, 출력 폴더 `dist`를 설정했습니다. 별도 서버나 환경 변수 없이 정적 웹 앱으로 빌드할 수 있습니다.
+[vercel.json](vercel.json)에 Vite 프레임워크, `corepack enable && pnpm install --frozen-lockfile`, `pnpm build`, 출력 폴더 `dist`를 설정했습니다. Corepack으로 `packageManager`에 고정한 pnpm 버전을 사용합니다. 별도 서버나 환경 변수 없이 정적 웹 앱으로 빌드할 수 있습니다.
 
 아직 실제 배포를 수행하지 않았습니다. Vercel 프로젝트 연결·배포와 Git 푸시는 별도 명시적 지시가 있을 때 진행합니다.
 

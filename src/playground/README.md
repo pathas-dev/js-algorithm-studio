@@ -9,5 +9,5 @@ be tested in `./__test__/playground.test.js` file.
 To run tests simply run:
 
 ```
-npm test -- -t 'playground'
+pnpm test -t 'playground'
 ```

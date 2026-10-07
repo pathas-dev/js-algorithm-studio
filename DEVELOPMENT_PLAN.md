@@ -89,12 +89,12 @@
 Node.js 22.12 이상.
 
 ```sh
-npm ci
-npm run check:docs
-npm run lint
-npm run build
-npm run coverage -- --runInBand
-npm run dev
+pnpm install --frozen-lockfile
+pnpm check:docs
+pnpm lint
+pnpm build
+pnpm coverage --runInBand
+pnpm dev
 ```
 
 이전 기록 · 2026-10-05 기준: 191개 테스트 모음, 650개 테스트 통과. 구문·함수·라인 커버리지 100%, 분기 98.48%. 타입 검사·프로덕션 빌드·문서 검사·린트 통과.

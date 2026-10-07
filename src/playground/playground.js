@@ -3,7 +3,7 @@ import factorial from '../algorithms/math/factorial/factorial';
 
 // Write your playground code inside the playground() function.
 // Test your code from __tests__/playground.test.js
-// Launch playground tests by running: npm test -- 'playground'
+// Launch playground tests by running: pnpm test 'playground'
 function playground() {
   // Replace the next line with your playground code.
   return factorial(5);
