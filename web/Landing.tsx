@@ -3,10 +3,10 @@ import './landing.css';
 
 type Language = 'ko' | 'en';
 const examples = [
-  ['stack', '실행 취소', 'Undo an action', '스택', 'Stack', '가장 최근 작업부터 되돌립니다. 마지막에 넣은 것을 먼저 꺼내는 LIFO 방식입니다.', 'Undo the latest action first. A stack takes out the last item added: LIFO.'],
-  ['queue', '순서대로 처리', 'Process in order', '큐', 'Queue', '인쇄 대기열처럼 먼저 들어온 요청부터 처리합니다. 먼저 넣은 것을 먼저 꺼내는 FIFO 방식입니다.', 'Like a print queue, requests are processed in arrival order: first in, first out.'],
-  ['trie', '검색어 자동 완성', 'Autocomplete a search', '트라이', 'Trie', '같은 접두사를 공유하는 단어를 모아 입력한 글자로 시작하는 후보를 찾습니다.', 'Group words by shared prefixes to find suggestions starting with the letters typed.'],
-  ['dijkstra', '가까운 경로 찾기', 'Find a shorter route', '다익스트라', 'Dijkstra', '도로를 정점과 간선으로 표현하고 이동 비용이 가장 작은 경로를 찾습니다. 음수 비용은 사용할 수 없습니다.', 'Model roads as vertices and edges, then find paths with the lowest cost. Edge costs must be nonnegative.'],
+  ['stack', '방금 한 일부터 되돌리기', 'Undo the thing you just did', '스택', 'Stack', '가장 최근에 넣은 것부터 꺼냅니다. 방금 한 일을 되돌릴 때도, 쌓인 접시를 꺼낼 때도.', 'Take out what you added last. It works for undoing an action, or taking a plate from a stack.'],
+  ['queue', '먼저 온 사람부터', 'First to arrive, first to leave', '큐', 'Queue', '먼저 들어온 요청부터 처리합니다. 인쇄 대기열도 이런 식으로 조용히 차례를 기다립니다.', 'Process requests in arrival order. A print queue waits its turn in much the same way.'],
+  ['trie', '말문이 같은 단어들', 'Words that start alike', '트라이', 'Trie', '같은 글자로 시작하는 단어들이 가지를 나눠 씁니다. 몇 글자만 적어도 후보가 보이는 이유.', 'Words share branches when they start with the same letters. A few letters are enough to find some suggestions.'],
+  ['dijkstra', '덜 돌아가는 쪽으로', 'Take fewer detours', '다익스트라', 'Dijkstra', '이동 비용이 작은 길부터 살펴봅니다. 음수 비용이 없을 때, 시작점에서 가장 적은 비용으로 가는 길을 찾습니다.', 'Start with lower-cost routes. With nonnegative edge costs, find the cheapest paths from a starting point.'],
 ];
 
 export default function Landing() {
@@ -17,7 +17,7 @@ export default function Landing() {
   const lesson = (id: string) => `?lesson=${id}&lang=${language}`;
   useEffect(() => {
     document.documentElement.lang = language;
-    document.title = t('Algorithm Studio · 생각을 움직여 보세요', 'Algorithm Studio · See your thinking in motion');
+    document.title = t('이젠 아무래도 좋을 알고리즘', 'Algorithms, for what it’s worth');
     const url = new URL(location.href);
     if (language === 'en') url.searchParams.set('lang', 'en');
     else url.searchParams.delete('lang');
@@ -30,44 +30,44 @@ export default function Landing() {
     { notation: 'O(n²)', count: size * (size - 1) / 2, name: t('버블 정렬 · 최악의 비교', 'Bubble sort · worst-case comparisons'), note: t('입력이 커질수록 빠르게 증가', 'Grows rapidly with input size'), color: '#ad5437' },
   ];
   return <div className="landing">
-    <a className="landing-skip" href="#warmup">{t('워밍업으로 건너뛰기', 'Skip to the warmup')}</a>
+    <a className="landing-skip" href="#warmup">{t('구경할 거리로 건너뛰기', 'Skip to things to explore')}</a>
     <header className="landing-header">
-      <a className="brand" href={language === 'en' ? '?lang=en' : '/'}><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" />Algorithm Studio</a>
+      <a className="brand" href={language === 'en' ? '?lang=en' : '/'}><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" />{t('이젠 아무래도 좋을 알고리즘', 'Algorithms, for what it’s worth')}</a>
       <nav aria-label={t('주요 메뉴', 'Main navigation')}>
-        <a href="#warmup">Big O</a><a href="#use-cases">{t('어디에 쓰일까?', 'Where is it used?')}</a>
+        <a href="#warmup">Big O</a><a href="#use-cases">{t('익숙한 것들', 'Familiar things')}</a>
         <button onClick={() => setLanguage(ko ? 'en' : 'ko')}>{ko ? 'English' : '한국어'}</button>
       </nav>
     </header>
     <main>
       <section className="landing-intro" aria-labelledby="intro-title">
         <div className="intro-copy">
-          <h1 id="intro-title">{t('외우기 전에,', 'Before you memorize,')}<br /><span>{t('움직여 보세요.', 'see it move.')}</span></h1>
-          <p>{t('복잡해 보이는 알고리즘도 작은 선택의 연속입니다. 먼저 감을 잡고, 입력을 바꾸고, 한 단계씩 따라가 보세요.', 'Every algorithm is a sequence of small decisions. Get a feel for the ideas, change the input, and follow each step.')}</p>
-          <div className="intro-links"><a className="landing-primary" href={lesson('bubble-sort')}>{t('버블 정렬부터 시작하기', 'Start with bubble sort')}<Arrow /></a><a className="landing-text-link" href="#warmup">{t('가볍게 워밍업', 'Warm up first')}<Arrow /></a></div>
+          <h1 id="intro-title">{t('이젠 아무래도 좋을', 'Algorithms,')}<br /><span>{t('알고리즘', 'for what it’s worth.')}</span></h1>
+          <p>{t('AI가 짜준다는데. 면접이 아니라면 외울 일도 없는데. 그래도 숫자가 제자리를 찾아가는 건 조금 볼 만합니다.', 'AI can write it. You might never need to memorize it. Still, there’s something nice about numbers finding their places.')}</p>
+          <div className="intro-links"><a className="landing-primary" href={lesson('bubble-sort')}>{t('그냥 구경하기', 'Just watch')}<Arrow /></a><a className="landing-text-link" href="#warmup">{t('얼마나 바쁜지 보기', 'See how much work it is')}<Arrow /></a></div>
         </div>
         <a className="intro-demo" href={lesson('bubble-sort')} aria-label={t('버블 정렬 시각화 열기', 'Open the bubble sort visualization')}>
-          <div className="demo-heading"><span>{t('이웃한 두 값, 한 번의 비교', 'Two neighbors. One comparison.')}</span><span className="demo-code">5 &gt; 2</span></div>
+          <div className="demo-heading"><span>{t('옆자리와 잠깐 얘기하는 중', 'A brief chat with the neighbor')}</span><span className="demo-code">5 &gt; 2</span></div>
           <div className="demo-bars" aria-hidden="true">{[3, 5, 2, 4, 1, 6].map((value, index) => <div key={index} className={index === 1 || index === 2 ? 'demo-bar comparing' : 'demo-bar'} style={{ height: `${value * 25}px` }}><span>{value}</span></div>)}</div>
           <div className="demo-explanation"><span className="demo-pair">[5, 2] <Arrow /> [2, 5]</span><p>{t('왼쪽 값이 더 크면 자리를 바꿉니다.', 'Swap them when the left value is larger.')}</p></div>
-          <div className="demo-bottom"><span>{t('이 작은 선택을 반복하면 정렬이 됩니다.', 'Repeat this small decision to sort the array.')}</span><Arrow /></div>
+          <div className="demo-bottom"><span>{t('이러다 보면, 제자리에 갑니다.', 'Keep at it. They find their places.')}</span><Arrow /></div>
         </a>
       </section>
       <section className="landing-warmup" id="warmup" aria-labelledby="big-o-title">
-        <div className="section-intro"><h2 id="big-o-title">{t('데이터가 늘어나면,', 'As the data grows,')}<br />{t('할 일은 얼마나 늘어날까요?', 'how much more work is there?')}</h2><p>{t('Big O는 입력 크기 n이 커질 때 필요한 시간이나 공간의 증가를 나타내는 상한 표기입니다. 초 단위의 속도가 아니라, 증가하는 모양을 읽습니다.', 'Big O describes an upper bound on how time or space grows with input size n. It describes the pattern of growth, not a speed measured in seconds.')}</p></div>
+        <div className="section-intro"><h2 id="big-o-title">{t('입력이 늘어나면,', 'When there’s more input,')}<br />{t('바빠지는 방식도 제각각.', 'everyone gets busy differently.')}</h2><p>{t('슬라이더를 움직이면 할 일이 얼마나 늘어나는지 보입니다. Big O는 입력이 커질 때 시간이나 공간이 늘어나는 상한 표기입니다. 초 단위의 속도는 아니고요.', 'Move the slider to see how the work grows. Big O is an upper bound on how time or space grows with input size. It isn’t a speed in seconds.')}</p></div>
         <div className="complexity-lab">
           <div className="lab-control"><label htmlFor="input-size">{t('입력 크기', 'Input size')} <strong>n = {size}</strong></label><input id="input-size" type="range" min="1" max="7" value={Math.log2(size)} aria-valuetext={`n = ${size}`} onChange={(event) => setSize(2 ** Number(event.target.value))} /><span>2–128</span></div>
           <div className="complexity-rows">{models.map((model) => <div className="complexity-row" key={model.notation}><div className="complexity-label"><strong>{model.notation}</strong><span>{model.name}</span></div><div className="complexity-meter"><div style={{ transform: `scaleX(${model.count / 8128})`, backgroundColor: model.color }} /></div><output aria-label={`${model.notation} ${t('모형 연산 수', 'model operations')}`}>{model.count.toLocaleString(language)}</output><small>{model.note}</small></div>)}</div>
           <p className="lab-caption">{t('막대는 같은 축의 단순 연산 모형입니다: 1, ⌈log₂ n⌉, n, n(n−1)/2. 실제 실행 시간이나 모든 구현의 정확한 연산 수는 아닙니다.', 'Bars use simple operation models on a shared scale: 1, ⌈log₂ n⌉, n, n(n−1)/2. They are not measured runtimes or exact counts for every implementation.')}</p>
         </div>
-        <div className="warmup-notes"><p><strong>{t('조건도 함께 읽기', 'Read the conditions, too')}</strong>{t('이진 탐색은 정렬된 데이터가 필요합니다. 버블 정렬의 O(n²)는 최악의 경우이며, 조기 종료를 쓰면 이미 정렬된 배열은 O(n)입니다.', 'Binary search needs sorted data. Bubble sort is O(n²) in the worst case; early exit makes an already sorted array O(n).')}</p><p><strong>{t('시간과 공간은 다른 질문', 'Time and space ask different questions')}</strong>{t('얼마나 많이 계산하는지, 얼마나 많은 메모리를 쓰는지 구분하세요. 병합 정렬은 보통 O(n log n) 시간과 O(n) 추가 공간을 사용합니다.', 'Distinguish how much computation you do from how much memory you use. Merge sort typically takes O(n log n) time and O(n) auxiliary space.')}</p></div>
+        <div className="warmup-notes"><p><strong>{t('몇 가지 사정은 있습니다', 'There are a few conditions')}</strong>{t('이진 탐색은 정렬된 데이터가 필요합니다. 버블 정렬의 O(n²)는 최악의 경우이며, 조기 종료를 쓰면 이미 정렬된 배열은 O(n)입니다.', 'Binary search needs sorted data. Bubble sort is O(n²) in the worst case; early exit makes an already sorted array O(n).')}</p><p><strong>{t('걸리는 품과 차지하는 자리', 'The work it takes, the room it uses')}</strong>{t('계산이 적다고 자리도 적게 쓰는 건 아닙니다. 병합 정렬은 보통 O(n log n) 시간과 O(n) 추가 공간을 사용합니다.', 'Less computation doesn’t always mean less room. Merge sort typically uses O(n log n) time and O(n) auxiliary space.')}</p></div>
       </section>
       <section className="landing-use-cases" id="use-cases" aria-labelledby="uses-title">
-        <div className="section-intro"><h2 id="uses-title">{t('이미 매일 쓰고 있는 아이디어.', 'Ideas you already use every day.')}</h2><p>{t('자료 구조는 데이터를 담는 방식, 알고리즘은 문제를 푸는 절차입니다. 익숙한 기능에서 출발하면 둘의 역할이 선명해집니다.', 'A data structure organizes data; an algorithm is a procedure for solving a problem. Familiar features make their roles easier to see.')}</p></div>
+        <div className="section-intro"><h2 id="uses-title">{t('이름은 몰라도, 익숙한 일들.', 'Familiar things, unfamiliar names.')}</h2><p>{t('되돌리기, 줄 서기, 검색어 추천, 길 찾기. 데이터를 담고 다루는 방식이 익숙한 기능 뒤에서 일을 하고 있습니다.', 'Undoing, waiting in line, suggesting a word, finding a route. Familiar features have ways of storing and handling data quietly working behind them.')}</p></div>
         <div className="use-case-list">{examples.map(([id, titleKo, titleEn, nameKo, nameEn, descriptionKo, descriptionEn]) => <a key={id} href={lesson(id)} className="use-case"><h3>{t(titleKo, titleEn)}</h3><p>{t(descriptionKo, descriptionEn)}</p><span>{t(nameKo, nameEn)}<Arrow /></span></a>)}</div>
       </section>
-      <section className="landing-start"><div><h2>{t('이제, 한 단계씩 확인해 볼까요?', 'Ready to follow each step?')}</h2><p>{t('재생을 멈추고, 값을 바꾸고, 코드와 움직임을 연결해 보세요.', 'Pause the playback, change a value, and connect the code with the movement.')}</p></div><a className="landing-primary" href={lesson('bubble-sort')}>{t('시각화 열기', 'Open the visualizer')}<Arrow /></a></section>
+      <section className="landing-start"><div><h2>{t('알아도 되고, 구경만 해도 됩니다.', 'Understand it, or just enjoy watching.')}</h2><p>{t('멈춰도 되고, 숫자를 바꿔도 됩니다. 코드는 궁금해졌을 때 펼쳐보면 되고요.', 'Pause it. Change a number. Open the code if you get curious.')}</p></div><a className="landing-primary" href={lesson('bubble-sort')}>{t('조금 더 구경하기', 'Watch a little more')}<Arrow /></a></section>
     </main>
-    <footer className="landing-footer"><span>Algorithm Studio</span><span>{t('천천히 살펴보세요. 이해는 속도보다 방향입니다.', 'Take your time. Understanding is about direction, not speed.')}</span></footer>
+    <footer className="landing-footer"><span>{t('이젠 아무래도 좋을 알고리즘', 'Algorithms, for what it’s worth')}</span><span>{t('아무것도 외우지 않았어도, 잘 구경했습니다.', 'Nothing memorized. Time well spent.')}</span></footer>
   </div>;
 }
 function Arrow() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>; }

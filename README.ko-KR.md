@@ -1,10 +1,10 @@
-# Algorithm Studio · 알고리즘 설명 목록
+# 이젠 아무래도 좋을 알고리즘 · 알고리즘 설명 목록
 
 [프로젝트 소개](README.md) | [알고리즘 설명 목록](README.ko-KR.md)
 
-[`js-algorithm-studio`](https://github.com/pathas-dev/js-algorithm-studio)는 JavaScript 알고리즘을 단계별로 탐색하는 **Algorithm Studio**의 저장소입니다.
+[`js-algorithm-studio`](https://github.com/pathas-dev/js-algorithm-studio)는 JavaScript 알고리즘을 단계별로 구경하는 **이젠 아무래도 좋을 알고리즘**의 저장소입니다.
 
-아래 목록은 저장소에 포함된 전체 알고리즘·자료 구조 코드와 한국어 설명입니다. 웹에서 지원하는 **45개 시각화**의 목록과 실행 방법은 [프로젝트 소개](README.md)를 참고하세요. 설명 파일이 있다고 웹 시각화까지 구현된 것은 아닙니다. 개별 설명에는 영어·한국어 전환 링크를 제공합니다.
+아래 목록은 저장소에 포함된 전체 알고리즘·자료 구조 코드와 한국어 설명입니다. 웹에서 지원하는 **111개 시각화**의 목록과 실행 방법은 [프로젝트 소개](README.md)를 참고하세요. 설명 파일이 있다고 웹 시각화까지 구현된 것은 아닙니다. 개별 설명에는 영어·한국어 전환 링크를 제공합니다.
 
 ## 자료 구조
 

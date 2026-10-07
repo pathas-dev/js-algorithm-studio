@@ -1,7 +1,7 @@
 {
   "name": "js-algorithm-studio",
   "version": "0.0.4",
-  "description": "알고리즘 실행 단계를 시각화하고 코드와 설명을 함께 탐색하는 한국어·영어 학습 웹 서비스, Algorithm Studio",
+  "description": "외우지 않아도 되는 알고리즘 구경 공간. 한국어·영어로 111개 알고리즘과 자료 구조의 움직임을 탐색합니다.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pathas-dev/js-algorithm-studio.git"

@@ -9,7 +9,7 @@ const App = lazy(() => import('./App'));
 
 function LoadingScreen() {
   return (
-    <main className="studio-loading" aria-label="Algorithm Studio">
+    <main className="studio-loading" aria-label="이젠 아무래도 좋을 알고리즘">
       <div className="loading-content">
         <div className="brand loading-brand">
           <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true">
@@ -21,7 +21,7 @@ function LoadingScreen() {
             </g>
             <circle cx="18.5" cy="24" r="4.5" fill="#efbd77" />
           </svg>
-          Algorithm Studio
+          {new URLSearchParams(location.search).get('lang') === 'en' ? 'Algorithms, for what it’s worth' : '이젠 아무래도 좋을 알고리즘'}
         </div>
         <svg className="loading-array" viewBox="0 0 264 144" fill="none" aria-hidden="true">
           <path d="M8 128H256" stroke="#c9d2cc" strokeDasharray="3 4" />

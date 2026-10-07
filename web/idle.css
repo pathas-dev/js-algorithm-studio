@@ -1,0 +1,72 @@
+/* Quiet shared lesson layout, extending the approved bubble-sort preview. */
+.idle-studio { height: auto; min-height: 100dvh; display: block; }
+.idle-studio .brand { font-weight: 550; }
+.idle-studio .brand-mark { width: 28px; height: 28px; flex-basis: 28px; }
+.idle-studio .header-note { color: #586b5e; }
+.idle-studio > main { display: block; margin-top: 42px; }
+.idle-studio .workspace { gap: 48px; }
+.idle-studio .catalog { align-self: start; max-height: 70dvh; }
+.idle-studio .algorithm-button { font-weight: 450; padding-block: 11px; }
+.idle-studio .algorithm-button.selected { background: #e8eee5; color: #365745; }
+.idle-studio .catalog-label { font-weight: 500; }
+.idle-studio .lesson { display: block; }
+.idle-studio .lesson-heading { margin-bottom: 32px; gap: 20px; }
+.idle-studio .lesson-heading h1 { font-size: clamp(32px, 3.4vw, 46px); font-weight: 450; line-height: 1.25; }
+.idle-studio .lesson-heading .lesson-tagline { margin-top: 14px; font-size: 21px; line-height: 1.6; color: #344e3e; text-wrap: balance; }
+.idle-studio .lesson-heading .lesson-intro { margin-top: 12px; max-width: 65ch; font-size: 15px; line-height: 1.85; color: #586b5e; word-break: keep-all; }
+.idle-studio .lesson-heading > .mantine-Badge-root { margin-top: 8px; border: 0; padding: 0; color: #586b5e; font-size: 12px; font-weight: 400; }
+.idle-studio .playback-card { padding: 12px 0; background: transparent; border: 0; border-top: 1px solid #d5dfd6; border-radius: 0; margin-bottom: 16px; }
+.idle-studio .play-button { background: #e2eae0; color: #344e3e; font-weight: 500; min-width: 140px; }
+.idle-studio .play-button:hover { background: #d3dfd0; }
+.idle-studio .timeline { accent-color: #5f7e65; }
+.idle-studio .step-counter strong { font-weight: 500; }
+.idle-studio .step-action { background: transparent; padding: 0 0 18px; margin-bottom: 0; gap: 16px; }
+.idle-studio .step-action .action-name { font-size: 14px; font-weight: 500; }
+.idle-studio .action-evidence { font-size: 15px; font-weight: 500; }
+.idle-studio .action-decision p { font-size: 14px; font-weight: 450; }
+.idle-studio .why-button { background: transparent; font-weight: 450; color: #4c6755; }
+.idle-studio .lesson-panels { display: block; }
+.idle-studio .canvas-card { padding: 24px 28px; background: #eef2eb; border: 0; border-radius: 12px; overflow: visible; display: block; }
+.idle-studio .canvas-card > .mantine-Group-root > p { font-weight: 450; color: #4c6755; }
+.idle-studio .canvas-card > .mantine-Group-root .mantine-Badge-root { background: transparent; color: #52695c; font-weight: 450; }
+.idle-studio .lesson-visual { display: block; overflow: visible; }
+.idle-studio .array-scroll { display: block; padding-top: 24px; }
+.idle-studio .array-chart { --array-baseline: 170px; --array-scale: 136px; height: 225px; min-height: 225px; }
+.idle-studio .bar { left: 14%; right: 14%; background: #b4c5b1; border-radius: 4px 4px 2px 2px; }
+.idle-studio .comparing .bar { background: #c59455; }
+.idle-studio .swapping .bar { background: #9b87ac; }
+.idle-studio .settled .bar { background: #64876b; }
+.idle-studio .bar-label { font-weight: 450; font-size: 15px; }
+.idle-studio .legend { padding-top: 0; }
+.idle-studio .inline-input-editor { margin-top: 22px; border-color: #d5dfd6; }
+.idle-studio .editable-array { background: transparent; padding-inline: 0; }
+.idle-studio .editable-array:hover { background: #e3ebe0; border-color: transparent; }
+.idle-studio .lesson-code { margin-top: 22px; border-top: 1px solid #d5dfd6; }
+.lesson-code summary { display: flex; align-items: center; gap: 10px; padding: 18px 2px; cursor: pointer; color: #4c6755; font-size: 14px; list-style: none; }
+.lesson-code summary::-webkit-details-marker { display: none; }
+.lesson-code summary::before { content: '+'; font-size: 18px; }
+.lesson-code[open] summary::before { content: '−'; }
+.lesson-code summary span { margin-left: auto; font: 12px ui-monospace, monospace; }
+.lesson-code summary:hover { color: #196d53; }
+.lesson-code summary:focus-visible { outline: 3px solid #087f5b; outline-offset: 3px; }
+.idle-studio .lesson-code .source-scroll { min-height: 320px; max-height: 420px; }
+.idle-studio .studio-footer { padding: 28px 0 8px; color: #586b5e; font-size: 12px; }
+@media (max-width: 1050px) {
+  .idle-studio .workspace { gap: 28px; }
+  .idle-studio .step-action { grid-template-columns: auto minmax(0, 1fr) auto; }
+}
+@media (max-width: 650px) {
+  .idle-studio .brand { font-size: 14px; }
+  .idle-studio .brand-mark { width: 24px; height: 24px; flex-basis: 24px; }
+  .idle-studio .studio-header { gap: 8px; }
+  .idle-studio > main { margin-top: 24px; }
+  .idle-studio .workspace { gap: 20px; }
+  .idle-studio .lesson-heading { margin-top: 0; margin-bottom: 24px; gap: 10px; }
+  .idle-studio .lesson-heading > div:first-child { flex-basis: 100%; }
+  .idle-studio .lesson-heading .lesson-tagline { font-size: 19px; }
+  .idle-studio .playback-toolbar { gap: 8px; }
+  .idle-studio .play-button { min-width: 126px; margin-inline: 2px; padding-inline: 10px; }
+  .idle-studio .canvas-card { padding: 20px 16px; }
+  .idle-studio .array-chart { --array-baseline: 146px; --array-scale: 110px; height: 196px; min-height: 196px; }
+  .idle-studio .step-action { gap: 8px; padding-bottom: 16px; }
+}

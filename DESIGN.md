@@ -1,17 +1,26 @@
 ---
-name: Algorithm Studio
-description: Step-by-step algorithm learning with visual execution and JavaScript.
+name: "이젠 아무래도 좋을 알고리즘"
+description: "Algorithms, for what it’s worth — watch first, explore when curious."
 colors:
   primary: "#196d53"
-  primary-hover: "#12533f"
   ink: "#1a3028"
   paper: "#f5f7f2"
   surface: "#fff"
   sage-surface: "#e8eee5"
+  canvas: "#eef2eb"
+  quiet-action: "#e2eae0"
+  quiet-action-hover: "#d3dfd0"
+  quiet-ink: "#344e3e"
+  selected-ink: "#365745"
   muted-text: "#4d6255"
+  lesson-muted: "#586b5e"
+  disclosure-text: "#4c6755"
   divider: "#d5dfd6"
-  landing-bar: "#9bb497"
-  landing-comparison: "#c58c47"
+  timeline: "#5f7e65"
+  bar: "#b4c5b1"
+  bar-comparison: "#c59455"
+  bar-swap: "#9b87ac"
+  bar-settled: "#64876b"
   comparison: "#d8964a"
   swap: "#8e79b4"
   settled: "#42886c"
@@ -22,43 +31,66 @@ colors:
 typography:
   display:
     fontFamily: '"Pretendard", "Noto Sans KR", system-ui, sans-serif'
-    fontSize: "clamp(38px, 4.7vw, 62px)"
-    fontWeight: 800
+    fontSize: "clamp(36px, 4.4vw, 58px)"
+    fontWeight: 450
     lineHeight: 1.2
     letterSpacing: "-.035em"
   headline:
     fontSize: "clamp(25px, 2.5vw, 34px)"
-    fontWeight: 750
+    fontWeight: 450
     lineHeight: 1.4
     letterSpacing: "-.03em"
+  title:
+    fontSize: "clamp(32px, 3.4vw, 46px)"
+    fontWeight: 450
+    lineHeight: 1.25
+    letterSpacing: "-.03em"
+  tagline:
+    fontSize: "21px"
+    lineHeight: 1.6
   body:
     fontFamily: '"Pretendard", "Noto Sans KR", system-ui, sans-serif'
     fontSize: "15px"
     lineHeight: 1.9
   label:
     fontSize: "13px"
+  action:
+    fontSize: "14px"
+    fontWeight: 500
+  brand:
+    fontWeight: 550
+    letterSpacing: "-.025em"
   code:
     fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
     fontSize: "13px"
     lineHeight: 1.9
 rounded:
   control: "9px"
+  canvas: "12px"
   code: "12px"
   landing-surface: "16px"
+  array-bar: "4px 4px 2px 2px"
 spacing:
   compact: "8px"
   control: "16px"
   group: "24px"
   panel: "32px"
+  workspace-gap: "48px"
   section-gap: "64px"
 components:
   button-primary:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.surface}"
+    backgroundColor: "{colors.quiet-action}"
+    textColor: "{colors.quiet-ink}"
+    typography: "{typography.action}"
     rounded: "{rounded.control}"
     padding: "14px 19px"
   button-primary-hover:
-    backgroundColor: "{colors.primary-hover}"
+    backgroundColor: "{colors.quiet-action-hover}"
+  lesson-canvas:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.canvas}"
+    padding: "24px 28px"
   landing-lab:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
@@ -70,60 +102,70 @@ components:
     rounded: "{rounded.code}"
 ---
 
-# Design System: Algorithm Studio
+# Design System: 이젠 아무래도 좋을 알고리즘
 
 ## Overview
 
-The implemented system uses green accents, warm off-white backgrounds, restrained borders, and readable Korean/English typography. The landing carries these incumbent visualizer choices into a more spacious introduction; the lesson workspace keeps execution and code close together.
+The approved concept uses green accents, light paper, muted sage surfaces and lighter headings across the landing and lessons. Playful Korean/English introductions invite watching; exact algorithm summaries and step evidence support closer reading. The execution canvas leads, with source code available below when curiosity calls.
 
 **Key Characteristics:**
-- Green actions and sage surfaces.
-- Monospaced values and source code.
-- Clear text explanations beside visual evidence.
+- Light paper, sage actions and restrained borders.
+- Lighter headings and quiet bilingual copy.
+- Visible execution with code closed until requested.
+- Monospaced values and distinct execution states.
 
-This document records the current implementation in `web/main.tsx`, `web/styles.css`, and `web/landing.css`; it does not establish a new identity.
+This document records `web/main.tsx`, `web/styles.css`, `web/idle.css` and `web/landing.css`. The incumbent favicon remains the identity asset.
 
 ## Colors
 
-Primary green identifies actions, highlighted headline text, and input accents. Ink supplies the principal text; paper, white, and sage separate content without heavy contrast. Muted text and dividers support the reading hierarchy.
+Green remains the underlying accent; pale sage now carries primary actions. Paper, white and the light canvas separate content without heavy contrast. Selected text, explanation links and muted copy use related green neutrals.
 
-Landing comparisons use the warmer landing-comparison accent. Lesson states retain their distinct comparison, swap, settled, and matched colors. The dark code panel provides a separate reading surface.
+Array and landing-preview bars use the quieter bar palette. Comparison, swap and settled retain distinct hues; matched bars remain blue. Incumbent comparison, swap, settled and matched tokens continue in legends, graph, matrix and other lesson states. Keep these contextual palettes rather than flattening every state to sage.
+
+Dark code surfaces retain their existing reading contrast and green active-line evidence.
 
 ## Typography
 
-The shared font stack supports Korean and English. Display and headline tokens describe landing headings; lesson titles use (30px, weight 750), falling to (27px) on mobile. Intro body text uses (17px, line-height 1.8) and a (43ch) measure; section copy uses the body token with a (65ch) measure. Values, Big O notation, and source code use monospaced faces and tabular numbers where specified.
+Pretendard and Noto Sans KR support Korean and English. Landing displays, section headings and lesson titles use the lighter hierarchy in the frontmatter. Brand text uses the brand weight; actions, catalog labels and evidence generally use (450–550). Detailed explanations and numerical labels retain their own emphasis where needed.
+
+Lesson taglines use the tagline size, falling to (19px) below (650px). Exact lesson summaries use (15px, line-height 1.85) and a (65ch) measure. Landing intro copy uses (17px, line-height 1.8), falling to (15px) on mobile, with a (43ch) measure. Landing section copy uses the body token and a (65ch) measure. The mobile landing display uses (36px).
+
+Values, Big O notation, mathematical expressions and code use native monospace stacks with tabular numbers where specified. Array values use (15px, weight 450); action evidence uses (15px, weight 500).
 
 ## Layout
 
-The landing container has a maximum width of (1320px) and desktop horizontal padding of (48px). The opening pairs copy and a sorting preview in (1.1fr / 1fr) columns with a (64px) gap. Divided use-case rows and the white complexity lab keep the lower sections quiet and readable.
+The landing retains a (1320px) container and (48px) desktop horizontal padding. Its opening pairs copy and a sorting preview in (1.1fr / 1fr) columns with a (64px) gap. Divided use-case rows and a white complexity lab keep the lower sections readable. At (900px), padding becomes (28px). At (650px), padding becomes (20px), the introduction and section copy stack, and the use-case description moves below its title.
 
-At (900px), landing padding becomes (28px) and column gaps contract. At (650px), padding becomes (20px), opening and section introductions stack, and use-case descriptions move beneath their titles. The mobile landing heading uses (42px).
+Lessons use a (1560px) container and (180px) catalog beside a single reading column. The document scrolls naturally; the catalog has its own (70dvh) maximum height. The workspace gap is (48px), becoming (28px) at (1050px) and (20px) at (650px). On mobile, a native selector replaces the catalog. The execution canvas precedes the code disclosure at every width.
 
-The visualizer uses a (1560px) container with a (180px) catalog and execution/code panels. Above (1050px), it allocates the viewport height and lets panes own their overflow. At (1050px), execution and code stack; at (650px), the catalog becomes a mobile selector and the workspace uses one column.
+Canvas padding becomes (20px 16px) on mobile. Array charts use a (225px) height, falling to (196px) on mobile. Expanded code has a bounded scroll area of (320–420px).
 
 ## Elevation & Depth
 
-The custom landing styles use flat color surfaces and thin borders rather than shadows. Sage groups the preview and closing action; white distinguishes the complexity lab. The visualizer similarly separates execution, controls, and code through surface color and borders.
+Primary surfaces are flat: thin dividers and tonal layering provide separation without shadows. White distinguishes the Big O lab; sage holds execution and the closing invitation. The detailed step-explanation popover retains its Mantine medium shadow as a transient overlay.
 
 ## Shapes
 
-Controls use gently rounded corners; larger landing surfaces use the landing-surface radius. Code panels use the code radius. Array bars use modest curved tops, while meters remain compact horizontal tracks.
+Controls remain gently rounded. Lesson canvases and dark code panels use their respective radii; landing surfaces use the larger landing radius. Playback and disclosure wrappers are flat, divided by horizontal rules. Array bars use smaller curved tops and subtly curved bottoms; landing-preview bars use (5px 5px 0 0). Complexity meters use (3px) corners.
 
 ## Components
 
-- Primary links: green fill, white text, a darker hover state, and the shared visible focus outline.
-- Header navigation: text links with underlined hover states, plus an outlined language control.
-- Complexity lab: native range input, monospaced operation counts, and horizontally scaled meters. Its caption distinguishes the growth model from measured runtime.
-- Use-case links: bordered editorial rows with a light sage hover surface.
-- Lesson controls: playback, a native timeline, editable inputs, and consistently colored execution states.
-- Code panel: dark source surface, line numbers, and a green active-line highlight.
+- Primary actions: pale sage fill, quiet green text and a darker sage hover. Lesson playback says “그냥 구경하기” / “Just watch” before playback begins.
+- Navigation: quiet text links, underlined hover, an outlined language switch and a sage selected catalog row. Mobile lessons use a native grouped selector.
+- Complexity lab: native range input, monospaced operation counts and meters on a shared scale. The caption identifies the simple growth model rather than measured runtime.
+- Execution canvas: light sage surface, factual step evidence and editable input beneath the visualization. Existing validation, playback, timeline, speed and keyboard controls remain available.
+- Code disclosure: native `details` / `summary`, closed on entering a lesson and reset on lesson change. The summary reads “코드도 궁금하다면” / “If you’re curious about the code”, with a plus/minus indicator. Opening reveals the incumbent dark panel, line numbers and active-line highlight.
+- Step explanation: “궁금하다면” / “Curious?” opens the precise explanation and relevant variables.
 
-Meter transitions use (0.3s) with `cubic-bezier(.16,1,.3,1)`. Global reduced-motion handling suppresses animation and transitions. Buttons and links use a (3px) focus outline with a (3px) offset.
+Meter transitions use (0.3s) with `cubic-bezier(.16,1,.3,1)`. Global reduced-motion handling suppresses animation and transitions; lesson motion respects the user's preference. Buttons, links, timeline and disclosure summary retain a (3px) focus outline with a (3px) offset.
 
 ## Do's and Don'ts
 
-- Do preserve the Algorithm Studio name and existing favicon.
+- Do use the Korean and English product names and preserve the incumbent favicon.
 - Do keep Korean and English copy readable at narrow widths.
+- Do place playful taglines alongside exact summaries and step explanations.
+- Do lead with execution and keep code available through a closed native disclosure.
 - Do pair execution colors with textual or numeric evidence.
 - Don't present the Big O growth model as measured runtime.
-- Don't collapse comparison, swap, settled, and matched lesson states into one accent.
+- Don't collapse comparison, swap, settled and matched lesson states into one accent.
+- Don't turn precise input constraints or error messages into jokes.

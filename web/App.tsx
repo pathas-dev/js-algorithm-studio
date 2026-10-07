@@ -24,6 +24,8 @@ import StructureView from './StructureView';
 import CodePanel from './CodePanel';
 import StringView from './StringView';
 import DpView from './DpView';
+import './idle.css';
+import { lessonTaglines } from './lesson-copy';
 
 function PlaybackIcon({ name }: { name: 'first' | 'previous' | 'play' | 'pause' | 'replay' | 'next' | 'last' }) {
   const paths = {
@@ -68,7 +70,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.lang = language;
-    document.title = `${algorithm.name[language]} · Algorithm Studio`;
+    document.title = `${algorithm.name[language]} · ${t('이젠 아무래도 좋을 알고리즘', 'Algorithms, for what it’s worth')}`;
     const url = new URL(location.href);
     url.searchParams.set('lesson', algorithm.id);
     url.searchParams.set('lang', language);
@@ -83,7 +85,7 @@ export default function App() {
     const onKey = (event: KeyboardEvent) => {
       if (editingInput || whyOpen) return;
       if (event.altKey || event.ctrlKey || event.metaKey) return;
-      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, a, [role="combobox"]')) return;
+      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, a, summary, [role="combobox"]')) return;
       if (event.key === 'ArrowLeft') seek(playback.index - 1);
       else if (event.key === 'ArrowRight') seek(playback.index + 1);
       else if (event.key === 'Home') seek(0);
@@ -262,10 +264,10 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="studio">
+      <div className="studio idle-studio">
         <header className="studio-header">
-          <a className="brand" href={ko ? "/" : "?lang=en"}><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" /> Algorithm Studio</a>
-          <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('작은 단계가 만드는 큰 이해', 'Small steps. Clear understanding.')}</Text>
+          <a className="brand" href={ko ? "/" : "?lang=en"}><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" />{t('이젠 아무래도 좋을 알고리즘', 'Algorithms, for what it’s worth')}</a>
+          <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('외우지 않아도 됩니다.', 'No memorizing required.')}</Text>
             <Button variant="default" size="xs" onClick={() => { setWhyOpen(false); setLanguage(ko ? 'en' : 'ko'); }}>{ko ? 'English' : '한국어'}</Button>
           </Group>
         </header>
@@ -287,8 +289,9 @@ export default function App() {
             </nav>
             <div className="lesson">
               <div className="lesson-heading">
-                <div><Group gap="sm"><Title order={1}>{algorithm.name[language]}</Title><Badge color="teal" variant="light">{algorithm.category === 'sort' ? t('정렬', 'SORTING') : algorithm.category === 'search' ? t('검색', 'SEARCHING') : algorithm.category === 'graph' ? t('그래프', 'GRAPHS') : algorithm.category === 'string' ? t('문자열', 'STRINGS') : algorithm.category === 'other' ? t('기타 알고리즘', 'OTHER ALGORITHMS') : algorithm.category === 'statistics' ? t('통계', 'STATISTICS') : algorithm.category === 'image-processing' ? t('이미지 처리', 'IMAGE PROCESSING') : algorithm.category === 'ml' ? t('머신 러닝', 'MACHINE LEARNING') : algorithm.category === 'cryptography' ? t('암호·해시', 'CIPHERS & HASHES') : algorithm.category === 'linked-list' ? t('연결 리스트 탐색', 'LINKED LIST TRAVERSAL') : algorithm.category === 'tree' ? t('트리 탐색', 'TREE TRAVERSAL') : algorithm.category === 'sets' ? t('집합·조합', 'SETS & COMBINATIONS') : algorithm.category === 'math' ? t('수학', 'MATHEMATICS') : algorithm.category === 'dp' ? t('동적 계획', 'DYNAMIC PROGRAMMING') : t('자료 구조', 'DATA STRUCTURES')}</Badge></Group>
-                  <Text size="sm" c="dimmed" mt={6}>{algorithm.summary[language]}</Text>
+                <div><Group gap="sm"><Title order={1}>{algorithm.name[language]}</Title></Group>
+                  <Text className="lesson-tagline">{lessonTaglines[algorithm.id][language]}</Text>
+                  <Text className="lesson-intro">{algorithm.summary[language]}</Text>
                 </div>
                 <Badge variant="outline" color="gray">{typeof algorithm.time === 'string' ? algorithm.time : algorithm.time[language]}</Badge>
               </div>
@@ -297,7 +300,7 @@ export default function App() {
                   <div className="transport">
                     <Button variant="subtle" className="transport-button" aria-label={t('처음', 'First')} title={t('처음으로 · Home', 'First step · Home')} onClick={() => seek(0)} disabled={playback.index === 0}><PlaybackIcon name="first" /></Button>
                     <Button variant="subtle" className="transport-button" aria-label={t('이전', 'Previous')} title={t('이전 단계 · ←', 'Previous step · ←')} onClick={() => seek(playback.index - 1)} disabled={playback.index === 0}><PlaybackIcon name="previous" /></Button>
-                    <Button className="play-button" onClick={togglePlayback} title={t('재생 / 일시정지 · Space', 'Play / pause · Space')} leftSection={<PlaybackIcon name={playback.playing ? 'pause' : playback.index === steps.length - 1 ? 'replay' : 'play'} />}>{playback.playing ? t('일시정지', 'Pause') : playback.index === steps.length - 1 ? t('다시 재생', 'Replay') : t('재생', 'Play')}</Button>
+                    <Button className="play-button" onClick={togglePlayback} title={t('재생 / 일시정지 · Space', 'Play / pause · Space')} leftSection={<PlaybackIcon name={playback.playing ? 'pause' : playback.index === steps.length - 1 ? 'replay' : 'play'} />}>{playback.playing ? t('일시정지', 'Pause') : playback.index === steps.length - 1 ? t('다시 재생', 'Replay') : t('그냥 구경하기', 'Just watch')}</Button>
                     <Button variant="subtle" className="transport-button" aria-label={t('다음', 'Next')} title={t('다음 단계 · →', 'Next step · →')} onClick={() => seek(playback.index + 1)} disabled={playback.index === steps.length - 1}><PlaybackIcon name="next" /></Button>
                     <Button variant="subtle" className="transport-button" aria-label={t('마지막', 'Last')} title={t('마지막으로 · End', 'Last step · End')} onClick={() => seek(steps.length - 1)} disabled={playback.index === steps.length - 1}><PlaybackIcon name="last" /></Button>
                   </div>
@@ -313,7 +316,7 @@ export default function App() {
             <output className="action-evidence">{action[1]}</output>
             <div className="action-decision"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg><Text data-testid="step-action">{action[2]}</Text></div>
             <Popover opened={whyOpen} onChange={setWhyOpen} position="bottom-end" width={380} trapFocus returnFocus withArrow shadow="md">
-              <Popover.Target><Button className="why-button" variant="subtle" aria-expanded={whyOpen} aria-label={t('왜? 단계 해설 열기', 'Why? Open step explanation')} onClick={() => { dispatch({ type: 'seek', index: playback.index }); setWhyOpen(!whyOpen); }}>{t('왜?', 'Why?')}</Button></Popover.Target>
+              <Popover.Target><Button className="why-button" variant="subtle" aria-expanded={whyOpen} aria-label={t('궁금하다면: 단계 해설 열기', 'Curious? Open step explanation')} onClick={() => { dispatch({ type: 'seek', index: playback.index }); setWhyOpen(!whyOpen); }}>{t('궁금하다면', 'Curious?')}</Button></Popover.Target>
               <Popover.Dropdown className="step-why" role="dialog" aria-label={t('상세 단계 해설', 'Detailed step explanation')}>
                 <Group justify="space-between"><Text fw={700}>{stepTitle}</Text><Button variant="subtle" size="xs" onClick={() => setWhyOpen(false)}>{t('닫기', 'Close')}</Button></Group>
                 <Text className="step-reason" data-testid="step-reason">{reason}</Text>
@@ -323,7 +326,7 @@ export default function App() {
               </section>
               <div className="lesson-panels">
                   <Paper withBorder className="canvas-card">
-                    <Group justify="space-between"><Text fw={600} size="sm">{t('실행 과정', 'Execution')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
+                    <Group justify="space-between"><Text fw={600} size="sm">{arrayLesson ? t('숫자들이 자리 잡는 동안', 'While the numbers find their places') : t('지금 벌어지는 일', 'What’s happening')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
                     <div className="lesson-visual">
                     {partialArray && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
                     {'buckets' in step.variables && <BucketView step={step} language={language} />}
@@ -357,13 +360,13 @@ export default function App() {
                       </button>}
                     </div>
                   </Paper>
-                <CodePanel source={algorithm.source} activeCode={step.code} language={language} />
+                <details className="lesson-code" key={algorithm.id}><summary>{t('코드도 궁금하다면', 'If you’re curious about the code')}<span>JavaScript</span></summary><CodePanel source={algorithm.source} activeCode={step.code} language={language} /></details>
               </div>
 
             </div>
           </div>
         </main>
-        <footer className="studio-footer">{t('천천히 살펴보세요. 이해는 속도보다 방향입니다.', 'Take your time. Understanding comes one step at a time.')}</footer>
+        <footer className="studio-footer">{t('아무것도 외우지 않았어도, 잘 구경했습니다.', 'Nothing memorized. Time well spent.')}</footer>
       </div>
     </MotionConfig>
   );
