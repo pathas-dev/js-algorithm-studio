@@ -122,6 +122,11 @@ typography:
     fontSize: "16px"
     fontWeight: 500
     fontFeature: '"tnum"'
+  sequence-character:
+    fontSize: "18px"
+    fontWeight: 500
+  sequence-index:
+    fontSize: "10px"
   code:
     fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
     fontSize: "13px"
@@ -132,6 +137,7 @@ rounded:
   code: "12px"
   landing-surface: "16px"
   array-bar: "4px 4px 2px 2px"
+  sequence-index: "4px"
 spacing:
   compact: "8px"
   control: "16px"
@@ -335,6 +341,8 @@ Dense dynamic-programming tables, string alignments, bit fields, numerical grids
 Hanoi uses native 3D torus rings above three fixed labeled stations A, B and C. Disc number determines ring radius; pole arrays determine the real destination and stack level. A moving ring lifts, travels and settles over (1.4s), driven by the same pausable trace clock as playback. The shared committed-step guard holds the last complete frame until the matching trace arrives; the frame loop owns mesh position and rotation across React renders. Independent torus surface rotation takes (8–12s), while labels and station centres remain fixed. Projected disc labels accompany exact top-to-bottom pole records. Enlarged and fullscreen Hanoi uses flex layout: the rings take the height remaining after headings, controls, station records and transport; exact station evidence stays visible. Reduced motion uses static ring geometry and exact station records; WebGL failure preserves the station records. All lesson traces advance at (2.8s) per step at (1×); only Bubble offers the repeating hold/dust/reform cycle.
 
 **The Topology Rule.** Motion may turn node surfaces or move a traced item; it must not invent edges, misrepresent traced station membership, or move a coordinate axis.
+
+Stack, queue, naive string search, KMP and Rabin–Karp additionally provide a native 3D sequence view and their original 2D records. Equal-size stack/queue planets retain actual node identities; TOP enters/leaves above the stack, and queue arrivals/departures follow REAR/FRONT. Upright UTF-16 character tiles preserve whitespace, surrogate units, row membership and exact pattern alignment; prefix/hash tables remain exact DOM evidence. The committed trace clock owns transfers and framing: pause freezes them, resume retains progress, and seek shows the selected snapshot directly. A native disclosure holds the original exact values/indices. Restrained mouse/keyboard orbit, label-scaled zoom, bounded scroll and one-finger native swipe keep long input inspectable. Reduced motion and WebGL failure retain the 2D view; visibility gates rendering, DPR is capped at 1.5 and materials are disposed. Z, Hamming, palindrome and other linked structures keep their current views.
 
 ### Native sky, loading and identity
 

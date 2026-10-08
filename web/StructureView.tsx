@@ -9,6 +9,7 @@ import HashView from './HashView';
 import LinkedListView from './LinkedListView';
 import GraphView from './GraphView';
 import BloomView from './BloomView';
+import SequenceView from './SequenceView';
 
 export default function StructureView({ step, language }: { step: Step; language: Language }) {
   if (step.variables.structure === 'bloom-filter') return <BloomView step={step} language={language} />;
@@ -43,12 +44,12 @@ export default function StructureView({ step, language }: { step: Step; language
   const entries: [string, number][] = lru ? JSON.parse(String(step.variables.entries)) : [];
   return <div className="structure-view">
     <p>{lru ? ko ? `LRU → MRU · 저장 ${step.array.length}/${step.variables.capacity}개 · 최근 조회·저장 순서` : `LRU → MRU · stored ${step.array.length}/${step.variables.capacity} · latest read / write order` : stack ? ko ? 'TOP · 위 → 아래 · 마지막에 넣은 값부터 꺼냅니다' : 'TOP · top → bottom · last in, first out' : ko ? 'FRONT → REAR · 먼저 넣은 값부터 꺼냅니다' : 'FRONT → REAR · first in, first out'}</p>
-    <div className={`structure-nodes ${stack ? 'stack-nodes' : ''}`} role="list" aria-label={ko ? '현재 자료 구조' : 'Current data structure'}>
+    <SequenceView step={step} language={language}><div className={`structure-nodes ${stack ? 'stack-nodes' : ''}`} role="list" aria-label={ko ? '현재 자료 구조' : 'Current data structure'}>
       {step.array.map((item, index) => <motion.div layout="position" key={item.id} className={`structure-node ${step.indices.includes(index) ? 'active-node' : ''}`} role="listitem">
         <span>{lru ? `${step.array.length === 1 ? 'LRU / MRU · ' : index === 0 ? 'LRU · ' : index === step.array.length - 1 ? 'MRU · ' : ''}${ko ? '키' : 'Key'} ${entries[index][0]}` : index === 0 ? stack ? 'TOP' : step.array.length === 1 ? 'FRONT / REAR' : 'FRONT' : !stack && index === step.array.length - 1 ? 'REAR' : index}</span><strong>{item.value}</strong>
       </motion.div>)}
       {!step.array.length && <div className="empty-array">{lru ? ko ? '빈 캐시 · 조회 결과는 undefined' : 'Empty cache · reads return undefined' : ko ? '비어 있음 · 조회·삭제 결과는 null' : 'Empty · peek / removal returns null'}</div>}
-    </div>
+    </div></SequenceView>
     {'evicted' in step.variables && <div className="frontier">{ko ? '제거된 LRU 키' : 'Evicted LRU key'} <output>{step.variables.evicted}</output></div>}
     {'result' in step.variables && <div className="frontier">{ko ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}
   </div>;

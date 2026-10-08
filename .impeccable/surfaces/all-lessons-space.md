@@ -2,6 +2,14 @@
 
 Scope: extend the approved observatory across all 111 runnable lessons; Experience with an exact, inspectable trace. Existing inputs, constraints, algorithms, bilingual explanations and source remain authoritative. Graphs provide a rotatable 3D observatory and 2D top view; other linked structures keep their top view. Hanoi owns a ring-transfer scene.
 
+## Authorized sequence extension
+
+The user authorized applying 3D to the most useful remaining lessons (2026-10-08). Stack, queue, naive string search, KMP and Rabin–Karp now default to a lazy native 3D sequence scene with the original 2D view available. Stack nodes keep their real identities and bottom levels; TOP enters and leaves above the existing stack. Queue nodes enter at REAR and leave from FRONT. Character tiles use the original UTF-16 units, explicit whitespace/surrogate labels, two upright rows and exact pattern alignment. KMP prefix and Rabin–Karp hash evidence stay outside the scene; a native disclosure contains exact original values and indices.
+
+All transfers and framing follow the committed trace clock, pausing/resuming at the same position and resolving seeks directly. Restrained orbit preserves row readability; zoom scales labels, and long rows or stacks scroll inside a bounded scene. Reduced motion and WebGL/context failure show the original 2D records. DPR remains capped at 1.5; visibility gates frame rendering and terrain/atmosphere materials are disposed. No dependency or raster asset is added. Z search, Hamming distance, palindrome and other structure families retain their established views.
+
+Verification: production build/typecheck, 29 existing structure/string/playback tests, 68 sequence traces with empty/duplicate/long/UTF-16 inputs, 1452 bilingual renders across all 111 lessons, 484 graph traces and existing Bubble checks pass. Browser checks cover all five 3D entries, 1440×1080 desktop and 390×844 responsive layout, mobile fullscreen transport, no horizontal page overflow, exact prefix/hash records, pause/resume without moving paused labels or skipping the step, and 2D/view-reset state preservation. Native swipe is enabled without overriding mouse/keyboard orbit; physical touchscreen/GPU performance and context-loss injection remain unmeasured. Finish verdict: approved within the established world.
+
 ## Direction contract
 THESIS: Every lesson becomes a small system to watch, while its real values and relationships remain readable.
 

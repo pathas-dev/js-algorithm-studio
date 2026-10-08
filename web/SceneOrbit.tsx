@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Spherical, Vector3 } from 'three';
+import { Spherical, TOUCH, Vector3 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 type Point = readonly [number, number, number];
@@ -14,8 +14,8 @@ function restoreView(controls: OrbitControls, home: Point) {
   controls.enableDamping = true;
 }
 
-export default function SceneOrbit({ home, target, reset, label, enabled = true, minPolar = .3, maxPolar = 1.35, maxAzimuth = Infinity }: {
-  home: Point; target: Point; reset: number; label: string; enabled?: boolean; minPolar?: number; maxPolar?: number; maxAzimuth?: number;
+export default function SceneOrbit({ home, target, reset, label, enabled = true, minPolar = .3, maxPolar = 1.35, maxAzimuth = Infinity, scrollable = false }: {
+  home: Point; target: Point; reset: number; label: string; enabled?: boolean; minPolar?: number; maxPolar?: number; maxAzimuth?: number; scrollable?: boolean;
 }) {
   const { camera, gl, invalidate } = useThree();
   const orbit = useRef<OrbitControls | null>(null);
@@ -26,6 +26,10 @@ export default function SceneOrbit({ home, target, reset, label, enabled = true,
     controls.enableDamping = true;
     controls.enablePan = false;
     controls.enableZoom = false;
+    if (scrollable) {
+      controls.touches.ONE = TOUCH.PAN;
+      gl.domElement.style.touchAction = 'pan-x pan-y';
+    }
     controls.minPolarAngle = minPolar;
     controls.maxPolarAngle = maxPolar;
     controls.minAzimuthAngle = -maxAzimuth;
@@ -59,7 +63,7 @@ export default function SceneOrbit({ home, target, reset, label, enabled = true,
       controls.dispose();
       orbit.current = null;
     };
-  }, [camera, gl, invalidate, enabled, home, target, minPolar, maxPolar, maxAzimuth, label]);
+  }, [camera, gl, invalidate, enabled, home, target, minPolar, maxPolar, maxAzimuth, label, scrollable]);
   useEffect(() => {
     if (!enabled) return;
     // Reset orientation only; the separate zoom controls keep their current value.
