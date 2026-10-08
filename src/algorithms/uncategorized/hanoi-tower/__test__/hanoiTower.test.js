@@ -3,7 +3,7 @@ import Stack from '../../../../data-structures/stack/Stack';
 
 describe('hanoiTower', () => {
   it('should solve tower of hanoi puzzle with 2 discs', () => {
-    const moveCallback = jest.fn();
+    const moveCallback = vi.fn();
     const numberOfDiscs = 2;
 
     const fromPole = new Stack();
@@ -37,7 +37,7 @@ describe('hanoiTower', () => {
   });
 
   it('should solve tower of hanoi puzzle with 3 discs', () => {
-    const moveCallback = jest.fn();
+    const moveCallback = vi.fn();
     const numberOfDiscs = 3;
 
     hanoiTower({
@@ -49,7 +49,7 @@ describe('hanoiTower', () => {
   });
 
   it('should solve tower of hanoi puzzle with 6 discs', () => {
-    const moveCallback = jest.fn();
+    const moveCallback = vi.fn();
     const numberOfDiscs = 6;
 
     hanoiTower({

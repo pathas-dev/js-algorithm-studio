@@ -36,8 +36,8 @@ describe('depthFirstSearch', () => {
 
     expect(graph.toString()).toBe('A,B,C,G,D,E,F');
 
-    const enterVertexCallback = jest.fn();
-    const leaveVertexCallback = jest.fn();
+    const enterVertexCallback = vi.fn();
+    const leaveVertexCallback = vi.fn();
 
     // Traverse graphs without callbacks first to check default ones.
     depthFirstSearch(graph, vertexA);
@@ -116,8 +116,8 @@ describe('depthFirstSearch', () => {
 
     expect(graph.toString()).toBe('A,B,C,G,D,E,F');
 
-    const enterVertexCallback = jest.fn();
-    const leaveVertexCallback = jest.fn();
+    const enterVertexCallback = vi.fn();
+    const leaveVertexCallback = vi.fn();
 
     depthFirstSearch(graph, vertexA, {
       enterVertex: enterVertexCallback,

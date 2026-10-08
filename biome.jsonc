@@ -1,0 +1,85 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["src/**", "web/**", "scripts/**", "*.json", "*.jsonc"]
+  },
+  "formatter": {
+    // ponytail: Trace highlights match src text exactly; include src after matching is normalized.
+    "includes": ["web/**", "scripts/**", "*.json", "*.jsonc"],
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    },
+    "globals": [
+      "describe",
+      "it",
+      "test",
+      "expect",
+      "beforeEach",
+      "afterEach",
+      "beforeAll",
+      "afterAll",
+      "vi"
+    ]
+  },
+  "linter": {
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUndeclaredVariables": "error",
+        "noUnusedVariables": "error",
+        "noUnusedFunctionParameters": "off"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "off",
+        "useOptionalChain": "off"
+      },
+      "performance": {
+        "noAccumulatingSpread": "off"
+      },
+      "style": {
+        "useNodejsImportProtocol": "off"
+      },
+      "suspicious": {
+        "useIterableCallbackReturn": {
+          "level": "error",
+          "options": {
+            "checkForEach": false
+          }
+        }
+      }
+    },
+    "includes": ["src/**"]
+  },
+  "overrides": [
+    {
+      "includes": ["src/**/__test__/**", "src/**/__tests__/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noApproximativeNumericConstant": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/algorithms/math/binary-floating-point/testCases.js"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noPrecisionLoss": "off"
+          }
+        }
+      }
+    }
+  ]
+}

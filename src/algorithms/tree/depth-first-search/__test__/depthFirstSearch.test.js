@@ -18,8 +18,8 @@ describe('depthFirstSearch', () => {
     // In-order traversing.
     expect(nodeA.toString()).toBe('D,B,E,A,F,C,G');
 
-    const enterNodeCallback = jest.fn();
-    const leaveNodeCallback = jest.fn();
+    const enterNodeCallback = vi.fn();
+    const leaveNodeCallback = vi.fn();
 
     // Traverse tree without callbacks first to check default ones.
     depthFirstSearch(nodeA);
@@ -68,8 +68,8 @@ describe('depthFirstSearch', () => {
     // In-order traversing.
     expect(nodeA.toString()).toBe('D,B,E,A,F,C,G');
 
-    const enterNodeCallback = jest.fn();
-    const leaveNodeCallback = jest.fn();
+    const enterNodeCallback = vi.fn();
+    const leaveNodeCallback = vi.fn();
 
     // Traverse tree without callbacks first to check default ones.
     depthFirstSearch(nodeA);

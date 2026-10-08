@@ -16,7 +16,6 @@ import recordStep from '../../../utils/trace/recordStep';
  * @param {function} [random]
  * @returns {{item: any, index: number}}
  */
-/* eslint-disable consistent-return */
 export default function weightedRandom(
   items,
   weights,

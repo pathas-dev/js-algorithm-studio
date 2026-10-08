@@ -4,7 +4,7 @@ import * as distance from '../../../math/euclidean-distance/euclideanDistance';
 describe('kMeans', () => {
   it('stops when cluster assignments keep oscillating', () => {
     let calls = 0;
-    const mockDistance = jest.spyOn(distance, 'default').mockImplementation(() => {
+    const mockDistance = vi.spyOn(distance, 'default').mockImplementation(() => {
       const iteration = Math.floor(calls / 4);
       const cluster = calls % 2;
       calls += 1;

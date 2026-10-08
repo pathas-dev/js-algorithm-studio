@@ -45,7 +45,7 @@ export default function traceHashTable(keys, operations = '') {
       snapshot(name, 'return node ? node.value.value : undefined;', { result: result === undefined ? 'undefined' : result });
     } else if (name === 'has') {
       const result = table.has(key);
-      snapshot(name, 'return Object.hasOwnProperty.call(this.keys, key);', { result });
+      snapshot(name, 'return Object.hasOwn(this.keys, key);', { result });
     } else {
       const result = table.delete(key);
       snapshot(name, 'delete(key) {', { result: result ? result.value.value : 'null' });

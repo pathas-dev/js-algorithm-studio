@@ -125,7 +125,7 @@ describe('Matrix', () => {
   });
 
   it('should generate a custom matrix based on specific cell indices', () => {
-    const indicesCallback = jest.fn((indices) => {
+    const indicesCallback = vi.fn((indices) => {
       return indices[0] * 10 + indices[1];
     });
     const m = mtrx.generate([3, 3], indicesCallback);

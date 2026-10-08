@@ -41,12 +41,14 @@
 
 ## 로컬 실행
 
-Node.js **22.12 이상**, pnpm **10.34.3**이 필요합니다.
+Node.js **22.12 이상**, pnpm **12.10.1**이 필요합니다.
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm dev
 ```
+
+`mise install`을 실행하면 `mise.toml`에 고정한 Node.js·pnpm을 설치할 수 있습니다.
 
 터미널에 표시되는 로컬 주소를 엽니다. 프로덕션 결과는 다음 명령으로 확인합니다.
 
@@ -89,16 +91,18 @@ pnpm preview
 
 ## 개발 및 점검
 
+Lint와 코드 포맷은 Biome, 테스트와 커버리지는 Vitest로 통합합니다. Vite 설정을 함께 사용하므로 Babel 변환 설정은 필요하지 않습니다. `pnpm lint`는 기존과 같이 `src`를 검사하고, `pnpm format`은 `web`·`scripts`와 루트 JSON을 정리합니다. `src`는 실행 단계의 코드 문자열과 정확히 일치해야 하므로 자동 포맷에서 제외합니다. `.editorconfig`는 Markdown 등 일반 텍스트 편집 규칙을 유지합니다.
+
 React·TypeScript·Vite로 구성하고, Mantine으로 UI, Motion으로 애니메이션, Shiki로 소스 구문 강조를 처리합니다. 기존 알고리즘에 선택적인 단계 기록을 연결하며 시각화용 알고리즘을 복제하지 않습니다.
 
 ```sh
 pnpm check:docs
 pnpm lint
 pnpm build
-pnpm coverage --runInBand
+pnpm coverage
 ```
 
-Jest는 알고리즘·단계 기록·입력 검증·재생 로직을 검사합니다. React 화면은 실제 브라우저에서 별도로 점검하며, 해당 화면의 DOM 테스트 커버리지는 Jest 수치에 포함하지 않습니다. 최신 검사 결과는 [개발 계획](DEVELOPMENT_PLAN.md)에 기록합니다.
+Vitest는 알고리즘·단계 기록·입력 검증·재생 로직을 검사합니다. React 화면은 실제 브라우저에서 별도로 점검하며, 해당 화면의 DOM 테스트 커버리지는 Vitest 수치에 포함하지 않습니다. 최신 검사 결과는 [개발 계획](DEVELOPMENT_PLAN.md)에 기록합니다.
 
 ## Vercel 배포 준비
 

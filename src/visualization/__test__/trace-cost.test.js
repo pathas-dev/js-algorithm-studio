@@ -3,7 +3,7 @@ import weightedRandom from '../../algorithms/statistics/weighted-random/weighted
 import rotate from '../../algorithms/uncategorized/square-matrix-rotation/squareMatrixRotation';
 
 it('does not serialize visualization snapshots when tracing is disabled', () => {
-  const stringify = jest.spyOn(JSON, 'stringify');
+  const stringify = vi.spyOn(JSON, 'stringify');
   try {
     kNN([[0, 0], [1, 1]], [0, 1], [0, 0], 1);
     weightedRandom(['A', 'B'], [1, 2]);

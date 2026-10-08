@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign, max-classes-per-file */
 
 /**
  * Simple implementation of the Doubly-Linked List Node

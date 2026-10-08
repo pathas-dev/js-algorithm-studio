@@ -379,7 +379,7 @@ export function traceHorner(values, x) {
 export function traceMatrix(inputs) {
   const matrices = inputs.map((input) => {
     let matrix;
-    try { matrix = JSON.parse(input); } catch (error) { throw new Error('matrix-input'); }
+    try { matrix = JSON.parse(input); } catch { throw new Error('matrix-input'); }
     if (!Array.isArray(matrix) || !matrix.length || matrix.length > 4
       || !matrix.every((row) => Array.isArray(row) && row.length > 0 && row.length <= 4
         && row.length === matrix[0].length && row.every((value) => (

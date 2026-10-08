@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax, no-unreachable-loop */
 
 /**
  * Implementation of the LRU (Least Recently Used) Cache

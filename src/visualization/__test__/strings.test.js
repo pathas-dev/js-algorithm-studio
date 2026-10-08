@@ -11,7 +11,7 @@ import { algorithmCode } from '../playback';
 
 describe('string search lessons', () => {
   it('does not serialize Z snapshots when tracing is disabled', () => {
-    const stringify = jest.spyOn(JSON, 'stringify');
+    const stringify = vi.spyOn(JSON, 'stringify');
     const positions = zAlgorithm('a'.repeat(512), 'a');
     const serialized = stringify.mock.calls.length;
     stringify.mockRestore();

@@ -162,9 +162,9 @@ describe('Deque', () => {
     deque.addBack({ value: 1, key: 'test1' });
     deque.addBack({ value: 2, key: 'test2' });
 
-    const toString = (value) => `${value.key}:${value.value}`;
+    const stringify = (value) => `${value.key}:${value.value}`;
 
-    expect(deque.toString(toString)).toBe('test1:1,test2:2');
+    expect(deque.toString(stringify)).toBe('test1:1,test2:2');
   });
 
   it('should track size correctly after many operations', () => {

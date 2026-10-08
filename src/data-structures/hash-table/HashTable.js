@@ -117,7 +117,7 @@ export default class HashTable {
    * @return {boolean}
    */
   has(key) {
-    return Object.hasOwnProperty.call(this.keys, key);
+    return Object.hasOwn(this.keys, key);
   }
 
   /**

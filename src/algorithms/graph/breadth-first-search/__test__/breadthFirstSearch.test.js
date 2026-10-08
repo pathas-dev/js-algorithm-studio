@@ -39,8 +39,8 @@ describe('breadthFirstSearch', () => {
 
     expect(graph.toString()).toBe('A,B,C,G,D,E,F,H');
 
-    const enterVertexCallback = jest.fn();
-    const leaveVertexCallback = jest.fn();
+    const enterVertexCallback = vi.fn();
+    const leaveVertexCallback = vi.fn();
 
     // Traverse graphs without callbacks first.
     breadthFirstSearch(graph, vertexA);
@@ -124,8 +124,8 @@ describe('breadthFirstSearch', () => {
 
     expect(graph.toString()).toBe('A,B,C,G,D,E,F,H');
 
-    const enterVertexCallback = jest.fn();
-    const leaveVertexCallback = jest.fn();
+    const enterVertexCallback = vi.fn();
+    const leaveVertexCallback = vi.fn();
 
     // Traverse graph with enterVertex and leaveVertex callbacks.
     breadthFirstSearch(graph, vertexA, {

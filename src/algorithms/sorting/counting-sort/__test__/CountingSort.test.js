@@ -23,7 +23,7 @@ describe('CountingSort', () => {
   });
 
   it('should allow to use specify max/min integer value in array to make sorting faster', () => {
-    const visitingCallback = jest.fn();
+    const visitingCallback = vi.fn();
     const sorter = new CountingSort({ visitingCallback });
 
     // Detect biggest number in array in prior.

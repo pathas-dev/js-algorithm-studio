@@ -23,40 +23,35 @@
   },
   "homepage": "https://github.com/pathas-dev/js-algorithm-studio#readme",
   "scripts": {
-    "lint": "eslint ./src/**",
-    "test": "jest",
-    "coverage": "jest --coverage",
+    "lint": "biome lint src --error-on-warnings",
+    "test": "vitest run --config web/vite.config.mts",
+    "coverage": "vitest run --config web/vite.config.mts --coverage",
     "ci": "pnpm lint && pnpm coverage",
     "prepare": "husky",
     "dev": "vite --config web/vite.config.mts",
     "build": "pnpm typecheck && vite build --config web/vite.config.mts",
     "preview": "vite preview --config web/vite.config.mts",
     "typecheck": "tsc --project web/tsconfig.json",
-    "check:docs": "node scripts/check-docs.mjs"
+    "check:docs": "node scripts/check-docs.mjs",
+    "format": "biome format --write ."
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.6",
-    "@babel/preset-env": "^7.29.0",
-    "@types/jest": "^30.0.0",
+    "@biomejs/biome": "2.5.15",
     "@types/node": "26.6.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react-swc": "4.3.3",
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^27.9.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "@vitest/coverage-istanbul": "5.0.3",
     "husky": "^9.1.7",
-    "jest": "^30.2.0",
     "pngjs": "^7.0.0",
     "typescript": "7.0.2",
-    "vite": "8.3.2"
+    "vite": "8.3.2",
+    "vitest": "5.0.3"
   },
   "engines": {
     "node": ">=22.12.0",
-    "pnpm": ">=10.34.3"
+    "pnpm": ">=12.10.1"
   },
   "dependencies": {
     "@mantine/core": "9.6.3",

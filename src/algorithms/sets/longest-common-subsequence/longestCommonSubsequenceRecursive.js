@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /**
  * Longest Common Subsequence (LCS) (Recursive Approach).
  *

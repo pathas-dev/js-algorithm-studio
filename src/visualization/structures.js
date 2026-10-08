@@ -19,11 +19,11 @@ export function parseOperations(text, commands, parseArgument = parseTarget) {
   if (entries.length > 64) throw new Error('operations-limit');
   return entries.map((entry) => {
     const [name, ...args] = entry.trim().split(/\s+/);
-    if (!Object.prototype.hasOwnProperty.call(commands, name) || args.length !== commands[name]) {
+    if (!Object.hasOwn(commands, name) || args.length !== commands[name]) {
       throw new Error('operations');
     }
     let parsed = [];
-    try { parsed = args.map((arg) => parseArgument(arg)); } catch (cause) { throw new Error('operations'); }
+    try { parsed = args.map((arg) => parseArgument(arg)); } catch { throw new Error('operations'); }
     return { name, value: parsed[0], ...(parsed.length > 1 ? { argument: parsed[1] } : {}) };
   });
 }

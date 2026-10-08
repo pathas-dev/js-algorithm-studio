@@ -57,7 +57,7 @@ it.each([-1, 1.5])('rejects invalid Fibonacci and Hanoi counts: %p', (count) => 
 });
 
 it('does not move any discs for an empty Hanoi tower', () => {
-  const moveCallback = jest.fn();
+  const moveCallback = vi.fn();
   hanoiTower({ numberOfDiscs: 0, moveCallback });
   expect(moveCallback).not.toHaveBeenCalled();
 });
@@ -69,13 +69,13 @@ it.each([
 });
 
 it.each([1.5, 4])('records the nonprime result for %p', (number) => {
-  const callback = jest.fn();
+  const callback = vi.fn();
   expect(trialDivision(number, callback)).toBe(false);
   expect(callback.mock.calls.at(-1)[0].variables.result).toBe(false);
 });
 
 it('records an empty result for a negative combination length', () => {
-  const callback = jest.fn();
+  const callback = vi.fn();
   expect(combineWithoutRepetitions([1], -1, callback)).toEqual([]);
   expect(callback.mock.calls.at(-1)[0]).toMatchObject({
     type: 'base', variables: { groups: '[]', count: 0 },

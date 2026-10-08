@@ -61,7 +61,7 @@ export class SortTester {
   }
 
   static testAlgorithmTimeComplexity(SortingClass, arrayToBeSorted, numberOfVisits) {
-    const visitingCallback = jest.fn();
+    const visitingCallback = vi.fn();
     const callbacks = { visitingCallback };
     const sorter = new SortingClass(callbacks);
 
