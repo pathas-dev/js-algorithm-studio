@@ -72,5 +72,5 @@
   "contributors": [
     "Oleksii Trekhleb (https://trekhleb.dev)"
   ],
-  "packageManager": "pnpm@10.34.3"
+  "packageManager": "pnpm@12.10.1"
 }
