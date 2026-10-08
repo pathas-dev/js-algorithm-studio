@@ -89,6 +89,8 @@
 /* Shared observatory shell; the optional clay renderer retains its own palette. */
 body:has(.space-studio.idle-studio) { background: #0b1012; }
 .space-studio.idle-studio {
+  position: relative;
+  isolation: isolate;
   --space-ground: #0b1012;
   --space-surface: #141b1d;
   --space-ink: #e2e7d9;
@@ -99,10 +101,11 @@ body:has(.space-studio.idle-studio) { background: #0b1012; }
   --mantine-color-dimmed: var(--space-muted);
   --mantine-color-body: var(--space-ground);
   color-scheme: dark;
-  background: var(--space-ground);
+  background: transparent;
   color: var(--space-ink);
   scrollbar-color: #54685d var(--space-ground);
 }
+.space-studio.idle-studio > .space-sky { position: fixed; z-index: -1; }
 .space-studio.idle-studio ::selection { color: #0b1012; background: #9bb7a5; }
 .space-studio.idle-studio .brand, .space-studio.idle-studio h1, .space-studio.idle-studio .action-name, .space-studio.idle-studio .action-evidence,
 .space-studio.idle-studio .action-decision, .space-studio.idle-studio .step-counter strong { color: var(--space-ink); }

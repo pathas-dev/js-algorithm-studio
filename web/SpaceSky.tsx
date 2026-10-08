@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
-import { lessonFragment, spaceFragment, spaceVertex } from './space-shader';
+import { lessonFragment, observatoryFragment, spaceFragment, spaceVertex } from './space-shader';
 import { observeSkyPointer } from './sky-pointer';
 
-export default function SpaceSky({ active = true, variant = 'ambient' }: { active?: boolean; variant?: 'ambient' | 'lesson' }) {
+export default function SpaceSky({ active = true, variant = 'ambient' }: { active?: boolean; variant?: 'ambient' | 'lesson' | 'observatory' }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [lost, setLost] = useState(false);
   const reduced = Boolean(useReducedMotion());
@@ -29,7 +29,7 @@ export default function SpaceSky({ active = true, variant = 'ambient' }: { activ
     const release = () => { cancelAnimationFrame(frame); shaders.forEach((shader) => gl.deleteShader(shader)); gl.deleteBuffer(buffer); gl.deleteProgram(program); };
     try {
       compile(gl.VERTEX_SHADER, spaceVertex);
-      compile(gl.FRAGMENT_SHADER, variant === 'lesson' ? lessonFragment : spaceFragment);
+      compile(gl.FRAGMENT_SHADER, variant === 'observatory' ? observatoryFragment : variant === 'lesson' ? lessonFragment : spaceFragment);
       gl.linkProgram(program);
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Sky shader unavailable');
     } catch { release(); setLost(true); return; }

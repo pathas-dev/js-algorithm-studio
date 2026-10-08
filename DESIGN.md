@@ -308,9 +308,15 @@ Ambient landing/loading skies retain broad sage and mauve clouds. Graph and othe
 
 Verified at 1440×1080 and 390×844 in the browser: fullscreen graph records stay above transport, 2D/3D graph and array wheel zoom updates the shared controls, and no horizontal page overflow occurs on the mobile graph. Type checking, 111 lesson entries, 1452 bilingual trace renders, 484 graph traces, and the loading/zoom/playback checks pass. Browser viewport fullscreen fallback was exercised; native fullscreen and physical mobile GPU performance remain unmeasured. No production rebuild was run.
 
-## Graph wormhole transitions (2026-10-08)
+## Interactive skies and lesson-page atmosphere (2026-10-08)
 
 Shared WebGL backgrounds and native array skies now respond to mouse movement with a damped local nebula curl, star parallax and soft sage light. Their canvases remain pointer-transparent where applicable; existing orbit, wheel zoom and controls keep receiving input. Touch, pen, orbit drags, reduced motion and hidden tabs suppress the response. Listeners are removed on unmount. Pointer motion is independent of algorithm playback. Coordinate, boundary, zero-size, visibility and cleanup checks pass; landing/native array shaders render without browser errors. No new dependency or raster is used.
+
+Every lesson page adds a fixed, viewport-sized observatory sky: a distant diagonal dust river in cool teal and mauve, sparse stars, and faint ochre filaments. This differs from the landing's broad sage clouds and the playback window's orbital currents while retaining the dark ground and ink. Page-sky animation stops behind fullscreen scenes, DPR stays capped at 1.5, and WebGL failure has a corresponding static CSS sky. The first-paint ground remains #0b1012. The shader stays behind navigation and text; playback windows retain their darker frame.
+
+Finish verdict: approved within the existing observatory direction. Browser checks at 1440×1080 and 390×844 confirm legible text, distinct page/playback atmospheres, pointer response, fullscreen entry/exit, no horizontal overflow, and no shader/console errors. Type checking, 111 bilingual lesson entries, 1452 trace renders and pointer/playback checks pass. A production rebuild, native fullscreen and physical mobile GPU performance remain unmeasured.
+
+## Graph wormhole transitions (2026-10-08)
 
 Active 3D connections open an ochre entrance, carry a light through a briefly illuminated spiral tube along the actual curve, and open a mauve arrival. The aperture planes face the observer at the trimmed endpoints so they remain legible while orbiting. Each (1.4s at 1×) transfer uses the existing trace clock; pausing freezes light, spiral and portal expansion, resuming retains progress, and seeking shows the exact static state. Reciprocal lanes, arrows, weights and selected-edge colors remain authoritative. Only active connections allocate the extra tube, two rims and light; no bloom pass, dependency or raster ships, and their geometry/material resources are disposed.
 

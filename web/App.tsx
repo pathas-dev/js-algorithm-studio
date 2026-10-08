@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Badge, Button, FocusTrap, Group, NativeSelect, Paper, Popover, Text, Textarea, TextInput, Title } from '@mantine/core';
 import { MotionConfig } from 'motion/react';
+import SpaceSky from './SpaceSky';
 import { MAX_VALUES, parseTarget, parseValues } from '../src/visualization/playback';
 import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
 import stepAction from '../src/visualization/step-action';
@@ -305,6 +306,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="studio idle-studio space-studio bubble-studio">
+        <SpaceSky variant="observatory" active={!focusedView} />
         <header className="studio-header">
           <a className="brand" href={ko ? "/" : "?lang=en"}><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" />{t('이젠 아무래도 좋을 알고리즘', 'Algorithms, for what it’s worth')}</a>
           <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('외우지 않아도 됩니다.', 'No memorizing required.')}</Text>

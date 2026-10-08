@@ -73,3 +73,30 @@ void main(){
   color*=1.0-smoothstep(0.3,1.1,length(p))*0.25;
   gl_FragColor=vec4(color+pointerLight(),1.0);
 }`;
+
+// A distant dust river frames the page while orbital currents stay inside the lesson.
+export const observatoryFragment = `${skyNoise}
+void main(){
+  vec2 uv=skyUv();
+  vec2 p=(uv-0.5)*vec2(uAspect,1.0);
+  vec2 q=mat2(0.92,0.38,-0.38,0.92)*p;
+  float t=uTime*0.018;
+  float cloud=field(q*2.8+vec2(t,-t*0.4));
+  float folds=field(q*5.0+vec2(-t*0.5,t)+12.4);
+  float river=exp(-pow((q.y-0.16-sin(q.x*1.8+t)*0.12)*3.1,2.0));
+  float veil=smoothstep(0.24,0.78,cloud)*river;
+  vec3 color=vec3(0.043,0.063,0.071);
+  color=mix(color,vec3(0.13,0.235,0.24),veil*0.55);
+  color+=vec3(0.07,0.038,0.09)*smoothstep(0.35,0.78,folds)*river*0.55;
+  float filament=pow(max(0.0,1.0-abs(cloud-folds)*4.0),5.0);
+  color+=vec3(0.11,0.095,0.055)*filament*veil*0.12;
+  color*=1.0-smoothstep(0.42,0.8,field(q*7.0+cloud))*river*0.22;
+  vec2 sky=uv*vec2(uAspect,1.0)*76.0;
+  vec2 cell=floor(sky), point=fract(sky)-vec2(hash(cell+11.0),hash(cell+29.0));
+  float star=exp(-pow(length(point)*27.0,2.0))*step(0.986,hash(cell));
+  float halo=exp(-length(point)*14.0)*step(0.998,hash(cell))*0.16;
+  color+=vec3(0.65,0.72,0.75)*(star+halo)*(0.8+0.2*sin(uTime*0.18+hash(cell)*6.28));
+  color+=pointerLight()*0.7;
+  color*=1.0-smoothstep(0.28,1.3,length(p))*0.25;
+  gl_FragColor=vec4(color,1.0);
+}`;
