@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { lessonFragment, spaceFragment, spaceVertex } from './space-shader';
+import { observeSkyPointer } from './sky-pointer';
 
 export default function SpaceSky({ active = true, variant = 'ambient' }: { active?: boolean; variant?: 'ambient' | 'lesson' }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -40,9 +41,16 @@ export default function SpaceSky({ active = true, variant = 'ambient' }: { activ
     gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
     const time = gl.getUniformLocation(program, 'uTime');
     const aspect = gl.getUniformLocation(program, 'uAspect');
+    const pointer = gl.getUniformLocation(program, 'uPointer');
+    const hover = gl.getUniformLocation(program, 'uHover');
+    const target = { x: .5, y: .5, strength: 0 };
+    const current = { ...target };
+    const stopPointer = active && !reduced ? observeSkyPointer(element, target) : () => {};
     const draw = () => {
       gl.uniform1f(time, elapsed);
       gl.uniform1f(aspect, element.width / element.height);
+      gl.uniform2f(pointer, current.x, current.y);
+      gl.uniform1f(hover, current.strength);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
     const resize = () => {
@@ -53,7 +61,12 @@ export default function SpaceSky({ active = true, variant = 'ambient' }: { activ
       draw();
     };
     const tick = (now: number) => {
-      elapsed += previous ? Math.min((now - previous) / 1000, 0.1) : 0;
+      const delta = previous ? Math.min((now - previous) / 1000, 0.1) : 0;
+      elapsed += delta;
+      const ease = 1 - Math.exp(-delta * 5);
+      current.x += (target.x - current.x) * ease;
+      current.y += (target.y - current.y) * ease;
+      current.strength += (target.strength - current.strength) * ease;
       previous = now;
       draw();
       frame = requestAnimationFrame(tick);
@@ -70,7 +83,7 @@ export default function SpaceSky({ active = true, variant = 'ambient' }: { activ
     document.addEventListener('visibilitychange', visibility);
     resize();
     visibility();
-    return () => { observer.disconnect(); element.removeEventListener('webglcontextlost', contextLost); document.removeEventListener('visibilitychange', visibility); release(); };
+    return () => { stopPointer(); observer.disconnect(); element.removeEventListener('webglcontextlost', contextLost); document.removeEventListener('visibilitychange', visibility); release(); };
   }, [reduced, lost, active, variant]);
   return lost ? <div className="space-sky space-sky-still" data-sky={variant} aria-hidden="true" /> : <canvas ref={canvas} className="space-sky" data-sky={variant} aria-hidden="true" />;
 }

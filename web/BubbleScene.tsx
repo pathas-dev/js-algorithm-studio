@@ -9,6 +9,8 @@ import { springProgress, planetRadius, planetSpacing, planetTransfer, axialAngle
 import { useSceneVisibility } from './use-scene-visibility';
 import { atmosphereMaterial, planetMaterial } from './planet-material';
 import SceneOrbit from './SceneOrbit';
+import { skyInteraction } from './space-shader';
+import { observeSkyPointer } from './sky-pointer';
 import './bubble.css';
 
 type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space'; zoom?: number; index?: number; numeralFont?: 'Manrope'; interactive?: boolean };
@@ -43,17 +45,21 @@ function Camera({ count, spacing, signed, view, world, zoom = 1, interactive, re
 }
 
 function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'step' | 'clock' | 'world'> & { spacing: number; renderIndex: number }) {
-  const { camera, size } = useThree();
+  const { camera, size, gl } = useThree();
+  const pointer = useRef({ x: .5, y: .5, strength: 0 });
+  useEffect(() => world === 'space' ? observeSkyPointer(gl.domElement, pointer.current) : undefined, [gl, world]);
   const anchor = useMemo(() => new Vector3(), []);
   const material = useMemo(() => new ShaderMaterial({
     depthTest: false, depthWrite: false,
-    uniforms: { uTime: { value: 0 }, uAspect: { value: 1 }, uRelease: { value: 0 }, uRipple: { value: 0 }, uCenter: { value: new Vector2(0.5, 0.4) }, uPaper: { value: new Color(world === 'space' ? '#0b1012' : '#f0efe7') }, uClay: { value: new Color(world === 'space' ? '#354c43' : '#91a28b') }, uInk: { value: new Color(world === 'space' ? '#403441' : '#41503e') } },
+    // Pointer light is independent of the pausable algorithm clock.
+    uniforms: { uPointer: { value: new Vector2(.5, .5) }, uHover: { value: 0 }, uTime: { value: 0 }, uAspect: { value: 1 }, uRelease: { value: 0 }, uRipple: { value: 0 }, uCenter: { value: new Vector2(0.5, 0.4) }, uPaper: { value: new Color(world === 'space' ? '#0b1012' : '#f0efe7') }, uClay: { value: new Color(world === 'space' ? '#354c43' : '#91a28b') }, uInk: { value: new Color(world === 'space' ? '#403441' : '#41503e') } },
     vertexShader: 'varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position.xy,1.0,1.0);}',
     fragmentShader: `
       varying vec2 vUv;
       uniform float uTime, uAspect, uRelease, uRipple;
       uniform vec2 uCenter;
       uniform vec3 uPaper, uClay, uInk;
+      ${skyInteraction}
       float hash(vec2 p){vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z);}
       float noise(vec2 p){
         vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
@@ -61,7 +67,8 @@ function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'ste
       }
       float field(vec2 p){return noise(p)*0.57+noise(p*2.07+3.1)*0.29+noise(p*4.13+7.6)*0.14;}
       void main(){
-        vec2 p=(vUv-0.5)*vec2(min(uAspect,3.0),1.0)*2.7;
+        vec2 uv=skyUv();
+        vec2 p=(uv-0.5)*vec2(min(uAspect,3.0),1.0)*2.7;
         float t=uTime*0.11;
         vec2 drift=vec2(field(p+vec2(t,-t*0.7)),field(p+vec2(-t*0.6,t)+9.2));
         float wash=field(p+drift*(1.6+uRelease*1.2)+vec2(t*0.3,-t*0.22));
@@ -77,23 +84,27 @@ function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'ste
         ${world === 'space' ? `
         color=mix(uPaper,uClay,smoothstep(0.35,0.8,wash)*0.42);
         color=mix(color,uInk,smoothstep(0.43,0.85,folds)*0.28);
-        vec2 sky=vUv*vec2(uAspect,1.0)*58.0;
+        vec2 sky=uv*vec2(uAspect,1.0)*58.0;
         vec2 cell=floor(sky);
         vec2 offset=vec2(hash(cell+3.0),hash(cell+19.0));
         float star=exp(-pow(length(fract(sky)-offset)*28.0,2.0))*step(0.976,hash(cell));
         float shimmer=0.7+0.3*sin(t+hash(cell)*6.28);
         color+=vec3(0.66,0.72,0.65)*star*shimmer;
-        color+=uClay*ring*0.08;
+        color+=uClay*ring*0.08+pointerLight();
         ` : ''}
         gl_FragColor=vec4(color,1.0);
         #include <colorspace_fragment>
       }`,
   }), [world]);
   useEffect(() => () => material.dispose(), [material]);
-  useFrame(() => {
+  useFrame((_, delta) => {
+    const uniforms = material.uniforms;
+    const ease = 1 - Math.exp(-Math.min(delta, .1) * 5);
+    uniforms.uPointer.value.x += (pointer.current.x - uniforms.uPointer.value.x) * ease;
+    uniforms.uPointer.value.y += (pointer.current.y - uniforms.uPointer.value.y) * ease;
+    uniforms.uHover.value += (pointer.current.strength - uniforms.uHover.value) * ease;
     const state = clock.current;
     if (state.index !== renderIndex) return;
-    const uniforms = material.uniforms;
     uniforms.uTime.value = state.time / 1000;
     uniforms.uAspect.value = size.width / size.height;
     uniforms.uRelease.value = Math.sin(Math.PI * Math.max(0, Math.min(1, erosion(state))));

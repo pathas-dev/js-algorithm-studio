@@ -4,6 +4,40 @@ import { renderToString } from 'react-dom/server';
 import { createServer } from 'vite';
 const server = await createServer({ configFile: 'web/vite.config.mts', server: { middlewareMode: true }, appType: 'custom' });
 try {
+  const { observeSkyPointer } = await server.ssrLoadModule('/sky-pointer.ts');
+  {
+    const savedWindow = globalThis.window;
+    const savedDocument = globalThis.document;
+    globalThis.window = new EventTarget();
+    globalThis.document = Object.assign(new EventTarget(), { hidden: false, documentElement: new EventTarget() });
+    try {
+      let rect = { left: 100, top: 50, width: 200, height: 100 };
+      const target = { x: .5, y: .5, strength: 0 };
+      const stop = observeSkyPointer({ getBoundingClientRect: () => rect }, target);
+      const move = (properties = {}) => window.dispatchEvent(Object.assign(new Event('pointermove'), { pointerType: 'mouse', buttons: 0, clientX: 150, clientY: 75, ...properties }));
+      move();
+      assert.deepEqual(target, { x: .25, y: .75, strength: 1 }, 'Pointer coordinates respect canvas offset and WebGL y direction');
+      for (const properties of [{ clientX: 99 }, { clientY: 151 }, { pointerType: 'touch' }, { pointerType: 'pen' }, { buttons: 1 }]) {
+        move(); move(properties);
+        assert.equal(target.strength, 0, 'Outside, touch and orbit drags do not disturb the sky');
+      }
+      move(); window.dispatchEvent(new Event('blur'));
+      assert.equal(target.strength, 0);
+      move(); document.documentElement.dispatchEvent(new Event('pointerleave'));
+      assert.equal(target.strength, 0);
+      move(); document.hidden = true; document.dispatchEvent(new Event('visibilitychange'));
+      assert.equal(target.strength, 0);
+      move(); assert.equal(target.strength, 0, 'Hidden tabs cannot retain a pointer glow');
+      document.hidden = false;
+      rect = { left: 0, top: 0, width: 0, height: 0 };
+      move(); assert.equal(target.strength, 0, 'Zero-sized loading canvases never create invalid uniforms');
+      stop(); rect = { left: 100, top: 50, width: 200, height: 100 };
+      move(); assert.equal(target.strength, 0, 'Unmount removes pointer listeners');
+    } finally {
+      if (savedWindow === undefined) delete globalThis.window; else globalThis.window = savedWindow;
+      if (savedDocument === undefined) delete globalThis.document; else globalThis.document = savedDocument;
+    }
+  }
   const { initialBubblePlayback, bubblePlaybackReducer: reduce, advanceBubblePlayback: advance } = await server.ssrLoadModule('/bubble-playback.ts');
   const { wheelZoom } = await server.ssrLoadModule('/scene-zoom.ts');
   assert(wheelZoom(1, -80) > 1 && wheelZoom(1, 80) < 1, 'Wheel direction matches zoom buttons');
