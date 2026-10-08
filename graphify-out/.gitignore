@@ -1,0 +1,6 @@
+# Machine-specific interpreter paths and transient rebuild files.
+.graphify_python
+.rebuild.lock
+.gfy-replace-*.tmp
+# Automatic snapshots of superseded graph outputs.
+/20??-??-??/
