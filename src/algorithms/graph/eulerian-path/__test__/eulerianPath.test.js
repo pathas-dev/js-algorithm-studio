@@ -4,6 +4,19 @@ import Graph from '../../../../data-structures/graph/Graph';
 import eulerianPath from '../eulerianPath';
 
 describe('eulerianPath', () => {
+  it('fails safely when an edge disappears during traversal', () => {
+    const a = new GraphVertex('A');
+    const b = new GraphVertex('B');
+    const edge = new GraphEdge(a, b);
+    const graph = new Graph().addEdge(edge);
+    expect(() => eulerianPath(graph, (step) => {
+      if (step.type === 'degree') {
+        a.deleteEdge(edge);
+        b.deleteEdge(edge);
+      }
+    })).toThrow('eulerian');
+  });
+
   it('should throw an error when graph is not Eulerian', () => {
     function findEulerianPathInNotEulerianGraph() {
       const vertexA = new GraphVertex('A');

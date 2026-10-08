@@ -1,6 +1,23 @@
 import KMeans from '../kMeans';
+import * as distance from '../../../math/euclidean-distance/euclideanDistance';
 
 describe('kMeans', () => {
+  it('stops when cluster assignments keep oscillating', () => {
+    let calls = 0;
+    const mockDistance = jest.spyOn(distance, 'default').mockImplementation(() => {
+      const iteration = Math.floor(calls / 4);
+      const cluster = calls % 2;
+      calls += 1;
+      return cluster === iteration % 2 ? 0 : 1;
+    });
+    try {
+      expect(() => KMeans([[0, 0], [1, 1]], 2)).toThrow('kmeans-convergence');
+      expect(mockDistance).toHaveBeenCalledTimes(400);
+    } finally {
+      mockDistance.mockRestore();
+    }
+  });
+
   it('should throw an error on invalid data', () => {
     expect(() => {
       KMeans();
