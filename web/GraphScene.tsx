@@ -24,7 +24,7 @@ function Camera({ reset, language }: { reset: number; language: Language }) {
     ortho.updateProjectionMatrix();
     invalidate();
   }, [camera, size, scene.zoom, invalidate]);
-  return <SceneOrbit home={home} target={target} reset={reset} label={language === 'ko' ? '3D 그래프 · 드래그 또는 방향키로 회전, Home으로 시점 초기화' : '3D graph · drag or use arrow keys to orbit, Home to reset'} />;
+  return <SceneOrbit home={home} target={target} reset={reset} label={language === 'ko' ? '3D 그래프 · 드래그 또는 방향키로 회전, 스크롤로 확대·축소, Home으로 시점 초기화' : '3D graph · drag or use arrow keys to orbit, scroll to zoom, Home to reset'} />;
 }
 
 function Labels({ nodes, edges, labels, weighted }: { nodes: GraphPlanet[]; edges: GraphConnection[]; labels: Labels; weighted: boolean }) {
@@ -121,6 +121,6 @@ export default function GraphScene({ nodes, edges, language, weighted, fallback 
       </div>
       <span className="sr-only">{nodes.map((node) => `${node.value}${node.current ? ko ? ' 현재 정점' : ' current vertex' : ''}`).join(', ')}. {edges.map((edge) => `${edge.from.value}${edge.directed ? ' → ' : ' ↔ '}${edge.to.value}${weighted && edge.weight !== undefined ? ` (${edge.weight})` : ''}${edge.active ? ko ? ' 검사 중' : ' inspecting' : edge.selected ? ko ? ' 선택됨' : ' selected' : ''}`).join('; ')}</span>
     </div>
-    <div className="graph-scene-footer"><p className="graph-help">{ko ? '드래그 또는 방향키로 회전' : 'Drag or use arrow keys to orbit'}</p><button className="bubble-size-button" onClick={() => setReset((value) => value + 1)}>{ko ? '시점 초기화' : 'Reset view'}</button></div>
+    <div className="graph-scene-footer"><p className="graph-help">{ko ? '드래그·방향키로 회전 · 스크롤로 확대·축소' : 'Drag or use arrow keys to orbit · scroll to zoom'}</p><button className="bubble-size-button" onClick={() => setReset((value) => value + 1)}>{ko ? '시점 초기화' : 'Reset view'}</button></div>
   </div>;
 }

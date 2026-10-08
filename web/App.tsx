@@ -383,7 +383,7 @@ export default function App() {
                       </div>
                     </Group>}
                     <Group className="bubble-stage-heading" justify="space-between"><Text fw={600} size="sm">{arrayLesson ? t('숫자들이 자리 잡는 동안', 'While the numbers find their places') : t('지금 벌어지는 일', 'What’s happening')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
-                    <SpaceLesson numeralFont={isBubble ? 'Manrope' : undefined} index={playback.index} zoom={sceneZoom} previous={steps[Math.max(0, playback.index - 1)]} clock={ambient.clock} reduced={ambient.reduced} view={bubbleView} sky={!arrayLesson}>
+                    <SpaceLesson numeralFont={isBubble ? 'Manrope' : undefined} index={playback.index} zoom={sceneZoom} onZoom={orbitalLesson ? setSceneZoom : undefined} previous={steps[Math.max(0, playback.index - 1)]} clock={ambient.clock} reduced={ambient.reduced} view={bubbleView} sky={!arrayLesson}>
                     <div className="lesson-visual">
                     {partialArray && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
                     <LessonView algorithm={algorithm} step={step} language={language} />

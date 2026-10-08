@@ -39,7 +39,7 @@ function Camera({ count, spacing, signed, view, world, zoom = 1, interactive, re
     camera.lookAt(target);
     camera.updateMatrixWorld();
   }, -1);
-  return world === 'space' && interactive ? <SceneOrbit home={arrayHome} target={arrayTarget} reset={reset} enabled={orbiting} minPolar={.55} maxPolar={1.35} maxAzimuth={Math.PI / 3} label={language === 'ko' ? '3D 배열 · 드래그 또는 방향키로 회전, Home으로 시점 초기화' : '3D array · drag or use arrow keys to orbit, Home to reset'} /> : null;
+  return world === 'space' && interactive ? <SceneOrbit home={arrayHome} target={arrayTarget} reset={reset} enabled={orbiting} minPolar={.55} maxPolar={1.35} maxAzimuth={Math.PI / 3} label={language === 'ko' ? '3D 배열 · 드래그 또는 방향키로 회전, 스크롤로 확대·축소, Home으로 시점 초기화' : '3D array · drag or use arrow keys to orbit, scroll to zoom, Home to reset'} /> : null;
 }
 
 function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'step' | 'clock' | 'world'> & { spacing: number; renderIndex: number }) {
@@ -345,6 +345,6 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
         {!step.array.length && <p className="bubble-empty">{language === 'ko' ? '빈 배열 · 잠깐 쉬어갑니다.' : 'An empty array. A moment of rest.'}</p>}
       </div>
     </div>
-    {orbiting && <div className="bubble-orbit-footer"><p className="graph-help">{language === 'ko' ? '드래그 또는 방향키로 회전' : 'Drag or use arrow keys to orbit'}</p><button className="bubble-size-button" onClick={() => setReset((value) => value + 1)}>{language === 'ko' ? '시점 초기화' : 'Reset view'}</button></div>}
+    {orbiting && <div className="bubble-orbit-footer"><p className="graph-help">{language === 'ko' ? '드래그·방향키로 회전 · 스크롤로 확대·축소' : 'Drag or use arrow keys to orbit · scroll to zoom'}</p><button className="bubble-size-button" onClick={() => setReset((value) => value + 1)}>{language === 'ko' ? '시점 초기화' : 'Reset view'}</button></div>}
   </div>;
 }

@@ -5,6 +5,14 @@ import { createServer } from 'vite';
 const server = await createServer({ configFile: 'web/vite.config.mts', server: { middlewareMode: true }, appType: 'custom' });
 try {
   const { initialBubblePlayback, bubblePlaybackReducer: reduce, advanceBubblePlayback: advance } = await server.ssrLoadModule('/bubble-playback.ts');
+  const { wheelZoom } = await server.ssrLoadModule('/scene-zoom.ts');
+  assert(wheelZoom(1, -80) > 1 && wheelZoom(1, 80) < 1, 'Wheel direction matches zoom buttons');
+  assert.equal(wheelZoom(2, -1000), 2);
+  assert.equal(wheelZoom(.5, 1000), .5);
+  assert.equal(wheelZoom(1, 0), 1);
+  assert.equal(wheelZoom(1, 3, 1), wheelZoom(1, 48, 0), 'Normalize line-mode mouse wheels');
+  assert.equal(wheelZoom(1, .25, 2), wheelZoom(1, 80, 0), 'Normalize page-mode mouse wheels');
+  assert(Math.abs(wheelZoom(wheelZoom(1, -80), 80) - 1) < 1e-12, 'Wheel zoom is reversible within its bounds');
   const { bubble } = await server.ssrLoadModule('/algorithms.ts');
   const { default: ArrayView } = await server.ssrLoadModule('/ArrayView.tsx');
   const { default: SpaceLesson } = await server.ssrLoadModule('/SpaceLesson.tsx');

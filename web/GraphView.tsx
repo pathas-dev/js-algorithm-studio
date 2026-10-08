@@ -22,9 +22,10 @@ export default function GraphView({ step, language, weighted = true }: { step: S
   const dfs = step.variables.mode === 'dfs' || step.variables.mode === 'topological';
   const frontier = String((dfs ? step.variables.stack : step.variables.queue) ?? '');
   const { nodes: positions, edges } = graphModel(step, seen, processed, chosen, Boolean(matrix));
-  const map = <svg viewBox="0 0 440 310" role="img" aria-describedby={statusId} aria-label={ko ? '현재 그래프' : 'Current graph'}>
+  const map = <svg className="graph-map" viewBox="0 0 440 310" role="img" aria-describedby={statusId} aria-label={ko ? '현재 그래프' : 'Current graph'}>
       <title>{`${ko ? '현재 그래프: ' : 'Current graph: '}${step.array.map((item) => item.value).join(', ')}`}</title>
       <defs><marker id={markerId} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a3b0a7" /></marker></defs>
+      <g transform={`translate(220 155) scale(${scene?.reduced ? 1 : scene?.zoom ?? 1}) translate(-220 -155)`}>
       {edges.map(({ from, to, weight, active, selected, reciprocal }) => {
         const a = from.value, b = to.value;
         const dx = to.x - from.x, dy = to.y - from.y, length = Math.hypot(dx, dy);
@@ -46,6 +47,7 @@ export default function GraphView({ step, language, weighted = true }: { step: S
           <title>{label}</title>
         </g>;
       })}
+      </g>
     </svg>;
   return <div className="graph-view" data-view={scene?.view ?? '2d'}>
     {scene?.view === '3d' && !scene.reduced && positions.length ? <Suspense fallback={map}><GraphScene nodes={positions} edges={edges} language={language} weighted={weighted} fallback={map} /></Suspense> : map}
