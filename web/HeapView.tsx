@@ -1,3 +1,4 @@
+import StorageView from './StorageView';
 import PlanetMark from './PlanetMark';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
@@ -16,7 +17,7 @@ export default function HeapView({ step, language }: { step: Step; language: Lan
   });
   return <div className="heap-view">
     <p>{maximum ? step.variables.adjusting ? language === 'ko' ? '힙 조정 중 · 부모 ≥ 자식 순서를 복원합니다' : 'Adjusting heap · restoring parent ≥ child' : language === 'ko' ? '최대 힙 · 부모 ≥ 자식' : 'Max heap · parent ≥ child' : priorityQueue ? step.variables.adjusting ? language === 'ko' ? '힙 조정 중 · 우선순위 순서 복원' : 'Adjusting heap · restoring priority order' : language === 'ko' ? '우선순위 큐 · 작은 p부터 처리' : 'Priority queue · smaller p first' : step.variables.adjusting ? language === 'ko' ? '힙 조정 중 · 부모 ≤ 자식 순서를 복원합니다' : 'Adjusting heap · restoring parent ≤ child' : language === 'ko' ? '최소 힙 · 부모 ≤ 자식' : 'Min heap · parent ≤ child'}</p>
-    <svg viewBox={`0 0 600 ${levels * 48 + 10}`} role="img" aria-label={maximum ? language === 'ko' ? '현재 최대 힙' : 'Current max heap' : language === 'ko' ? '현재 최소 힙' : 'Current min heap'}>
+    <StorageView step={step} language={language}><svg viewBox={`0 0 600 ${levels * 48 + 10}`} role="img" aria-label={maximum ? language === 'ko' ? '현재 최대 힙' : 'Current max heap' : language === 'ko' ? '현재 최소 힙' : 'Current min heap'}>
       <title>{heap.map((item) => item.value).join(', ') || '∅'}</title>
       {nodes.slice(1).map((node, index) => {
         const parent = nodes[Math.floor(index / 2)];
@@ -28,7 +29,7 @@ export default function HeapView({ step, language }: { step: Step; language: Lan
         {priorityQueue && <text textAnchor="middle" y={27} fontSize={9} fill="#e2e7d9">p:{priorities[String(node.value)]}</text>}
       </motion.g>)}
       {!nodes.length && <text x={300} y={25} textAnchor="middle">∅</text>}
-    </svg>
+    </svg></StorageView>
     <output data-testid="heap-values">[{heap.map((item) => item.value).join(', ')}]</output>
   </div>;
 }

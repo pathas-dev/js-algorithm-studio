@@ -1,10 +1,34 @@
 # All lesson observatories
 
-Scope: extend the approved observatory across all 111 runnable lessons; Experience with an exact, inspectable trace. Existing inputs, constraints, algorithms, bilingual explanations and source remain authoritative. Graphs provide a rotatable 3D observatory and 2D top view. Singly and doubly linked-list structure lessons add communication modules with the original 2D top view available; deque and forward/reverse traversal keep their existing views. Trees, heaps and hash structures remain unchanged. Hanoi owns a ring-transfer scene.
+Scope: extend the approved observatory across all 111 runnable lessons; Experience with an exact, inspectable trace. Existing inputs, constraints, algorithms, bilingual explanations and source remain authoritative. Graphs provide a rotatable 3D observatory and 2D top view. Singly and doubly linked-list structure lessons add communication modules with the original 2D top view available; deque and forward/reverse traversal keep their existing views. Min-heap, max-heap and priority-queue structure lessons add real heap control slots; hash-table adds address docks and actual collision chains. Trees, heap sort and other structure lessons retain their incumbent views. Hanoi owns a ring-transfer scene.
+
+## Authorized heap and hash storage equipment extension
+
+The user approved native 3D for only min-heap, max-heap, priority-queue and hash-table structure lessons after the linked-list extension (2026-10-09). These four inherit the observatory rather than creating a new visual system. The user's rejection of generic planets for every structure guides this local equipment expression; heap sort and other trees/structures retain their incumbent views.
+
+THESIS: Show actual heap relationships and hash storage through inspectable control slots and addressed docks.
+
+OWN-WORLD: Inherit near-black ground, cream ink, sage/mauve equipment, warm active-state evidence, existing typography and quiet controls. No new dependency, global token system or raster asset is introduced.
+
+STORY: Stable heap control units transfer between real tree slots, while fixed indices and ROOT identify the destinations. Hash cargo arrives at one of eight address docks; collisions retain the recorded chain order, probes emphasize the real candidate, overwrites retain key identity and deletes remove the entry.
+
+FIRST VIEWPORT: The existing lesson controls surround a lazy native storage scene. Shared 2D/3D, zoom and transport remain available, with exact heap order or returned hash values and an optional original-2D storage disclosure.
+
+FORM: Box control units rest on fixed heap platforms connected by the actual parent `floor((child−1)/2)`. Address docks anchor hash rails carrying key/value panels. Restrained orbit and bounded native two-axis scroll keep long storage inspectable. Palette and body type remain incumbent.
+
+The heap explanation retains parent ≤ child for min-heap, parent ≥ child for max-heap, and smaller p first for priority queues, including transient adjustment states; it does not imply a fully sorted array. Stable item IDs distinguish equal, fractional and negative values; p travels with its unit. Hash addresses, chain order, key/value pairs, probe candidates and results come directly from each snapshot. Storage motion and update pulses use the committed shared clock: pause freezes transfers, resume continues and seek shows the selected state directly. Home/Reset view preserves playback and zoom. Shared zoom spans 50–200% with disabled endpoints. The bounded region supports native horizontal/vertical exploration, with maximum heights of 420px on desktop and 350px on mobile; its stage grows with the model and zoom. Changed steps focus the active unit or dock after camera, canvas and committed clock agree, while same-step manual scrolling persists. Original SVG/DOM records remain in the exact-storage disclosure and separate screen-reader text. Lazy loading, reduced motion, errors and WebGL context loss retain 2D. Visibility gates rendering, DPR remains capped at 1.5 and native resources are cleaned up. Trace algorithms and input constraints are unchanged.
+
+Verification (2026-10-09): the storage self-check covers 939 actual snapshots across min/max heaps with duplicate, fractional and negative values, priority updates, empty/32-item heaps, Unicode hash keys, 12 collision keys, deletion and overwrite. Pause/resume/seek, bilingual SSR and fixed slot tags are covered. All 26 related tests, 1452 bilingual trace renders across the unchanged 111 lessons, typecheck and production build pass.
+
+Browser checks at 1440×1080 and 390×844 cover all four defaults, hash probes/collisions, a 32-item long heap at 50%, the retained 2D view and exact disclosure, keyboard orbit/Home/Reset view, fullscreen entry/exit, English switching, pause and zoom bounds. No document overflow or browser errors were observed. The 11 required storage review captures and additional paused-swap proof were opened and valid. Physical phone touch interaction and GPU performance were not tested.
+
+The initial full finish review accepted the concept and static composition, validated all 11 captures, and required one correction: ROOT/index labels moved with heap values. The corrected scene projects those labels from fixed slots while values and priorities follow units. A real paused 8/3 swap screenshot, source inspection and trace assertion confirmed the separation. Final verdict: “Fix resolved. Disposition: ship.” That verdict pass scored only the listed fixed-index/ROOT correction; it was not a fresh whole-surface review.
+
+Pre-existing documentation drift: `.impeccable/design.json` still describes other connected structures as planar and lacks the later sequence, linked-list and storage equipment expressions. This ordinary local extension preserves the normative DESIGN.md frontmatter and sidecar; that older drift is recorded without repair or canonization.
 
 ## Authorized linked-list communication equipment extension
 
-The user approved communication station modules for only the singly and doubly linked-list structure lessons (2026-10-09). This is an extension within the incumbent observatory. Deque, forward/reverse traversal, trees, heaps and hash structures keep their established views; the completed sequence scenes and global playback controls remain intact.
+The user approved communication station modules for only the singly and doubly linked-list structure lessons (2026-10-09). This is an extension within the incumbent observatory. At the time of this linked-list extension, deque, forward/reverse traversal, trees, heaps and hash structures kept their established views; the completed sequence scenes and global playback controls remain intact.
 
 THESIS: Show exact pointer changes through communication modules and actual directed cables.
 
@@ -39,7 +63,7 @@ The first finish review required a fix for hidden TOP on long stacks. Camera-pro
 ## Direction contract
 THESIS: Every lesson becomes a small system to watch, while its real values and relationships remain readable.
 
-OWN-WORLD: Inherit the dark green observatory, subdued ochre, sage and mauve, shader sky, existing lettering and quiet controls. Arrays and graph maps use planets for values or nodes; sequence lessons use cargo and scanning equipment. Connections remain actual edges.
+OWN-WORLD: Inherit the dark green observatory, subdued ochre, sage and mauve, shader sky, existing lettering and quiet controls. Arrays and graph maps use planets for values or nodes; sequence lessons use cargo and scanning equipment, linked lists use communication modules, and these four storage lessons use control slots and docks. Connections remain actual edges.
 
 STORY: Choose a lesson, watch a slow transition, pause or seek, then inspect exact values and code.
 

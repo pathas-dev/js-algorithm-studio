@@ -152,3 +152,16 @@
 .space-studio.idle-studio .bubble-immersive .graph-scene { flex: 1; min-height: 240px; height: auto; }
 .space-studio.idle-studio .bubble-immersive .graph-view > svg { flex: 1; height: 240px; min-height: 240px; max-height: none; width: 100%; }
 .space-studio.idle-studio .bubble-immersive .array-state { margin-top: auto; flex-shrink: 0; }
+
+.storage-labels { position: absolute; inset: 0; pointer-events: none; }
+.storage-labels > span { position: absolute; left: 0; top: 0; visibility: hidden; display: grid; place-items: center; color: #e2e7d9; font-variant-numeric: tabular-nums; background: #14201ef2; padding: 2px 5px; }
+.storage-labels strong { font-size: 15px; font-weight: 500; line-height: 1.3; }
+.storage-labels small, .storage-labels em { font-size: 10px; font-style: normal; line-height: 1.35; color: #c9d2c6; }
+.storage-labels > span[data-kind="hash"] { width: 145px; overflow-wrap: anywhere; }
+.storage-labels > span[data-kind="hash"] small { font-size: 12px; }
+.storage-labels > span[data-active="true"] { color: #eed1a3; }
+.storage-labels .storage-address { font-size: 16px; }
+.storage-guide { margin: 10px 0 3px; }
+.storage-observatory .graph-scene-footer { flex-wrap: wrap; }
+
+.storage-labels .storage-slot { font-size: 10px; line-height: 1.4; color: #c9d2c6; }
