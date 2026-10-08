@@ -1,6 +1,30 @@
 .space-lesson { position: relative; isolation: isolate; margin-top: 12px; }
 .space-lesson > .space-sky { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: .65; pointer-events: none; }
 .space-lesson-content { position: relative; }
+.graph-observatory { position: relative; }
+.graph-scene { position: relative; height: clamp(310px, 34vw, 420px); overflow: hidden; }
+.graph-canvas, .graph-labels { position: absolute; inset: 0; }
+.graph-canvas { cursor: grab; touch-action: none; }
+.graph-canvas:active { cursor: grabbing; }
+.graph-canvas canvas:focus-visible { outline: 2px solid #9bb7a5; outline-offset: -3px; }
+.graph-labels { pointer-events: none; }
+.graph-labels > span { position: absolute; left: 0; top: 0; visibility: hidden; font-variant-numeric: tabular-nums; }
+.graph-node-label { color: #e2e7d9; font-family: inherit; font-size: 16px; font-weight: 500; text-shadow: 0 2px 8px #0b1012; }
+.graph-node-label[data-current="true"] { color: #eed1a3; }
+.graph-node-label[data-dimmed="true"] { opacity: .5; }
+.graph-weight-label { padding: 2px 5px; border-radius: 3px; background: #0b1012dc; color: #c9d2c6; font: 11px ui-monospace, monospace; }
+.graph-weight-label[data-active="true"] { color: #eed1a3; }
+.graph-scene-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 0 12px; }
+.graph-help { margin: 0; color: var(--space-muted, #a3b0a7); font-size: 11px; line-height: 1.7; }
+.graph-scene-footer .bubble-size-button { min-height: 36px; }
+.space-studio.idle-studio .bubble-expanded .graph-scene { height: clamp(300px, calc(100dvh - 330px), 720px); }
+@media (max-width: 650px) {
+  .graph-scene { height: 320px; }
+  .graph-node-label { font-size: 14px; }
+  .graph-scene-footer { gap: 8px; }
+  .space-studio.idle-studio .bubble-control-row .bubble-caption { flex-basis: 100%; }
+  .space-studio.idle-studio .bubble-scene-controls { width: 100%; justify-content: flex-start; }
+}
 .orbital-array { display: flex; gap: 0; min-height: 150px; align-items: center; padding-block: 18px; width: max-content; min-width: 100%; }
 .orbital-slot { display: grid; place-items: center; gap: 5px; flex: 1 0 72px; color: #e2e7d9; font: 13px ui-monospace, monospace; }
 .orbital-slot svg { width: 72px; height: 64px; }

@@ -1,16 +1,15 @@
 import PlanetMark from './PlanetMark';
-import { useId } from 'react';
+import { lazy, Suspense, useId } from 'react';
 import type { Step, Language } from './algorithms';
+import { useSpaceLesson } from './SpaceLesson';
+import { graphModel } from './graph-scene';
+const GraphScene = lazy(() => import('./GraphScene'));
 
 export default function GraphView({ step, language, weighted = true }: { step: Step; language: Language; weighted?: boolean }) {
   const ko = language === 'ko';
   const statusId = useId();
   const markerId = `${statusId}-arrow`;
-  // ponytail: circular layout for at most 12 vertices; add a graph layout library for larger graphs.
-  const positions = step.array.map((item, index) => {
-    const angle = index / step.array.length * Math.PI * 2 - Math.PI / 2;
-    return { ...item, x: 220 + Math.cos(angle) * 150, y: 155 + Math.sin(angle) * 116 };
-  });
+  const scene = useSpaceLesson();
   const distances: Record<string, number | null> | undefined = step.variables.distances === undefined ? undefined : JSON.parse(String(step.variables.distances));
   const groups: number[][] | undefined = step.variables.groups === undefined ? undefined : JSON.parse(String(step.variables.groups));
   const groupMap = new Map<number, number[]>();
@@ -22,20 +21,17 @@ export default function GraphView({ step, language, weighted = true }: { step: S
   const processed = matrix && step.type === 'done' ? seen : String(step.variables.processed ?? '').split(',');
   const dfs = step.variables.mode === 'dfs' || step.variables.mode === 'topological';
   const frontier = String((dfs ? step.variables.stack : step.variables.queue) ?? '');
-  return <div className="graph-view">
-    <svg viewBox="0 0 440 310" role="img" aria-describedby={statusId} aria-label={ko ? '현재 그래프' : 'Current graph'}>
+  const { nodes: positions, edges } = graphModel(step, seen, processed, chosen, Boolean(matrix));
+  const map = <svg viewBox="0 0 440 310" role="img" aria-describedby={statusId} aria-label={ko ? '현재 그래프' : 'Current graph'}>
       <title>{`${ko ? '현재 그래프: ' : 'Current graph: '}${step.array.map((item) => item.value).join(', ')}`}</title>
       <defs><marker id={markerId} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a3b0a7" /></marker></defs>
-      {step.edges?.map(([a, b, weight]) => {
-        const from = positions.find((node) => node.value === a)!;
-        const to = positions.find((node) => node.value === b)!;
-        const active = matrix ? (step.variables.current === a && step.variables.via === b) || (step.variables.via === a && step.variables.next === b) || (!step.variables.directed && ((step.variables.current === b && step.variables.via === a) || (step.variables.via === b && step.variables.next === a))) : (step.variables.current === a && step.variables.next === b) || (!step.variables.directed && step.variables.current === b && step.variables.next === a);
-        const selected = chosen.some(([c, d]) => (c === a && d === b) || (c === b && d === a));
+      {edges.map(({ from, to, weight, active, selected, reciprocal }) => {
+        const a = from.value, b = to.value;
         const dx = to.x - from.x, dy = to.y - from.y, length = Math.hypot(dx, dy);
-        const reciprocal = step.variables.directed && step.edges?.some(([c, d]) => c === b && d === a);
         const bend = reciprocal ? 28 : 0;
-        const cx = (from.x + to.x) / 2 - dy / length * bend, cy = (from.y + to.y) / 2 + dx / length * bend;
-        return <g key={`${a}-${b}`}><path d={`M ${from.x + dx / length * 22} ${from.y + dy / length * 22} Q ${cx} ${cy} ${to.x - dx / length * 24} ${to.y - dy / length * 24}`} fill="none" stroke={active ? '#d6b476' : selected ? '#8faf9d' : '#526b60'} strokeWidth={active || selected ? 4 : 2} markerEnd={step.variables.directed ? `url(#${markerId})` : undefined} />
+        const cx = (from.x + to.x) / 2 - dy / (length || 1) * bend, cy = (from.y + to.y) / 2 + dx / (length || 1) * bend;
+        const path = length ? `M ${from.x + dx / length * 22} ${from.y + dy / length * 22} Q ${cx} ${cy} ${to.x - dx / length * 24} ${to.y - dy / length * 24}` : `M ${from.x - 15} ${from.y - 15} C ${from.x - 65} ${from.y - 72}, ${from.x + 65} ${from.y - 72}, ${from.x + 15} ${from.y - 15}`;
+        return <g key={`${a}-${b}`}><path d={path} fill="none" stroke={active ? '#d6b476' : selected ? '#8faf9d' : '#526b60'} strokeWidth={active || selected ? 4 : 2} markerEnd={step.variables.directed ? `url(#${markerId})` : undefined} />
           {weighted && weight !== undefined && <text x={(from.x + 2 * cx + to.x) / 4} y={(from.y + 2 * cy + to.y) / 4 - 5} textAnchor="middle" fontSize={12} fontWeight={700} fill="#e2e7d9" stroke="#0b1012" strokeWidth={4} paintOrder="stroke">{weight}</text>}
         </g>;
       })}
@@ -45,12 +41,16 @@ export default function GraphView({ step, language, weighted = true }: { step: S
         const discovered = seen.includes(String(node.value));
         const label = `${node.value}: ${current ? ko ? '현재 정점' : 'current' : done ? ko ? '처리 완료' : 'processed' : discovered ? ko ? '발견' : 'discovered' : ko ? '미발견' : 'undiscovered'}`;
         return <g key={node.id}>
-          <PlanetMark cx={node.x} cy={node.y} r={20} fill={current ? '#d6b476' : done ? '#8faf9d' : discovered ? '#8dacc0' : '#82968c'} stroke={step.variables.via === node.value ? "#9b6fa8" : "#526b60"} strokeWidth={3} opacity={!discovered && step.type === 'done' ? .3 : 1} />
+          <PlanetMark cx={node.x} cy={node.y} r={20} fill={node.color} stroke={node.via ? "#afa0be" : "#526b60"} strokeWidth={3} opacity={node.dimmed ? .3 : 1} />
           <text x={node.x} y={node.y + 5} textAnchor="middle" fill={!discovered && step.type === 'done' ? '#e2e7d9' : '#0b1012'} fontSize={14} fontWeight={700}>{node.value}</text>
           <title>{label}</title>
         </g>;
       })}
-    </svg>
+    </svg>;
+  return <div className="graph-view" data-view={scene?.view ?? '2d'}>
+    {scene?.view === '3d' && !scene.reduced && positions.length ? <Suspense fallback={map}><GraphScene nodes={positions} edges={edges} language={language} weighted={weighted} fallback={map} /></Suspense> : map}
+    {scene?.view === '3d' && scene.reduced && <p className="graph-help">{ko ? '움직임 줄이기 설정에 맞춰 탑뷰로 보여드립니다.' : 'Showing the top view for your reduced-motion preference.'}</p>}
+    {!positions.length && <p className="graph-help">{ko ? '정점이 없는 그래프입니다.' : 'This graph has no vertices.'}</p>}
     {('queue' in step.variables || dfs) && <div className="frontier"><span>{groups ? ko ? '남은 간선 · 가중치 오름차순' : 'Remaining edges · increasing weight' : distances ? ko ? '우선순위 큐 · 힙 배열' : 'Priority queue · heap storage' : dfs ? ko ? '재귀 스택 · 아래 → 위' : 'Recursion stack · bottom → top' : ko ? '큐 · 앞 → 뒤' : 'Queue · front → back'}</span><output data-testid="frontier">[{frontier.split(',').filter(Boolean).join(', ')}]</output></div>}
     {groups && <div className="frontier" id={step.variables.structure === 'disjoint-set' ? statusId : undefined}><span>{ko ? '분리 집합 · 대표: 구성원' : 'Disjoint sets · representative: members'}</span><output data-testid="disjoint-groups">{[...groupMap].map(([root, members]) => `${root}: [${members.join(', ')}]`).join(' · ')}</output></div>}
     {distances && <table className="graph-table" data-testid="distance-table"><caption>{step.variables.negativeCycle ? ko ? '음수 사이클 · 잠정 거리 (최단 거리 아님)' : 'Negative cycle · tentative distances (not shortest)' : ko ? '시작점에서의 거리 · ∞는 도달 불가' : 'Distance from start · ∞ means unreachable'}</caption><thead><tr><th>{ko ? '정점' : 'Vertex'}</th><th>{ko ? '거리' : 'Distance'}</th><th>{ko ? '이전 정점' : 'Previous'}</th></tr></thead><tbody>{step.array.map((item) => <tr key={item.id}><td>{item.value}</td><td>{distances[item.value] ?? '∞'}</td><td>{previous?.[item.value] ?? '—'}</td></tr>)}</tbody></table>}

@@ -61,6 +61,9 @@ colors:
   space-comparison: "#d6b476"
   space-swap: "#afa0be"
   space-settled: "#8faf9d"
+  space-graph-discovered: "#8dacc0"
+  space-connection: "#526b60"
+  space-active-ink: "#eed1a3"
   space-landing-action: "#263b30"
   space-landing-hover: "#354c43"
   space-control-line: "#3e5149"
@@ -113,6 +116,11 @@ typography:
   bubble-index:
     fontSize: "12px"
     letterSpacing: ".04em"
+    fontFeature: '"tnum"'
+  graph-label:
+    fontFamily: '"Pretendard", "Noto Sans KR", system-ui, sans-serif'
+    fontSize: "16px"
+    fontWeight: 500
     fontFeature: '"tnum"'
   code:
     fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
@@ -191,17 +199,17 @@ components:
 
 The user-approved observatory now covers landing, loading, favicon, Big O and all 111 runnable algorithm and data-structure lessons (2026-10-08). Numbered worn planets, sparse stars and diffuse green/mauve nebula make watching the invitation. Existing Korean/English product names, lighter type, precise evidence and reading order remain. The shared world extends the original Bubble direction (seed 7554e619); its surface expressions are recorded in `.impeccable/surfaces/bubble-space.md`, `.impeccable/surfaces/landing-space.md` and `.impeccable/surfaces/all-lessons-space.md`.
 
-Every lesson shares the dark shell and quiet sage controls. Sorting and search use native numbered planets, connected structures use planar maps, dense records preserve their exact axes, and Hanoi transfers real disc rings between three stations. Playful bilingual introductions invite watching, while exact summaries, model formulas and step evidence support closer reading. Source code stays available below the execution canvas when curiosity calls.
+Every lesson shares the dark shell and quiet sage controls. Sorting and search use native numbered planets; graph lessons add rotatable 3D planetary connections with a 2D top view. Other connected structures use planar maps, dense records preserve their exact axes, and Hanoi transfers real disc rings between three stations. Playful bilingual introductions invite watching, while exact summaries, model formulas and step evidence support closer reading. Source code stays available below the execution canvas when curiosity calls.
 
 **Key Characteristics:**
 - Low-light observatory on landing, loading, favicon, Big O and all 111 lessons.
-- Native array planets, planar topology, exact coordinate records and three-station Hanoi rings.
+- Native array and graph planets, readable topology, exact coordinate records and three-station Hanoi rings.
 - Worn numbered planets, procedural atmosphere and equally sized model stars.
 - Lighter headings and quiet bilingual copy.
 - Visible execution with code closed until requested.
 - Exact numeric values and distinct execution states.
 
-Source evidence includes `web/main.tsx`, `web/styles.css`, `web/idle.css`, `web/landing.css`, `web/Landing.tsx`, `web/SpaceSky.tsx`, `web/space-shader.ts`, `web/LoadingScreen.tsx`, `web/BubbleScene.tsx`, `web/bubble-motion.ts`, `web/ComplexityScene.tsx`, `web/bubble.css`, `web/cosmos.css`, `web/App.tsx`, `web/SpaceLesson.tsx`, `web/HanoiScene.tsx`, `web/PlanetMark.tsx`, `web/useBubblePlayback.ts` and `web/public/favicon.svg`. The optional legacy clay renderer remains implemented in BubbleScene; active landing, sorting and search scenes explicitly select space. The orbital SVG is the identity mark, with an ICO derivative for browser compatibility.
+Source evidence includes `web/main.tsx`, `web/styles.css`, `web/idle.css`, `web/landing.css`, `web/Landing.tsx`, `web/SpaceSky.tsx`, `web/space-shader.ts`, `web/LoadingScreen.tsx`, `web/BubbleScene.tsx`, `web/bubble-motion.ts`, `web/ComplexityScene.tsx`, `web/bubble.css`, `web/cosmos.css`, `web/App.tsx`, `web/SpaceLesson.tsx`, `web/GraphScene.tsx`, `web/GraphView.tsx`, `web/graph-scene.ts`, `web/graph-geometry.ts`, `web/planet-material.ts`, `web/HanoiScene.tsx`, `web/PlanetMark.tsx`, `web/useBubblePlayback.ts` and `web/public/favicon.svg`. The optional legacy clay renderer remains implemented in BubbleScene; active landing, sorting and search scenes explicitly select space. The orbital SVG is the identity mark, with an ICO derivative for browser compatibility.
 
 ## Colors
 
@@ -209,7 +217,7 @@ The observatory uses near-black ground, cream ink and muted green-grey copy. Sag
 
 Native sky shader colors are recorded as CSS RGB percentages matching its RGB inputs. Domain-warped green/mauve light and sparse muted stars are atmospheric, not categorical evidence. The static CSS fallback uses the two still-sky hues. Loading uses the sage planet, ochre ellipse/moon and its inset shadow; the favicon uses the same orbit geometry with its own shade.
 
-All lessons use the observatory palette; comparison, swap, settled and matched remain distinct. Graph discovery keeps its blue-grey state, red-black trees keep semantic node colors, and image lessons preserve grayscale pixel values. Dark code surfaces retain their existing reading contrast and green active-line evidence. Source-backed light and clay tokens remain legacy options, including warm/cool renderer lights; they are not the active lesson default.
+All lessons use the observatory palette; comparison, swap, settled and matched remain distinct. Graph discovery keeps its blue-grey state; muted green connections, warm active ink, comparison-gold current nodes and settled-green processed nodes carry the same meaning in both views. Red-black trees keep semantic node colors, and image lessons preserve grayscale pixel values. Dark code surfaces retain their existing reading contrast and green active-line evidence. Source-backed light and clay tokens remain legacy options, including warm/cool renderer lights; they are not the active lesson default.
 
 **The Shared World Rule.** Apply the observatory to every lesson; preserve each algorithm’s real values, topology, axes and semantic execution states.
 
@@ -223,6 +231,8 @@ Big O notation, mathematical expressions, code and numerical evidence outside Bu
 
 Bubble’s in-canvas values and fixed index rail use the bubble-numeral family and weight. The self-hosted Manrope numeric subset is (2.8KB WOFF2), with its OFL license in `web/public/fonts`. Runtime value sprites use measured-width, (256px)-high textures, rebuilt after the font loads. Index metadata uses the bubble-index size, tabular feature and tracking. This is an explicit Bubble-only opt-in; other array lessons and the landing preview retain their native monospace values, (52px) canvas text, (80px)-high textures and (11px) index metadata where shown.
 
+3D graph IDs inherit the body family with the graph-label size, weight and tabular feature; below (650px) they use (14px). Projected labels remain upright as the camera turns. Edge weights retain native monospace at (11px) over a dark backing. Manrope remains local to Bubble.
+
 ## Layout
 
 The landing retains a (1320px) container and (48px) desktop horizontal padding. Its opening pairs copy and a sorting preview in (1.1fr / 1fr) columns with a (64px) gap. Divided use-case rows and a translucent observatory complexity lab keep the lower sections readable. The lab lays out four comparison columns on desktop and two below (650px), with scene heights of (210px) and (180px) respectively. At (900px), padding becomes (28px). At (650px), padding becomes (20px), the introduction and section copy stack, and the use-case description moves below its title.
@@ -231,11 +241,15 @@ Lessons use a (1560px) container and (180px) catalog beside a single reading col
 
 Lesson canvases use horizontal padding (20px), with (20px) vertical padding on mobile. Native array scenes use (350px) height, falling to (320px) on mobile; Hanoi uses (320px), falling to (280px). Long arrays and dense records retain scrolling. Expanded code has a bounded scroll area of (320–420px).
 
+Graph scenes use height `clamp(310px, 34vw, 420px)`, or (320px) below (650px). Expanded graph scenes use `clamp(300px, calc(100dvh - 330px), 720px)`. At mobile widths, the shared graph and array control-row caption occupies its own row and controls use the full width. Graph evidence retains its own records below the scene.
+
 ## Elevation & Depth
 
 Primary UI surfaces remain flat: thin dividers and tonal layering provide separation without decorative shadows. Observatory panels reveal the atmospheric backdrop; all lesson surfaces use dark tonal layering. The detailed step-explanation popover retains its Mantine medium shadow as a transient overlay.
 
 Sorting, search and the landing preview use native spheres, procedural 3D surface noise and matte material (roughness 0.97, metalness 0). Warm key and cool fill directional lights (intensities 3.8 and 1.1), with warm ambient light (0.55), reveal worn terrain. The space floor is hidden and spheres do not cast shadows. Native transparent rings render their front and back with depth testing; they are geometry rather than painted ellipses. The shallow orthographic 3D view has a front-facing 2D mode (z scale 0.01), where rings disappear. Independent local axial rotation turns the 3D sphere or the 2D shader terrain even before playback and while sorting is paused; rings, numeric labels and slot centres do not spin. The landing runs the real sorting trace. Space scenes render continuously while visible, returning to demand rendering offscreen or in a hidden document.
+
+Graph spheres use procedural worn terrain with matte roughness (0.92) and faint sage emission (0.12). The shared additive Fresnel atmosphere uses a cubic rim falloff without writing depth: it outlines graph planets and 3D array/preview spheres in their current material color. Array rims fade with erosion. SVG PlanetMark nodes retain a stationary warm highlight and dark limb shade beneath their printed labels while meridians rotate. These treatments add material depth without changing topology or numeric evidence.
 
 Big O uses additive shader Points with soft glow and small bright cores, not lit blocks or contact shadows. Stable local 3D coordinates grow outward with `cbrt(index) × 0.14`, golden-angle placement and bounded vertical dispersion. Each star has the same point-size rule across all models: at least (4 CSS pixels), otherwise camera zoom × (0.16), scaled for renderer DPR. All four scenes share orthographic (6.5) world units. Larger work counts add stars without enlarging existing ones or changing the camera scale.
 
@@ -284,9 +298,13 @@ Bubble's two views share a full-canvas procedural nebula and sparse stars behind
 
 Three.js/Fiber loads lazily through the bubble scene. Cold loading reserves the canvas height with a quiet bilingual status before planets appear. Reduced motion, scene failure or WebGL context loss uses the existing static array renderer; exact trace controls remain available. The landing preview shares that fallback; Big O preserves its accessible counts and descriptions if WebGL fails. All lessons retain exact trace controls and readable evidence through their static or accessible fallback.
 
-### Planar maps, coordinate records and Hanoi
+### Graph observatory, planar maps, coordinate records and Hanoi
 
-Graphs, trees, linked lists and heaps use native SVG planets in a top view. Node centres, actual connections, arrow direction, weights and printed IDs stay readable; autonomous meridian rotation changes the surface markings, not the topology. Node spin periods are (8–12s), based on radius, and run only while visible in a non-hidden document. Reduced motion removes the spin and state transitions.
+The catalog's 15 graph algorithms plus graph-structure and disjoint-set use lazy native 3D by default, with the existing SVG top view selected through the shared 2D/3D radios. Nodes retain a fixed circular layout with small stable height offsets; equal-radius spheres (0.36) carry printed vertex IDs, subdued rings and a slightly larger atmosphere (0.385). Actual connections use curved tubes and directed cones; reciprocal directed edges occupy separate lanes. Active-edge light travels with the pausable, seekable trace clock. Current, discovered, processed, intermediate and selected-edge states retain their existing semantics. Frontier, distances, predecessor, matrix, discovery/low and disjoint-set records remain exact beneath the scene. Supported input validation still rejects self-loops; defensive loop geometry does not extend that contract.
+
+Drag the graph canvas or focus it and use arrow keys to orbit; Home and Reset view return to the home viewpoint. Shared (50–200%) zoom controls retain their existing increments and preserve playback. Camera rotation changes projection, not node layout, edge identity or records. Planet surfaces rotate independently over (10s) while visible; rings and labels stay stable. DPR is capped at (1.5), offscreen/hidden scenes use demand rendering, and custom materials, tube geometries and controls are disposed on cleanup. Reduced motion keeps the SVG top view with an explanatory status. Scene failure or WebGL context loss restores that view and preserves records.
+
+Trees, linked lists and heaps continue to use native SVG planets in a top view; graph lessons use the same treatment in 2D. Node centres, actual connections, arrow direction, weights and printed IDs stay readable. Autonomous meridian rotation changes the surface markings beneath stationary light/shadow shading, not the topology. Node spin periods are (8–12s), based on radius, and run only while visible in a non-hidden document. Reduced motion removes the spin and state transitions.
 
 Dense dynamic-programming tables, string alignments, bit fields, numerical grids and chess boards keep their actual row/column axes, characters and values. Small orbital beacons mark coordinate records without replacing notation. Seam-carving pixels retain their true grayscale values. These records remain exact data views within the common dark shell. Rain bar values and mathematical point labels use cream space ink against the dark ground; Liu’s `r = 1` label uses dark ground ink inside its sage polygon.
 
@@ -296,7 +314,7 @@ Hanoi uses native 3D torus rings above three fixed labeled stations A, B and C. 
 
 ### Native sky, loading and identity
 
-Landing and the exported LoadingScreen share SpaceSky's native lightweight WebGL highp shader, independently of lazy Three.js/Fiber. Its domain-warped green/mauve nebula drifts slowly behind sparse twinkling stars. DPR is capped at (1.5); ResizeObserver updates its canvas, cleanup releases shader/program/buffer resources, and hidden tabs stop its RAF. Reduced motion renders a still sky. Shader compilation failure, unavailable WebGL or context loss replaces the canvas with the static CSS atmospheric gradient while text and controls remain readable.
+Landing, loading and non-array lesson backgrounds share SpaceSky's native lightweight WebGL highp shader, independently of lazy Three.js/Fiber. Its domain-warped green/mauve nebula drifts slowly behind sparse variable-size twinkling stars, rare subtle halos and faint dust filaments. SpaceSky and the Bubble backdrop use a stable polynomial noise hash; palette and playback ownership remain unchanged. DPR is capped at (1.5); ResizeObserver updates its canvas, cleanup releases shader/program/buffer resources, and hidden tabs stop its RAF. Lesson visibility gates the shared sky. Reduced motion renders a still sky. Shader compilation failure, unavailable WebGL or context loss replaces the canvas with the static CSS atmospheric gradient while text and controls remain readable.
 
 LoadingScreen is the root Suspense fallback. The bilingual quiet status is a polite live region; the geometric orbit is decorative. Its planet's sage/ochre material patches rotate over (110s) beneath stationary inset shading; its moon keeps the (22s) orbit. Both animations pause offscreen or in a hidden document and stop for reduced motion. The patches reuse the loading shade at (50% opacity) and ochre at (40% opacity). It does not impose a fake delay. The product name uses inherited cream ink and the existing type family. The authored orbital SVG mark is paired with an ICO derivative; no new project dependency is required to generate the compatibility asset.
 

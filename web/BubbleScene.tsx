@@ -7,6 +7,7 @@ import type { BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
 import { springProgress, planetRadius, planetSpacing, planetTransfer, axialAngle, traceTransitionTime } from './bubble-motion';
 import { useSceneVisibility } from './use-scene-visibility';
+import { atmosphereMaterial } from './planet-material';
 import './bubble.css';
 
 type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space'; zoom?: number; index?: number; numeralFont?: 'Manrope' };
@@ -47,7 +48,7 @@ function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'ste
       uniform float uTime, uAspect, uRelease, uRipple;
       uniform vec2 uCenter;
       uniform vec3 uPaper, uClay, uInk;
-      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float hash(vec2 p){vec3 q=fract(vec3(p.xyx)*0.1031); q+=dot(q,q.yzx+33.33); return fract((q.x+q.y)*q.z);}
       float noise(vec2 p){
         vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
         return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);
@@ -104,6 +105,8 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
   const space = world === 'space';
   const radius = planetRadius(item.value, maximum);
   const spinTime = useRef(0);
+  const atmosphere = useMemo(() => atmosphereMaterial(), []);
+  useEffect(() => () => atmosphere.dispose(), [atmosphere]);
   const number = useRef<Sprite>(null);
   const text = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -211,6 +214,8 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     material.color.lerp(targetColor, space ? 1 - Math.exp(-Math.min(delta, 0.1) * 8) : 1);
     material.emissive.copy(material.color);
     material.emissiveIntensity = view === '2d' ? 0.4 : space ? 0.025 : 0;
+    atmosphere.uniforms.uColor.value.copy(material.color);
+    atmosphere.uniforms.uOpacity.value = (active ? .45 : .24) * (1 - ease(uniforms.uErosion.value));
     // Shadows fade with the object, avoiding a solid ghost after erosion.
     mesh.current.castShadow = !space && view === '3d' && uniforms.uErosion.value < 0.3;
     if (ring.current) {
@@ -234,7 +239,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
       indexLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${space ? size.height - 18 : (1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
     }
   });
-  return <><mesh ref={mesh} geometry={geometry} material={material} castShadow />{space && item.id % 3 === 0 && <mesh ref={ring}><ringGeometry args={[radius * 1.3, radius * 1.7, 80]} /><meshStandardMaterial color="#82968c" side={DoubleSide} transparent opacity={0.25} depthWrite={false} roughness={1} /></mesh>}<sprite ref={number} material={text.material} scale={[text.width, 0.38, 1]} /></>;
+  return <><mesh ref={mesh} geometry={geometry} material={material} castShadow>{space && view === '3d' && <mesh material={atmosphere}><sphereGeometry args={[radius * 1.055, 32, 24]} /></mesh>}</mesh>{space && item.id % 3 === 0 && <mesh ref={ring}><ringGeometry args={[radius * 1.3, radius * 1.7, 80]} /><meshStandardMaterial color="#82968c" side={DoubleSide} transparent opacity={0.25} depthWrite={false} roughness={1} /></mesh>}<sprite ref={number} material={text.material} scale={[text.width, 0.38, 1]} /></>;
 }
 
 function Dust({ step, maximum, clock, world, spacing, renderIndex }: Pick<Props, 'step' | 'clock' | 'world'> & { maximum: number; spacing: number; renderIndex: number }) {

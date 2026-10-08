@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-08T03:30:35Z",
+  "generatedAt": "2026-10-08T07:08:05.743Z",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -983,6 +983,48 @@
           "oklch(84% 0.0360 161.19)",
           "oklch(95% 0.0360 161.19)"
         ]
+      },
+      "space-graph-discovered": {
+        "role": "secondary",
+        "displayName": "Discovered Graph Blue-grey",
+        "tonalRamp": [
+          "oklch(15% 0.0448 236.53)",
+          "oklch(26% 0.0448 236.53)",
+          "oklch(38% 0.0448 236.53)",
+          "oklch(49% 0.0448 236.53)",
+          "oklch(61% 0.0448 236.53)",
+          "oklch(72% 0.0448 236.53)",
+          "oklch(84% 0.0448 236.53)",
+          "oklch(95% 0.0448 236.53)"
+        ]
+      },
+      "space-connection": {
+        "role": "neutral",
+        "displayName": "Quiet Graph Connection",
+        "tonalRamp": [
+          "oklch(15% 0.0344 166.30)",
+          "oklch(26% 0.0344 166.30)",
+          "oklch(38% 0.0344 166.30)",
+          "oklch(49% 0.0344 166.30)",
+          "oklch(61% 0.0344 166.30)",
+          "oklch(72% 0.0344 166.30)",
+          "oklch(84% 0.0344 166.30)",
+          "oklch(95% 0.0344 166.30)"
+        ]
+      },
+      "space-active-ink": {
+        "role": "secondary",
+        "displayName": "Active Graph Cream",
+        "tonalRamp": [
+          "oklch(15% 0.0683 79.10)",
+          "oklch(26% 0.0683 79.10)",
+          "oklch(38% 0.0683 79.10)",
+          "oklch(49% 0.0683 79.10)",
+          "oklch(61% 0.0683 79.10)",
+          "oklch(72% 0.0683 79.10)",
+          "oklch(84% 0.0683 79.10)",
+          "oklch(95% 0.0683 79.10)"
+        ]
       }
     },
     "typographyMeta": {
@@ -1013,6 +1055,10 @@
       "bubble-index": {
         "displayName": "Bubble Index Metadata",
         "purpose": "Bubble-only fixed screen-space index rail: 12px, tabular numerals and .04em tracking. Other arrays retain 11px index metadata where shown."
+      },
+      "graph-label": {
+        "displayName": "Graph Vertex ID",
+        "purpose": "Projected 3D graph IDs inherit the body family with tabular numerals; 14px below 650px. Labels remain upright as the camera turns. Manrope remains Bubble-only."
       }
     },
     "shadows": [
@@ -1046,7 +1092,7 @@
       {
         "name": "bubble-background",
         "value": "domain-warped nebula; sparse star twinkle; faint swap ripple",
-        "purpose": "Bubble scene nebula, twinkle, dust and swaps share cumulative playback clock and speed. Pause freezes that trace clock; seek/edit/reset restores deterministic trace states. Independent planet axial rotation continues while visible, regardless of playback. Reduced motion or scene failure uses the static array renderer; no physics engine."
+        "purpose": "Bubble scene nebula, twinkle, dust and swaps share cumulative playback clock and speed. Pause freezes that trace clock; seek/edit/reset restores deterministic trace states. Independent planet axial rotation continues while visible, regardless of playback. Reduced motion or scene failure uses the static array renderer; no physics engine. Background noise uses the same stable polynomial hash as SpaceSky, retaining its palette and trace-clock ownership."
       },
       {
         "name": "clay-damped-spring",
@@ -1056,7 +1102,7 @@
       {
         "name": "native-space-sky",
         "value": "uTime × 0.035 domain warp; sin(uTime × 0.28 + seed) twinkle",
-        "purpose": "Independent native WebGL highp landing/loading sky, DPR cap 1.5, ResizeObserver and resource cleanup. Hidden RAF stops, reduced motion is still, shader failure/context loss uses static CSS sky."
+        "purpose": "Independent native WebGL highp landing/loading/non-array lesson sky with stable polynomial noise hash, sparse variable-size stars, rare subtle halos and faint dust filaments. DPR cap 1.5, ResizeObserver and resource cleanup. Hidden RAF stops and lesson visibility gates animation; reduced motion is still, shader failure/context loss uses static CSS sky. Existing green/mauve palette is preserved."
       },
       {
         "name": "complexity-star-fade",
@@ -1111,7 +1157,7 @@
       {
         "name": "planar-planet-spin",
         "value": "period = 8 + min(radius, 24) / 6 seconds; 350ms ease-out state colors",
-        "purpose": "SVG meridians rotate within fixed planetary nodes; topology, edges, labels and record axes stay fixed. Visibility and hidden-document gates pause rotation; reduced motion removes spin and transitions."
+        "purpose": "SVG meridians rotate within fixed planetary nodes; topology, edges, labels and record axes stay fixed. Visibility and hidden-document gates pause rotation; reduced motion removes spin and transitions. Stationary warm highlight and dark limb shading remain beneath labels as the meridians rotate."
       },
       {
         "name": "hanoi-ring-transfer",
@@ -1132,6 +1178,16 @@
         "name": "sort-fullscreen-reduced",
         "value": "opacity .9→1 entry, 1→.9 exit; animation/transition duration 0.01ms",
         "purpose": "Reduced motion removes scaling from sorting fullscreen feedback; the global reduced-motion override keeps the opacity transition minimal."
+      },
+      {
+        "name": "graph-planet-spin",
+        "value": "10s independent axial rotation; delta <= 0.1s; color easing 1 - exp(-min(delta, 0.1) * 8)",
+        "purpose": "Native textured graph spheres turn while visible before playback and while the trace is paused. Stable layout, rings, projected inherited-body labels, edge identity and exact records retain their meaning. DPR is capped at 1.5; offscreen/hidden scenes render on demand. Reduced motion and scene/context failure use the SVG top view with preserved records."
+      },
+      {
+        "name": "graph-edge-flow",
+        "value": "traceTransitionTime(clock, index, animate); reverse traversal uses 1 - progress",
+        "purpose": "A shader trail follows only the active actual connection with the shared pausable, seekable trace clock. Directed cones and reciprocal lanes preserve direction; selected edges retain settled green. Geometry and materials are disposed on cleanup."
       }
     ],
     "breakpoints": [
@@ -1211,7 +1267,7 @@
       "name": "Lesson canvas",
       "kind": "card",
       "refersTo": "lesson-canvas",
-      "description": "Shared dark observation window for planets, planar topology, coordinate records and three-station Hanoi; exact evidence precedes the optional code disclosure. Enlarged/fullscreen Hanoi rings fill the actual remaining flex height while station records and transport retain their space. Rain values and mathematical point labels use cream space ink; Liu’s r = 1 uses dark ground ink within the sage polygon.",
+      "description": "Shared dark observation window for array and graph planets, readable topology, coordinate records and three-station Hanoi; exact evidence precedes the optional code disclosure. Enlarged/fullscreen Hanoi rings fill the actual remaining flex height while station records and transport retain their space. Rain values and mathematical point labels use cream space ink; Liu’s r = 1 uses dark ground ink within the sage polygon. Graphs default to lazy rotatable 3D with 2D SVG available; actual curved connections and directed lanes preserve semantics. Shared cubic Fresnel rims enrich 3D graph/array/preview planets; array rims fade with erosion. Graph spheres use radius 0.36 and atmosphere 0.385; SVG nodes keep stationary light/shadow beneath rotating meridians. Exact graph records remain beneath either view.",
       "html": "<section class=\"ds-canvas\"><p>While the numbers find their places</p><div class=\"ds-evidence\">[5, 2] → [2, 5]</div></section>",
       "css": ".ds-canvas{background:#0b1012;color:#e2e7d9;border:0;border-radius:12px;padding:22px 20px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-canvas p{margin:0;font-size:14px;font-weight:450;color:#a3b0a7}.ds-evidence{padding-top:24px;font:500 15px ui-monospace,SFMono-Regular,Consolas,monospace}@media(max-width:650px){.ds-canvas{padding:20px}}"
     },
@@ -1231,9 +1287,9 @@
       "css": ".ds-loading{background:radial-gradient(ellipse at 75% 30%,#202e28,transparent 70%),radial-gradient(ellipse at 25% 75%,#29222b,#0b1012 75%);color:#e2e7d9;text-align:center;padding:24px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-orbit{position:relative;width:230px;height:170px;margin:0 auto 28px}.ds-orbit::before{content:\"\";position:absolute;inset:38px 10px;border:1px solid #b7a07e;border-radius:50%;transform:rotate(-28deg);opacity:.6}.ds-planet{position:absolute;width:76px;height:76px;left:77px;top:47px;background:#9bb7a5;border-radius:50%;box-shadow:inset -18px -12px 28px #31463b;overflow:hidden}.ds-planet::before{content:\"\";position:absolute;inset:-20%;background:radial-gradient(ellipse at 30% 35%,#31463b80,transparent 35%),radial-gradient(ellipse at 65% 70%,#b7a07e66,transparent 40%);animation:ds-loading-spin 110s linear infinite}.ds-orbit:not([data-spinning=\"true\"]) .ds-moon,.ds-orbit:not([data-spinning=\"true\"]) .ds-planet::before{animation-play-state:paused}.ds-moon{position:absolute;inset:0;animation:ds-loading-orbit 22s linear infinite}.ds-moon::after{content:\"\";position:absolute;left:23px;top:50px;width:7px;height:7px;border-radius:50%;background:#b7a07e}.ds-status p{margin:0 0 10px;font-size:19px;font-weight:450;letter-spacing:-.02em}.ds-status>span{font-size:13px;color:#a3b0a7}@keyframes ds-loading-spin{to{transform:rotate(360deg)}}@keyframes ds-loading-orbit{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.ds-moon,.ds-planet::before{animation:none}}"
     },
     {
-      "name": "Array view switch",
+      "name": "Array and graph view switch",
       "kind": "input",
-      "description": "Array view controls use native 2D/3D radios and compact zoom buttons: (50–200%) in (25%) steps, with the displayed percentage resetting to (100%). View and zoom changes preserve playback; magnified arrays scroll horizontally. These controls are disabled while editing, and zoom is omitted for the static reduced-motion view. All ten sorting lessons use one fullscreen action; other categories retain separate Enlarge and Fullscreen actions. Sorting and search scenes flex into the height remaining after headings and controls. The same 2D/3D and zoom controls also cover ungrouped set traces and jump mode without changing input semantics.\n\nAll ten sorting lessons share Bubble’s single fullscreen entry/exit action and scene-only immersive layout. Native `requestFullscreen` is preferred, with a browser-viewport fallback. The immersive view contains the mounted live scene, view/zoom/loop controls and transport; title, narrative, stage heading, legend and input/editor are hidden. The scene fills the height remaining above transport at desktop and mobile widths. Focus stays trapped, body scrolling is locked, and leaving returns focus to the sorting lesson’s fullscreen action. Heap and bucket auxiliary records remain below the floating controls with (76px) top clearance, a (30dvh) maximum height and their own scrolling, leaving the remaining height for planets.\n\nThe sorting scene arrives over (320ms), scaling (.985→1) and fading (.6→1) with exponential ease-out (`cubic-bezier(.16, 1, .3, 1)`). Explicit exit and fallback Escape depart over (180ms), scaling to (.99) and fading to (.5) with ease-in. Native browser Escape exits immediately. Reduced motion uses opacity only (.9→1 on entry and →.9 on exit), under the global (0.01ms) animation/transition override. Entry and exit preserve the mounted scene and playback.",
+      "description": "Array view controls use native 2D/3D radios and compact zoom buttons: (50–200%) in (25%) steps, with the displayed percentage resetting to (100%). View and zoom changes preserve playback; magnified arrays scroll horizontally. These controls are disabled while editing, and zoom is omitted for the static reduced-motion view. All ten sorting lessons use one fullscreen action; other categories retain separate Enlarge and Fullscreen actions. Sorting and search scenes flex into the height remaining after headings and controls. The same 2D/3D and zoom controls also cover ungrouped set traces and jump mode without changing input semantics.\n\nAll ten sorting lessons share Bubble’s single fullscreen entry/exit action and scene-only immersive layout. Native `requestFullscreen` is preferred, with a browser-viewport fallback. The immersive view contains the mounted live scene, view/zoom/loop controls and transport; title, narrative, stage heading, legend and input/editor are hidden. The scene fills the height remaining above transport at desktop and mobile widths. Focus stays trapped, body scrolling is locked, and leaving returns focus to the sorting lesson’s fullscreen action. Heap and bucket auxiliary records remain below the floating controls with (76px) top clearance, a (30dvh) maximum height and their own scrolling, leaving the remaining height for planets.\n\nThe sorting scene arrives over (320ms), scaling (.985→1) and fading (.6→1) with exponential ease-out (`cubic-bezier(.16, 1, .3, 1)`). Explicit exit and fallback Escape depart over (180ms), scaling to (.99) and fading to (.5) with ease-in. Native browser Escape exits immediately. Reduced motion uses opacity only (.9→1 on entry and →.9 on exit), under the global (0.01ms) animation/transition override. Entry and exit preserve the mounted scene and playback. The catalog’s 15 graph algorithms plus graph-structure and disjoint-set share these view/zoom controls. Graph 3D is the default; 2D uses the existing SVG top view. Drag or focus-and-arrow-key orbit, Home/Reset view and zoom retain playback. Mobile graph/array captions occupy their own row.",
       "html": "<div class=\"ds-space-view-sample\"><fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset></div>",
       "css": ".ds-space-view-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #2c3936;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#a3b0a7;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#26362e;color:#e2e7d9}.ds-bubble-view input:hover+span{background:#1d2a25}.ds-bubble-view input:focus-visible+span{outline:3px solid #9bb7a5;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
     },
@@ -1247,10 +1303,10 @@
   ],
   "narrative": {
     "northStar": "Low-light observatory",
-    "overview": "The user-approved observatory now covers landing, loading, favicon, Big O and all 111 runnable algorithm and data-structure lessons (2026-10-08). Numbered worn planets, sparse stars and diffuse green/mauve nebula make watching the invitation. Existing Korean/English product names, lighter type, precise evidence and reading order remain. The shared world extends the original Bubble direction (seed 7554e619); its surface expressions are recorded in `.impeccable/surfaces/bubble-space.md`, `.impeccable/surfaces/landing-space.md` and `.impeccable/surfaces/all-lessons-space.md`.\n\nEvery lesson shares the dark shell and quiet sage controls. Sorting and search use native numbered planets, connected structures use planar maps, dense records preserve their exact axes, and Hanoi transfers real disc rings between three stations. Playful bilingual introductions invite watching, while exact summaries, model formulas and step evidence support closer reading. Source code stays available below the execution canvas when curiosity calls.",
+    "overview": "The user-approved observatory now covers landing, loading, favicon, Big O and all 111 runnable algorithm and data-structure lessons (2026-10-08). Numbered worn planets, sparse stars and diffuse green/mauve nebula make watching the invitation. Existing Korean/English product names, lighter type, precise evidence and reading order remain. The shared world extends the original Bubble direction (seed 7554e619); its surface expressions are recorded in `.impeccable/surfaces/bubble-space.md`, `.impeccable/surfaces/landing-space.md` and `.impeccable/surfaces/all-lessons-space.md`.\n\nEvery lesson shares the dark shell and quiet sage controls. Sorting and search use native numbered planets; graph lessons add rotatable 3D planetary connections with a 2D top view. Other connected structures use planar maps, dense records preserve their exact axes, and Hanoi transfers real disc rings between three stations. Playful bilingual introductions invite watching, while exact summaries, model formulas and step evidence support closer reading. Source code stays available below the execution canvas when curiosity calls.",
     "keyCharacteristics": [
       "Low-light observatory on landing, loading, favicon, Big O and all 111 lessons.",
-      "Native array planets, planar topology, exact coordinate records and three-station Hanoi rings.",
+      "Native array and graph planets, readable topology, exact coordinate records and three-station Hanoi rings.",
       "Worn numbered planets, procedural atmosphere and equally sized model stars.",
       "Lighter headings and quiet bilingual copy.",
       "Visible execution with code closed until requested.",
