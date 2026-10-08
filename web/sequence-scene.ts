@@ -49,17 +49,38 @@ export function sequenceModel(step: Step) {
   return { tokens, linear, stack, width, height, center: [Math.max(0, ...tokens.map((token) => token.position[0])) / 2, stack ? Math.max(0, (step.array.length - 1) * .95 / 2) : 0, 0] as Point };
 }
 
-export function sequencePosition(token: SequenceToken | undefined, previous: SequenceToken | undefined, progress: number): Point {
+export function sequencePorts(capacity: number, stack: boolean) {
+  const end = (Math.max(1, capacity) - 1) * (stack ? .95 : 1.1);
+  const entry: Point = stack ? [0, end + 1.1, 0] : [end + 1.4, 0, 0];
+  const exit: Point = stack ? entry : [-1.4, 0, 0];
+  return { entry, exit, end, center: [stack ? 0 : end / 2, stack ? end / 2 : 0, 0] as Point,
+    width: stack ? 4.8 : Math.max(6, end + 5), height: stack ? Math.max(5, end + 4) : 5 };
+}
+
+export function sequenceScanner(step: Step, previous: Step, progress: number) {
+  const length = String(step.variables.pattern ?? '').length;
+  const t = Math.max(0, Math.min(1, progress));
+  const alignment = Number(previous.variables.alignment ?? 0) + (Number(step.variables.alignment ?? 0) - Number(previous.variables.alignment ?? 0)) * t;
+  const reading = length > 0 && step.variables.phase !== 'prefix' && !['start', 'done', 'word-hash'].includes(step.type);
+  const comparing = reading && step.type === 'compare' && typeof step.variables.textIndex === 'number';
+  return { x: alignment * .9 + (length - 1) * .45, width: length * .9 + .24,
+    visible: length > 0, reading, beam: comparing ? Number(step.variables.textIndex) * .9 : undefined };
+}
+
+export function sequencePosition(token: SequenceToken | undefined, previous: SequenceToken | undefined, progress: number, capacity?: number): Point {
   const item = token ?? previous!;
-  const offset: Point = item.row === 'stack' ? [1.6, 1.1, 0] : [token ? 1.6 : -1.6, .8, 0];
-  const from = previous?.position ?? item.position.map((value, axis) => value + offset[axis]);
-  const to = token?.position ?? item.position.map((value, axis) => value + offset[axis]);
+  const stack = item.row === 'stack';
+  const ports = sequencePorts(capacity ?? (stack ? Math.round(item.position[1] / .95) + 1 : item.index + 1), stack);
+  const linear = stack || item.row === 'queue';
+  const from = previous?.position ?? (linear ? ports.entry : item.position);
+  const to = token?.position ?? (linear ? ports.exit : item.position);
   const t = Math.max(0, Math.min(1, progress));
   return from.map((value, axis) => value + (to[axis] - value) * t) as Point;
 }
 
 export function sequenceMotion(step: Step, previous: Step) {
   if (!sequenceSceneSupported(step) || !sequenceSceneSupported(previous)) return false;
+  if (step.variables.structure === 'stack' && step.type === 'peek' && step.indices.length > 0) return true;
   const before = sequenceModel(previous).tokens;
   const after = sequenceModel(step).tokens;
   return before.length !== after.length || after.some((token) => {

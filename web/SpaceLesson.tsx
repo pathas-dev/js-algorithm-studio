@@ -7,7 +7,7 @@ import { wheelZoom } from './scene-zoom';
 import './bubble.css';
 import './cosmos.css';
 
-type Scene = { previous: Step; clock: RefObject<BubblePlayback>; reduced: boolean; view: '2d' | '3d'; zoom?: number; index?: number; numeralFont?: 'Manrope' };
+type Scene = { previous: Step; clock: RefObject<BubblePlayback>; reduced: boolean; view: '2d' | '3d'; zoom?: number; index?: number; capacity?: number; numeralFont?: 'Manrope' };
 const Context = createContext<Scene | null>(null);
 export const useSpaceLesson = () => useContext(Context);
 

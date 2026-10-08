@@ -13,6 +13,10 @@
 .sequence-observatory[data-kind="string"] .sequence-labels > span { width: 48px; }
 .sequence-observatory[data-kind="string"] .sequence-labels strong { font-size: 18px; }
 .sequence-labels > span[data-wide="true"] strong { font-size: 12px; }
+.sequence-labels > .sequence-port { width: 92px; color: #a3b7a9; }
+.sequence-labels .sequence-port strong { font-size: 11px; letter-spacing: .06em; }
+.sequence-labels .sequence-port small { top: calc(50% + 12px); }
+.sequence-guide { margin: 8px 0; }
 .sequence-empty { position: absolute; inset: 45% 0 auto; text-align: center; color: #a3b0a7; }
 .sequence-records { margin: 6px 0 16px; }
 .sequence-records summary { cursor: pointer; width: fit-content; color: #c9d2c6; font-size: 12px; padding: 8px 0; }
