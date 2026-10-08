@@ -1,5 +1,5 @@
+import PlanetMark from './PlanetMark';
 import { useId } from 'react';
-import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
 
 export default function GraphView({ step, language, weighted = true }: { step: Step; language: Language; weighted?: boolean }) {
@@ -24,8 +24,8 @@ export default function GraphView({ step, language, weighted = true }: { step: S
   const frontier = String((dfs ? step.variables.stack : step.variables.queue) ?? '');
   return <div className="graph-view">
     <svg viewBox="0 0 440 310" role="img" aria-describedby={statusId} aria-label={ko ? '현재 그래프' : 'Current graph'}>
-      <title>{ko ? '현재 그래프: ' : 'Current graph: '}{step.array.map((item) => item.value).join(', ')}</title>
-      <defs><marker id={markerId} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#617469" /></marker></defs>
+      <title>{`${ko ? '현재 그래프: ' : 'Current graph: '}${step.array.map((item) => item.value).join(', ')}`}</title>
+      <defs><marker id={markerId} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a3b0a7" /></marker></defs>
       {step.edges?.map(([a, b, weight]) => {
         const from = positions.find((node) => node.value === a)!;
         const to = positions.find((node) => node.value === b)!;
@@ -35,8 +35,8 @@ export default function GraphView({ step, language, weighted = true }: { step: S
         const reciprocal = step.variables.directed && step.edges?.some(([c, d]) => c === b && d === a);
         const bend = reciprocal ? 28 : 0;
         const cx = (from.x + to.x) / 2 - dy / length * bend, cy = (from.y + to.y) / 2 + dx / length * bend;
-        return <g key={`${a}-${b}`}><path d={`M ${from.x + dx / length * 22} ${from.y + dy / length * 22} Q ${cx} ${cy} ${to.x - dx / length * 24} ${to.y - dy / length * 24}`} fill="none" stroke={active ? '#d8964a' : selected ? '#326f54' : '#aabdb0'} strokeWidth={active || selected ? 4 : 2} markerEnd={step.variables.directed ? `url(#${markerId})` : undefined} />
-          {weighted && weight !== undefined && <text x={(from.x + 2 * cx + to.x) / 4} y={(from.y + 2 * cy + to.y) / 4 - 5} textAnchor="middle" fontSize={12} fontWeight={700} fill="#305645" stroke="#fff" strokeWidth={4} paintOrder="stroke">{weight}</text>}
+        return <g key={`${a}-${b}`}><path d={`M ${from.x + dx / length * 22} ${from.y + dy / length * 22} Q ${cx} ${cy} ${to.x - dx / length * 24} ${to.y - dy / length * 24}`} fill="none" stroke={active ? '#d6b476' : selected ? '#8faf9d' : '#526b60'} strokeWidth={active || selected ? 4 : 2} markerEnd={step.variables.directed ? `url(#${markerId})` : undefined} />
+          {weighted && weight !== undefined && <text x={(from.x + 2 * cx + to.x) / 4} y={(from.y + 2 * cy + to.y) / 4 - 5} textAnchor="middle" fontSize={12} fontWeight={700} fill="#e2e7d9" stroke="#0b1012" strokeWidth={4} paintOrder="stroke">{weight}</text>}
         </g>;
       })}
       {positions.map((node, index) => {
@@ -44,11 +44,11 @@ export default function GraphView({ step, language, weighted = true }: { step: S
         const done = processed.includes(String(node.value));
         const discovered = seen.includes(String(node.value));
         const label = `${node.value}: ${current ? ko ? '현재 정점' : 'current' : done ? ko ? '처리 완료' : 'processed' : discovered ? ko ? '발견' : 'discovered' : ko ? '미발견' : 'undiscovered'}`;
-        return <motion.g key={node.id} animate={{ opacity: !discovered && step.type === 'done' ? .3 : 1 }}>
-          <circle cx={node.x} cy={node.y} r={20} fill={current ? '#d8964a' : done ? '#326f54' : discovered ? '#2c7198' : '#e4ece6'} stroke={step.variables.via === node.value ? "#9b6fa8" : "#fff"} strokeWidth={3} />
-          <text x={node.x} y={node.y + 5} textAnchor="middle" fill={current ? '#263f32' : discovered ? '#fff' : '#305645'} fontSize={14} fontWeight={700}>{node.value}</text>
+        return <g key={node.id}>
+          <PlanetMark cx={node.x} cy={node.y} r={20} fill={current ? '#d6b476' : done ? '#8faf9d' : discovered ? '#8dacc0' : '#82968c'} stroke={step.variables.via === node.value ? "#9b6fa8" : "#526b60"} strokeWidth={3} opacity={!discovered && step.type === 'done' ? .3 : 1} />
+          <text x={node.x} y={node.y + 5} textAnchor="middle" fill={!discovered && step.type === 'done' ? '#e2e7d9' : '#0b1012'} fontSize={14} fontWeight={700}>{node.value}</text>
           <title>{label}</title>
-        </motion.g>;
+        </g>;
       })}
     </svg>
     {('queue' in step.variables || dfs) && <div className="frontier"><span>{groups ? ko ? '남은 간선 · 가중치 오름차순' : 'Remaining edges · increasing weight' : distances ? ko ? '우선순위 큐 · 힙 배열' : 'Priority queue · heap storage' : dfs ? ko ? '재귀 스택 · 아래 → 위' : 'Recursion stack · bottom → top' : ko ? '큐 · 앞 → 뒤' : 'Queue · front → back'}</span><output data-testid="frontier">[{frontier.split(',').filter(Boolean).join(', ')}]</output></div>}

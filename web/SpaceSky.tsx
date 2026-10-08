@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { spaceFragment, spaceVertex } from './space-shader';
 
-export default function SpaceSky() {
+export default function SpaceSky({ active = true }: { active?: boolean }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [lost, setLost] = useState(false);
   const reduced = Boolean(useReducedMotion());
@@ -61,7 +61,7 @@ export default function SpaceSky() {
     const visibility = () => {
       cancelAnimationFrame(frame);
       previous = 0;
-      if (!document.hidden && !reduced) frame = requestAnimationFrame(tick);
+      if (active && !document.hidden && !reduced) frame = requestAnimationFrame(tick);
     };
     const contextLost = (event: Event) => { event.preventDefault(); setLost(true); };
     const observer = new ResizeObserver(resize);
@@ -71,6 +71,6 @@ export default function SpaceSky() {
     resize();
     visibility();
     return () => { observer.disconnect(); element.removeEventListener('webglcontextlost', contextLost); document.removeEventListener('visibilitychange', visibility); release(); };
-  }, [reduced, lost]);
+  }, [reduced, lost, active]);
   return lost ? <div className="space-sky space-sky-still" aria-hidden="true" /> : <canvas ref={canvas} className="space-sky" aria-hidden="true" />;
 }

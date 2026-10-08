@@ -1,3 +1,4 @@
+import PlanetMark from './PlanetMark';
 import type { Step, Language } from './algorithms';
 
 type Node = { position: number; left: number; right: number; value: number | null };
@@ -14,14 +15,14 @@ export default function SegmentView({ step, language }: { step: Step; language: 
         <title>{nodes.map((node) => `[${node.left},${node.right}]:${node.value ?? '∅'}`).join(', ')}</title>
         {nodes.filter((node) => node.position > 0).map((node) => {
           const parent = nodes.find((item) => item.position === Math.floor((node.position - 1) / 2))!;
-          return <line key={node.position} x1={parent.x} y1={parent.y} x2={node.x} y2={node.y} stroke="#cbd7ce" strokeWidth={2} />;
+          return <line key={node.position} x1={parent.x} y1={parent.y} x2={node.x} y2={node.y} stroke="#526b60" strokeWidth={2} />;
         })}
         {nodes.map((node) => <g key={node.position} transform={`translate(${node.x},${node.y})`} opacity={step.type === 'none' && step.variables.position === node.position ? .4 : 1}>
-          <circle r={17} fill={step.variables.position === node.position ? '#d8964a' : node.value === null ? '#a9bcb0' : '#326f54'} />
-          <text y={4} textAnchor="middle" fontSize={11} fill="white">{node.value ?? '∅'}</text>
-          <text y={33} textAnchor="middle" fontSize={9} fill="#617469">[{node.left}, {node.right}]</text>
+          <PlanetMark r={17} fill={step.variables.position === node.position ? '#d6b476' : node.value === null ? '#a9bcb0' : '#8faf9d'} />
+          <text y={4} textAnchor="middle" fontSize={11} fill="#0b1012">{node.value ?? '∅'}</text>
+          <text y={33} textAnchor="middle" fontSize={9} fill="#a3b0a7">[{node.left}, {node.right}]</text>
         </g>)}
-        {!nodes.length && <text x={width / 2} y={50} textAnchor="middle" fill="#617469">∅</text>}
+        {!nodes.length && <text x={width / 2} y={50} textAnchor="middle" fill="#a3b0a7">∅</text>}
       </svg>
     </div>
     {'result' in step.variables && <div className="frontier">{language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(step.variables.result)}</output></div>}

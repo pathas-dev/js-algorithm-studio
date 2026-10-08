@@ -5,7 +5,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import type { Item, Step } from './algorithms';
 import { BUBBLE_SWAP_MS, type BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
-import { springProgress, planetRadius, planetSpacing, orbitalSwap, axialAngle } from './bubble-motion';
+import { springProgress, planetRadius, planetSpacing, planetTransfer, axialAngle } from './bubble-motion';
 import { useSceneVisibility } from './use-scene-visibility';
 import './bubble.css';
 
@@ -23,9 +23,9 @@ function Camera({ count, spacing, signed, view, world }: { count: number; spacin
   const target = useMemo(() => new Vector3(0, world === 'space' ? 0.55 : signed ? 0 : 1.25, 0), [signed, world]);
   useEffect(() => {
     const ortho = camera as OrthographicCamera;
-    ortho.zoom = Math.min(size.width / Math.max(7.8, count * spacing + 1.8), size.height / (world === 'space' ? 4.6 : signed ? 9.6 : 5.5));
+    ortho.zoom = Math.min(size.width / Math.max(7.8, count * spacing + 1.8), size.height / (world === 'space' ? view === '2d' ? 7 : 4.6 : signed ? 9.6 : 5.5));
     ortho.updateProjectionMatrix();
-  }, [camera, size.width, size.height, count, spacing, signed, world]);
+  }, [camera, size.width, size.height, count, spacing, signed, world, view]);
   useFrame((_, delta) => {
     depth.current += ((view === '3d' ? 1 : 0) - depth.current) * (1 - Math.exp(-Math.min(delta, 0.1) * 7));
     camera.position.set(-2.2 * depth.current, target.y + 3.5 * depth.current, 12);
@@ -174,19 +174,20 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
   const base = useMemo(() => new Color(space ? ['#82968c', '#b7a07e', '#8c8196'][item.id % 3] : '#91a28b').offsetHSL(0, 0, (seed(item.id + 6) - 0.5) * 0.08), [item.id, space]);
   const warm = useMemo(() => new Color(space ? '#d6b476' : '#ba9469'), [space]);
   const swap = useMemo(() => new Color(space ? '#afa0be' : '#a79aab'), [space]);
+  const targetColor = useMemo(() => new Color(), []);
   const settled = useMemo(() => new Color(space ? '#8faf9d' : '#74886d'), [space]);
   useFrame((_, delta) => {
     if (!mesh.current) return;
     if (space && visible) spinTime.current += Math.min(delta, 0.1) * 1000;
     const state = clock.current;
     const from = previous.array.findIndex((entry) => entry.id === item.id);
-    const moving = step.type === 'swap' && state.animate && from !== index;
+    const moving = state.index < state.length - 1 && state.animate && from >= 0 && from !== index && previous.array.length === step.array.length;
     const time = moving ? Math.min(1, state.elapsed / BUBBLE_SWAP_MS) : 1;
     const progress = springProgress(time);
     const arc = moving ? Math.sin(time * Math.PI) : 0;
     const oldX = position(from < 0 ? index : from, step.array.length, spacing);
     const nextX = position(index, step.array.length, spacing);
-    const [planetX, orbit] = orbitalSwap(oldX, nextX, time);
+    const [planetX, orbit] = planetTransfer(oldX, nextX, time, spacing);
     if (space) mesh.current.position.set(planetX, 0.55 + (view === '2d' ? orbit : 0), view === '3d' ? orbit : 0);
     else mesh.current.position.set(oldX + (nextX - oldX) * progress, Math.sign(item.value || 1) * stoneHeight / 2 + arc * 0.035, arc * (from < index ? 0.85 : -0.85));
     const spin = axialAngle(spinTime.current, item.id, radius);
@@ -196,9 +197,13 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     mesh.current.scale.z = view === '2d' ? 0.01 : 1;
     uniforms.uErosion.value = Math.max(0, Math.min(1, erosion(state)));
     const active = step.indices.includes(index);
-    const isSettled = index >= Number(step.variables.sortedFrom ?? step.array.length);
-    const color = active ? step.type === 'swap' ? swap : warm : isSettled ? settled : base;
-    material.color.lerp(color, space ? 1 - Math.exp(-Math.min(delta, 0.1) * 8) : 1);
+    const isSettled = index >= Number(step.variables.sortedFrom ?? step.array.length) || index < Number(step.variables.sortedCount ?? 0);
+    const matched = String(step.variables.matches ?? '').split(',').includes(String(index));
+    const pivot = step.variables.pivotIndex === index;
+    const outside = 'low' in step.variables && (index < Number(step.variables.low) || index > Number(step.variables.high));
+    const color = active ? step.type === 'swap' ? swap : warm : pivot ? swap : isSettled || matched ? settled : base;
+    targetColor.copy(color).multiplyScalar(outside ? .55 : 1);
+    material.color.lerp(targetColor, space ? 1 - Math.exp(-Math.min(delta, 0.1) * 8) : 1);
     material.emissive.copy(material.color);
     material.emissiveIntensity = view === '2d' ? 0.4 : space ? 0.025 : 0;
     // Shadows fade with the object, avoiding a solid ghost after erosion.
@@ -213,7 +218,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     }
     const label = labels.current.get(item.id);
     if (number.current) {
-      const labelScale = Math.max(1, 60 / (camera as OrthographicCamera).zoom);
+      const labelScale = Math.min(Math.max(1, 60 / (camera as OrthographicCamera).zoom), spacing * .85 / text.width);
       number.current.scale.set(text.width * labelScale, 0.38 * labelScale, 1);
       number.current.position.set(mesh.current.position.x, (space ? mesh.current.position.y + radius + 0.26 : Math.sign(item.value || 1) * (stoneHeight + 0.3) + arc * 0.035), mesh.current.position.z + (view === '3d' ? space ? radius * 0.3 : 0.36 : 0.01));
       text.material.opacity = 1 - ease(uniforms.uErosion.value);
@@ -295,7 +300,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
   const spacing = world === 'space' ? planetSpacing(step.array.map((item) => item.value), maximum) : 1.12;
   const signed = step.array.some((item) => item.value < 0);
   const slotWidth = Math.max(world === 'space' ? 72 : 36, ...step.array.map((item) => String(item.value).length * 9 + 16));
-  const fallback = <ArrayView step={step} language={language} />;
+  const fallback = <ArrayView step={step} language={language} orbital={false} planetary={world === 'space'} />;
   if (reduced || lost) return fallback;
   return <div ref={sceneRef} className="bubble-art" data-view={view} data-world={world} data-spinning={visible}>
     <div className="bubble-art-scroll">
@@ -321,7 +326,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
           </div>
         </SceneBoundary>
         <ol className="bubble-values" aria-label={language === 'ko' ? '현재 배열' : 'Current array'}>
-          {step.array.map((item, index) => <li key={item.id} ref={(node) => { if (node) labels.current.set(item.id, node); else labels.current.delete(item.id); }} aria-label={language === 'ko' ? `인덱스 ${index}, 값 ${item.value}` : `Index ${index}, value ${item.value}`}><span className="sr-only">{item.value}</span><small className="bubble-index">[{index}]</small></li>)}
+          {step.array.map((item, index) => <li key={item.id} ref={(node) => { if (node) labels.current.set(item.id, node); else labels.current.delete(item.id); }} aria-label={`${language === 'ko' ? `인덱스 ${index}, 값 ${item.value}` : `Index ${index}, value ${item.value}`}${step.variables.pivotIndex === index ? language === 'ko' ? ' · 피벗' : ' · pivot' : ''}`}><span className="sr-only">{item.value}</span><small className="bubble-index">[{index}]{step.variables.pivotIndex === index && ' ◆'}</small></li>)}
         </ol>
         {!step.array.length && <p className="bubble-empty">{language === 'ko' ? '빈 배열 · 잠깐 쉬어갑니다.' : 'An empty array. A moment of rest.'}</p>}
       </div>

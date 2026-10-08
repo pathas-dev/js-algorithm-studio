@@ -1,34 +1,19 @@
-import PuzzleView from './PuzzleView';
-import WeightedView from './WeightedView';
-import SeamView from './SeamView';
-import LearningView from './LearningView';
-import CipherView from './CipherView';
-import LinkedListView from './LinkedListView';
-import TreeView from './TreeView';
-import CollectionView from './CollectionView';
-import MathView from './MathView';
-import { lazy, Suspense, useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Badge, Button, FocusTrap, Group, NativeSelect, Paper, Popover, Text, Textarea, TextInput, Title } from '@mantine/core';
 import { MotionConfig } from 'motion/react';
-import { MAX_VALUES, parseTarget, parseValues, playbackReducer } from '../src/visualization/playback';
+import { MAX_VALUES, parseTarget, parseValues } from '../src/visualization/playback';
 import { algorithms, bubble, type Algorithm, type Language } from './algorithms';
 import stepAction from '../src/visualization/step-action';
 import { catalogCategories, plannedAlgorithms } from './catalog';
 import { parseWords } from '../src/visualization/trie';
 import { parseEdges, parseWeightedEdges } from '../src/visualization/graph';
-import GraphView from './GraphView';
-import BucketView from './BucketView';
-import HeapView from './HeapView';
-import ArrayView from './ArrayView';
-import StructureView from './StructureView';
 import CodePanel from './CodePanel';
-import StringView from './StringView';
-import DpView from './DpView';
 import './idle.css';
 import { lessonTaglines } from './lesson-copy';
 import useBubblePlayback from './useBubblePlayback';
 
-const BubbleScene = lazy(() => import('./BubbleScene'));
+import SpaceLesson from './SpaceLesson';
+import LessonView from './LessonView';
 
 function PlaybackIcon({ name }: { name: 'first' | 'previous' | 'play' | 'pause' | 'replay' | 'next' | 'last' }) {
   const paths = {
@@ -64,7 +49,7 @@ export default function App() {
   const [fullscreen, setFullscreen] = useState(false);
   const lessonRef = useRef<HTMLDivElement>(null);
   const enlargeRef = useRef<HTMLButtonElement>(null);
-  const focusedView = isBubble && (expanded || fullscreen);
+  const focusedView = expanded || fullscreen;
   useEffect(() => {
     const changed = () => setFullscreen(document.fullscreenElement === lessonRef.current);
     document.addEventListener('fullscreenchange', changed);
@@ -92,10 +77,8 @@ export default function App() {
       catch { /* Enlarged view remains available when native fullscreen is unsupported. */ }
     }
   }
-  const [standardPlayback, standardDispatch] = useReducer(playbackReducer, { index: 0, playing: false, length: steps.length, speed: 1 });
-  const ambient = useBubblePlayback(steps, isBubble);
-  const playback = isBubble ? ambient.playback : standardPlayback;
-  const dispatch = isBubble ? ambient.dispatch : standardDispatch;
+  const ambient = useBubblePlayback(steps, true, false, isBubble);
+  const { playback, dispatch } = ambient;
   const step = steps[playback.index];
   const isSort = algorithm.category === 'sort';
   const matrixLesson = algorithm.category === 'dp' || 'dpMatrix' in step.variables;
@@ -116,11 +99,6 @@ export default function App() {
     url.searchParams.set('lang', language);
     history.replaceState(null, '', url);
   }, [language, algorithm]);
-  useEffect(() => {
-    if (isBubble || !playback.playing) return;
-    const timer = window.setTimeout(() => standardDispatch({ type: 'tick' }), 950 / playback.speed);
-    return () => window.clearTimeout(timer);
-  }, [isBubble, playback.playing, playback.index, playback.speed]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (editingInput || whyOpen) return;
@@ -177,7 +155,6 @@ export default function App() {
     setError('');
     setSteps(trace);
     ambient.dispatch({ type: 'reset', length: trace.length });
-    standardDispatch({ type: 'reset', length: trace.length });
   }
 
   function editInput() {
@@ -305,7 +282,7 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className={`studio idle-studio${isBubble ? ' bubble-studio space-studio' : ''}`}>
+      <div className="studio idle-studio space-studio bubble-studio">
         <header className="studio-header">
           <a className="brand" href={ko ? "/" : "?lang=en"}><img className="brand-mark" src="/favicon.svg" width="32" height="32" alt="" />{t('이젠 아무래도 좋을 알고리즘', 'Algorithms, for what it’s worth')}</a>
           <Group gap="md"><Text size="sm" c="dimmed" className="header-note">{t('외우지 않아도 됩니다.', 'No memorizing required.')}</Text>
@@ -328,7 +305,7 @@ export default function App() {
               </div>)}
               <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
-            <FocusTrap active={focusedView}><div ref={lessonRef} className={`lesson${focusedView ? ' bubble-expanded' : ''}`} role={focusedView ? 'dialog' : undefined} aria-modal={focusedView || undefined} aria-label={focusedView ? t('버블 정렬 크게 보기', 'Enlarged bubble sort') : undefined}>
+            <FocusTrap active={focusedView}><div ref={lessonRef} className={`lesson${focusedView ? ' bubble-expanded' : ''}`} role={focusedView ? 'dialog' : undefined} aria-modal={focusedView || undefined} aria-label={focusedView ? `${algorithm.name[language]} · ${t('크게 보기', 'Enlarged view')}` : undefined}>
               <div className="lesson-heading">
                 <div><Group gap="sm"><Title order={1}>{algorithm.name[language]}</Title></Group>
                   <Text className="lesson-tagline">{lessonTaglines[algorithm.id][language]}</Text>
@@ -358,7 +335,7 @@ export default function App() {
             <div className="action-decision"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg><Text data-testid="step-action">{action[2]}</Text></div>
             <Popover opened={whyOpen} onChange={setWhyOpen} position="bottom-end" width={380} trapFocus returnFocus withArrow shadow="md">
               <Popover.Target><Button className="why-button" variant="subtle" aria-expanded={whyOpen} aria-label={t('궁금하다면: 단계 해설 열기', 'Curious? Open step explanation')} onClick={() => { dispatch({ type: 'seek', index: playback.index }); setWhyOpen(!whyOpen); }}>{t('궁금하다면', 'Curious?')}</Button></Popover.Target>
-              <Popover.Dropdown className={`step-why${isBubble ? ' space-why' : ''}`} role="dialog" aria-label={t('상세 단계 해설', 'Detailed step explanation')}>
+              <Popover.Dropdown className="step-why space-why" role="dialog" aria-label={t('상세 단계 해설', 'Detailed step explanation')}>
                 <Group justify="space-between"><Text fw={700}>{stepTitle}</Text><Button variant="subtle" size="xs" onClick={() => setWhyOpen(false)}>{t('닫기', 'Close')}</Button></Group>
                 <Text className="step-reason" data-testid="step-reason">{reason}</Text>
                 <Group gap="xs" mt="sm">{Object.entries(step.variables).filter(([name]) => ['i', 'j', 'swapped', 'index', 'position', 'current', 'next', 'value', 'target', 'result', 'priority', 'gap', 'depth', 'bucket', 'digit', 'minIndex', 'middleIndex', 'low', 'high', 'lowIndex', 'highIndex', 'pivotIndex', 'candidate', 'weight', 'via', 'iteration', 'operation', 'word', 'character', 'charIndex', 'key', 'keyHash', 'hash', 'queryLeft', 'queryRight', 'left', 'right', 'sum', 'lowbit', 'row', 'column', 'textIndex', 'wordIndex', 'alignment', 'prefixIndex', 'suffixIndex', 'balance', 'rotation'].includes(name)).map(([name, value]) => <Badge key={name} variant="light" color="teal">{name} = {String(value)}</Badge>)}</Group>
@@ -367,27 +344,27 @@ export default function App() {
               </section>
               <div className="lesson-panels">
                   <Paper withBorder className="canvas-card">
-                    {isBubble && <Group justify="space-between" mb="sm">
-                      <p className="bubble-caption" data-testid="bubble-phase" data-phase={ambient.playback.phase}>{ambient.playback.phase === 'erode' ? t('잠깐의 질서가, 천천히 흩어집니다.', 'A little order, slowly drifting away.') : ambient.playback.phase === 'form' ? t('같은 숫자들이, 다시 모입니다.', 'The same numbers gather again.') : ambient.playback.phase === 'hold' ? t('제자리에 도착했습니다. 잠깐 그대로.', 'In their places. Stay a little while.') : t('서두를 일 없는, 작은 궤도 교환.', 'Small orbital exchanges, with nowhere to rush.')}</p>
+                    {<Group justify="space-between" mb="sm">
+                      {isBubble ? <p className="bubble-caption" data-testid="bubble-phase" data-phase={ambient.playback.phase}>{ambient.playback.phase === 'erode' ? t('잠깐의 질서가, 천천히 흩어집니다.', 'A little order, slowly drifting away.') : ambient.playback.phase === 'form' ? t('같은 숫자들이, 다시 모입니다.', 'The same numbers gather again.') : ambient.playback.phase === 'hold' ? t('제자리에 도착했습니다. 잠깐 그대로.', 'In their places. Stay a little while.') : t('서두를 일 없는, 작은 궤도 교환.', 'Small orbital exchanges, with nowhere to rush.')}</p> : <p className="bubble-caption">{t(algorithm.category === 'graph' || ['structure', 'tree', 'linked-list'].includes(algorithm.category) ? '위에서 바라보는, 작은 연결의 우주.' : algorithm.id === 'hanoi-tower' ? '세 정거장 사이로, 고리가 건너갑니다.' : '각자의 자리에 놓인, 작은 별들.', algorithm.category === 'graph' || ['structure', 'tree', 'linked-list'].includes(algorithm.category) ? 'A little connected universe, seen from above.' : algorithm.id === 'hanoi-tower' ? 'Rings travelling between three stations.' : 'Small stars, each in its place.')}</p>}
                       <div className="bubble-scene-controls">
                         <button ref={enlargeRef} data-autofocus className="bubble-size-button" disabled={editingInput} aria-expanded={focusedView} onClick={() => { if (fullscreen) void document.exitFullscreen(); setExpanded(!focusedView); }}>{focusedView ? t('작게 보기', 'Shrink view') : t('크게 보기', 'Enlarge view')}</button>
                         <button className="bubble-size-button" disabled={editingInput} onClick={() => void toggleFullscreen()}>{fullscreen ? t('전체화면 종료', 'Exit fullscreen') : t('전체화면', 'Fullscreen')}</button>
-                        <fieldset className="bubble-view-switch" disabled={editingInput}>
+                        {arrayLesson && <fieldset className="bubble-view-switch" disabled={editingInput}>
                           <legend className="sr-only">{t('보기 방식', 'View mode')}</legend>
                           {(['2d', '3d'] as const).map((view) => <label key={view}><input type="radio" name="bubble-view" value={view} checked={bubbleView === view} onChange={() => setBubbleView(view)} /><span>{view.toUpperCase()}</span></label>)}
-                        </fieldset>
-                        <label className="bubble-loop"><input type="checkbox" checked={ambient.playback.loop} disabled={editingInput} onChange={(event) => ambient.dispatch({ type: 'loop', loop: event.currentTarget.checked })} />{t('천천히 반복', 'Slow loop')}</label>
+                        </fieldset>}
+                        {isBubble && <label className="bubble-loop"><input type="checkbox" checked={ambient.playback.loop} disabled={editingInput} onChange={(event) => ambient.dispatch({ type: 'loop', loop: event.currentTarget.checked })} />{t('천천히 반복', 'Slow loop')}</label>}
                       </div>
                     </Group>}
                     <Group justify="space-between"><Text fw={600} size="sm">{arrayLesson ? t('숫자들이 자리 잡는 동안', 'While the numbers find their places') : t('지금 벌어지는 일', 'What’s happening')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
+                    <SpaceLesson previous={steps[Math.max(0, playback.index - 1)]} clock={ambient.clock} reduced={ambient.reduced} view={bubbleView} sky={!arrayLesson}>
                     <div className="lesson-visual">
                     {partialArray && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
-                    {'buckets' in step.variables && <BucketView step={step} language={language} />}
-                    {'heapSize' in step.variables && algorithm.category !== 'structure' && <HeapView step={step} language={language} />}
-                    {algorithm.category === 'other' ? <PuzzleView step={step} language={language} /> : algorithm.category === 'statistics' ? <WeightedView step={step} language={language} /> : algorithm.category === 'image-processing' ? <SeamView step={step} language={language} /> : algorithm.category === 'ml' ? <LearningView step={step} language={language} /> : algorithm.category === 'cryptography' ? <CipherView step={step} language={language} /> : algorithm.category === 'linked-list' ? <LinkedListView step={step} language={language} /> : algorithm.category === 'tree' ? <TreeView step={step} language={language} /> : algorithm.category === 'sets' ? <CollectionView step={step} language={language} /> : matrixLesson ? <DpView step={step} language={language} /> : algorithm.category === 'math' ? <MathView step={step} language={language} /> : algorithm.category === 'string' ? <StringView step={step} language={language} /> : algorithm.category === 'graph' ? <GraphView step={step} language={language} weighted={algorithm.graphWeighted ?? false} /> : algorithm.category === 'structure' ? <StructureView step={step} language={language} /> : isBubble ? <Suspense fallback={<ArrayView step={step} language={language} />}><BubbleScene step={step} previous={steps[Math.max(0, playback.index - 1)]} clock={ambient.clock} language={language} reduced={ambient.reduced} view={bubbleView} world="space" /></Suspense> : <ArrayView step={step} language={language} />}
+                    <LessonView algorithm={algorithm} step={step} language={language} />
                     <Group gap="lg" className="legend">{algorithm.category === 'other' ? <span><i className="dot comparing" />{t('현재 선택', 'Current selection')}</span> : algorithm.category === 'statistics' ? <span><i className="dot comparing" />{t('현재 항목', 'Current item')}</span> : algorithm.category === 'image-processing' ? <><span><i className="dot comparing" />{t('현재 픽셀', 'Current pixel')}</span><span><i className="dot matched" />{t('선택한 심', 'Selected seam')}</span></> : algorithm.category === 'ml' ? <span><i className="dot comparing" />{t('현재 점', 'Current point')}</span> : algorithm.category === 'cryptography' ? <span><i className="dot matched" />{t('현재 창', 'Current window')}</span> : ['tree', 'linked-list'].includes(algorithm.category) ? <><span><i className="dot comparing" />{t('현재 노드', 'Current node')}</span><span><i className="dot matched" />{t('방문', 'Visited')}</span></> : algorithm.category === 'sets' ? <span><i className="dot comparing" />{t('현재 선택', 'Current selection')}</span> : algorithm.category === 'math' ? <span><i className="dot comparing" />{step.variables.mode === 'bits' ? t('선택한 비트', 'Selected bit') : t('현재 계산', 'Current calculation')}</span> : matrixLesson ? <><span><i className="dot comparing" />{t('현재 셀', 'Current cell')}</span><span><i className="dot matched" />{t('참조 셀', 'Referenced cell')}</span></> : algorithm.category === 'graph' ? <><span><i className="dot comparing" />{t('현재 정점', 'Current')}</span><span><i className="dot matched" />{t('발견', 'Discovered')}</span><span><i className="dot settled" />{t('처리 완료', 'Processed')}</span></> : algorithm.category === 'structure' ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span></> : ['search', 'string'].includes(algorithm.category) ? <><span><i className="dot comparing" />{t('확인 중', 'Inspect')}</span><span><i className="dot matched" />{t('일치', 'Match')}</span></> : ['heap-sort', 'counting-sort', 'radix-sort', 'bucket-sort'].includes(algorithm.id) ? <><span><i className="dot comparing" />{t('선택·확인', 'Select / inspect')}</span><span><i className="dot settled" />{t('정렬된 결과', 'Sorted output')}</span></> : <><span><i className="dot comparing" />{t('비교', 'Compare')}</span><span><i className="dot swapping" />{t('교환', 'Swap')}</span><span><i className="dot settled" />{t('정렬된 구간', 'Sorted region')}</span></>}</Group>
                     {!arrayLesson && <div className="array-state"><Text size="xs" c="dimmed">{'result' in step.variables && algorithm.category === 'graph' ? t('결과', 'Result') : ['dp', 'string', 'math', 'sets', 'tree', 'linked-list', 'cryptography', 'ml', 'image-processing', 'statistics', 'other'].includes(algorithm.category) ? t('결과', 'Result') : distanceSummary !== undefined ? t('현재 거리', 'Current distances') : 'chosen' in step.variables ? t('선택한 간선', 'Selected edges') : step.variables.mode === 'topological' ? step.type === 'done' ? t('위상 순서', 'Topological order') : t('완료 스택 · 위 → 아래', 'Completion stack · top → bottom') : 'matrix' in step.variables ? t('경유 정점', 'Intermediate vertex') : algorithm.category === 'graph' ? t('방문 순서', 'Visit order') : 'hashTable' in step.variables ? t('저장된 키', 'Stored keys') : 'trie' in step.variables ? t('저장된 단어', 'Stored words') : 'tree' in step.variables ? t('중위 순회 · 왼쪽 → 루트 → 오른쪽', 'Inorder · left → root → right') : step.variables.structure === 'stack' ? t('현재 노드 · TOP → 아래', 'Current nodes · TOP → bottom') : step.variables.structure === 'queue' ? t('현재 노드 · FRONT → REAR', 'Current nodes · FRONT → REAR') : step.variables.structure === 'linked-list' ? t('노드 표시 순서 · 연결은 화살표 참고', 'Displayed nodes · follow arrows for links') : algorithm.category === 'structure' ? t('현재 입력·저장 값', 'Current input / stored values') : t('현재 배열', 'Current array')}</Text><output data-testid="array-values">[{['string', 'dp', 'math', 'sets', 'tree', 'linked-list', 'cryptography', 'ml', 'image-processing', 'statistics', 'other'].includes(algorithm.category) ? String(step.variables.result ?? '—') : algorithm.category === 'graph' && 'result' in step.variables ? `${step.variables.result === 'cycle' ? t('사이클 있음', 'Cycle exists') : step.variables.result === 'acyclic' ? t('사이클 없음', 'No cycle') : step.variables.result}${step.variables.result === 'cycle' && step.variables.order ? ` · ${step.variables.order}` : ''}` : distanceSummary ?? ('chosen' in step.variables ? JSON.parse(String(step.variables.chosen)).map((edge: number[]) => edge.join('–')).join(', ') : 'matrix' in step.variables ? step.variables.via ?? '—' : algorithm.category === 'graph' ? step.variables.order : 'hashTable' in step.variables ? step.variables.keys : 'trie' in step.variables ? step.variables.words : 'tree' in step.variables ? step.variables.inorder : step.array.map((item) => item.value).join(', '))}]</output></div>}
                     </div>
+                    </SpaceLesson>
                     <div className="inline-input-editor">
                       <Group justify="space-between" gap="sm">
                         <Text size="xs" c="dimmed">{arrayLesson ? partialArray ? t('현재 부분 배열', 'Current subarray') : t('현재 배열', 'Current array') : t('실행 입력', 'Run input')}</Text>

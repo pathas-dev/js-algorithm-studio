@@ -1,3 +1,4 @@
+import PlanetMark from './PlanetMark';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
 
@@ -19,12 +20,12 @@ export default function HeapView({ step, language }: { step: Step; language: Lan
       <title>{heap.map((item) => item.value).join(', ') || '∅'}</title>
       {nodes.slice(1).map((node, index) => {
         const parent = nodes[Math.floor(index / 2)];
-        return <line key={node.id} x1={parent.x} y1={parent.y} x2={node.x} y2={node.y} stroke="#cbd7ce" strokeWidth={2} />;
+        return <line key={node.id} x1={parent.x} y1={parent.y} x2={node.x} y2={node.y} stroke="#526b60" strokeWidth={2} />;
       })}
       {nodes.map((node, index) => <motion.g key={node.id} animate={{ x: node.x, y: node.y }} transition={{ duration: .24 }}>
-        <circle r={13} fill={(['heap', 'max-heap', 'priority-queue'].includes(String(step.variables.structure)) ? step.indices.includes(start + index) : index === 0) ? '#d8964a' : '#326f54'} />
-        <text textAnchor="middle" y={4} fontSize={11} fill="white">{node.value}</text>
-        {priorityQueue && <text textAnchor="middle" y={27} fontSize={9} fill="#305645">p:{priorities[String(node.value)]}</text>}
+        <PlanetMark r={13} fill={(['heap', 'max-heap', 'priority-queue'].includes(String(step.variables.structure)) ? step.indices.includes(start + index) : index === 0) ? '#d6b476' : '#8faf9d'} />
+        <text textAnchor="middle" y={4} fontSize={11} fill="#0b1012">{node.value}</text>
+        {priorityQueue && <text textAnchor="middle" y={27} fontSize={9} fill="#e2e7d9">p:{priorities[String(node.value)]}</text>}
       </motion.g>)}
       {!nodes.length && <text x={300} y={25} textAnchor="middle">∅</text>}
     </svg>

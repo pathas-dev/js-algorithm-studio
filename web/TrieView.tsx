@@ -1,3 +1,4 @@
+import PlanetMark from './PlanetMark';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
 
@@ -24,12 +25,12 @@ export default function TrieView({ step, language }: { step: Step; language: Lan
         <title>{String(step.variables.words) || '∅'}</title>
         {nodes.flatMap((node) => node.children.map((id) => {
           const child = nodes.find((item) => item.id === id)!;
-          return <line key={`${node.id}-${id}`} x1={node.x} y1={node.y} x2={child.x} y2={child.y} stroke="#cbd7ce" strokeWidth={2} />;
+          return <line key={`${node.id}-${id}`} x1={node.x} y1={node.y} x2={child.x} y2={child.y} stroke="#526b60" strokeWidth={2} />;
         }))}
         {nodes.map((node) => <motion.g key={node.id} animate={{ x: node.x, y: node.y }} transition={{ duration: .24 }}>
           <title>{node.depth === 0 ? 'ROOT' : node.prefix}</title>
-          <circle r={17} fill={step.variables.activeNode === node.id ? '#d8964a' : '#eaf0e9'} stroke={node.complete ? '#42886c' : '#cddbd1'} strokeWidth={node.complete ? 4 : 1} />
-          <text y={4} textAnchor="middle" fontSize={node.depth === 0 ? 8 : 13} fill="#305645">{node.depth === 0 ? 'ROOT' : node.character}</text>
+          <PlanetMark r={17} fill={step.variables.activeNode === node.id ? '#d6b476' : '#82968c'} stroke={node.complete ? '#42886c' : '#526b60'} strokeWidth={node.complete ? 4 : 1} />
+          <text y={4} textAnchor="middle" fontSize={node.depth === 0 ? 8 : 13} fill="#0b1012">{node.depth === 0 ? 'ROOT' : node.character}</text>
         </motion.g>)}
       </svg>
     </div>

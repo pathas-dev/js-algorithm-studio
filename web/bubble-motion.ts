@@ -25,6 +25,18 @@ export function orbitalSwap(from: number, to: number, time: number): [number, nu
   return [from + (to - from) * (1 - Math.cos(angle)) / 2, (to - from) * Math.sin(angle) / 2];
 }
 
+// Distant transfers clear intermediate slots before travelling across the row.
+export function planetTransfer(from: number, to: number, time: number, spacing: number): [number, number] {
+  const distance = Math.abs(to - from);
+  if (distance <= spacing * 1.01) return orbitalSwap(from, to, time);
+  const clearance = spacing * 1.05;
+  const traveled = Math.max(0, Math.min(1, time)) * (distance + clearance * 2);
+  const direction = Math.sign(to - from);
+  if (traveled < clearance) return [from, direction * traveled];
+  if (traveled < clearance + distance) return [from + direction * (traveled - clearance), direction * clearance];
+  return [to, direction * (distance + clearance * 2 - traveled)];
+}
+
 // Small/medium/large planets turn in 8/10/12 seconds; IDs keep a stable phase.
 export function axialAngle(timeMs: number, id: number, radius = 0.33) {
   const period = 8 + Math.max(0, Math.min(1, (radius - 0.13) / 0.4)) * 4;

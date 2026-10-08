@@ -1,3 +1,4 @@
+import PlanetMark from './PlanetMark';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
 
@@ -21,7 +22,7 @@ export default function LinkedListView({ step, language }: { step: Step; languag
           const start = nodes.find((node) => node.id === from)!;
           const end = nodes.find((node) => node.id === to);
           return end ? <path key={from} d={`M${start.x} 89 C${start.x} 130 ${end.x} 130 ${end.x} 89`} stroke="#658873" fill="none" markerEnd="url(#list-arrow)" />
-            : <text key={from} x={start.x} y={118} textAnchor="middle" fill="#617469" fontSize={12}>↓ ∅</text>;
+            : <text key={from} x={start.x} y={118} textAnchor="middle" fill="#a3b0a7" fontSize={12}>↓ ∅</text>;
         })}
         {previousLinks.map(([from, to]) => {
           const start = nodes.find((node) => node.id === from)!;
@@ -30,12 +31,12 @@ export default function LinkedListView({ step, language }: { step: Step; languag
             : <text key={from} x={start.x + 10} y={160} textAnchor="middle" fill="#8877a2" fontSize={12}>↓ ∅</text>;
         })}
         {nodes.map((node, index) => <motion.g key={node.id} animate={{ x: node.x }} transition={{ duration: .24 }}>
-          <text y={21} textAnchor="middle" fontSize={10} fill="#617469">{[step.variables.head === node.id ? deque ? 'FRONT' : 'HEAD' : '', step.variables.tail === node.id ? deque ? 'BACK' : 'TAIL' : ''].filter(Boolean).join(' / ')}</text>
-          <rect x={-35} y={32} width={70} height={56} rx={8} fill={step.indices.includes(index) ? '#fff0d8' : traversal && seen.includes(node.id) ? '#d4e9dc' : '#eaf0e9'} stroke={step.indices.includes(index) ? '#d8964a' : '#cddbd1'} />
-          <text y={50} textAnchor="middle" fontSize={10} fill="#617469">N{node.id}</text>
-          <text y={74} textAnchor="middle" fontSize={13} fill="#305645">{node.value}</text>
+          <text y={21} textAnchor="middle" fontSize={10} fill="#a3b0a7">{[step.variables.head === node.id ? deque ? 'FRONT' : 'HEAD' : '', step.variables.tail === node.id ? deque ? 'BACK' : 'TAIL' : ''].filter(Boolean).join(' / ')}</text>
+          <PlanetMark cy={60} r={25} fill={step.indices.includes(index) ? '#d6b476' : traversal && seen.includes(node.id) ? '#8faf9d' : '#82968c'} stroke={step.indices.includes(index) ? '#d6b476' : '#526b60'} />
+          <text y={50} textAnchor="middle" fontSize={10} fill="#0b1012">N{node.id}</text>
+          <text y={74} textAnchor="middle" fontSize={13} fill="#0b1012">{node.value}</text>
         </motion.g>)}
-        {!nodes.length && <text x={width / 2} y={72} textAnchor="middle" fill="#617469">{deque ? 'FRONT = BACK = ∅' : 'HEAD = TAIL = ∅'}</text>}
+        {!nodes.length && <text x={width / 2} y={72} textAnchor="middle" fill="#a3b0a7">{deque ? 'FRONT = BACK = ∅' : 'HEAD = TAIL = ∅'}</text>}
       </svg>
     </div>
     {step.variables.mode === 'list-reverse' && <div className="frontier">{language === 'ko' ? '호출 스택 · HEAD → 현재' : 'Call stack · HEAD → current'} <strong>{String(step.variables.stack) || '∅'}</strong></div>}

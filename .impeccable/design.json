@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-07T21:31:41.202263Z",
+  "generatedAt": "2026-10-08T02:12:07.156172+00:00",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -1028,7 +1028,7 @@
       {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Opposing semicircles exchange at constant path speed over 1.4s: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes the trace, nebula, twinkle and dust while independent axial rotation continues. Seek/edit restores exact trace geometry without resetting axial time. Reduced motion uses the static array renderer. Explicit play starts the next pending action after entry, seeking, any paused comparison or a completed swap’s idle tail; animated unfinished swaps resume at their exact progress."
+        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Adjacent opposing semicircles exchange at constant path speed over 1.4s; distant transfers lift clear of intervening slots, travel and settle: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes the trace, nebula, twinkle and dust while independent axial rotation continues. Seek/edit restores exact trace geometry without resetting axial time. Reduced motion uses the static array renderer. Explicit play starts the next pending action after entry, seeking, any paused comparison or a completed swap’s idle tail; animated unfinished swaps resume at their exact progress."
       },
       {
         "name": "bubble-view-transition",
@@ -1073,7 +1073,7 @@
       {
         "name": "bubble-planet-spin",
         "value": "period = 8 + clamp((radius − 0.13) / 0.4, 0, 1) × 4 seconds; angle = visibleSeconds × 2π / period + id × 0.8; delta ≤ 0.1s",
-        "purpose": "Every visible space planet rotates independently before playback and while sorting is paused, with a ten-second baseline: small planets turn in 8s, medium in 10s and large in 12s. Speed follows rendered radius, not item ID; IDs retain only stable phases. 3D spins the actual sphere about y; 2D spins shader terrain while flattened geometry stays front-facing. Rings, numeric labels and fixed slot centres do not spin. Playback speed, pause, seek and trace reset do not control or reset axial time. Offscreen, hidden-document and reduced-motion gates stop nonessential motion."
+        "purpose": "Every visible sorting or search space planet rotates independently before playback and while sorting is paused, with a ten-second baseline: small planets turn in 8s, medium in 10s and large in 12s. Speed follows rendered radius, not item ID; IDs retain only stable phases. 3D spins the actual sphere about y; 2D spins shader terrain while flattened geometry stays front-facing. Rings, numeric labels and fixed slot centres do not spin. Playback speed, pause, seek and trace reset do not control or reset axial time. Offscreen, hidden-document and reduced-motion gates stop nonessential motion."
       },
       {
         "name": "landing-preview-playback",
@@ -1093,7 +1093,22 @@
       {
         "name": "bubble-color-transition",
         "value": "1 - exp(-min(delta, 0.1) * 8)",
-        "purpose": "Space planet colors ease between the existing neutral, comparison, swap and settled palette in about 375ms to 95%; emissive and rings follow the interpolated color. Static reduced-motion array fallback is unchanged."
+        "purpose": "Sorting and search space planet colors ease between the existing neutral, comparison, swap and settled palette in about 375ms to 95%; emissive and rings follow the interpolated color. Static reduced-motion array fallback is unchanged."
+      },
+      {
+        "name": "shared-lesson-playback",
+        "value": "1x: step 2800ms; transition 1400ms; finite outside Bubble",
+        "purpose": "One shared pausable trace clock drives all 111 lessons. Pause preserves transfer progress; seek restores exact trace evidence. Only Bubble defaults to its hold/erode/form loop; other lessons stop at the final step."
+      },
+      {
+        "name": "planar-planet-spin",
+        "value": "period = 8 + min(radius, 24) / 6 seconds; 350ms ease-out state colors",
+        "purpose": "SVG meridians rotate within fixed planetary nodes; topology, edges, labels and record axes stay fixed. Visibility and hidden-document gates pause rotation; reduced motion removes spin and transitions."
+      },
+      {
+        "name": "hanoi-ring-transfer",
+        "value": "1400ms trace-clock lift/travel/settle; independent spin period = 8 + disc / n * 4 seconds",
+        "purpose": "Native torus rings move between the actual A/B/C pole arrays and stack levels. Pause freezes transfer progress; local surface spin continues only while visible. Projected numbers and exact top-to-bottom pole records retain numerical truth; reduced motion or failure preserves static evidence."
       }
     ],
     "breakpoints": [
@@ -1114,23 +1129,23 @@
       {
         "name": "focus-outline",
         "value": "3px solid #087f5b; outline-offset: 3px",
-        "purpose": "Visible focus on other light algorithm lessons."
+        "purpose": "Source-backed legacy light focus only; active lessons use observatory-focus."
       },
       {
         "name": "observatory-focus",
         "value": "3px solid #9bb7a5; outline-offset: 3px (2px on enlargement buttons)",
-        "purpose": "Bubble and landing focus against dark ground; Bubble enlargement offset 2px, landing range offset 4px."
+        "purpose": "All lessons and landing against dark ground; enlargement offset 2px, landing range offset 4px."
       }
     ]
   },
   "components": [
     {
-      "name": "Quiet primary action",
+      "name": "Observatory primary action",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Sage invitation to watch; shared with lesson playback.",
+      "description": "Shared lesson playback invitation: dark sage fill and cream ink.",
       "html": "<a class=\"ds-primary\" href=\"?lesson=bubble-sort&amp;lang=en\">Just watch</a>",
-      "css": ".ds-primary{display:inline-flex;align-items:center;gap:18px;background:#e2eae0;color:#344e3e;border-radius:9px;padding:14px 19px;text-decoration:none;font:500 14px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif;transition:background .2s}.ds-primary:hover{background:#d3dfd0}.ds-primary:focus-visible{outline:3px solid #087f5b;outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+      "css": ".ds-primary{display:inline-flex;align-items:center;gap:18px;background:#26362e;color:#e2e7d9;border-radius:9px;padding:14px 19px;text-decoration:none;font:500 14px \"Pretendard\", \"Noto Sans KR\", system-ui, sans-serif;transition:background .2s}.ds-primary:hover{background:#34483b}.ds-primary:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
     },
     {
       "name": "Language control",
@@ -1167,15 +1182,15 @@
       "refersTo": "code-panel",
       "description": "Closed by default; native summary reveals the existing dark JavaScript panel.",
       "html": "<details class=\"ds-disclosure\"><summary>If you’re curious about the code<span>JavaScript</span></summary><section class=\"ds-code\"><div>JavaScript</div><pre><span class=\"ds-active\">  4  compare(array[i], array[j]);</span></pre></section></details>",
-      "css": ".ds-code{background:#17241f;color:#e6eee8;border-radius:12px;overflow:hidden}.ds-code>div{background:#21312a;color:#acc3b4;padding:15px 18px;font:12px ui-monospace,monospace}.ds-code pre{margin:0;padding:14px 0;font:13px/1.9 ui-monospace,SFMono-Regular,Consolas,monospace;overflow:auto}.ds-active{display:block;background:#304f40;border-left:1px solid #a7d7b6}.ds-disclosure{margin-top:22px;border-top:1px solid #d5dfd6;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-disclosure summary{display:flex;align-items:center;gap:10px;padding:18px 2px;cursor:pointer;color:#4c6755;font-size:14px;list-style:none}.ds-disclosure summary::-webkit-details-marker{display:none}.ds-disclosure summary::before{content:\"+\";font-size:18px}.ds-disclosure[open] summary::before{content:\"−\"}.ds-disclosure summary span{margin-left:auto;font:12px ui-monospace,monospace}.ds-disclosure summary:hover{color:#196d53}.ds-disclosure summary:focus-visible{outline:3px solid #087f5b;outline-offset:3px}"
+      "css": ".ds-code{background:#17241f;color:#e6eee8;border-radius:12px;overflow:hidden}.ds-code>div{background:#21312a;color:#acc3b4;padding:15px 18px;font:12px ui-monospace,monospace}.ds-code pre{margin:0;padding:14px 0;font:13px/1.9 ui-monospace,SFMono-Regular,Consolas,monospace;overflow:auto}.ds-active{display:block;background:#304f40;border-left:1px solid #a7d7b6}.ds-disclosure{margin-top:22px;border-top:1px solid #2c3936;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-disclosure summary{display:flex;align-items:center;gap:10px;padding:18px 2px;cursor:pointer;color:#a3b0a7;font-size:14px;list-style:none}.ds-disclosure summary::-webkit-details-marker{display:none}.ds-disclosure summary::before{content:\"+\";font-size:18px}.ds-disclosure[open] summary::before{content:\"−\"}.ds-disclosure summary span{margin-left:auto;font:12px ui-monospace,monospace}.ds-disclosure summary:hover{color:#e2e7d9}.ds-disclosure summary:focus-visible{outline:3px solid #9bb7a5;outline-offset:3px}"
     },
     {
       "name": "Lesson canvas",
       "kind": "card",
       "refersTo": "lesson-canvas",
-      "description": "Light execution surface preceding the optional code disclosure.",
+      "description": "Shared dark observation window for planets, planar topology, coordinate records and three-station Hanoi; exact evidence precedes the optional code disclosure.",
       "html": "<section class=\"ds-canvas\"><p>While the numbers find their places</p><div class=\"ds-evidence\">[5, 2] → [2, 5]</div></section>",
-      "css": ".ds-canvas{background:#eef2eb;color:#1a3028;border:0;border-radius:12px;padding:24px 28px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-canvas p{margin:0;font-size:14px;font-weight:450;color:#4c6755}.ds-evidence{padding-top:24px;font:500 15px ui-monospace,SFMono-Regular,Consolas,monospace}@media(max-width:650px){.ds-canvas{padding:20px 16px}}"
+      "css": ".ds-canvas{background:#0b1012;color:#e2e7d9;border:0;border-radius:12px;padding:22px 20px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-canvas p{margin:0;font-size:14px;font-weight:450;color:#a3b0a7}.ds-evidence{padding-top:24px;font:500 15px ui-monospace,SFMono-Regular,Consolas,monospace}@media(max-width:650px){.ds-canvas{padding:20px}}"
     },
     {
       "name": "Observatory watch action",
@@ -1193,9 +1208,9 @@
       "css": ".ds-loading{background:radial-gradient(ellipse at 75% 30%,#202e28,transparent 70%),radial-gradient(ellipse at 25% 75%,#29222b,#0b1012 75%);color:#e2e7d9;text-align:center;padding:24px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-orbit{position:relative;width:230px;height:170px;margin:0 auto 28px}.ds-orbit::before{content:\"\";position:absolute;inset:38px 10px;border:1px solid #b7a07e;border-radius:50%;transform:rotate(-28deg);opacity:.6}.ds-planet{position:absolute;width:76px;height:76px;left:77px;top:47px;background:#9bb7a5;border-radius:50%;box-shadow:inset -18px -12px 28px #31463b;overflow:hidden}.ds-planet::before{content:\"\";position:absolute;inset:-20%;background:radial-gradient(ellipse at 30% 35%,#31463b80,transparent 35%),radial-gradient(ellipse at 65% 70%,#b7a07e66,transparent 40%);animation:ds-loading-spin 110s linear infinite}.ds-orbit:not([data-spinning=\"true\"]) .ds-moon,.ds-orbit:not([data-spinning=\"true\"]) .ds-planet::before{animation-play-state:paused}.ds-moon{position:absolute;inset:0;animation:ds-loading-orbit 22s linear infinite}.ds-moon::after{content:\"\";position:absolute;left:23px;top:50px;width:7px;height:7px;border-radius:50%;background:#b7a07e}.ds-status p{margin:0 0 10px;font-size:19px;font-weight:450;letter-spacing:-.02em}.ds-status>span{font-size:13px;color:#a3b0a7}@keyframes ds-loading-spin{to{transform:rotate(360deg)}}@keyframes ds-loading-orbit{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.ds-moon,.ds-planet::before{animation:none}}"
     },
     {
-      "name": "Bubble view switch",
+      "name": "Array view switch",
       "kind": "input",
-      "description": "Bubble observatory native 2D/3D radios with 3D selected by default; front-facing 2D flattens spheres and hides rings. Changes preserve the running trace; disabled while editing. Enlarge/Fullscreen retains native requestFullscreen, enlarged fallback, active focus trap and Escape return focus; transport stays beneath the artwork.",
+      "description": "Sorting and search observatory native 2D/3D radios with 3D selected by default; front-facing 2D flattens spheres and hides rings. Changes preserve the running trace; disabled while editing. Enlarge/Fullscreen retains native requestFullscreen, enlarged fallback, active focus trap and Escape return focus; transport stays beneath the artwork.",
       "html": "<div class=\"ds-space-view-sample\"><fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset></div>",
       "css": ".ds-space-view-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #2c3936;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#a3b0a7;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#26362e;color:#e2e7d9}.ds-bubble-view input:hover+span{background:#1d2a25}.ds-bubble-view input:focus-visible+span{outline:3px solid #9bb7a5;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
     },
@@ -1209,10 +1224,10 @@
   ],
   "narrative": {
     "northStar": "Low-light observatory",
-    "overview": "The user-approved observatory now covers landing, loading, favicon, Big O and Bubble sort (2026-10-08). Numbered worn planets, sparse stars and diffuse green/mauve nebula make watching the invitation. Existing Korean/English product names, lighter type, precise evidence and reading order remain. The shared world extends the original Bubble direction (seed 7554e619); its surface expressions are recorded in `.impeccable/surfaces/bubble-space.md` and `.impeccable/surfaces/landing-space.md`.\n\nOther algorithm lessons retain their light paper, muted sage surfaces, established layouts and execution colors. The observatory approval is scoped to the named surfaces; it does not invert every lesson. Playful bilingual introductions invite watching, while exact summaries, model formulas and step evidence support closer reading. Source code stays available below the execution canvas when curiosity calls.",
+    "overview": "The user-approved observatory now covers landing, loading, favicon, Big O and all 111 runnable algorithm and data-structure lessons (2026-10-08). Numbered worn planets, sparse stars and diffuse green/mauve nebula make watching the invitation. Existing Korean/English product names, lighter type, precise evidence and reading order remain. The shared world extends the original Bubble direction (seed 7554e619); its surface expressions are recorded in `.impeccable/surfaces/bubble-space.md`, `.impeccable/surfaces/landing-space.md` and `.impeccable/surfaces/all-lessons-space.md`.\n\nEvery lesson shares the dark shell and quiet sage controls. Sorting and search use native numbered planets, connected structures use planar maps, dense records preserve their exact axes, and Hanoi transfers real disc rings between three stations. Playful bilingual introductions invite watching, while exact summaries, model formulas and step evidence support closer reading. Source code stays available below the execution canvas when curiosity calls.",
     "keyCharacteristics": [
-      "Low-light observatory on landing, loading, favicon, Big O and Bubble sort.",
-      "Light paper and sage actions on other algorithm lessons.",
+      "Low-light observatory on landing, loading, favicon, Big O and all 111 lessons.",
+      "Native array planets, planar topology, exact coordinate records and three-station Hanoi rings.",
       "Worn numbered planets, procedural atmosphere and equally sized model stars.",
       "Lighter headings and quiet bilingual copy.",
       "Visible execution with code closed until requested.",
@@ -1220,8 +1235,8 @@
     ],
     "rules": [
       {
-        "name": "The Scoped World Rule",
-        "body": "Apply the observatory to landing, loading, favicon, Big O and Bubble sort; other algorithm lessons keep their incumbent light palette and layout.",
+        "name": "The Shared World Rule",
+        "body": "Apply the observatory to every lesson; preserve each algorithm’s real values, topology, axes and semantic execution states.",
         "section": "colors"
       },
       {
@@ -1236,7 +1251,12 @@
       },
       {
         "name": "The Printed Value Rule",
-        "body": "Bubble planet geometry is illustrative; exact signed numbers and fixed numeric slots are the algorithm evidence. Rings and exchange arcs do not describe astronomical measurements or simulated physics.",
+        "body": "Planet geometry is illustrative; exact signed numbers and fixed numeric slots are the algorithm evidence. Rings and exchange arcs do not describe astronomical measurements or simulated physics.",
+        "section": "components"
+      },
+      {
+        "name": "The Topology Rule",
+        "body": "Motion may turn node surfaces or move a traced item; it must not invent edges, misrepresent traced station membership, or move a coordinate axis.",
         "section": "components"
       }
     ],
@@ -1246,8 +1266,8 @@
       "Do place playful taglines alongside exact summaries and step explanations.",
       "Do lead with execution and keep code available through a closed native disclosure.",
       "Do pair execution colors with textual or numeric evidence.",
-      "Do scope the observatory to landing, loading, favicon, Big O and Bubble sort while retaining other lessons’ light palette and layout.",
-      "Do treat printed signed Bubble values and fixed indices as authoritative over illustrative geometry."
+      "Do use the shared observatory across all 111 lessons while preserving real topology, coordinate axes and exact records.",
+      "Do treat printed signed values, fixed indices and Hanoi pole records as authoritative over illustrative geometry."
     ],
     "donts": [
       "Don't present Bubble rings or swap arcs as astronomical measurements or physical simulation.",

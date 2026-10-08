@@ -1,3 +1,4 @@
+import PlanetMark from './PlanetMark';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
 
@@ -15,7 +16,7 @@ export default function TreeView({ step, language }: { step: Step; language: Lan
   if (traversal && tree.length) orderNodes(tree.find((node) => node.depth === 0)!.id);
   else ordered.push(...[...tree].sort((a, b) => a.value - b.value));
   const seenIds: number[] = JSON.parse(String(step.variables.seenIds ?? '[]'));
-  const width = traversal ? Math.max(320, tree.length * 36 + 40) : Math.max(600, tree.length * 50 + 40);
+  const width = traversal ? Math.max(320, tree.length * 48 + 60) : Math.max(600, tree.length * 50 + 40);
   const avl = step.variables.structure === 'avl-tree';
   const rb = step.variables.structure === 'red-black-tree';
   const nodes = tree.map((node) => ({ ...node, x: 30 + (ordered.findIndex((item) => item.id === node.id) + .5) / Math.max(1, tree.length) * (width - 60), y: 35 + node.depth * (avl || rb ? 75 : 55) }));
@@ -27,16 +28,16 @@ export default function TreeView({ step, language }: { step: Step; language: Lan
         <title>{String(traversal ? step.variables.order : step.variables.inorder) || '∅'}</title>
         {nodes.flatMap((node) => [node.left, node.right].filter((id) => id >= 0).map((id) => {
           const child = nodes.find((item) => item.id === id)!;
-          return <line key={`${node.id}-${id}`} x1={node.x} y1={node.y} x2={child.x} y2={child.y} stroke="#cbd7ce" strokeWidth={2} />;
+          return <line key={`${node.id}-${id}`} x1={node.x} y1={node.y} x2={child.x} y2={child.y} stroke="#526b60" strokeWidth={2} />;
         }))}
         {nodes.map((node, index) => <motion.g key={node.id} animate={{ x: node.x, y: node.y }} transition={{ duration: .24 }}>
-          <circle r={18} fill={traversal ? step.indices.includes(index) ? '#d8964a' : seenIds.includes(node.id) ? '#d4e9dc' : '#eef2ed' : rb ? node.color === 'red' ? '#b54343' : node.color === 'black' ? '#263d34' : '#a6b4ad' : step.indices.includes(index) ? '#d8964a' : '#326f54'} stroke={rb && step.indices.includes(index) ? '#d8964a' : 'none'} strokeWidth={3} />
-          <text textAnchor="middle" y={4} fontSize={12} fill={traversal ? "#203d2f" : "white"}>{node.value}</text>
-          {avl && <text textAnchor="middle" y={32} fontSize={10} fill={Math.abs(node.balance!) > 1 ? '#b45309' : '#617469'}>b={node.balance} · h={node.height}</text>}
-          {rb && <text textAnchor="middle" y={32} fontSize={10} fill="#617469">{node.color === 'red' ? 'R' : node.color === 'black' ? 'B' : '?'}</text>}
-          {node.depth === 0 && <text textAnchor="middle" y={-25} fontSize={9} fill="#617469">ROOT</text>}
+          <PlanetMark r={18} fill={traversal ? step.indices.includes(index) ? '#d6b476' : seenIds.includes(node.id) ? '#8faf9d' : '#82968c' : rb ? node.color === 'red' ? '#b54343' : node.color === 'black' ? '#263d34' : '#a6b4ad' : step.indices.includes(index) ? '#d6b476' : '#8faf9d'} stroke={rb && step.indices.includes(index) ? '#d6b476' : 'none'} strokeWidth={3} />
+          <text textAnchor="middle" y={4} fontSize={12} fill={rb ? "white" : "#0b1012"}>{node.value}</text>
+          {avl && <text textAnchor="middle" y={32} fontSize={10} fill={Math.abs(node.balance!) > 1 ? '#b45309' : '#a3b0a7'}>b={node.balance} · h={node.height}</text>}
+          {rb && <text textAnchor="middle" y={32} fontSize={10} fill="#a3b0a7">{node.color === 'red' ? 'R' : node.color === 'black' ? 'B' : '?'}</text>}
+          {node.depth === 0 && <text textAnchor="middle" y={-25} fontSize={9} fill="#a3b0a7">ROOT</text>}
         </motion.g>)}
-        {!nodes.length && <text x={width / 2} y={55} textAnchor="middle" fill="#617469">ROOT = ∅</text>}
+        {!nodes.length && <text x={width / 2} y={55} textAnchor="middle" fill="#a3b0a7">ROOT = ∅</text>}
       </svg>
     </div>
     {traversal && <div className="frontier">{step.variables.mode === 'tree-bfs' ? language === 'ko' ? '대기 큐 · FRONT → REAR' : 'Queue · FRONT → REAR' : language === 'ko' ? '호출 스택 · 루트 → 현재' : 'Call stack · root → current'} <strong>{step.variables.mode === 'tree-bfs' ? (JSON.parse(String(step.variables.queue)) as number[]).join(' → ') || '∅' : String(step.variables.stack) || '∅'}</strong></div>}
