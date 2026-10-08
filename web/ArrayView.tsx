@@ -3,13 +3,18 @@ import type { Step } from './algorithms';
 import { lazy, Suspense } from 'react';
 import { useSpaceLesson } from './SpaceLesson';
 import PlanetMark from './PlanetMark';
+import SpaceSky from './SpaceSky';
 
 const BubbleScene = lazy(() => import('./BubbleScene'));
 
 export default function ArrayView({ step, language, orbital = true, planetary = false }: { step: Step; language: 'ko' | 'en'; orbital?: boolean; planetary?: boolean }) {
   const reducedMotion = useReducedMotion();
   const scene = useSpaceLesson();
-  if (orbital && scene && !scene.reduced) return <Suspense fallback={<div className="bubble-canvas bubble-loading" role="status">{language === 'ko' ? '행성을 불러오는 중' : 'Loading planets'}</div>}><BubbleScene step={step} language={language} {...scene} world="space" /></Suspense>;
+  if (orbital && scene && !scene.reduced) return <Suspense fallback={<div className="bubble-art"><div className="bubble-canvas bubble-loading">
+    <SpaceSky />
+    <div className="bubble-loading-preview" aria-hidden="true"><ArrayView step={step} language={language} orbital={false} planetary /></div>
+    <p role="status">{language === 'ko' ? '행성을 불러오는 중' : 'Loading planets'}</p>
+  </div></div>}><BubbleScene step={step} language={language} {...scene} world="space" /></Suspense>;
   const max = Math.max(1, ...step.array.map((item) => Math.abs(item.value)));
   if (scene || planetary) return <div className="array-scroll"><div className="orbital-array" role="list" aria-label={language === 'ko' ? '현재 배열' : 'Current array'}>
     {step.array.map((item, index) => {

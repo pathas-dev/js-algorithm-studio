@@ -55,7 +55,11 @@
 .bubble-size-button:disabled { opacity: .5; cursor: default; }
 .bubble-zoom { display: flex; align-items: center; gap: 1px; }
 .bubble-zoom button { min-width: 36px; min-height: 36px; display: grid; place-items: center; }
-.bubble-loading { display: grid; place-items: center; color: var(--space-muted); font-size: 13px; }
+.bubble-loading { position: relative; isolation: isolate; display: grid; grid-template-rows: 1fr auto; overflow: hidden; color: var(--space-muted); font-size: 13px; }
+.bubble-loading > .space-sky { z-index: -1; }
+.bubble-loading-preview { align-self: center; overflow: hidden; opacity: .55; }
+.bubble-loading-preview .array-scroll { overflow: hidden; }
+.bubble-loading > p { margin: 0; padding: 16px; text-align: center; }
 .bubble-studio.idle-studio .bubble-expanded { position: fixed; inset: 0; z-index: 150; padding: 18px 28px; overflow: auto; background: #f6f4ed; }
 .bubble-studio.idle-studio .bubble-expanded .lesson-heading { margin-bottom: 8px; }
 .bubble-studio.idle-studio .bubble-expanded .lesson-heading h1 { font-size: 26px; }
