@@ -3,7 +3,19 @@ import type { Item, Step } from './algorithms';
 export type GraphPlanet = Item & { x: number; y: number; position: [number, number, number]; color: string; current: boolean; via: boolean; dimmed: boolean };
 export type GraphConnection = { from: GraphPlanet; to: GraphPlanet; weight?: number; active: boolean; selected: boolean; reciprocal: boolean; directed: boolean; reverse: boolean };
 
-export function graphModel(step: Step, seen: string[], processed: string[], chosen: number[][], matrix: boolean) {
+export function graphTravel(step: Step, previous?: Step): [number, number] | undefined {
+  const { current, next } = step.variables;
+  if (typeof current !== 'number') return;
+  if (typeof next === 'number') return [current, next];
+  if (['enter', 'collect'].includes(step.type)) {
+    const stack = String(step.variables.stack ?? '').split(',').filter(Boolean).map(Number);
+    if (stack.length > 1 && stack.at(-1) === current) return [stack[stack.length - 2], current];
+  }
+  if (step.type === 'take-edge' && typeof previous?.variables.current === 'number') return [previous.variables.current, current];
+}
+
+export function graphModel(step: Step, seen: string[], processed: string[], chosen: number[][], matrix: boolean, previous?: Step) {
+  const travel = graphTravel(step, previous);
   const nodes: GraphPlanet[] = step.array.map((item, index) => {
     const angle = index / step.array.length * Math.PI * 2 - Math.PI / 2;
     const current = step.variables.structure === 'disjoint-set' ? step.indices.includes(index) : step.variables.current === item.value;
@@ -19,9 +31,9 @@ export function graphModel(step: Step, seen: string[], processed: string[], chos
     const directed = Boolean(step.variables.directed);
     const active = matrix
       ? (step.variables.current === a && step.variables.via === b) || (step.variables.via === a && step.variables.next === b) || (!directed && ((step.variables.current === b && step.variables.via === a) || (step.variables.via === b && step.variables.next === a)))
-      : (step.variables.current === a && step.variables.next === b) || (!directed && step.variables.current === b && step.variables.next === a);
+      : (travel?.[0] === a && travel[1] === b) || (!directed && travel?.[0] === b && travel[1] === a);
     const selected = chosen.some(([c, d]) => (c === a && d === b) || (!directed && c === b && d === a));
-    const reverse = !directed && (matrix ? (step.variables.current === b && step.variables.via === a) || (step.variables.via === b && step.variables.next === a) : step.variables.current === b);
+    const reverse = !directed && (matrix ? (step.variables.current === b && step.variables.via === a) || (step.variables.via === b && step.variables.next === a) : travel?.[0] === b);
     return [{ from, to, weight, active, selected, directed, reverse, reciprocal: directed && a !== b && Boolean(step.edges?.some(([c, d]) => c === b && d === a)) }];
   });
   return { nodes, edges };

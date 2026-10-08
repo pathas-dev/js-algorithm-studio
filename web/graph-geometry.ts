@@ -1,6 +1,17 @@
 import { CubicBezierCurve3, QuadraticBezierCurve3, Vector3 } from 'three';
 import type { GraphConnection } from './graph-scene';
 
+export function wormholeFrame(progress: number, reverse: boolean) {
+  const time = Math.max(0, Math.min(1, progress));
+  const travel = Math.max(0, Math.min(1, (time - .12) / .72));
+  return {
+    position: reverse ? 1 - travel : travel,
+    energy: Math.sin(time * Math.PI),
+    departure: Math.sin(Math.min(1, time / .4) * Math.PI),
+    arrival: Math.sin(Math.max(0, (time - .65) / .35) * Math.PI),
+  };
+}
+
 // Both directions get their own lane; trim connections to the actual sphere surface.
 export function graphCurve(edge: GraphConnection) {
   const from = new Vector3(...edge.from.position), to = new Vector3(...edge.to.position);

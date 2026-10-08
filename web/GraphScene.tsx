@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Color, Mesh, OrthographicCamera, Quaternion, ShaderMaterial, TubeGeometry, Vector3 } from 'three';
+import { Color, Mesh, OrthographicCamera, Quaternion, TubeGeometry, Vector3 } from 'three';
 import SceneOrbit from './SceneOrbit';
 import { SceneBoundary } from './BubbleScene';
 import { useSpaceLesson } from './SpaceLesson';
@@ -8,7 +8,7 @@ import { useSceneVisibility } from './use-scene-visibility';
 import type { GraphPlanet, GraphConnection } from './graph-scene';
 import { graphCurve } from './graph-geometry';
 import { atmosphereMaterial, planetMaterial } from './planet-material';
-import { traceTransitionTime } from './bubble-motion';
+import GraphWormhole from './GraphWormhole';
 import type { Language } from './algorithms';
 
 type Labels = RefObject<Map<string, HTMLSpanElement>>;
@@ -67,30 +67,14 @@ function Planet({ node, visible }: { node: GraphPlanet; visible: boolean }) {
 }
 
 function Connection({ edge }: { edge: GraphConnection }) {
-  const scene = useSpaceLesson()!;
   const curve = useMemo(() => graphCurve(edge), [edge]);
   const geometry = useMemo(() => new TubeGeometry(curve, 48, edge.active || edge.selected ? .022 : .012, 5, false), [curve, edge.active, edge.selected]);
   const color = edge.active ? '#d6b476' : edge.selected ? '#8faf9d' : '#526b60';
   const arrow = useMemo(() => ({ position: curve.getPoint(.96), rotation: new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), curve.getTangent(.96).normalize()) }), [curve]);
-  const flow = useMemo(() => new ShaderMaterial({
-    transparent: true, depthWrite: false,
-    uniforms: { uProgress: { value: 0 }, uColor: { value: new Color('#eed1a3') } },
-    vertexShader: 'varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-    fragmentShader: `varying vec2 vUv; uniform float uProgress; uniform vec3 uColor;
-      void main(){float trail=exp(-abs(vUv.x-uProgress)*22.0); gl_FragColor=vec4(uColor,trail*.95);
-      #include <colorspace_fragment>
-      }`,
-  }), []);
   useEffect(() => () => geometry.dispose(), [geometry]);
-  useEffect(() => () => flow.dispose(), [flow]);
-  useFrame(() => {
-    const state = scene.clock.current;
-    const progress = traceTransitionTime(state, scene.index ?? state.index, state.animate);
-    if (progress !== undefined) flow.uniforms.uProgress.value = edge.reverse ? 1 - progress : progress;
-  });
   return <>
     <mesh geometry={geometry}><meshBasicMaterial color={color} transparent opacity={edge.active || edge.selected ? .9 : .55} /></mesh>
-    {edge.active && <mesh geometry={geometry} material={flow} />}
+    {edge.active && <GraphWormhole curve={curve} reverse={edge.reverse} />}
     {edge.directed && <mesh position={arrow.position} quaternion={arrow.rotation}><coneGeometry args={[.07, .19, 8]} /><meshBasicMaterial color={edge.active || edge.selected ? color : '#a3b0a7'} /></mesh>}
   </>;
 }

@@ -21,7 +21,7 @@ export default function GraphView({ step, language, weighted = true }: { step: S
   const processed = matrix && step.type === 'done' ? seen : String(step.variables.processed ?? '').split(',');
   const dfs = step.variables.mode === 'dfs' || step.variables.mode === 'topological';
   const frontier = String((dfs ? step.variables.stack : step.variables.queue) ?? '');
-  const { nodes: positions, edges } = graphModel(step, seen, processed, chosen, Boolean(matrix));
+  const { nodes: positions, edges } = graphModel(step, seen, processed, chosen, Boolean(matrix), scene?.previous);
   const map = <svg className="graph-map" viewBox="0 0 440 310" role="img" aria-describedby={statusId} aria-label={ko ? '현재 그래프' : 'Current graph'}>
       <title>{`${ko ? '현재 그래프: ' : 'Current graph: '}${step.array.map((item) => item.value).join(', ')}`}</title>
       <defs><marker id={markerId} viewBox="0 0 10 10" refX={9} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a3b0a7" /></marker></defs>

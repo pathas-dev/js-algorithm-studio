@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import type { Step } from './algorithms';
 import { advanceBubblePlayback, bubblePlaybackReducer, initialBubblePlayback, type BubbleAction } from './bubble-playback';
+import { graphTravel } from './graph-scene';
 
 export default function useBubblePlayback(steps: Step[], active: boolean, autoplay = false, loop = true) {
   const [playback, setPlayback] = useState(() => {
@@ -11,8 +12,11 @@ export default function useBubblePlayback(steps: Step[], active: boolean, autopl
   const clock = useRef(playback);
   const reduced = Boolean(useReducedMotion());
   const dispatch = (action: BubbleAction) => {
+    const step = steps[clock.current.index];
+    const previous = steps[Math.max(0, clock.current.index - 1)];
+    const graphMotion = Boolean(step.edges?.length && (graphTravel(step, previous) || typeof step.variables.via === 'number'));
     clock.current = bubblePlaybackReducer(clock.current, action.type === 'toggle'
-      ? { ...action, swap: ['swap', 'move'].includes(steps[clock.current.index]?.type) || steps[clock.current.index]?.array.some((item, index) => steps[Math.max(0, clock.current.index - 1)]?.array[index]?.id !== item.id) }
+      ? { ...action, swap: graphMotion || ['swap', 'move'].includes(step.type) || step.array.some((item, index) => previous.array[index]?.id !== item.id) }
       : action);
     setPlayback(clock.current);
   };
