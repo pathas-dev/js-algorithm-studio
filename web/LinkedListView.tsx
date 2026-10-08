@@ -1,6 +1,7 @@
 import PlanetMark from './PlanetMark';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
+import LinkedView from './LinkedView';
 
 export default function LinkedListView({ step, language }: { step: Step; language: Language }) {
   const links: number[][] = JSON.parse(String(step.variables.links));
@@ -13,7 +14,7 @@ export default function LinkedListView({ step, language }: { step: Step; languag
   const width = Math.max(320, nodes.length * 94 + 34);
   return <div className="structure-view">
     <p>{doubly ? language === 'ko' ? '초록 next · 보라 previous · N 번호는 노드 식별자 · ∅는 null' : 'Green next · purple previous · N labels identify nodes · ∅ means null' : language === 'ko' ? 'next 연결 · N 번호는 노드 식별자 · ∅는 null' : 'next links · N labels identify nodes · ∅ means null'}</p>
-    <div className="list-scroll">
+    <LinkedView step={step} language={language}><div className="list-scroll">
       <svg width={width} height={doubly ? 200 : 150} viewBox={`0 0 ${width} ${doubly ? 200 : 150}`} role="img" aria-label={doubly ? language === 'ko' ? '현재 이중 연결 리스트' : 'Current doubly linked list' : language === 'ko' ? '현재 연결 리스트' : 'Current linked list'}>
         <title>{nodes.map((node) => `N${node.id}: ${node.value}`).join(', ') || '∅'}</title>
         <defs><marker id="list-arrow" viewBox="0 0 10 10" refX={9} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#658873" /></marker></defs>
@@ -38,7 +39,7 @@ export default function LinkedListView({ step, language }: { step: Step; languag
         </motion.g>)}
         {!nodes.length && <text x={width / 2} y={72} textAnchor="middle" fill="#a3b0a7">{deque ? 'FRONT = BACK = ∅' : 'HEAD = TAIL = ∅'}</text>}
       </svg>
-    </div>
+    </div></LinkedView>
     {step.variables.mode === 'list-reverse' && <div className="frontier">{language === 'ko' ? '호출 스택 · HEAD → 현재' : 'Call stack · HEAD → current'} <strong>{String(step.variables.stack) || '∅'}</strong></div>}
     {'result' in step.variables && <div className="frontier">{traversal ? language === 'ko' ? '방문 순서' : 'Visit order' : language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(traversal ? step.variables.order : step.variables.result) || '∅'}</output></div>}
   </div>;

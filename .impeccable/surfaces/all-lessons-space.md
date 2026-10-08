@@ -1,6 +1,28 @@
 # All lesson observatories
 
-Scope: extend the approved observatory across all 111 runnable lessons; Experience with an exact, inspectable trace. Existing inputs, constraints, algorithms, bilingual explanations and source remain authoritative. Graphs provide a rotatable 3D observatory and 2D top view; other linked structures keep their top view. Hanoi owns a ring-transfer scene.
+Scope: extend the approved observatory across all 111 runnable lessons; Experience with an exact, inspectable trace. Existing inputs, constraints, algorithms, bilingual explanations and source remain authoritative. Graphs provide a rotatable 3D observatory and 2D top view. Singly and doubly linked-list structure lessons add communication modules with the original 2D top view available; deque and forward/reverse traversal keep their existing views. Trees, heaps and hash structures remain unchanged. Hanoi owns a ring-transfer scene.
+
+## Authorized linked-list communication equipment extension
+
+The user approved communication station modules for only the singly and doubly linked-list structure lessons (2026-10-09). This is an extension within the incumbent observatory. Deque, forward/reverse traversal, trees, heaps and hash structures keep their established views; the completed sequence scenes and global playback controls remain intact.
+
+THESIS: Show exact pointer changes through communication modules and actual directed cables.
+
+OWN-WORLD: Inherit the near-black observatory ground, cream ink, sage next and mauve previous channels, existing typography and quiet controls. Equipment extends the current world without a new visual system.
+
+STORY: Insertion brings a module into the row; deletion departs and reconnects the recorded neighbours. Detach the old cable first, then grow its replacement over the existing 1.4s trace transition. Stable node IDs and signed values distinguish duplicate values. Partial reverse and null HEAD/TAIL follow the real snapshots.
+
+FIRST VIEWPORT: The existing lesson transport surrounds the native observation scene. Shared 2D/3D and zoom controls keep exact playback available; an optional native disclosure reveals the original SVG and textual nodes/next/previous evidence.
+
+FORM: Native Three.js/Fiber equipment has octagonal bodies, solar wings, antennas and pointer ports. Next and previous occupy separate cable channels with arrows and null terminals. Constrained orbit, zoom and bounded native scroll/swipe support inspection. No concept comp, new raster asset or dependency is introduced.
+
+The two structure lessons default to lazy 3D. HEAD/TAIL tags, current/previous/next cues and directed cables use exact snapshot data. The committed playback guard owns module movement and detach/attach progress: pause freezes it, resume retains progress and seek shows the chosen state directly. Home/Reset view preserves zoom and playback. Long inputs focus the active node or HEAD on step changes only after the actual canvas, camera and committed clock agree; same-step manual scrolling persists. The native disclosure contains the original SVG and textual nodes/next/previous record, and separate screen-reader evidence retains all pointers. Reduced motion has an explanatory 2D status; scene errors or context loss fall back to the original SVG. Visibility gates rendering, DPR stays capped at 1.5 and native resources are cleaned up.
+
+Verification of this extension (2026-10-09): 217 linked snapshots cover both defaults, negative duplicate values, empty and 32-node input, partial reverse, null, separated cable lanes, detach-before-attach, pause/resume/seek and the committed-step guard, plus bilingual SSR and reduced motion. The 24 existing structure/playback tests, 1452 bilingual trace renders across 111 lessons, typecheck and production build pass. The build retains its existing large-chunk warning.
+
+Browser checks at 1440×1080 and 390×844 cover Korean/English, default 3D and retained 2D, 125% zoom plus Home, viewport fullscreen fallback, empty/32-node input, the exact-record disclosure and no horizontal page overflow. After replacing 4 nodes with 32, rapid End/Left/Left brings current N31 to x227 within a viewport beginning at x36, at scrollLeft 3917, without a recovery step. Manual scrollLeft 3527 persists at the same step. Keyboard orbit was exercised; live mouse dragging and physical touch hardware were not. Native fullscreen and physical GPU performance remain unmeasured.
+
+Finish verdict: ship for the two scored fixes (active-node focus race and cable cache invalidation). The verdict pass resolved those findings; it did not repeat a whole-surface review. Earlier sequence, graph and Bubble records remain evidence of their own passes.
 
 ## Authorized sequence extension and equipment redesign
 
