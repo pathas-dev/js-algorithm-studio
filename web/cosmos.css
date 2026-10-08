@@ -108,3 +108,12 @@
 .space-studio.idle-studio .bubble-expanded:has(.hanoi-scene) :is(.space-lesson, .space-lesson-content, .lesson-visual, .puzzle-view, .hanoi-scene) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .space-studio.idle-studio .bubble-expanded .hanoi-scene .hanoi-canvas { flex: 1; min-height: 0; height: auto; }
 .space-studio.idle-studio .bubble-expanded .hanoi-scene .hanoi-labels { height: 100%; overflow: hidden; }
+
+/* Fill tall viewports before placing the graph's exact records at the bottom. */
+.space-studio.idle-studio .bubble-immersive:not(:has(.bubble-art, .hanoi-scene)) .space-lesson-content { height: 100%; display: flex; flex-direction: column; }
+.space-studio.idle-studio .bubble-immersive:not(:has(.bubble-art, .hanoi-scene)) .lesson-visual { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.space-studio.idle-studio .bubble-immersive .graph-view,
+.space-studio.idle-studio .bubble-immersive .graph-observatory { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.space-studio.idle-studio .bubble-immersive .graph-scene { flex: 1; min-height: 240px; height: auto; }
+.space-studio.idle-studio .bubble-immersive .graph-view > svg { flex: 1; height: 240px; min-height: 240px; max-height: none; width: 100%; }
+.space-studio.idle-studio .bubble-immersive .array-state { margin-top: auto; flex-shrink: 0; }
