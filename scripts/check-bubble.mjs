@@ -1,10 +1,28 @@
 import assert from 'node:assert/strict';
+import React from 'react';
+import { renderToString } from 'react-dom/server';
 import { createServer } from 'vite';
 const server = await createServer({ configFile: 'web/vite.config.mts', server: { middlewareMode: true }, appType: 'custom' });
 try {
   const { initialBubblePlayback, bubblePlaybackReducer: reduce, advanceBubblePlayback: advance } = await server.ssrLoadModule('/bubble-playback.ts');
   const { bubble } = await server.ssrLoadModule('/algorithms.ts');
-  const { springProgress, workStar, planetRadius, planetSpacing, orbitalSwap, axialAngle } = await server.ssrLoadModule('/bubble-motion.ts');
+  const { default: ArrayView } = await server.ssrLoadModule('/ArrayView.tsx');
+  const { default: SpaceLesson } = await server.ssrLoadModule('/SpaceLesson.tsx');
+  for (const language of ['ko', 'en']) {
+    const initial = bubble.run([8, 3])[0];
+    const markup = renderToString(React.createElement(SpaceLesson, { previous: initial, clock: { current: initialBubblePlayback(3) }, reduced: false, view: '3d', sky: false }, React.createElement(ArrayView, { step: initial, language })));
+    assert(markup.includes('bubble-loading'), 'A cold scene reserves the canvas while its Three.js chunk loads');
+    assert(!markup.includes('array-chart') && !markup.includes('class="bar"'), 'The old bar chart never flashes during planetary scene loading');
+  }
+  const { springProgress, workStar, planetRadius, planetSpacing, orbitalSwap, axialAngle, traceTransitionTime } = await server.ssrLoadModule('/bubble-motion.ts');
+  const swapClock = { ...initialBubblePlayback(10), index: 3, playing: true, animate: true, elapsed: 1400 };
+  const nextClock = advance(swapClock, 1400);
+  assert.equal(traceTransitionTime(nextClock, 3, true), undefined, 'A clock that advances before React commits must not rewind the completed swap');
+  assert.equal(traceTransitionTime(nextClock, 4, true), 0, 'The next committed swap starts from its previous slot');
+  const midSwap = advance(nextClock, 700);
+  assert.equal(traceTransitionTime(midSwap, 4, true), .5);
+  assert.equal(traceTransitionTime(reduce(midSwap, { type: 'toggle', swap: true }), 4, true), .5, 'Pause preserves the rendered transfer');
+  assert.equal(traceTransitionTime(reduce(midSwap, { type: 'seek', index: 7 }), 7, false), 1, 'Seeking resolves directly to exact positions');
   for (const id of [0, 1, 6]) {
     assert.equal(axialAngle(0, id), id * 0.8);
     assert.equal(axialAngle(-100, id), axialAngle(0, id));

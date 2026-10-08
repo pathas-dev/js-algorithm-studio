@@ -45,13 +45,19 @@ export default function App() {
   const [steps, setSteps] = useState(() => initial.inputMode === 'text' || initial.inputMode === 'words' ? initial.run(initial.example, undefined, undefined, undefined, initial.operations) : initial.run(initial.example, initial.target, initial.graphEdges, initial.graphDirected, initial.operations));
   const isBubble = algorithm.id === 'bubble-sort';
   const [bubbleView, setBubbleView] = useState<'2d' | '3d'>('3d');
+  const [sceneZoom, setSceneZoom] = useState(1);
   const [expanded, setExpanded] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreenFallback, setFullscreenFallback] = useState(false);
   const lessonRef = useRef<HTMLDivElement>(null);
   const enlargeRef = useRef<HTMLButtonElement>(null);
-  const focusedView = expanded || fullscreen;
+  const focusedView = expanded || fullscreen || fullscreenFallback;
   useEffect(() => {
-    const changed = () => setFullscreen(document.fullscreenElement === lessonRef.current);
+    const changed = () => {
+      const active = document.fullscreenElement === lessonRef.current;
+      setFullscreen(active);
+      setExpanded(active);
+    };
     document.addEventListener('fullscreenchange', changed);
     return () => document.removeEventListener('fullscreenchange', changed);
   }, []);
@@ -60,7 +66,7 @@ export default function App() {
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const close = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !document.fullscreenElement) setExpanded(false);
+      if (event.key === 'Escape' && !document.fullscreenElement) { setExpanded(false); setFullscreenFallback(false); }
     };
     window.addEventListener('keydown', close);
     return () => {
@@ -70,11 +76,15 @@ export default function App() {
     };
   }, [focusedView]);
   async function toggleFullscreen() {
-    if (document.fullscreenElement) await document.exitFullscreen();
+    if (document.fullscreenElement || fullscreenFallback) {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      setFullscreenFallback(false);
+      setExpanded(false);
+    }
     else {
       setExpanded(true);
-      try { await lessonRef.current?.requestFullscreen(); }
-      catch { /* Enlarged view remains available when native fullscreen is unsupported. */ }
+      try { await lessonRef.current!.requestFullscreen(); }
+      catch { setFullscreenFallback(true); }
     }
   }
   const ambient = useBubblePlayback(steps, true, false, isBubble);
@@ -145,6 +155,7 @@ export default function App() {
   function selectAlgorithm(next: Algorithm) {
     const trace = next.inputMode === 'text' || next.inputMode === 'words' ? next.run(next.example, undefined, undefined, undefined, next.operations) : next.run(next.example, next.target, next.graphEdges, next.graphDirected);
     setAlgorithm(next);
+    setSceneZoom(1);
     setWhyOpen(false);
     setEditingInput(false);
     setOperationInput(next.operations ?? '');
@@ -347,17 +358,22 @@ export default function App() {
                     {<Group justify="space-between" mb="sm">
                       {isBubble ? <p className="bubble-caption" data-testid="bubble-phase" data-phase={ambient.playback.phase}>{ambient.playback.phase === 'erode' ? t('잠깐의 질서가, 천천히 흩어집니다.', 'A little order, slowly drifting away.') : ambient.playback.phase === 'form' ? t('같은 숫자들이, 다시 모입니다.', 'The same numbers gather again.') : ambient.playback.phase === 'hold' ? t('제자리에 도착했습니다. 잠깐 그대로.', 'In their places. Stay a little while.') : t('서두를 일 없는, 작은 궤도 교환.', 'Small orbital exchanges, with nowhere to rush.')}</p> : <p className="bubble-caption">{t(algorithm.category === 'graph' || ['structure', 'tree', 'linked-list'].includes(algorithm.category) ? '위에서 바라보는, 작은 연결의 우주.' : algorithm.id === 'hanoi-tower' ? '세 정거장 사이로, 고리가 건너갑니다.' : '각자의 자리에 놓인, 작은 별들.', algorithm.category === 'graph' || ['structure', 'tree', 'linked-list'].includes(algorithm.category) ? 'A little connected universe, seen from above.' : algorithm.id === 'hanoi-tower' ? 'Rings travelling between three stations.' : 'Small stars, each in its place.')}</p>}
                       <div className="bubble-scene-controls">
-                        <button ref={enlargeRef} data-autofocus className="bubble-size-button" disabled={editingInput} aria-expanded={focusedView} onClick={() => { if (fullscreen) void document.exitFullscreen(); setExpanded(!focusedView); }}>{focusedView ? t('작게 보기', 'Shrink view') : t('크게 보기', 'Enlarge view')}</button>
-                        <button className="bubble-size-button" disabled={editingInput} onClick={() => void toggleFullscreen()}>{fullscreen ? t('전체화면 종료', 'Exit fullscreen') : t('전체화면', 'Fullscreen')}</button>
+                        <button ref={enlargeRef} data-autofocus className="bubble-size-button" disabled={editingInput} aria-expanded={focusedView} onClick={() => { if (fullscreen) void document.exitFullscreen(); setFullscreenFallback(false); setExpanded(!focusedView); }}>{focusedView ? t('작게 보기', 'Shrink view') : t('크게 보기', 'Enlarge view')}</button>
+                        <button className="bubble-size-button" disabled={editingInput} onClick={() => void toggleFullscreen()}>{fullscreen || fullscreenFallback ? t('전체화면 종료', 'Exit fullscreen') : t('전체화면으로 보기', 'View fullscreen')}</button>
                         {arrayLesson && <fieldset className="bubble-view-switch" disabled={editingInput}>
                           <legend className="sr-only">{t('보기 방식', 'View mode')}</legend>
                           {(['2d', '3d'] as const).map((view) => <label key={view}><input type="radio" name="bubble-view" value={view} checked={bubbleView === view} onChange={() => setBubbleView(view)} /><span>{view.toUpperCase()}</span></label>)}
                         </fieldset>}
+                        {arrayLesson && !ambient.reduced && <div className="bubble-zoom" role="group" aria-label={t('확대·축소', 'Zoom')}>
+                          <button className="bubble-size-button" aria-label={t('축소', 'Zoom out')} disabled={editingInput || sceneZoom <= .5} onClick={() => setSceneZoom((zoom) => Math.max(.5, zoom - .25))}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M5 12h14" /></svg></button>
+                          <button className="bubble-size-button" aria-label={t('배율 초기화', 'Reset zoom')} disabled={editingInput} onClick={() => setSceneZoom(1)}>{Math.round(sceneZoom * 100)}%</button>
+                          <button className="bubble-size-button" aria-label={t('확대', 'Zoom in')} disabled={editingInput || sceneZoom >= 2} onClick={() => setSceneZoom((zoom) => Math.min(2, zoom + .25))}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M5 12h14M12 5v14" /></svg></button>
+                        </div>}
                         {isBubble && <label className="bubble-loop"><input type="checkbox" checked={ambient.playback.loop} disabled={editingInput} onChange={(event) => ambient.dispatch({ type: 'loop', loop: event.currentTarget.checked })} />{t('천천히 반복', 'Slow loop')}</label>}
                       </div>
                     </Group>}
                     <Group justify="space-between"><Text fw={600} size="sm">{arrayLesson ? t('숫자들이 자리 잡는 동안', 'While the numbers find their places') : t('지금 벌어지는 일', 'What’s happening')}</Text><Badge variant="light" color={step.type === 'done' ? 'teal' : 'gray'}>{stepTitle}</Badge></Group>
-                    <SpaceLesson previous={steps[Math.max(0, playback.index - 1)]} clock={ambient.clock} reduced={ambient.reduced} view={bubbleView} sky={!arrayLesson}>
+                    <SpaceLesson index={playback.index} zoom={sceneZoom} previous={steps[Math.max(0, playback.index - 1)]} clock={ambient.clock} reduced={ambient.reduced} view={bubbleView} sky={!arrayLesson}>
                     <div className="lesson-visual">
                     {partialArray && <Text size="xs" c="dimmed" mt="sm">{t(`현재 부분 배열 · 재귀 깊이 ${step.variables.depth} · 인덱스는 부분 배열 기준`, `Current subarray · recursion depth ${step.variables.depth} · local indices`)}</Text>}
                     <LessonView algorithm={algorithm} step={step} language={language} />

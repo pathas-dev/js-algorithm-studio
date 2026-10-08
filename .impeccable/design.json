@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-08T02:12:07.156172+00:00",
+  "generatedAt": "2026-10-08T02:48:47.698501+00:00",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -1028,7 +1028,7 @@
       {
         "name": "bubble-daydream",
         "value": "1x: step 2800ms; swap 1400ms; hold 6000ms; erode 6000ms; form 3000ms",
-        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Adjacent opposing semicircles exchange at constant path speed over 1.4s; distant transfers lift clear of intervening slots, travel and settle: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes the trace, nebula, twinkle and dust while independent axial rotation continues. Seek/edit restores exact trace geometry without resetting axial time. Reduced motion uses the static array renderer. Explicit play starts the next pending action after entry, seeking, any paused comparison or a completed swap’s idle tail; animated unfinished swaps resume at their exact progress."
+        "purpose": "Bubble-sort planets reserve the maximum ring diameter plus 0.28 in each slot. Adjacent opposing semicircles exchange at constant path speed over 1.4s; distant transfers lift clear of intervening slots, travel and settle: depth in 3D, vertical clearance in 2D. Clay keeps the existing damped spring. Depth-tested native value sprites, signed DOM values and fixed indices retain numerical truth. Views share Canvas and trace clock; pause freezes the trace, nebula, twinkle and dust while independent axial rotation continues. Seek/edit restores exact trace geometry without resetting axial time. Reduced motion uses the static array renderer. Explicit play starts the next pending action after entry, seeking, any paused comparison or a completed swap’s idle tail; animated unfinished swaps resume at their exact progress. Scene motion uses only the clock matching the committed trace step, retaining the last complete frame while the next trace commits. Moving mesh positions remain under the frame clock’s control across React renders."
       },
       {
         "name": "bubble-view-transition",
@@ -1210,7 +1210,7 @@
     {
       "name": "Array view switch",
       "kind": "input",
-      "description": "Sorting and search observatory native 2D/3D radios with 3D selected by default; front-facing 2D flattens spheres and hides rings. Changes preserve the running trace; disabled while editing. Enlarge/Fullscreen retains native requestFullscreen, enlarged fallback, active focus trap and Escape return focus; transport stays beneath the artwork.",
+      "description": "Array view controls use native 2D/3D radios and compact zoom buttons: (50–200%) in (25%) steps, with the displayed percentage resetting to (100%). View and zoom changes preserve playback; magnified arrays scroll horizontally. These controls are disabled while editing, and zoom is omitted for the static reduced-motion view. Every lesson offers Enlarge and Fullscreen buttons. Fullscreen uses native `requestFullscreen` where available, otherwise fills the browser viewport with an explicit Exit fullscreen button. The focused view uses an active focus trap; Escape closes it and restores focus to Enlarge. Array scenes flex into the height remaining after the heading and controls, keeping transport visible on mobile while explanatory and editing content is hidden.",
       "html": "<div class=\"ds-space-view-sample\"><fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset></div>",
       "css": ".ds-space-view-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #2c3936;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#a3b0a7;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#26362e;color:#e2e7d9}.ds-bubble-view input:hover+span{background:#1d2a25}.ds-bubble-view input:focus-visible+span{outline:3px solid #9bb7a5;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
     },

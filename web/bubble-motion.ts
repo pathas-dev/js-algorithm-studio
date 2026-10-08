@@ -1,3 +1,11 @@
+import { BUBBLE_SWAP_MS, type BubblePlayback } from './bubble-playback';
+
+// A newer clock cannot animate an older React trace: retain the last complete frame.
+export function traceTransitionTime(state: BubblePlayback, renderIndex: number, moving: boolean) {
+  if (state.index !== renderIndex) return undefined;
+  return moving ? Math.min(1, state.elapsed / BUBBLE_SWAP_MS) : 1;
+}
+
 // A damped response with a small overshoot; tied to playback, so pausing freezes it.
 export function springProgress(value: number) {
   if (value <= 0) return 0;

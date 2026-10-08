@@ -6,7 +6,7 @@ import { useSceneVisibility } from './use-scene-visibility';
 import './bubble.css';
 import './cosmos.css';
 
-type Scene = { previous: Step; clock: RefObject<BubblePlayback>; reduced: boolean; view: '2d' | '3d' };
+type Scene = { previous: Step; clock: RefObject<BubblePlayback>; reduced: boolean; view: '2d' | '3d'; zoom?: number; index?: number };
 const Context = createContext<Scene | null>(null);
 export const useSpaceLesson = () => useContext(Context);
 

@@ -3,13 +3,13 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { BufferAttribute, BufferGeometry, CanvasTexture, Color, Sprite, SpriteMaterial, SRGBColorSpace, Mesh, MeshStandardMaterial, OrthographicCamera, VSMShadowMap, Points, ShaderMaterial, SphereGeometry, DoubleSide, Vector2, Vector3 } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Item, Step } from './algorithms';
-import { BUBBLE_SWAP_MS, type BubblePlayback } from './bubble-playback';
+import type { BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
-import { springProgress, planetRadius, planetSpacing, planetTransfer, axialAngle } from './bubble-motion';
+import { springProgress, planetRadius, planetSpacing, planetTransfer, axialAngle, traceTransitionTime } from './bubble-motion';
 import { useSceneVisibility } from './use-scene-visibility';
 import './bubble.css';
 
-type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space' };
+type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space'; zoom?: number; index?: number };
 type Labels = RefObject<Map<number, HTMLLIElement>>;
 const ease = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 const seed = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
@@ -17,15 +17,15 @@ const erosion = (state: BubblePlayback) => state.phase === 'erode' ? state.elaps
 const position = (index: number, length: number, spacing = 1.12) => (index - (length - 1) / 2) * spacing;
 const height = (item: Item, maximum: number) => Math.max(0.16, Math.abs(item.value) / maximum * 3.2);
 
-function Camera({ count, spacing, signed, view, world }: { count: number; spacing: number; signed: boolean } & Pick<Props, 'view' | 'world'>) {
+function Camera({ count, spacing, signed, view, world, zoom = 1 }: { count: number; spacing: number; signed: boolean } & Pick<Props, 'view' | 'world' | 'zoom'>) {
   const { camera, size } = useThree();
   const depth = useRef(view === '3d' ? 1 : 0);
   const target = useMemo(() => new Vector3(0, world === 'space' ? 0.55 : signed ? 0 : 1.25, 0), [signed, world]);
   useEffect(() => {
     const ortho = camera as OrthographicCamera;
-    ortho.zoom = Math.min(size.width / Math.max(7.8, count * spacing + 1.8), size.height / (world === 'space' ? view === '2d' ? 7 : 4.6 : signed ? 9.6 : 5.5));
+    ortho.zoom = Math.min(size.width / zoom / Math.max(7.8, count * spacing + 1.8), size.height / (world === 'space' ? view === '2d' ? 7 : 4.6 : signed ? 9.6 : 5.5)) * zoom;
     ortho.updateProjectionMatrix();
-  }, [camera, size.width, size.height, count, spacing, signed, world, view]);
+  }, [camera, size.width, size.height, count, spacing, signed, world, view, zoom]);
   useFrame((_, delta) => {
     depth.current += ((view === '3d' ? 1 : 0) - depth.current) * (1 - Math.exp(-Math.min(delta, 0.1) * 7));
     camera.position.set(-2.2 * depth.current, target.y + 3.5 * depth.current, 12);
@@ -35,7 +35,7 @@ function Camera({ count, spacing, signed, view, world }: { count: number; spacin
   return null;
 }
 
-function Backdrop({ step, clock, world, spacing }: Pick<Props, 'step' | 'clock' | 'world'> & { spacing: number }) {
+function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'step' | 'clock' | 'world'> & { spacing: number; renderIndex: number }) {
   const { camera, size } = useThree();
   const anchor = useMemo(() => new Vector3(), []);
   const material = useMemo(() => new ShaderMaterial({
@@ -85,6 +85,7 @@ function Backdrop({ step, clock, world, spacing }: Pick<Props, 'step' | 'clock' 
   useEffect(() => () => material.dispose(), [material]);
   useFrame(() => {
     const state = clock.current;
+    if (state.index !== renderIndex) return;
     const uniforms = material.uniforms;
     uniforms.uTime.value = state.time / 1000;
     uniforms.uAspect.value = size.width / size.height;
@@ -97,7 +98,7 @@ function Backdrop({ step, clock, world, spacing }: Pick<Props, 'step' | 'clock' 
   return <mesh material={material} frustumCulled={false} renderOrder={-10}><planeGeometry args={[2, 2]} /></mesh>;
 }
 
-function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world, spacing, visible }: { item: Item; index: number; maximum: number; spacing: number; visible: boolean; labels: Labels; signed: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world'>) {
+function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world, spacing, visible, renderIndex }: { item: Item; index: number; maximum: number; spacing: number; visible: boolean; labels: Labels; signed: boolean; renderIndex: number } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world'>) {
   const mesh = useRef<Mesh>(null);
   const ring = useRef<Mesh>(null);
   const space = world === 'space';
@@ -177,12 +178,14 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
   const targetColor = useMemo(() => new Color(), []);
   const settled = useMemo(() => new Color(space ? '#8faf9d' : '#74886d'), [space]);
   useFrame((_, delta) => {
+    // Keep the last complete frame until React commits the matching trace step.
     if (!mesh.current) return;
-    if (space && visible) spinTime.current += Math.min(delta, 0.1) * 1000;
     const state = clock.current;
     const from = previous.array.findIndex((entry) => entry.id === item.id);
     const moving = state.index < state.length - 1 && state.animate && from >= 0 && from !== index && previous.array.length === step.array.length;
-    const time = moving ? Math.min(1, state.elapsed / BUBBLE_SWAP_MS) : 1;
+    const time = traceTransitionTime(state, renderIndex, moving);
+    if (time === undefined) return;
+    if (space && visible) spinTime.current += Math.min(delta, 0.1) * 1000;
     const progress = springProgress(time);
     const arc = moving ? Math.sin(time * Math.PI) : 0;
     const oldX = position(from < 0 ? index : from, step.array.length, spacing);
@@ -226,13 +229,13 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     const indexLabel = label?.querySelector<HTMLElement>('.bubble-index');
     if (indexLabel) {
       anchor.set(position(index, step.array.length, spacing), signed && !space ? -4.4 : -0.55 - (space ? spacing / 2 : 0), 0).project(camera);
-      indexLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${(1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
+      indexLabel.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px, ${space ? size.height - 18 : (1 - anchor.y) * size.height / 2}px) translate(-50%, -50%)`;
     }
   });
-  return <><mesh ref={mesh} geometry={geometry} material={material} castShadow position={[position(index, step.array.length, spacing), Math.sign(item.value || 1) * stoneHeight / 2, 0]} />{space && item.id % 3 === 0 && <mesh ref={ring}><ringGeometry args={[radius * 1.3, radius * 1.7, 80]} /><meshStandardMaterial color="#82968c" side={DoubleSide} transparent opacity={0.25} depthWrite={false} roughness={1} /></mesh>}<sprite ref={number} material={text.material} scale={[text.width, 0.38, 1]} /></>;
+  return <><mesh ref={mesh} geometry={geometry} material={material} castShadow />{space && item.id % 3 === 0 && <mesh ref={ring}><ringGeometry args={[radius * 1.3, radius * 1.7, 80]} /><meshStandardMaterial color="#82968c" side={DoubleSide} transparent opacity={0.25} depthWrite={false} roughness={1} /></mesh>}<sprite ref={number} material={text.material} scale={[text.width, 0.38, 1]} /></>;
 }
 
-function Dust({ step, maximum, clock, world, spacing }: Pick<Props, 'step' | 'clock' | 'world'> & { maximum: number; spacing: number }) {
+function Dust({ step, maximum, clock, world, spacing, renderIndex }: Pick<Props, 'step' | 'clock' | 'world'> & { maximum: number; spacing: number; renderIndex: number }) {
   const points = useRef<Points>(null);
   const { size } = useThree();
   const perStone = size.width < 500 ? 36 : 72;
@@ -265,6 +268,7 @@ function Dust({ step, maximum, clock, world, spacing }: Pick<Props, 'step' | 'cl
   useFrame(() => {
     if (!points.current) return;
     const state = clock.current;
+    if (state.index !== renderIndex) return;
     const eroding = state.phase === 'erode' || state.phase === 'form';
     const swapping = state.phase === 'sort' && step.type === 'swap' && state.animate;
     points.current.visible = eroding || swapping;
@@ -292,10 +296,11 @@ export class SceneBoundary extends Component<{ children: ReactNode; fallback: Re
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-export default function BubbleScene({ step, previous, clock, language, reduced, view, world = 'clay' }: Props) {
+export default function BubbleScene({ step, previous, clock, language, reduced, view, world = 'clay', zoom = 1, index: traceIndex }: Props) {
   const [lost, setLost] = useState(false);
   const { sceneRef, visible } = useSceneVisibility(world === 'space' && !reduced && !lost);
   const labels = useRef(new Map<number, HTMLLIElement>());
+  const renderIndex = traceIndex ?? clock.current.index;
   const maximum = Math.max(1, ...step.array.map((item) => Math.abs(item.value)));
   const spacing = world === 'space' ? planetSpacing(step.array.map((item) => item.value), maximum) : 1.12;
   const signed = step.array.some((item) => item.value < 0);
@@ -304,7 +309,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
   if (reduced || lost) return fallback;
   return <div ref={sceneRef} className="bubble-art" data-view={view} data-world={world} data-spinning={visible}>
     <div className="bubble-art-scroll">
-      <div className="bubble-art-frame" style={{ minWidth: Math.max(280, step.array.length * slotWidth) }}>
+      <div className="bubble-art-frame" style={{ width: `${Math.max(1, zoom) * 100}%`, minWidth: Math.max(280, step.array.length * slotWidth) * zoom }}>
         <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
           <div className="bubble-canvas" aria-hidden="true">
             <Canvas orthographic frameloop={world === 'space' && !visible ? 'demand' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, 5.1, 10], zoom: 60 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => {
@@ -312,16 +317,16 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
               gl.setClearColor(world === 'space' ? '#0b1012' : '#f0efe7');
               gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
             }}>
-              <Camera spacing={spacing} count={step.array.length} signed={signed} view={view} world={world} />
-              <Backdrop spacing={spacing} step={step} clock={clock} world={world} />
+              <Camera zoom={zoom} spacing={spacing} count={step.array.length} signed={signed} view={view} world={world} />
+              <Backdrop renderIndex={renderIndex} spacing={spacing} step={step} clock={clock} world={world} />
               <ambientLight intensity={world === 'space' ? 0.55 : 1.2} color="#f5efe3" />
               <directionalLight position={[-3, 10, 4]} intensity={world === 'space' ? 3.8 : 2.8} color="#fff6e6" castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-Math.max(8, step.array.length * 0.65)} shadow-camera-right={Math.max(8, step.array.length * 0.65)} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-radius={8} shadow-blurSamples={16} />
               <directionalLight position={[4, 3, -3]} intensity={world === 'space' ? 1.1 : 0.8} color="#b9c9b5" />
               <mesh visible={world !== 'space' && view === '3d'} rotation={[-Math.PI / 2, 0, 0]} position={[0, signed ? -3.3 : -0.015, 0]} receiveShadow>
                 <planeGeometry args={[100, 100]} /><shadowMaterial color="#41503e" opacity={0.14} />
               </mesh>
-              {step.array.map((item, index) => <Stone visible={visible} spacing={spacing} key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
-              <Dust spacing={spacing} step={step} maximum={maximum} clock={clock} world={world} />
+              {step.array.map((item, index) => <Stone renderIndex={renderIndex} visible={visible} spacing={spacing} key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
+              <Dust renderIndex={renderIndex} spacing={spacing} step={step} maximum={maximum} clock={clock} world={world} />
             </Canvas>
           </div>
         </SceneBoundary>
