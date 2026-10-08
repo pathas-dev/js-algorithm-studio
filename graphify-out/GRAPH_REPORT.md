@@ -1,33 +1,33 @@
-# Graph Report - js-algorithm-studio  (2026-10-08)
+# Graph Report - javascript-algorithms-visualizer  (2026-10-08)
 
 ## Corpus Check
-- 717 files · ~551,097 words
+- 723 files · ~555,900 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 14 file(s) not represented in the graph (top: (none) 7, .css 5, .ico 1)
+- Unclassified: 15 file(s) not represented in the graph (top: (none) 7, .css 5, .toml 1)
 
 ## Summary
-- 2841 nodes · 5362 edges · 235 communities (178 shown, 57 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 158 edges (avg confidence: 0.88)
+- 2868 nodes · 5452 edges · 216 communities (164 shown, 52 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 160 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c015943b`
+- Built from commit: `abb79820`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- GraphVertex
+- graph.js
 - algorithms.ts
 - playback.test.js
-- Comparator
+- Heap
 - math-algorithms.ts
 - puzzle-algorithms.ts
 - resizeImageWidth.js
 - dynamic.js
-- cryptography-algorithms.ts
+- strings.js
 - math.js
 - LessonView.tsx
-- strings.js
+- GraphScene.tsx
 - ComplexNumber
 - App.tsx
 - package.json
@@ -37,11 +37,11 @@
 - 기본 연산에 대한 수도코드
 - DisjointSet
 - recordStep
-- BubbleScene.tsx
-- traversal-algorithms.ts
+- Landing.tsx
+- Comparator
 - DoublyLinkedList
-- recordGraphStep
-- Graph
+- BubbleScene.tsx
+- bubble-motion.ts
 - collection-algorithms.ts
 - Dijkstra's Algorithm
 - Deque
@@ -53,32 +53,32 @@
 - 이젠 아무래도 좋을 알고리즘
 - Stack
 - Best Time to Buy and Sell Stock
-- README.ko-KR.md
-- check-docs.mjs
+- strongly-connected-components/README.ko-KR.md
+- react
 - bitsToFloat.test.js
 - BinaryTreeNode
-- Queue
+- recordStep.js
 - traceBits
-- SortTester.js
-- validation.test.js
+- HanoiScene.tsx
+- collections.js
 - LRU 캐시 알고리즘
 - structures.js
 - multiply.js
-- recordStep.js
+- SegmentTree
 - Basic Operations
 - Jump Game
 - BloomFilter
 - Bloom Filter
+- TrieNode
 - HashTable
-- trie.js
-- PuzzleView.tsx
+- PriorityQueue
 - compilerOptions
 - Design System: 이젠 아무래도 좋을 알고리즘
 - factorial
 - Operations on matrices
 - nQueens.js
 - Doubly Linked List
-- Knapsack
+- stack/README.ko-KR.md
 - Algorithms
 - Pseudocode for Basic Operations
 - range.js
@@ -94,7 +94,7 @@
 - Levenshtein Distance
 - Rain Terraces (Trapping Rain Water) Problem
 - LRUCache
-- graph.js
+- squareRoot
 - puzzles.js
 - Hill Cipher
 - Polynomial Rolling Hash
@@ -107,7 +107,7 @@
 - Permutations
 - Rabin Karp Algorithm
 - Square Matrix In-Place Rotation
-- BinarySearchTree
+- BinarySearchTreeNode
 - Binary Search Tree
 - dependencies
 - Caesar Cipher Algorithm
@@ -130,9 +130,8 @@
 - N-Queens Problem
 - Recursive Staircase Problem
 - Doubly Linked List
-- CodePanel.tsx
+- dpLongestIncreasingSubsequence.js
 - Binary representation of floating-point numbers
-- euclideanAlgorithm
 - k-Means Algorithm
 - Binary Search
 - Interpolation Search
@@ -152,7 +151,6 @@
 - Breadth-First Search (BFS)
 - Disjoint Set
 - Heap (data-structure)
-- traversals.js
 - avl-tree/README.ko-KR.md
 - fenwick-tree/README.ko-KR.md
 - red-black-tree/README.ko-KR.md
@@ -165,7 +163,6 @@
 - bridges/README.ko-KR.md
 - graph/depth-first-search/README.ko-KR.md
 - eulerian-path/README.ko-KR.md
-- Algorithm
 - travelling-salesman/README.ko-KR.md
 - reverse-traversal/README.ko-KR.md
 - traversal/README.ko-KR.md
@@ -184,33 +181,23 @@
 - Knuth–Morris–Pratt Algorithm
 - tree/depth-first-search/README.ko-KR.md
 - hanoi-tower/README.ko-KR.md
-- knight-tour/README.ko-KR.md
+- README.ko-KR.md
 - DisjointSetAdhoc
 - graph/README.ko-KR.md
 - tree/README.ko-KR.md
 - If uncle is BLACK
 - SimplePolynomialHash
 - bitsDiff.js
-- liuHui.js
-- hash-table/README.ko-KR.md
 - queue/README.ko-KR.md
 - trie/README.ko-KR.md
 - vercel.json
 - Project Backers
-- RadixSort
-- combinationSum.js
-- depthFirstSearch
-- 알고리즘 실험 공간
+- validation.test.js
 - All lesson observatories
-- reverseTraversal.js
-- hornerMethod.js
-- vite
+- hornerMethod.test.js
 - dcMaximumSubarraySum
-- dpMaximumSubarray.js
 - btPowerSetRecursive
 - nQueensBitwiseRecursive
-- engines
-- repository
 - bits/isPowerOfTwo.js
 - multiplyUnsigned.js
 - switchSign.js
@@ -237,19 +224,13 @@
 - CONTRIBUTING.md
 - bubble-space.md
 - landing-space.md
-- numeric.js
 - knightTour.js
 - fisher-yates/README.ko-KR.md
-- hamiltonianCycle.js
 - primeFactors.js
 - weighted-random/README.ko-KR.md
 - squareMatrixRotation.js
-- step-action.js
-- bwPowerSet.js
 - dpUniquePaths.js
 - fastPowering
-- interpolationSearch.js
-- fisherYates.test.js
 
 ## God Nodes (most connected - your core abstractions)
 1. `recordStep()` - 196 edges
@@ -258,9 +239,9 @@
 4. `Comparator` - 35 edges
 5. `recordGraphStep()` - 34 edges
 6. `GraphEdge` - 33 edges
-7. `Step` - 32 edges
-8. `PlanetMark()` - 31 edges
-9. `Language` - 31 edges
+7. `Step` - 33 edges
+8. `Language` - 32 edges
+9. `PlanetMark()` - 31 edges
 10. `LinkedList` - 28 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -278,23 +259,19 @@
 ## Import Cycles
 - None detected.
 
-## Communities (235 total, 57 thin omitted)
+## Communities (216 total, 52 thin omitted)
 
-### Community 0 - "GraphVertex"
-Cohesion: 0.13
-Nodes (4): findEulerianPathInNotEulerianGraph(), GraphEdge, GraphVertex, createEmptyVertex()
+### Community 0 - "graph.js"
+Cohesion: 0.05
+Nodes (58): articulationPoints(), visit(), bellmanFord(), graphBridges(), visit(), depthFirstSearch(), depthFirstSearchRecursive(), initCallbacks() (+50 more)
 
 ### Community 1 - "algorithms.ts"
 Cohesion: 0.02
 Nodes (60): AlgorithmConfig, articulation, avlTree, bellman, bfs, binary, binarySearchTree, bloomFilter (+52 more)
 
 ### Community 2 - "playback.test.js"
-Cohesion: 0.14
-Nodes (9): BubbleSort, HeapSort, InsertionSort, QuickSort, QuickSortInPlace, SelectionSort, ShellSort, Sort (+1 more)
-
-### Community 3 - "Comparator"
-Cohesion: 0.07
-Nodes (8): binarySearch(), jumpSearch(), linearSearch(), Heap, MaxHeap, MinHeap, PriorityQueue, Comparator
+Cohesion: 0.05
+Nodes (26): interpolationSearch(), fisherYates(), Knapsack, BubbleSort, BucketSort(), CountingSort, HeapSort, InsertionSort (+18 more)
 
 ### Community 4 - "math-algorithms.ts"
 Cohesion: 0.04
@@ -309,36 +286,36 @@ Cohesion: 0.07
 Nodes (35): pngjs, Calculating the energy map, Calculating the pixel's energy, Content-aware image resizing, Content-aware image resizing in JavaScript, Content-aware width resizing (the entry function), Finding the seam with the lowest energy (Dynamic Programming approach), How Seam Carving algorithms works (+27 more)
 
 ### Community 7 - "dynamic.js"
-Cohesion: 0.16
-Nodes (11): longestCommonSubsequence(), shortestCommonSupersequence(), levenshteinDistance(), longestCommonSubstring(), regularExpressionMatching(), requireDpStrings(), traceEditDistance(), traceLcs() (+3 more)
+Cohesion: 0.11
+Nodes (13): KnapsackItem, longestCommonSubsequence(), shortestCommonSupersequence(), levenshteinDistance(), longestCommonSubstring(), regularExpressionMatching(), requireDpStrings(), traceEditDistance() (+5 more)
 
-### Community 8 - "cryptography-algorithms.ts"
-Cohesion: 0.09
-Nodes (27): caesarCipherDecrypt(), caesarCipherEncrypt(), englishAlphabet, getCipherMap(), alphabetCodeShift, generateKeyMatrix(), generateMessageVector(), hillCipherDecrypt() (+19 more)
+### Community 8 - "strings.js"
+Cohesion: 0.05
+Nodes (44): caesarCipherDecrypt(), caesarCipherEncrypt(), englishAlphabet, getCipherMap(), alphabetCodeShift, generateKeyMatrix(), generateMessageVector(), hillCipherDecrypt() (+36 more)
 
 ### Community 9 - "math.js"
-Cohesion: 0.09
-Nodes (27): fibonacciNth(), integerPartition(), pascalTriangleRecursive(), trialDivision(), degreeToRadian(), sieveOfEratosthenes(), squareRoot(), failingSquareRoot() (+19 more)
+Cohesion: 0.10
+Nodes (25): fibonacciNth(), hornerMethod(), integerPartition(), trialDivision(), degreeToRadian(), sieveOfEratosthenes(), traceDistance(), traceFactorial() (+17 more)
 
 ### Community 10 - "LessonView.tsx"
-Cohesion: 0.15
-Nodes (29): motion, react, Language, Step, ArrayView(), BubbleScene, BloomView(), BucketView() (+21 more)
+Cohesion: 0.11
+Nodes (39): motion, Language, Step, ArrayView(), BubbleScene, BloomView(), BucketView(), ChessView() (+31 more)
 
-### Community 11 - "strings.js"
-Cohesion: 0.13
-Nodes (15): PolynomialHash, hammingDistance(), naiveSearch(), isPalindrome(), rabinKarp(), buildZArray(), SEPARATOR, zAlgorithm() (+7 more)
+### Community 11 - "GraphScene.tsx"
+Cohesion: 0.17
+Nodes (19): @react-three/fiber, three, Camera(), graphCurve(), GraphConnection, GraphPlanet, Camera(), Connection() (+11 more)
 
 ### Community 12 - "ComplexNumber"
 Cohesion: 0.13
 Nodes (10): bitLength(), ComplexNumber, dft(), fastFourierTransform(), reverseBits(), inverseDiscreteFourierTransform(), fourierTestCases, FourierTester (+2 more)
 
 ### Community 13 - "App.tsx"
-Cohesion: 0.13
-Nodes (17): parseEdges(), parseWeightedEdges(), requireEdges(), requireNodes(), requireWeightedEdges(), parseTarget(), parseValues(), algorithms (+9 more)
+Cohesion: 0.09
+Nodes (17): shiki, bubbleAction(), parseTarget(), parseValues(), stepAction(), algorithms, bubble, App() (+9 more)
 
 ### Community 14 - "package.json"
-Cohesion: 0.07
-Nodes (28): author, bugs, url, contributors, description, homepage, keywords, license (+20 more)
+Cohesion: 0.06
+Nodes (34): author, bugs, url, contributors, description, engines, node, pnpm (+26 more)
 
 ### Community 15 - "Bit Manipulation"
 Cohesion: 0.07
@@ -347,6 +324,10 @@ Nodes (25): Bit Manipulation, Clear Bit, Count Bits of a Number, Count Bits to F
 ### Community 16 - "weightedRandom"
 Cohesion: 0.31
 Nodes (7): Applications of Weighted Random, Implementation, The Algorithm, Weighted Random, What is "Weighted Random", weightedRandom(), traceWeighted()
+
+### Community 17 - "RedBlackTree"
+Cohesion: 0.16
+Nodes (3): BinarySearchTree, RED_BLACK_TREE_COLORS, RedBlackTree
 
 ### Community 18 - "기본 연산에 대한 수도코드"
 Cohesion: 0.08
@@ -357,28 +338,28 @@ Cohesion: 0.15
 Nodes (5): detectUndirectedCycleUsingDisjointSet(), DisjointSet, DisjointSetItem, checkNotExistingSets(), mergeNotExistingSets()
 
 ### Community 20 - "recordStep"
-Cohesion: 0.28
-Nodes (5): BucketSort(), buildPatternTable(), knuthMorrisPratt(), AvlTree, recordStep()
-
-### Community 21 - "BubbleScene.tsx"
-Cohesion: 0.06
-Nodes (63): @react-three/fiber, three, bubble, Item, axialAngle(), orbitalSwap(), planetRadius(), planetSpacing() (+55 more)
-
-### Community 22 - "traversal-algorithms.ts"
 Cohesion: 0.18
-Nodes (6): NumericAlgorithm, listForwardLesson, listReverseLesson, traversalAlgorithms, treeBfsLesson, treeDfsLesson
+Nodes (8): euclideanAlgorithm(), leastCommonMultiple(), getNGonSideCount(), getNGonSideLength(), liuHui(), pascalTriangleRecursive(), AvlTree, recordStep()
+
+### Community 21 - "Landing.tsx"
+Cohesion: 0.14
+Nodes (19): workStar(), Camera(), Cluster(), ComplexityScene(), Arrow(), BubbleScene, ComplexityScene, examples (+11 more)
+
+### Community 22 - "Comparator"
+Cohesion: 0.19
+Nodes (4): binarySearch(), jumpSearch(), linearSearch(), Comparator
 
 ### Community 23 - "DoublyLinkedList"
 Cohesion: 0.13
 Nodes (3): 구현과 참고 자료, DoublyLinkedList, DoublyLinkedListNode
 
-### Community 24 - "recordGraphStep"
-Cohesion: 0.14
-Nodes (20): articulationPoints(), visit(), graphBridges(), visit(), depthFirstSearch(), depthFirstSearchRecursive(), initCallbacks(), detectDirectedCycle() (+12 more)
+### Community 24 - "BubbleScene.tsx"
+Cohesion: 0.22
+Nodes (18): Item, axialAngle(), planetRadius(), planetSpacing(), springProgress(), arrayHome, arrayTarget, Backdrop() (+10 more)
 
-### Community 25 - "Graph"
-Cohesion: 0.20
-Nodes (9): kruskal(), applyPrimToDirectedGraph(), prim(), applyPrimToDirectedGraph(), Graph, addSameEdgeTwice(), deleteNotExistingEdge(), traceGraphStructure() (+1 more)
+### Community 25 - "bubble-motion.ts"
+Cohesion: 0.24
+Nodes (12): orbitalSwap(), planetTransfer(), advanceBubblePlayback(), BUBBLE_PHASE_MS, BUBBLE_STEP_MS, BUBBLE_SWAP_MS, BubbleAction, BubblePhase (+4 more)
 
 ### Community 26 - "collection-algorithms.ts"
 Cohesion: 0.10
@@ -392,13 +373,17 @@ Nodes (16): Dijkstra's Algorithm, Implementation example, Implementation notes, 
 Cohesion: 0.25
 Nodes (9): Deque, Complexity, Deque (Double-Ended Queue), Implementation Note, 덱 (양방향 큐), 예제·수식·시각 자료, Operations, References (+1 more)
 
+### Community 29 - "LinkedList"
+Cohesion: 0.05
+Nodes (25): breadthFirstSearch(), initCallbacks(), reverseTraversal(), reverseTraversalRecursive(), traversal(), breadthFirstSearch(), initCallbacks(), depthFirstSearch() (+17 more)
+
 ### Community 30 - "devDependencies"
 Cohesion: 0.11
 Nodes (19): devDependencies, @babel/cli, @babel/preset-env, eslint, eslint-config-airbnb, eslint-plugin-import, eslint-plugin-jest, eslint-plugin-jsx-a11y (+11 more)
 
 ### Community 31 - "Matrix.js"
-Cohesion: 0.14
-Nodes (22): euclideanDistance(), add(), dot(), generate(), getCellAtIndex(), mul(), shape(), sub() (+14 more)
+Cohesion: 0.18
+Nodes (19): euclideanDistance(), add(), dot(), generate(), getCellAtIndex(), mul(), shape(), sub() (+11 more)
 
 ### Community 34 - "이젠 아무래도 좋을 알고리즘"
 Cohesion: 0.11
@@ -412,33 +397,29 @@ Nodes (6): hashTable, isValid(), hanoiTower(), hanoiTowerRecursive(), Stack, tra
 Cohesion: 0.11
 Nodes (16): Accumulator Approach `O(n)`, Additional Space Complexity, Additional Space Complexity, Additional Space Complexity, Best Time to Buy and Sell Stock, Divide and conquer approach `O(2^n)`, 구현과 참고 자료, 예제·수식·시각 자료 (+8 more)
 
-### Community 37 - "README.ko-KR.md"
-Cohesion: 0.11
-Nodes (11): 강한 연결 요소, 구현과 참고 자료, 예제·수식·시각 자료, References, Strongly Connected Component, 단순 문자열 검색, Naive string search, 스택 (+3 more)
+### Community 37 - "strongly-connected-components/README.ko-KR.md"
+Cohesion: 0.29
+Nodes (5): 강한 연결 요소, 구현과 참고 자료, 예제·수식·시각 자료, References, Strongly Connected Component
 
-### Community 38 - "check-docs.mjs"
-Cohesion: 0.22
-Nodes (4): @vitejs/plugin-react-swc, check(), errors, root
+### Community 38 - "react"
+Cohesion: 0.13
+Nodes (10): @mantine/core, react, react-dom, vite, @vitejs/plugin-react-swc, check(), errors, root (+2 more)
 
 ### Community 39 - "bitsToFloat.test.js"
 Cohesion: 0.25
 Nodes (11): bitsToFloat(), bitsToFloat16(), bitsToFloat32(), bitsToFloat64(), precisionConfigs, floatAs32BinaryString(), floatAs64BinaryString(), floatAsBinaryString() (+3 more)
 
-### Community 41 - "Queue"
-Cohesion: 0.20
-Nodes (5): breadthFirstSearch(), initCallbacks(), breadthFirstSearch(), initCallbacks(), Queue
-
 ### Community 42 - "traceBits"
 Cohesion: 0.18
 Nodes (6): clearBit(), fullAdder(), getBit(), setBit(), updateBit(), traceBits()
 
-### Community 43 - "SortTester.js"
-Cohesion: 0.25
-Nodes (7): equalArr, negativeArr, negativeArrSorted, notSortedArr, reverseArr, sortedArr, SortTester
+### Community 43 - "HanoiScene.tsx"
+Cohesion: 0.24
+Nodes (9): traceTransitionTime(), SceneBoundary, Camera(), hanoiPosition(), hanoiPositions(), HanoiScene(), Ring(), RingPosition (+1 more)
 
-### Community 44 - "validation.test.js"
-Cohesion: 0.23
-Nodes (11): cartesianProduct(), combineWithoutRepetitions(), dpLongestIncreasingSubsequence(), traceCartesian(), traceCombinations(), traceCombinationSum(), traceLis(), traceMaximumSubarray() (+3 more)
+### Community 44 - "collections.js"
+Cohesion: 0.20
+Nodes (11): cartesianProduct(), dpMaximumSubarray(), bwPowerSet(), traceCartesian(), traceCombinations(), traceCombinationSum(), traceMaximumSubarray(), tracePermutations() (+3 more)
 
 ### Community 45 - "LRU 캐시 알고리즘"
 Cohesion: 0.12
@@ -464,17 +445,9 @@ Nodes (12): Approach 1: Backtracking, Approach 2: Dynamic Programming Top-down, 
 Cohesion: 0.14
 Nodes (12): Algorithm description, Applications, Bloom Filter, False Positives, Insertion, 구현과 참고 자료, 블룸 필터, 예제·수식·시각 자료 (+4 more)
 
-### Community 53 - "HashTable"
-Cohesion: 0.09
-Nodes (3): HashTable, Trie, TrieNode
-
-### Community 54 - "trie.js"
-Cohesion: 0.62
-Nodes (4): traceHashTable(), parseWord(), parseWords(), traceTrie()
-
-### Community 55 - "PuzzleView.tsx"
-Cohesion: 0.24
-Nodes (9): ChessView(), DpView(), ParenthesesView(), HanoiScene, PuzzleView(), RainView(), StockView(), display() (+1 more)
+### Community 54 - "HashTable"
+Cohesion: 0.18
+Nodes (5): HashTable, traceHashTable(), parseWord(), parseWords(), traceTrie()
 
 ### Community 56 - "compilerOptions"
 Cohesion: 0.14
@@ -482,11 +455,11 @@ Nodes (13): compilerOptions, allowJs, esModuleInterop, jsx, lib, module, moduleR
 
 ### Community 57 - "Design System: 이젠 아무래도 좋을 알고리즘"
 Cohesion: 0.15
-Nodes (12): Colors, Components, Design System: 이젠 아무래도 좋을 알고리즘, Do's and Don'ts, Elevation & Depth, Layout, Native sky, loading and identity, Overview (+4 more)
+Nodes (12): Colors, Components, Design System: 이젠 아무래도 좋을 알고리즘, Do's and Don'ts, Elevation & Depth, Graph observatory, planar maps, coordinate records and Hanoi, Layout, Native sky, loading and identity (+4 more)
 
 ### Community 58 - "factorial"
-Cohesion: 0.29
-Nodes (4): factorial(), combineWithRepetitions(), permutateWithoutRepetitions(), playground()
+Cohesion: 0.18
+Nodes (7): factorial(), combineWithRepetitions(), permutateWithoutRepetitions(), playground(), 알고리즘 실험 공간, 예제·수식·시각 자료, Playground
 
 ### Community 59 - "Operations on matrices"
 Cohesion: 0.15
@@ -500,9 +473,9 @@ Nodes (5): isSafe(), nQueens(), nQueensRecursive(), QueenPosition, Bitwise Solut
 Cohesion: 0.15
 Nodes (9): Doubly Linked List, 공간 복잡도, 기본 동작을 위한 Pseudocode, 복잡도, 삭제, 삽입, 시간 복잡도, 역순회 (+1 more)
 
-### Community 62 - "Knapsack"
-Cohesion: 0.13
-Nodes (4): Knapsack, KnapsackItem, MergeSort, traceKnapsack()
+### Community 62 - "stack/README.ko-KR.md"
+Cohesion: 0.33
+Nodes (4): 스택, 참조, References, Stack
 
 ### Community 63 - "Algorithms"
 Cohesion: 0.17
@@ -525,8 +498,8 @@ Cohesion: 0.18
 Nodes (11): Big O 표기, 알고리즘, 유용한 정보, 이젠 아무래도 좋을 알고리즘 · 알고리즘 설명 목록, 자료 구조, 자료 구조 작업별 복잡도, 정렬 알고리즘 복잡도, 주제별 알고리즘 (+3 more)
 
 ### Community 68 - "playback.js"
-Cohesion: 0.32
-Nodes (5): algorithmCode(), MAX_VALUES, playbackReducer(), requireSorted(), traceDisjointSet()
+Cohesion: 0.11
+Nodes (16): traceBfs(), traceDfs(), algorithmCode(), MAX_VALUES, playbackReducer(), requireSorted(), traceDisjointSet(), Algorithm (+8 more)
 
 ### Community 69 - "Detect Cycle in Graphs"
 Cohesion: 0.18
@@ -559,10 +532,6 @@ Nodes (9): Applications, Definition, Dynamic Programming Approach Explanation, E
 ### Community 76 - "Rain Terraces (Trapping Rain Water) Problem"
 Cohesion: 0.18
 Nodes (9): Approach 1: Brute force, Approach 2: Dynamic Programming, Examples, 구현과 참고 자료, 빗물 가두기, 예제·수식·시각 자료, Rain Terraces (Trapping Rain Water) Problem, References (+1 more)
-
-### Community 78 - "graph.js"
-Cohesion: 0.22
-Nodes (18): bellmanFord(), floydWarshall(), traceArticulation(), traceBellmanFord(), traceBfs(), traceBridges(), traceCycle(), traceDfs() (+10 more)
 
 ### Community 79 - "puzzles.js"
 Cohesion: 0.19
@@ -607,10 +576,6 @@ Nodes (8): Algorithm, Application, Complexity, Hash Function Used, 구현과 참
 ### Community 90 - "Square Matrix In-Place Rotation"
 Cohesion: 0.20
 Nodes (8): Algorithm, Examples, 구현과 참고 자료, 예제·수식·시각 자료, 정사각 행렬의 제자리 회전, References, Square Matrix In-Place Rotation, The Problem
-
-### Community 91 - "BinarySearchTree"
-Cohesion: 0.14
-Nodes (4): BinarySearchTree, BinarySearchTreeNode, removeNotExistingElementFromTree(), RED_BLACK_TREE_COLORS
 
 ### Community 92 - "Binary Search Tree"
 Cohesion: 0.20
@@ -780,10 +745,6 @@ Nodes (6): Disjoint Set, Implementation, 구현과 참고 자료, 서로소 집�
 Cohesion: 0.25
 Nodes (6): Heap (data-structure), Implementation, 참조, 힙 (자료구조), References, Time Complexities
 
-### Community 136 - "traversals.js"
-Cohesion: 0.38
-Nodes (7): traversal(), traceList(), traceListForward(), traceListReverse(), traceTree(), traceTreeBfs(), traceTreeDfs()
-
 ### Community 137 - "avl-tree/README.ko-KR.md"
 Cohesion: 0.25
 Nodes (6): AVL Tree, AVL Tree Rotations, AVL 트리, 구현과 참고 자료, 예제·수식·시각 자료, References
@@ -831,10 +792,6 @@ Nodes (5): Depth-First Search (DFS), 구현과 참고 자료, 깊이 우선 탐�
 ### Community 148 - "eulerian-path/README.ko-KR.md"
 Cohesion: 0.29
 Nodes (5): Eulerian Path, 구현과 참고 자료, 예제·수식·시각 자료, 오일러 경로, References
-
-### Community 149 - "Algorithm"
-Cohesion: 0.22
-Nodes (6): Algorithm, TextAlgorithm, imageAlgorithms, seam, statisticsAlgorithms, weighted
 
 ### Community 150 - "travelling-salesman/README.ko-KR.md"
 Cohesion: 0.29
@@ -908,9 +865,9 @@ Nodes (5): Depth-First Search (DFS), 구현과 참고 자료, 예제·수식·�
 Cohesion: 0.29
 Nodes (5): 구현과 참고 자료, 예제·수식·시각 자료, 하노이의 탑, References, Tower of Hanoi
 
-### Community 168 - "knight-tour/README.ko-KR.md"
-Cohesion: 0.29
-Nodes (5): Knight's Tour, 구현과 참고 자료, 나이트 투어, 예제·수식·시각 자료, References
+### Community 168 - "README.ko-KR.md"
+Cohesion: 0.11
+Nodes (11): 단순 문자열 검색, Naive string search, Knight's Tour, 구현과 참고 자료, 나이트 투어, 예제·수식·시각 자료, References, Hash Table (+3 more)
 
 ### Community 170 - "graph/README.ko-KR.md"
 Cohesion: 0.29
@@ -923,14 +880,6 @@ Nodes (5): 구현과 참고 자료, 예제·수식·시각 자료, 트리, Refer
 ### Community 172 - "If uncle is BLACK"
 Cohesion: 0.29
 Nodes (7): Balancing during insertion, If uncle is BLACK, If uncle is RED, Left Left Case (See g, p and x), Left Right Case (See g, p and x), Right Left Case (See g, p and x), Right Right Case (See g, p and x)
-
-### Community 175 - "liuHui.js"
-Cohesion: 0.70
-Nodes (3): getNGonSideCount(), getNGonSideLength(), liuHui()
-
-### Community 176 - "hash-table/README.ko-KR.md"
-Cohesion: 0.33
-Nodes (4): Hash Table, Hash Table, 참고, References
 
 ### Community 177 - "queue/README.ko-KR.md"
 Cohesion: 0.33
@@ -948,33 +897,13 @@ Nodes (5): buildCommand, framework, installCommand, outputDirectory, $schema
 Cohesion: 0.40
 Nodes (4): `O(2ⁿ)` Backers, `O(n²)` Backers, `O(n×log(n))` Backers, Project Backers
 
-### Community 183 - "depthFirstSearch"
-Cohesion: 0.70
-Nodes (3): depthFirstSearch(), depthFirstSearchRecursive(), initCallbacks()
-
-### Community 184 - "알고리즘 실험 공간"
-Cohesion: 0.40
-Nodes (3): 알고리즘 실험 공간, 예제·수식·시각 자료, Playground
+### Community 182 - "validation.test.js"
+Cohesion: 0.48
+Nodes (3): combinationSum(), combinationSumRecursive(), combineWithoutRepetitions()
 
 ### Community 185 - "All lesson observatories"
-Cohesion: 0.50
-Nodes (3): All lesson observatories, Authorized follow-up repairs, Direction contract
-
-### Community 188 - "vite"
-Cohesion: 0.43
-Nodes (3): @mantine/core, react-dom, vite
-
-### Community 193 - "engines"
-Cohesion: 0.67
-Nodes (3): engines, node, pnpm
-
-### Community 194 - "repository"
-Cohesion: 0.67
-Nodes (3): repository, type, url
-
-### Community 221 - "numeric.js"
-Cohesion: 0.50
-Nodes (4): CountingSort, requireIntegers(), traceCounting(), traceRadix()
+Cohesion: 0.33
+Nodes (5): All lesson observatories, Authorized follow-up repairs, Authorized graph and material extension, Authorized sorting orbit and material extension, Direction contract
 
 ### Community 223 - "knightTour.js"
 Cohesion: 0.52
@@ -984,33 +913,29 @@ Nodes (5): getPossibleMoves(), isBoardCompletelyVisited(), isMoveAllowed(), knig
 Cohesion: 0.33
 Nodes (4): Fisher–Yates shuffle, 구현과 참고 자료, 피셔–예이츠 셔플, References
 
-### Community 225 - "hamiltonianCycle.js"
-Cohesion: 0.70
-Nodes (4): hamiltonianCycle(), hamiltonianCycleRecursive(), isCycle(), isSafe()
-
 ### Community 227 - "weighted-random/README.ko-KR.md"
 Cohesion: 0.40
 Nodes (3): 가중 무작위 선택, 구현과 참고 자료, 예제·수식·시각 자료
 
 ## Knowledge Gaps
-- **837 isolated node(s):** `name`, `version`, `description`, `type`, `url` (+832 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1095 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **57 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **844 isolated node(s):** `name`, `version`, `description`, `type`, `url` (+839 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1102 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **52 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `덱 (양방향 큐)` connect `Deque` to `Doubly Linked List`, `DoublyLinkedList`?**
-  _High betweenness centrality (0.332) - this node is a cross-community bridge._
+  _High betweenness centrality (0.340) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `description` to the rest of the system?**
-  _837 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `GraphVertex` be split into smaller, more focused modules?**
-  _Cohesion score 0.12896405919661733 - nodes in this community are weakly interconnected._
+  _844 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `graph.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.05263157894736842 - nodes in this community are weakly interconnected._
 - **Why does `Deque` connect `Deque` to `structures.js`, `DoublyLinkedList`?**
-  _High betweenness centrality (0.253) - this node is a cross-community bridge._
+  _High betweenness centrality (0.258) - this node is a cross-community bridge._
 - **Should `algorithms.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.015503875968992248 - nodes in this community are weakly interconnected._
-- **Why does `recordStep()` connect `recordStep` to `playback.test.js`, `Comparator`, `resizeImageWidth.js`, `dynamic.js`, `cryptography-algorithms.ts`, `math.js`, `strings.js`, `ComplexNumber`, `weightedRandom`, `RedBlackTree`, `DisjointSet`, `DoublyLinkedList`, `recordGraphStep`, `LinkedList`, `Matrix.js`, `Stack`, `Queue`, `validation.test.js`, `liuHui.js`, `recordStep.js`, `BloomFilter`, `HashTable`, `combinationSum.js`, `factorial`, `reverseTraversal.js`, `hornerMethod.js`, `nQueens.js`, `Knapsack`, `dpMaximumSubarray.js`, `range.js`, `graph.js`, `puzzles.js`, `BinarySearchTree`, `knightTour.js`, `primeFactors.js`, `squareMatrixRotation.js`, `bwPowerSet.js`, `dpUniquePaths.js`, `fastPowering`, `interpolationSearch.js`, `fisherYates.test.js`, `euclideanAlgorithm`?**
-  _High betweenness centrality (0.168) - this node is a cross-community bridge._
+- **Why does `recordStep()` connect `recordStep` to `graph.js`, `playback.test.js`, `Heap`, `resizeImageWidth.js`, `dynamic.js`, `strings.js`, `math.js`, `ComplexNumber`, `weightedRandom`, `RedBlackTree`, `DisjointSet`, `Comparator`, `DoublyLinkedList`, `LinkedList`, `Matrix.js`, `Stack`, `recordStep.js`, `collections.js`, `SegmentTree`, `BloomFilter`, `TrieNode`, `validation.test.js`, `HashTable`, `factorial`, `nQueens.js`, `range.js`, `squareRoot`, `puzzles.js`, `BinarySearchTreeNode`, `knightTour.js`, `primeFactors.js`, `squareMatrixRotation.js`, `dpUniquePaths.js`, `fastPowering`, `dpLongestIncreasingSubsequence.js`?**
+  _High betweenness centrality (0.167) - this node is a cross-community bridge._
 - **Should `playback.test.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.13793103448275862 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.052192982456140354 - nodes in this community are weakly interconnected._
