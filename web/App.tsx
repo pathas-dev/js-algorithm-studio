@@ -122,7 +122,7 @@ export default function App() {
   }, [language, algorithm]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (editingInput || whyOpen) return;
+      if (event.defaultPrevented || editingInput || whyOpen) return;
       if (event.altKey || event.ctrlKey || event.metaKey) return;
       if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, a, summary, [role="combobox"]')) return;
       if (event.key === 'ArrowLeft') seek(playback.index - 1);

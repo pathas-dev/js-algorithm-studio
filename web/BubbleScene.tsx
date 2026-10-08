@@ -7,10 +7,11 @@ import type { BubblePlayback } from './bubble-playback';
 import ArrayView from './ArrayView';
 import { springProgress, planetRadius, planetSpacing, planetTransfer, axialAngle, traceTransitionTime } from './bubble-motion';
 import { useSceneVisibility } from './use-scene-visibility';
-import { atmosphereMaterial } from './planet-material';
+import { atmosphereMaterial, planetMaterial } from './planet-material';
+import SceneOrbit from './SceneOrbit';
 import './bubble.css';
 
-type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space'; zoom?: number; index?: number; numeralFont?: 'Manrope' };
+type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space'; zoom?: number; index?: number; numeralFont?: 'Manrope'; interactive?: boolean };
 type Labels = RefObject<Map<number, HTMLLIElement>>;
 const ease = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 const seed = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
@@ -18,22 +19,27 @@ const erosion = (state: BubblePlayback) => state.phase === 'erode' ? state.elaps
 const position = (index: number, length: number, spacing = 1.12) => (index - (length - 1) / 2) * spacing;
 const height = (item: Item, maximum: number) => Math.max(0.16, Math.abs(item.value) / maximum * 3.2);
 
-function Camera({ count, spacing, signed, view, world, zoom = 1 }: { count: number; spacing: number; signed: boolean } & Pick<Props, 'view' | 'world' | 'zoom'>) {
+const arrayHome = [-2.2, 4.05, 12] as const;
+const arrayTarget = [0, .55, 0] as const;
+
+function Camera({ count, spacing, signed, view, world, zoom = 1, interactive, reset, language }: { count: number; spacing: number; signed: boolean; reset: number } & Pick<Props, 'view' | 'world' | 'zoom' | 'interactive' | 'language'>) {
   const { camera, size } = useThree();
   const depth = useRef(view === '3d' ? 1 : 0);
   const target = useMemo(() => new Vector3(0, world === 'space' ? 0.55 : signed ? 0 : 1.25, 0), [signed, world]);
+  const orbiting = world === 'space' && view === '3d' && interactive;
   useEffect(() => {
     const ortho = camera as OrthographicCamera;
     ortho.zoom = Math.min(size.width / zoom / Math.max(7.8, count * spacing + 1.8), size.height / (world === 'space' ? view === '2d' ? 7 : 4.6 : signed ? 9.6 : 5.5)) * zoom;
     ortho.updateProjectionMatrix();
   }, [camera, size.width, size.height, count, spacing, signed, world, view, zoom]);
   useFrame((_, delta) => {
+    if (orbiting) { depth.current = 1; return; }
     depth.current += ((view === '3d' ? 1 : 0) - depth.current) * (1 - Math.exp(-Math.min(delta, 0.1) * 7));
     camera.position.set(-2.2 * depth.current, target.y + 3.5 * depth.current, 12);
     camera.lookAt(target);
     camera.updateMatrixWorld();
   }, -1);
-  return null;
+  return world === 'space' && interactive ? <SceneOrbit home={arrayHome} target={arrayTarget} reset={reset} enabled={orbiting} minPolar={.55} maxPolar={1.35} maxAzimuth={Math.PI / 3} label={language === 'ko' ? '3D 배열 · 드래그 또는 방향키로 회전, Home으로 시점 초기화' : '3D array · drag or use arrow keys to orbit, Home to reset'} /> : null;
 }
 
 function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'step' | 'clock' | 'world'> & { spacing: number; renderIndex: number }) {
@@ -129,7 +135,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
   const { camera, size } = useThree();
   const anchor = useMemo(() => new Vector3(), []);
   const stoneHeight = height(item, maximum);
-  const uniforms = useMemo(() => ({ uErosion: { value: 0 }, uStoneHeight: { value: space ? radius * 2 : stoneHeight }, uPlanetRadius: { value: radius }, uPlanetSeed: { value: item.id }, uPlanetSpin: { value: 0 } }), [stoneHeight, space, radius, item.id]);
+  const uniforms = useMemo(() => ({ uErosion: { value: 0 }, uStoneHeight: { value: space ? radius * 2 : stoneHeight }, uPlanetSpin: { value: 0 } }), [stoneHeight, space, radius]);
   const geometry = useMemo(() => {
     if (space) return new SphereGeometry(radius, 48, 32);
     const shape = new RoundedBoxGeometry(0.78, stoneHeight, 0.7, 4, Math.min(0.065, stoneHeight / 3));
@@ -142,7 +148,8 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     return shape;
   }, [stoneHeight, item.id, radius, space]);
   const material = useMemo(() => {
-    const clay = new MeshStandardMaterial({ color: '#91a28b', roughness: space ? 0.97 : 0.93, metalness: 0 });
+    if (space) return planetMaterial(item.id, uniforms);
+    const clay = new MeshStandardMaterial({ color: '#91a28b', roughness: 0.93, metalness: 0 });
     clay.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, uniforms);
       shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vClay;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvClay = position;');
@@ -151,29 +158,14 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
         uniform float uErosion;
         uniform float uStoneHeight;
         float clayNoise(vec3 p) { return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
-        ${space ? `
-        uniform float uPlanetRadius, uPlanetSeed, uPlanetSpin;
-        float planetNoise(vec3 p) {
-          vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
-          return mix(mix(mix(clayNoise(i),clayNoise(i+vec3(1,0,0)),f.x),mix(clayNoise(i+vec3(0,1,0)),clayNoise(i+vec3(1,1,0)),f.x),f.y),
-                     mix(mix(clayNoise(i+vec3(0,0,1)),clayNoise(i+vec3(1,0,1)),f.x),mix(clayNoise(i+vec3(0,1,1)),clayNoise(i+vec3(1,1,1)),f.x),f.y),f.z);
-        }` : ''}
       `).replace('#include <color_fragment>', `#include <color_fragment>
         float grain = clayNoise(floor(vClay * 180.0));
         float edge = (vClay.y / uStoneHeight + 0.5) * 0.82 + clayNoise(floor(vClay * 18.0)) * 0.18;
         if (uErosion > 0.0 && edge > 1.0 - uErosion) discard;
         diffuseColor.rgb *= 0.97 + grain * 0.045;
-        ${space ? `
-        vec3 surface=vClay/uPlanetRadius;
-        float c=cos(uPlanetSpin), s=sin(uPlanetSpin);
-        surface=vec3(c*surface.x+s*surface.z,surface.y,-s*surface.x+c*surface.z);
-        float terrain=planetNoise(surface*4.0+vec3(uPlanetSeed));
-        float strata=planetNoise(surface*19.0+terrain*2.0);
-        diffuseColor.rgb *= 0.45+terrain*0.65+strata*0.2+grain*0.04;
-        ` : ''}
       `);
     };
-    clay.customProgramCacheKey = () => space ? 'bubble-planets-v3' : 'bubble-clay-v2';
+    clay.customProgramCacheKey = () => 'bubble-clay-v2';
     return clay;
   }, [uniforms, space, radius, item.id]);
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
@@ -213,7 +205,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     targetColor.copy(color).multiplyScalar(outside ? .55 : 1);
     material.color.lerp(targetColor, space ? 1 - Math.exp(-Math.min(delta, 0.1) * 8) : 1);
     material.emissive.copy(material.color);
-    material.emissiveIntensity = view === '2d' ? 0.4 : space ? 0.025 : 0;
+    material.emissiveIntensity = view === '2d' ? 0.4 : space ? 0.12 : 0;
     atmosphere.uniforms.uColor.value.copy(material.color);
     atmosphere.uniforms.uOpacity.value = (active ? .45 : .24) * (1 - ease(uniforms.uErosion.value));
     // Shadows fade with the object, avoiding a solid ghost after erosion.
@@ -228,7 +220,8 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     }
     const label = labels.current.get(item.id);
     if (number.current) {
-      const labelScale = Math.min(Math.max(1, 60 / (camera as OrthographicCamera).zoom), spacing * .85 / text.width);
+      const projectedSpacing = spacing * (space && view === '3d' ? Math.abs(camera.matrixWorld.elements[0]) : 1);
+      const labelScale = Math.min(Math.max(1, 60 / (camera as OrthographicCamera).zoom), projectedSpacing * .85 / text.width);
       number.current.scale.set(text.width * labelScale, 0.38 * labelScale, 1);
       number.current.position.set(mesh.current.position.x, (space ? mesh.current.position.y + radius + 0.26 : Math.sign(item.value || 1) * (stoneHeight + 0.3) + arc * 0.035), mesh.current.position.z + (view === '3d' ? space ? radius * 0.3 : 0.36 : 0.01));
       text.material.opacity = 1 - ease(uniforms.uErosion.value);
@@ -303,8 +296,9 @@ export class SceneBoundary extends Component<{ children: ReactNode; fallback: Re
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-export default function BubbleScene({ step, previous, clock, language, reduced, view, world = 'clay', zoom = 1, index: traceIndex, numeralFont }: Props) {
+export default function BubbleScene({ step, previous, clock, language, reduced, view, world = 'clay', zoom = 1, index: traceIndex, numeralFont, interactive = true }: Props) {
   const [lost, setLost] = useState(false);
+  const [reset, setReset] = useState(0);
   const [fontReady, setFontReady] = useState(false);
   useEffect(() => {
     if (!numeralFont) return;
@@ -320,22 +314,23 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
   const signed = step.array.some((item) => item.value < 0);
   const slotWidth = Math.max(world === 'space' ? 72 : 36, ...step.array.map((item) => String(item.value).length * 9 + 16));
   const fallback = <ArrayView step={step} language={language} orbital={false} planetary={world === 'space'} />;
+  const orbiting = interactive && world === 'space' && view === '3d';
   if (reduced || lost) return fallback;
-  return <div ref={sceneRef} className="bubble-art" data-view={view} data-world={world} data-spinning={visible} data-numerals={numeralFont}>
+  return <div ref={sceneRef} className="bubble-art" data-view={view} data-world={world} data-spinning={visible} data-numerals={numeralFont} data-orbiting={orbiting}>
     <div className="bubble-art-scroll">
       <div className="bubble-art-frame" style={{ width: `${Math.max(1, zoom) * 100}%`, minWidth: Math.max(280, step.array.length * slotWidth) * zoom }}>
         <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
-          <div className="bubble-canvas" aria-hidden="true">
+          <div className="bubble-canvas" aria-hidden={!orbiting}>
             <Canvas orthographic frameloop={world === 'space' && !visible ? 'demand' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, 5.1, 10], zoom: 60 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => {
               gl.shadowMap.type = VSMShadowMap;
               gl.setClearColor(world === 'space' ? '#0b1012' : '#f0efe7');
               gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
             }}>
-              <Camera zoom={zoom} spacing={spacing} count={step.array.length} signed={signed} view={view} world={world} />
+              <Camera zoom={zoom} spacing={spacing} count={step.array.length} signed={signed} view={view} world={world} interactive={interactive} reset={reset} language={language} />
               <Backdrop renderIndex={renderIndex} spacing={spacing} step={step} clock={clock} world={world} />
-              <ambientLight intensity={world === 'space' ? 0.55 : 1.2} color="#f5efe3" />
-              <directionalLight position={[-3, 10, 4]} intensity={world === 'space' ? 3.8 : 2.8} color="#fff6e6" castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-Math.max(8, step.array.length * 0.65)} shadow-camera-right={Math.max(8, step.array.length * 0.65)} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-radius={8} shadow-blurSamples={16} />
-              <directionalLight position={[4, 3, -3]} intensity={world === 'space' ? 1.1 : 0.8} color="#b9c9b5" />
+              <ambientLight intensity={world === 'space' ? 0.65 : 1.2} color={world === 'space' ? '#b9c9b5' : '#f5efe3'} />
+              <directionalLight position={world === 'space' ? [-4, 7, 5] : [-3, 10, 4]} intensity={world === 'space' ? 3.2 : 2.8} color="#fff6e6" castShadow={world !== 'space'} shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} shadow-camera-left={-Math.max(8, step.array.length * 0.65)} shadow-camera-right={Math.max(8, step.array.length * 0.65)} shadow-camera-top={8} shadow-camera-bottom={-8} shadow-radius={8} shadow-blurSamples={16} />
+              <directionalLight position={world === 'space' ? [4, 1, -4] : [4, 3, -3]} intensity={world === 'space' ? 1.4 : 0.8} color="#b9c9b5" />
               <mesh visible={world !== 'space' && view === '3d'} rotation={[-Math.PI / 2, 0, 0]} position={[0, signed ? -3.3 : -0.015, 0]} receiveShadow>
                 <planeGeometry args={[100, 100]} /><shadowMaterial color="#41503e" opacity={0.14} />
               </mesh>
@@ -350,5 +345,6 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
         {!step.array.length && <p className="bubble-empty">{language === 'ko' ? '빈 배열 · 잠깐 쉬어갑니다.' : 'An empty array. A moment of rest.'}</p>}
       </div>
     </div>
+    {orbiting && <div className="bubble-orbit-footer"><p className="graph-help">{language === 'ko' ? '드래그 또는 방향키로 회전' : 'Drag or use arrow keys to orbit'}</p><button className="bubble-size-button" onClick={() => setReset((value) => value + 1)}>{language === 'ko' ? '시점 초기화' : 'Reset view'}</button></div>}
   </div>;
 }

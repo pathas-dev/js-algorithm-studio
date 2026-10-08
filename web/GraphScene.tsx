@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Color, Mesh, OrthographicCamera, Quaternion, ShaderMaterial, Spherical, TubeGeometry, Vector3 } from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Color, Mesh, OrthographicCamera, Quaternion, ShaderMaterial, TubeGeometry, Vector3 } from 'three';
+import SceneOrbit from './SceneOrbit';
 import { SceneBoundary } from './BubbleScene';
 import { useSpaceLesson } from './SpaceLesson';
 import { useSceneVisibility } from './use-scene-visibility';
@@ -13,53 +13,18 @@ import type { Language } from './algorithms';
 
 type Labels = RefObject<Map<string, HTMLSpanElement>>;
 const home = [-1.8, 6.5, 8] as const;
+const target = [0, .25, 0] as const;
 
-function Camera({ reset, reduced, language }: { reset: number; reduced: boolean; language: Language }) {
+function Camera({ reset, language }: { reset: number; language: Language }) {
   const scene = useSpaceLesson()!;
-  const { camera, size, gl, invalidate } = useThree();
-  const orbit = useRef<OrbitControls | null>(null);
-  useEffect(() => {
-    const controls = new OrbitControls(camera, gl.domElement);
-    orbit.current = controls;
-    controls.enableDamping = !reduced;
-    controls.enablePan = false;
-    controls.enableZoom = false;
-    controls.minPolarAngle = .3;
-    controls.maxPolarAngle = 1.35;
-    controls.target.set(0, .25, 0);
-    const changed = () => invalidate();
-    const keydown = (event: KeyboardEvent) => {
-      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home'].includes(event.key)) return;
-      event.preventDefault();
-      if (event.key === 'Home') camera.position.set(...home);
-      else {
-        const spherical = new Spherical().setFromVector3(camera.position.clone().sub(controls.target));
-        spherical.theta += event.key === 'ArrowLeft' ? -.12 : event.key === 'ArrowRight' ? .12 : 0;
-        spherical.phi = Math.max(.3, Math.min(1.35, spherical.phi + (event.key === 'ArrowUp' ? -.1 : event.key === 'ArrowDown' ? .1 : 0)));
-        camera.position.copy(new Vector3().setFromSpherical(spherical).add(controls.target));
-      }
-      controls.update();
-      invalidate();
-    };
-    gl.domElement.tabIndex = 0;
-    gl.domElement.setAttribute('aria-label', language === 'ko' ? '3D 그래프 · 드래그 또는 방향키로 회전, Home으로 시점 초기화' : '3D graph · drag or use arrow keys to orbit, Home to reset');
-    controls.addEventListener('change', changed);
-    gl.domElement.addEventListener('keydown', keydown);
-    return () => { controls.removeEventListener('change', changed); gl.domElement.removeEventListener('keydown', keydown); controls.dispose(); orbit.current = null; };
-  }, [camera, gl, invalidate, reduced, language]);
-  useEffect(() => {
-    camera.position.set(...home);
-    orbit.current?.update();
-    invalidate();
-  }, [camera, reset, invalidate, language]);
+  const { camera, size, invalidate } = useThree();
   useEffect(() => {
     const ortho = camera as OrthographicCamera;
     ortho.zoom = Math.min(size.width / 8.2, size.height / 6.2) * (scene.zoom ?? 1);
     ortho.updateProjectionMatrix();
     invalidate();
   }, [camera, size, scene.zoom, invalidate]);
-  useFrame(() => orbit.current?.update(), -1);
-  return null;
+  return <SceneOrbit home={home} target={target} reset={reset} label={language === 'ko' ? '3D 그래프 · 드래그 또는 방향키로 회전, Home으로 시점 초기화' : '3D graph · drag or use arrow keys to orbit, Home to reset'} />;
 }
 
 function Labels({ nodes, edges, labels, weighted }: { nodes: GraphPlanet[]; edges: GraphConnection[]; labels: Labels; weighted: boolean }) {
@@ -145,7 +110,7 @@ export default function GraphScene({ nodes, edges, language, weighted, fallback 
         gl.setClearColor('#0b1012', 0);
         gl.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); setLost(true); }, { once: true });
       }}>
-        <Camera reset={reset} reduced={scene.reduced} language={language} /><Labels nodes={nodes} edges={edges} labels={labels} weighted={weighted} />
+        <Camera reset={reset} language={language} /><Labels nodes={nodes} edges={edges} labels={labels} weighted={weighted} />
         <ambientLight intensity={.65} color="#b9c9b5" /><directionalLight position={[-4, 7, 5]} intensity={3.2} color="#fff6e6" /><directionalLight position={[4, 1, -4]} intensity={1.4} color="#9bb7a5" />
         {edges.map((edge) => <Connection key={`${edge.from.id}-${edge.to.id}`} edge={edge} />)}
         {nodes.map((node) => <Planet key={node.id} node={node} visible={visible} />)}

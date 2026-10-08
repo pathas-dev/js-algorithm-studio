@@ -63,7 +63,7 @@ export default function Landing() {
         <div className="intro-demo">
           <div className="demo-heading"><span>{t('이웃 궤도를 살펴보는 중', 'Observing neighboring orbits')}</span>{!reduced && <button className="demo-pause" onClick={() => dispatch({ type: 'toggle' })}>{playback.playing ? t('정렬 멈추기', 'Pause sorting') : t('정렬 이어보기', 'Resume sorting')}</button>}</div>
           <a className="demo-open" href={lesson('bubble-sort')} aria-label={t('버블 정렬 시각화 열기', 'Open the bubble sort visualization')}>
-            <div ref={sceneRef} className="demo-scene" data-playing={visible && playback.playing} aria-hidden="true"><Suspense fallback={<div className="demo-loading" />}><BubbleScene index={playback.index} step={step} previous={previous} clock={previewClock} language={language} reduced={reduced} view="3d" world="space" /></Suspense></div>
+            <div ref={sceneRef} className="demo-scene" data-playing={visible && playback.playing} aria-hidden="true"><Suspense fallback={<div className="demo-loading" />}><BubbleScene interactive={false} index={playback.index} step={step} previous={previous} clock={previewClock} language={language} reduced={reduced} view="3d" world="space" /></Suspense></div>
             <div className="demo-explanation"><span className="demo-pair">{pair.length === 2 ? step.type === 'swap' ? <><span>[{pair.join(', ')}]</span><Arrow /><span>[{[...pair].reverse().join(', ')}]</span></> : `${pair[0]} ${pair[0] > pair[1] ? '>' : '≤'} ${pair[1]}` : `[${step.array.map((item) => item.value).join(', ')}]`}</span><p>{bubble.explain(step, language)[0]}</p></div>
             <div className="demo-bottom"><span>{t('이러다 보면, 제자리에 갑니다.', 'Keep at it. They find their places.')}</span><Arrow /></div>
           </a>

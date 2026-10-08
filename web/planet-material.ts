@@ -1,25 +1,30 @@
-import { AdditiveBlending, Color, MeshStandardMaterial, ShaderMaterial } from 'three';
+import { AdditiveBlending, Color, MeshStandardMaterial, ShaderMaterial, type IUniform } from 'three';
 
-export function planetMaterial(seed: number) {
+export function planetMaterial(seed: number, uniforms?: Record<string, IUniform<number>>) {
   const material = new MeshStandardMaterial({ color: '#82968c', roughness: .92, emissive: '#26362e', emissiveIntensity: .12 });
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uSeed = { value: seed * 3.17 };
+    Object.assign(shader.uniforms, { uErosion: { value: 0 }, uStoneHeight: { value: 1 }, uPlanetSpin: { value: 0 } }, uniforms);
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vTerrain;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvTerrain=position;');
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>
       varying vec3 vTerrain;
-      uniform float uSeed;
+      uniform float uSeed, uErosion, uStoneHeight, uPlanetSpin;
       float hashTerrain(vec3 p){return fract(sin(dot(p,vec3(12.9898,78.233,37.719)))*43758.5453);}
       float terrain(vec3 p){vec3 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f);
         return mix(mix(mix(hashTerrain(i),hashTerrain(i+vec3(1,0,0)),f.x),mix(hashTerrain(i+vec3(0,1,0)),hashTerrain(i+vec3(1,1,0)),f.x),f.y),
         mix(mix(hashTerrain(i+vec3(0,0,1)),hashTerrain(i+vec3(1,0,1)),f.x),mix(hashTerrain(i+vec3(0,1,1)),hashTerrain(i+vec3(1,1,1)),f.x),f.y),f.z);}
     `).replace('#include <color_fragment>', `#include <color_fragment>
       vec3 p=normalize(vTerrain);
+      float c=cos(uPlanetSpin),s=sin(uPlanetSpin);
+      p=vec3(c*p.x+s*p.z,p.y,-s*p.x+c*p.z);
+      float erosionEdge=(vTerrain.y/uStoneHeight+.5)*.82+hashTerrain(floor(vTerrain*18.0))*.18;
+      if(uErosion>0.0 && erosionEdge>1.0-uErosion) discard;
       float continents=terrain(p*4.0+uSeed);
       float detail=terrain(p*21.0+continents*2.0);
       diffuseColor.rgb *= .42+continents*.68+detail*.22;
     `);
   };
-  material.customProgramCacheKey = () => 'observatory-terrain-v1';
+  material.customProgramCacheKey = () => 'observatory-terrain-v2';
   return material;
 }
 

@@ -8,6 +8,16 @@ try {
   const { bubble } = await server.ssrLoadModule('/algorithms.ts');
   const { default: ArrayView } = await server.ssrLoadModule('/ArrayView.tsx');
   const { default: SpaceLesson } = await server.ssrLoadModule('/SpaceLesson.tsx');
+  const { default: BubbleScene } = await server.ssrLoadModule('/BubbleScene.tsx');
+  const initialScene = bubble.run([-3, 0, 2.5, -3])[0];
+  const sceneProps = { step: initialScene, previous: initialScene, clock: { current: initialBubblePlayback(3) }, language: 'en', world: 'space', view: '3d', reduced: false };
+  const orbitMarkup = renderToString(React.createElement(BubbleScene, sceneProps));
+  assert(orbitMarkup.includes('Reset view') && orbitMarkup.includes('Drag or use arrow keys to orbit'), 'Array lessons expose orbit controls beside the scene');
+  for (const props of [{ interactive: false }, { view: '2d' }, { reduced: true }]) {
+    const markup = renderToString(React.createElement(BubbleScene, { ...sceneProps, ...props }));
+    assert(!markup.includes('bubble-orbit-footer'), 'Landing, 2D and reduced motion never offer unavailable orbit controls');
+    assert(markup.includes('-3') && markup.includes('2.5'), 'Every rendering path retains exact signed and duplicate values');
+  }
   for (const language of ['ko', 'en']) {
     const initial = bubble.run([8, 3])[0];
     const markup = renderToString(React.createElement(SpaceLesson, { previous: initial, clock: { current: initialBubblePlayback(3) }, reduced: false, view: '3d', sky: false }, React.createElement(ArrayView, { step: initial, language })));

@@ -26,6 +26,11 @@
 .bubble-art-scroll { overflow-x: auto; overflow-y: hidden; scrollbar-color: #aab3a0 #f0efe7; scrollbar-width: thin; }
 .bubble-art-frame { position: relative; }
 .bubble-canvas { height: 350px; margin-top: 8px; }
+.bubble-art[data-orbiting="true"] .bubble-canvas { cursor: grab; touch-action: none; }
+.bubble-art[data-orbiting="true"] .bubble-canvas:active { cursor: grabbing; }
+.bubble-canvas canvas:focus-visible { outline: 2px solid #9bb7a5; outline-offset: -3px; }
+.bubble-orbit-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 0 12px; }
+.bubble-orbit-footer .bubble-size-button { min-height: 36px; }
 .bubble-values { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; overflow: hidden; pointer-events: none; color: #41503e; }
 .bubble-values li { font: 15px ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 .bubble-art[data-numerals="Manrope"] .bubble-values li { font-family: "Manrope", sans-serif; font-weight: 500; }
@@ -159,6 +164,9 @@ body:has(.space-studio.idle-studio) { background: #0b1012; }
 .bubble-studio.idle-studio .bubble-immersive .bubble-scene-controls { gap: 14px; justify-content: flex-end; }
 .bubble-studio.idle-studio .bubble-immersive .space-lesson { margin-top: 0; }
 .bubble-studio.idle-studio .bubble-immersive:has(.bubble-art) .bubble-canvas { height: 100%; margin-top: 0; }
+.bubble-studio.idle-studio .bubble-immersive .bubble-art { display: flex; flex-direction: column; }
+.bubble-studio.idle-studio .bubble-immersive .bubble-art-scroll { flex: 1; min-height: 0; height: auto; }
+.bubble-studio.idle-studio .bubble-immersive .bubble-orbit-footer { flex-shrink: 0; padding: 6px 20px 8px; }
 .bubble-studio.idle-studio .bubble-immersive .playback-card { flex-shrink: 0; padding: 12px max(24px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)); }
 /* Tables and diagrams scroll within the scene while fullscreen and playback controls stay visible. */
 .bubble-studio.idle-studio .bubble-immersive:not(:has(.bubble-art, .hanoi-scene)) .bubble-control-row { position: static; flex-shrink: 0; padding: 16px 20px; }
