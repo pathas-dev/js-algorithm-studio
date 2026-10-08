@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-08T02:48:47.698501+00:00",
+  "generatedAt": "2026-10-08T03:15:51Z",
   "title": "Design System: 이젠 아무래도 좋을 알고리즘",
   "extensions": {
     "colorMeta": {
@@ -1004,7 +1004,15 @@
       },
       "code": {
         "displayName": "Source Code",
-        "purpose": "JavaScript, values and numerical evidence in native monospace stacks."
+        "purpose": "JavaScript and numerical evidence outside Bubble artwork in native monospace stacks."
+      },
+      "bubble-numeral": {
+        "displayName": "Bubble Numerals",
+        "purpose": "Bubble-only in-canvas values and fixed index rail use self-hosted Manrope 500; 2.8KB numeric WOFF2 subset and OFL license. Measured-width, 256px-high CanvasTextures rebuild after font load. Other array lessons and landing retain 52px native monospace canvas text and 80px-high textures."
+      },
+      "bubble-index": {
+        "displayName": "Bubble Index Metadata",
+        "purpose": "Bubble-only fixed screen-space index rail: 12px, tabular numerals and .04em tracking. Other arrays retain 11px index metadata where shown."
       }
     },
     "shadows": [
@@ -1109,6 +1117,21 @@
         "name": "hanoi-ring-transfer",
         "value": "1400ms trace-clock lift/travel/settle; independent spin period = 8 + disc / n * 4 seconds",
         "purpose": "Native torus rings move between the actual A/B/C pole arrays and stack levels. Pause freezes transfer progress; local surface spin continues only while visible. Projected numbers and exact top-to-bottom pole records retain numerical truth; reduced motion or failure preserves static evidence."
+      },
+      {
+        "name": "bubble-fullscreen-entry",
+        "value": "320ms cubic-bezier(.16, 1, .3, 1); scale .985→1; opacity .6→1",
+        "purpose": "Bubble-only immersive arrival: one fullscreen action, mounted scene plus view/zoom/loop controls and transport. Native fullscreen preferred with viewport fallback; title, narrative, stage heading, legend and input/editor are hidden. Focus trap, body scroll lock and focus return to the fullscreen action remain active; playback persists."
+      },
+      {
+        "name": "bubble-fullscreen-exit",
+        "value": "180ms ease-in; scale 1→.99; opacity 1→.5",
+        "purpose": "Bubble explicit exit and fallback Escape animate before closing; native browser Escape exits immediately. Scene and playback remain mounted through entry and exit."
+      },
+      {
+        "name": "bubble-fullscreen-reduced",
+        "value": "opacity .9→1 entry, 1→.9 exit; animation/transition duration 0.01ms",
+        "purpose": "Reduced motion removes scaling from Bubble fullscreen feedback; the global reduced-motion override keeps the opacity transition minimal."
       }
     ],
     "breakpoints": [
@@ -1210,7 +1233,7 @@
     {
       "name": "Array view switch",
       "kind": "input",
-      "description": "Array view controls use native 2D/3D radios and compact zoom buttons: (50–200%) in (25%) steps, with the displayed percentage resetting to (100%). View and zoom changes preserve playback; magnified arrays scroll horizontally. These controls are disabled while editing, and zoom is omitted for the static reduced-motion view. Every lesson offers Enlarge and Fullscreen buttons. Fullscreen uses native `requestFullscreen` where available, otherwise fills the browser viewport with an explicit Exit fullscreen button. The focused view uses an active focus trap; Escape closes it and restores focus to Enlarge. Array scenes flex into the height remaining after the heading and controls, keeping transport visible on mobile while explanatory and editing content is hidden.",
+      "description": "Array view controls use native 2D/3D radios and compact zoom buttons: (50–200%) in (25%) steps, with the displayed percentage resetting to (100%). View and zoom changes preserve playback; magnified arrays scroll horizontally. These controls are disabled while editing, and zoom is omitted for the static reduced-motion view. Other lessons retain separate Enlarge and Fullscreen actions; sorting and search scenes flex into the height remaining after headings and controls.\n\nBubble uses one fullscreen entry/exit action. Native `requestFullscreen` is preferred, with a browser-viewport fallback. The immersive view contains the mounted live scene, view/zoom/loop controls and transport; title, narrative, stage heading, legend and input/editor are hidden. The scene fills the height remaining above transport at desktop and mobile widths. Focus stays trapped, body scrolling is locked, and leaving returns focus to Bubble’s fullscreen action.\n\nBubble’s scene arrives over (320ms), scaling (.985→1) and fading (.6→1) with exponential ease-out (`cubic-bezier(.16, 1, .3, 1)`). Explicit exit and fallback Escape depart over (180ms), scaling to (.99) and fading to (.5) with ease-in. Native browser Escape exits immediately. Reduced motion uses opacity only (.9→1 on entry and →.9 on exit), under the global (0.01ms) animation/transition override. Entry and exit preserve the mounted scene and playback.",
       "html": "<div class=\"ds-space-view-sample\"><fieldset class=\"ds-bubble-view\"><legend class=\"ds-bubble-view-label\">View mode</legend><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"2d\"><span>2D</span></label><label><input type=\"radio\" name=\"ds-bubble-view\" value=\"3d\" checked><span>3D</span></label></fieldset></div>",
       "css": ".ds-space-view-sample{color-scheme:dark;background:#0b1012;padding:16px}.ds-bubble-view{display:flex;gap:2px;padding:3px;margin:0;border:1px solid #2c3936;border-radius:9px;font-family:\"Pretendard\",\"Noto Sans KR\",system-ui,sans-serif}.ds-bubble-view-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.ds-bubble-view label{position:relative;cursor:pointer}.ds-bubble-view input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}.ds-bubble-view span{display:block;padding:8px 12px;border-radius:6px;color:#a3b0a7;font-size:12px;font-weight:550}.ds-bubble-view input:checked+span{background:#26362e;color:#e2e7d9}.ds-bubble-view input:hover+span{background:#1d2a25}.ds-bubble-view input:focus-visible+span{outline:3px solid #9bb7a5;outline-offset:3px}.ds-bubble-view:disabled{opacity:.5}"
     },
@@ -1231,7 +1254,7 @@
       "Worn numbered planets, procedural atmosphere and equally sized model stars.",
       "Lighter headings and quiet bilingual copy.",
       "Visible execution with code closed until requested.",
-      "Monospaced values and distinct execution states."
+      "Exact numeric values and distinct execution states."
     ],
     "rules": [
       {

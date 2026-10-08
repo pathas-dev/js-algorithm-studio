@@ -9,7 +9,7 @@ import { springProgress, planetRadius, planetSpacing, planetTransfer, axialAngle
 import { useSceneVisibility } from './use-scene-visibility';
 import './bubble.css';
 
-type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space'; zoom?: number; index?: number };
+type Props = { step: Step; previous: Step; clock: RefObject<BubblePlayback>; language: 'ko' | 'en'; reduced: boolean; view: '2d' | '3d'; world?: 'clay' | 'space'; zoom?: number; index?: number; numeralFont?: 'Manrope' };
 type Labels = RefObject<Map<number, HTMLLIElement>>;
 const ease = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 const seed = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
@@ -98,7 +98,7 @@ function Backdrop({ step, clock, world, spacing, renderIndex }: Pick<Props, 'ste
   return <mesh material={material} frustumCulled={false} renderOrder={-10}><planeGeometry args={[2, 2]} /></mesh>;
 }
 
-function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world, spacing, visible, renderIndex }: { item: Item; index: number; maximum: number; spacing: number; visible: boolean; labels: Labels; signed: boolean; renderIndex: number } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world'>) {
+function Stone({ item, index, step, previous, clock, maximum, labels, signed, view, world, spacing, visible, renderIndex, fontReady, numeralFont }: { item: Item; index: number; maximum: number; spacing: number; visible: boolean; labels: Labels; signed: boolean; renderIndex: number; fontReady: boolean } & Pick<Props, 'step' | 'previous' | 'clock' | 'view' | 'world' | 'numeralFont'>) {
   const mesh = useRef<Mesh>(null);
   const ring = useRef<Mesh>(null);
   const space = world === 'space';
@@ -107,10 +107,12 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
   const number = useRef<Sprite>(null);
   const text = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = Math.max(96, String(item.value).length * 48);
-    canvas.height = 80;
+    const font = numeralFont ? '500 176px "Manrope", sans-serif' : '52px ui-monospace, monospace';
     const context = canvas.getContext('2d')!;
-    context.font = '52px ui-monospace, monospace';
+    context.font = font;
+    canvas.width = numeralFont ? Math.max(160, Math.ceil(context.measureText(String(item.value)).width) + 48) : Math.max(96, String(item.value).length * 48);
+    canvas.height = numeralFont ? 256 : 80;
+    context.font = font;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.fillStyle = space ? '#e2e7d9' : '#41503e';
@@ -119,7 +121,7 @@ function Stone({ item, index, step, previous, clock, maximum, labels, signed, vi
     texture.colorSpace = SRGBColorSpace;
     const material = new SpriteMaterial({ map: texture, depthTest: true, depthWrite: false, transparent: true, alphaTest: 0.05, toneMapped: false });
     return { texture, material, width: canvas.width / canvas.height * 0.38 };
-  }, [item.value, space]);
+  }, [item.value, space, fontReady, numeralFont]);
   useEffect(() => () => { text.texture.dispose(); text.material.dispose(); }, [text]);
   const { camera, size } = useThree();
   const anchor = useMemo(() => new Vector3(), []);
@@ -296,8 +298,15 @@ export class SceneBoundary extends Component<{ children: ReactNode; fallback: Re
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-export default function BubbleScene({ step, previous, clock, language, reduced, view, world = 'clay', zoom = 1, index: traceIndex }: Props) {
+export default function BubbleScene({ step, previous, clock, language, reduced, view, world = 'clay', zoom = 1, index: traceIndex, numeralFont }: Props) {
   const [lost, setLost] = useState(false);
+  const [fontReady, setFontReady] = useState(false);
+  useEffect(() => {
+    if (!numeralFont) return;
+    let active = true;
+    void document.fonts.load('500 176px "Manrope"', '0123456789.-').then(() => { if (active) setFontReady(true); }).catch(() => {});
+    return () => { active = false; };
+  }, [numeralFont]);
   const { sceneRef, visible } = useSceneVisibility(world === 'space' && !reduced && !lost);
   const labels = useRef(new Map<number, HTMLLIElement>());
   const renderIndex = traceIndex ?? clock.current.index;
@@ -307,7 +316,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
   const slotWidth = Math.max(world === 'space' ? 72 : 36, ...step.array.map((item) => String(item.value).length * 9 + 16));
   const fallback = <ArrayView step={step} language={language} orbital={false} planetary={world === 'space'} />;
   if (reduced || lost) return fallback;
-  return <div ref={sceneRef} className="bubble-art" data-view={view} data-world={world} data-spinning={visible}>
+  return <div ref={sceneRef} className="bubble-art" data-view={view} data-world={world} data-spinning={visible} data-numerals={numeralFont}>
     <div className="bubble-art-scroll">
       <div className="bubble-art-frame" style={{ width: `${Math.max(1, zoom) * 100}%`, minWidth: Math.max(280, step.array.length * slotWidth) * zoom }}>
         <SceneBoundary fallback={fallback} onError={() => setLost(true)}>
@@ -325,7 +334,7 @@ export default function BubbleScene({ step, previous, clock, language, reduced, 
               <mesh visible={world !== 'space' && view === '3d'} rotation={[-Math.PI / 2, 0, 0]} position={[0, signed ? -3.3 : -0.015, 0]} receiveShadow>
                 <planeGeometry args={[100, 100]} /><shadowMaterial color="#41503e" opacity={0.14} />
               </mesh>
-              {step.array.map((item, index) => <Stone renderIndex={renderIndex} visible={visible} spacing={spacing} key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
+              {step.array.map((item, index) => <Stone numeralFont={numeralFont} fontReady={fontReady} renderIndex={renderIndex} visible={visible} spacing={spacing} key={item.id} item={item} index={index} maximum={maximum} step={step} previous={previous} clock={clock} labels={labels} signed={signed} view={view} world={world} />)}
               <Dust renderIndex={renderIndex} spacing={spacing} step={step} maximum={maximum} clock={clock} world={world} />
             </Canvas>
           </div>

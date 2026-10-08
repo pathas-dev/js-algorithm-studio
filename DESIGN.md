@@ -107,6 +107,13 @@ typography:
   brand:
     fontWeight: 550
     letterSpacing: "-.025em"
+  bubble-numeral:
+    fontFamily: '"Manrope", sans-serif'
+    fontWeight: 500
+  bubble-index:
+    fontSize: "12px"
+    letterSpacing: ".04em"
+    fontFeature: '"tnum"'
   code:
     fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
     fontSize: "13px"
@@ -192,7 +199,7 @@ Every lesson shares the dark shell and quiet sage controls. Sorting and search u
 - Worn numbered planets, procedural atmosphere and equally sized model stars.
 - Lighter headings and quiet bilingual copy.
 - Visible execution with code closed until requested.
-- Monospaced values and distinct execution states.
+- Exact numeric values and distinct execution states.
 
 Source evidence includes `web/main.tsx`, `web/styles.css`, `web/idle.css`, `web/landing.css`, `web/Landing.tsx`, `web/SpaceSky.tsx`, `web/space-shader.ts`, `web/LoadingScreen.tsx`, `web/BubbleScene.tsx`, `web/bubble-motion.ts`, `web/ComplexityScene.tsx`, `web/bubble.css`, `web/cosmos.css`, `web/App.tsx`, `web/SpaceLesson.tsx`, `web/HanoiScene.tsx`, `web/PlanetMark.tsx`, `web/useBubblePlayback.ts` and `web/public/favicon.svg`. The optional legacy clay renderer remains implemented in BubbleScene; active landing, sorting and search scenes explicitly select space. The orbital SVG is the identity mark, with an ICO derivative for browser compatibility.
 
@@ -212,7 +219,9 @@ Pretendard and Noto Sans KR support Korean and English. Landing displays, sectio
 
 Lesson taglines use the tagline size, falling to (19px) below (650px). Exact lesson summaries use (15px, line-height 1.85) and a (65ch) measure. Landing intro copy uses (17px, line-height 1.8), falling to (15px) on mobile, with a (43ch) measure. Landing section copy uses the body token and a (65ch) measure. The mobile landing display uses (36px).
 
-Values, Big O notation, mathematical expressions and code use native monospace stacks with tabular numbers where specified. Array values use (15px, weight 450); action evidence uses (15px, weight 500).
+Big O notation, mathematical expressions, code and numerical evidence outside Bubble artwork use native monospace stacks with tabular numbers where specified. Array values use (15px, weight 450); action evidence uses (15px, weight 500).
+
+Bubble’s in-canvas values and fixed index rail use the bubble-numeral family and weight. The self-hosted Manrope numeric subset is (2.8KB WOFF2), with its OFL license in `web/public/fonts`. Runtime value sprites use measured-width, (256px)-high textures, rebuilt after the font loads. Index metadata uses the bubble-index size, tabular feature and tracking. This is an explicit Bubble-only opt-in; other array lessons and the landing preview retain their native monospace values, (52px) canvas text, (80px)-high textures and (11px) index metadata where shown.
 
 ## Layout
 
@@ -251,7 +260,7 @@ Sorting, search and the landing preview use spheres with radius `max(0.13, abs(v
 
 **The Model Evidence Rule.** Pair geometric work counts with their exact formulas and the model caption; never describe them as measured runtime.
 
-Global reduced-motion handling suppresses animation and transitions; lesson motion respects the user's preference. Buttons, links, timeline and disclosure summary retain a (3px) focus outline with a (3px) offset. Observatory controls use sage focus against the dark ground; compact Bubble enlargement buttons retain their (2px) offset and the landing range uses (4px).
+Global reduced-motion handling suppresses animation and transitions; lesson motion respects the user's preference. Buttons, links, timeline and disclosure summary retain a (3px) focus outline with a (3px) offset. Observatory controls use sage focus against the dark ground; compact view-size buttons retain their (2px) offset and the landing range uses (4px).
 
 ### Shared observatory execution
 
@@ -259,7 +268,11 @@ Sorting and search artwork reuse each algorithm’s exact trace and stable item 
 
 **The Printed Value Rule.** Planet geometry is illustrative; exact signed numbers and fixed numeric slots are the algorithm evidence. Rings and exchange arcs do not describe astronomical measurements or simulated physics.
 
-Array view controls use native 2D/3D radios and compact zoom buttons: (50–200%) in (25%) steps, with the displayed percentage resetting to (100%). View and zoom changes preserve playback; magnified arrays scroll horizontally. These controls are disabled while editing, and zoom is omitted for the static reduced-motion view. Every lesson offers Enlarge and Fullscreen buttons. Fullscreen uses native `requestFullscreen` where available, otherwise fills the browser viewport with an explicit Exit fullscreen button. The focused view uses an active focus trap; Escape closes it and restores focus to Enlarge. Array scenes flex into the height remaining after the heading and controls, keeping transport visible on mobile while explanatory and editing content is hidden.
+Array view controls use native 2D/3D radios and compact zoom buttons: (50–200%) in (25%) steps, with the displayed percentage resetting to (100%). View and zoom changes preserve playback; magnified arrays scroll horizontally. These controls are disabled while editing, and zoom is omitted for the static reduced-motion view. Other lessons retain separate Enlarge and Fullscreen actions; sorting and search scenes flex into the height remaining after headings and controls.
+
+Bubble uses one fullscreen entry/exit action. Native `requestFullscreen` is preferred, with a browser-viewport fallback. The immersive view contains the mounted live scene, view/zoom/loop controls and transport; title, narrative, stage heading, legend and input/editor are hidden. The scene fills the height remaining above transport at desktop and mobile widths. Focus stays trapped, body scrolling is locked, and leaving returns focus to Bubble’s fullscreen action.
+
+Bubble’s scene arrives over (320ms), scaling (.985→1) and fading (.6→1) with exponential ease-out (`cubic-bezier(.16, 1, .3, 1)`). Explicit exit and fallback Escape depart over (180ms), scaling to (.99) and fading to (.5) with ease-in. Native browser Escape exits immediately. Reduced motion uses opacity only (.9→1 on entry and →.9 on exit), under the global (0.01ms) animation/transition override. Entry and exit preserve the mounted scene and playback.
 
 The landing introduction explicitly selects the same BubbleScene space world and runs `bubble.run([3, 5, 2, 4, 1, 6])` in 3D. The shared playback hook enables autoplay for this preview while lesson playback defaults to stopped. Sorting starts on visible entry, then repeats the established hold/dust/reform cycle at (1×). A separate native bilingual pause/resume button sits outside the artwork’s lesson link; pausing sorting leaves axial rotation running. Comparison operators, before/after swap pairs and explanations follow the actual current trace step. IntersectionObserver and document visibility gate preview playback and continuous rendering; frame deltas are capped at (0.1s), preventing catch-up jumps. Reduced motion does not autoplay and omits the pause control. Its (235px) scene omits slot indices. Numeric sprite textures are generated at runtime with native canvas text, not externally produced bitmap assets.
 

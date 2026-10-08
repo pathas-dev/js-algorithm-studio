@@ -28,6 +28,8 @@
 .bubble-canvas { height: 350px; margin-top: 8px; }
 .bubble-values { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; overflow: hidden; pointer-events: none; color: #41503e; }
 .bubble-values li { font: 15px ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.bubble-art[data-numerals="Manrope"] .bubble-values li { font-family: "Manrope", sans-serif; font-weight: 500; }
+.bubble-art[data-numerals="Manrope"] .bubble-index { font-size: 12px; letter-spacing: .04em; }
 .bubble-index { position: absolute; top: 0; left: 0; white-space: nowrap; }
 .bubble-index { color: #666c5e; font-size: 11px; }
 .bubble-index::before { content: ''; display: block; width: 1px; height: 5px; margin: 0 auto 6px; background: #aab3a0; }
@@ -140,3 +142,33 @@ body:has(.space-studio.idle-studio) { background: #0b1012; }
 .space-studio.idle-studio .bubble-view-switch input:focus-visible + span { outline-color: #9bb7a5; }
 .space-why { background: #141b1d; color: #e2e7d9; border-color: #2c3936; }
 .space-why p, .space-why .mantine-Badge-root, .space-why .mantine-Button-root { color: #c9d2c6; }
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/manrope-numbers-500.woff2') format('woff2');
+  unicode-range: U+20, U+2B, U+2D-2E, U+30-39, U+5B, U+5D;
+}
+
+/* The fullscreen observation keeps the live scene mounted through entry and exit. */
+.bubble-studio.idle-studio .bubble-immersive { padding: 0; height: 100dvh; overflow: hidden; }
+.bubble-studio.idle-studio .bubble-immersive :is(.lesson-heading, .bubble-caption, .bubble-stage-heading, .legend) { display: none; }
+.bubble-studio.idle-studio .bubble-immersive .canvas-card { position: relative; padding: 0; margin: 0; border-radius: 0; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; animation: observatory-open 320ms cubic-bezier(.16, 1, .3, 1) both; }
+.bubble-studio.idle-studio .bubble-immersive .bubble-control-row { position: absolute; top: max(16px, env(safe-area-inset-top)); right: max(20px, env(safe-area-inset-right)); left: 20px; z-index: 2; justify-content: flex-end; margin: 0; }
+.bubble-studio.idle-studio .bubble-immersive .bubble-scene-controls { gap: 14px; justify-content: flex-end; }
+.bubble-studio.idle-studio .bubble-immersive .space-lesson { margin-top: 0; }
+.bubble-studio.idle-studio .bubble-immersive:has(.bubble-art) .bubble-canvas { height: 100%; margin-top: 0; }
+.bubble-studio.idle-studio .bubble-immersive .playback-card { padding: 12px max(24px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)); }
+.bubble-studio.idle-studio .bubble-closing .canvas-card { animation: observatory-close 180ms ease-in both; }
+@keyframes observatory-open { from { opacity: .6; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
+@keyframes observatory-close { to { opacity: .5; transform: scale(.99); } }
+@media (max-width: 650px) {
+  .bubble-studio.idle-studio .bubble-immersive .bubble-control-row { left: 12px; right: 12px; top: max(12px, env(safe-area-inset-top)); }
+  .bubble-studio.idle-studio .bubble-immersive .bubble-scene-controls { gap: 8px; }
+  .bubble-studio.idle-studio .bubble-immersive .playback-card { padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes observatory-open { from { opacity: .9; } to { opacity: 1; } }
+  @keyframes observatory-close { to { opacity: .9; } }
+}
