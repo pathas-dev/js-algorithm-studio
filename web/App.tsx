@@ -52,7 +52,7 @@ export default function App() {
   const [fullscreenFallback, setFullscreenFallback] = useState(false);
   const [fullscreenClosing, setFullscreenClosing] = useState(false);
   const lessonRef = useRef<HTMLDivElement>(null);
-  const enlargeRef = useRef<HTMLButtonElement>(null);
+  const fullscreenRef = useRef<HTMLButtonElement>(null);
   const focusedView = expanded || fullscreen || fullscreenFallback;
   useEffect(() => {
     const changed = () => {
@@ -70,17 +70,16 @@ export default function App() {
     document.body.style.overflow = 'hidden';
     const close = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !document.fullscreenElement) {
-        if (isSort) setFullscreenClosing(true);
-        else { setExpanded(false); setFullscreenFallback(false); }
+        setFullscreenClosing(true);
       }
     };
     window.addEventListener('keydown', close);
     return () => {
       document.body.style.overflow = overflow;
       window.removeEventListener('keydown', close);
-      enlargeRef.current?.focus({ preventScroll: true });
+      fullscreenRef.current?.focus({ preventScroll: true });
     };
-  }, [focusedView, isSort]);
+  }, [focusedView]);
   async function closeFullscreen() {
     if (document.fullscreenElement) await document.exitFullscreen();
     setFullscreenFallback(false);
@@ -90,8 +89,7 @@ export default function App() {
   async function toggleFullscreen() {
     if (fullscreenClosing) return;
     if (document.fullscreenElement || fullscreenFallback) {
-      if (isSort) setFullscreenClosing(true);
-      else await closeFullscreen();
+      setFullscreenClosing(true);
     }
     else {
       setExpanded(true);
@@ -328,7 +326,7 @@ export default function App() {
               </div>)}
               <Text size="xs" c="dimmed" mt="xl">{t(`현재 지원: ${algorithms.length}개 알고리즘`, `Available: ${algorithms.length} algorithms`)}</Text>
             </nav>
-            <FocusTrap active={focusedView}><div ref={lessonRef} className={`lesson${focusedView ? ' bubble-expanded' : ''}${isSort && focusedView ? ' bubble-immersive' : ''}${fullscreenClosing ? ' bubble-closing' : ''}`} onAnimationEnd={(event) => { if (event.animationName === 'observatory-close') void closeFullscreen(); }} role={focusedView ? 'dialog' : undefined} aria-modal={focusedView || undefined} aria-label={focusedView ? `${algorithm.name[language]} · ${t('전체화면', 'Fullscreen')}` : undefined}>
+            <FocusTrap active={focusedView}><div ref={lessonRef} className={`lesson${focusedView ? ' bubble-expanded bubble-immersive' : ''}${fullscreenClosing ? ' bubble-closing' : ''}`} onAnimationEnd={(event) => { if (event.animationName === 'observatory-close') void closeFullscreen(); }} role={focusedView ? 'dialog' : undefined} aria-modal={focusedView || undefined} aria-label={focusedView ? `${algorithm.name[language]} · ${t('전체화면', 'Fullscreen')}` : undefined}>
               <div className="lesson-heading">
                 <div><Group gap="sm"><Title order={1}>{algorithm.name[language]}</Title></Group>
                   <Text className="lesson-tagline">{lessonTaglines[algorithm.id][language]}</Text>
@@ -370,8 +368,7 @@ export default function App() {
                     {<Group className="bubble-control-row" justify="space-between" mb="sm">
                       {isBubble ? <p className="bubble-caption" data-testid="bubble-phase" data-phase={ambient.playback.phase}>{ambient.playback.phase === 'erode' ? t('잠깐의 질서가, 천천히 흩어집니다.', 'A little order, slowly drifting away.') : ambient.playback.phase === 'form' ? t('같은 숫자들이, 다시 모입니다.', 'The same numbers gather again.') : ambient.playback.phase === 'hold' ? t('제자리에 도착했습니다. 잠깐 그대로.', 'In their places. Stay a little while.') : t('서두를 일 없는, 작은 궤도 교환.', 'Small orbital exchanges, with nowhere to rush.')}</p> : <p className="bubble-caption">{t(algorithm.category === 'graph' || ['structure', 'tree', 'linked-list'].includes(algorithm.category) ? '위에서 바라보는, 작은 연결의 우주.' : algorithm.id === 'hanoi-tower' ? '세 정거장 사이로, 고리가 건너갑니다.' : '각자의 자리에 놓인, 작은 별들.', algorithm.category === 'graph' || ['structure', 'tree', 'linked-list'].includes(algorithm.category) ? 'A little connected universe, seen from above.' : algorithm.id === 'hanoi-tower' ? 'Rings travelling between three stations.' : 'Small stars, each in its place.')}</p>}
                       <div className="bubble-scene-controls">
-                        {!isSort && <button ref={enlargeRef} data-autofocus className="bubble-size-button" disabled={editingInput} aria-expanded={focusedView} onClick={() => { if (fullscreen) void document.exitFullscreen(); setFullscreenFallback(false); setExpanded(!focusedView); }}>{focusedView ? t('작게 보기', 'Shrink view') : t('크게 보기', 'Enlarge view')}</button>}
-                        <button ref={isSort ? enlargeRef : undefined} data-autofocus={isSort || undefined} className="bubble-size-button" disabled={editingInput || fullscreenClosing} aria-expanded={isSort ? focusedView : undefined} onClick={() => void toggleFullscreen()}>{fullscreen || fullscreenFallback ? t('전체화면 종료', 'Exit fullscreen') : t('전체화면으로 보기', 'View fullscreen')}</button>
+                        <button ref={fullscreenRef} data-autofocus className="bubble-size-button" disabled={editingInput || fullscreenClosing} aria-expanded={focusedView} onClick={() => void toggleFullscreen()}>{fullscreen || fullscreenFallback ? t('전체화면 종료', 'Exit fullscreen') : t('전체화면으로 보기', 'View fullscreen')}</button>
                         {orbitalLesson && <fieldset className="bubble-view-switch" disabled={editingInput}>
                           <legend className="sr-only">{t('보기 방식', 'View mode')}</legend>
                           {(['2d', '3d'] as const).map((view) => <label key={view}><input type="radio" name="bubble-view" value={view} checked={bubbleView === view} onChange={() => setBubbleView(view)} /><span>{view.toUpperCase()}</span></label>)}

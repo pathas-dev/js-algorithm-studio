@@ -159,7 +159,10 @@ body:has(.space-studio.idle-studio) { background: #0b1012; }
 .bubble-studio.idle-studio .bubble-immersive .bubble-scene-controls { gap: 14px; justify-content: flex-end; }
 .bubble-studio.idle-studio .bubble-immersive .space-lesson { margin-top: 0; }
 .bubble-studio.idle-studio .bubble-immersive:has(.bubble-art) .bubble-canvas { height: 100%; margin-top: 0; }
-.bubble-studio.idle-studio .bubble-immersive .playback-card { padding: 12px max(24px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)); }
+.bubble-studio.idle-studio .bubble-immersive .playback-card { flex-shrink: 0; padding: 12px max(24px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)); }
+/* Tables and diagrams scroll within the scene while fullscreen and playback controls stay visible. */
+.bubble-studio.idle-studio .bubble-immersive:not(:has(.bubble-art, .hanoi-scene)) .bubble-control-row { position: static; flex-shrink: 0; padding: 16px 20px; }
+.bubble-studio.idle-studio .bubble-immersive:not(:has(.bubble-art, .hanoi-scene)) .space-lesson { flex: 1; min-height: 0; overflow: auto; padding: 0 20px 16px; }
 .bubble-studio.idle-studio .bubble-closing .canvas-card { animation: observatory-close 180ms ease-in both; }
 @keyframes observatory-open { from { opacity: .6; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
 @keyframes observatory-close { to { opacity: .5; transform: scale(.99); } }
