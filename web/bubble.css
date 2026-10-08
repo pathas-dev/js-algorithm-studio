@@ -172,3 +172,7 @@ body:has(.space-studio.idle-studio) { background: #0b1012; }
   @keyframes observatory-open { from { opacity: .9; } to { opacity: 1; } }
   @keyframes observatory-close { to { opacity: .9; } }
 }
+
+/* Auxiliary sort records stay below the floating controls and leave room for the planets. */
+.bubble-studio.idle-studio .bubble-immersive .lesson-visual:has(> :is(.heap-view, .bucket-view)) { padding-top: 76px; }
+.bubble-studio.idle-studio .bubble-immersive .lesson-visual > :is(.heap-view, .bucket-view) { flex-shrink: 0; max-height: 30dvh; overflow: auto; padding-inline: 16px; }

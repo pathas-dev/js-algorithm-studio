@@ -14,3 +14,6 @@ FIRST VIEWPORT: Shared navigation and playback surround a generous observation w
 FORM: Established-world extension, pinned observatory seed 7554e619. No new concept roll or comp authority. Signature interaction: a Hanoi ring lifts, travels, and settles at its actual destination, using the same pausable trace clock.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+## Authorized follow-up repairs
+The user extended Bubble's single fullscreen action to all ten sorting lessons. Their immersive scene retains view/zoom controls and transport with the same entry/exit motion; non-sort lessons keep their existing actions. Heap and bucket evidence stays readable below the floating controls in a bounded scroll region. Shuffle, LIS, maximum subarray and jump game expose the existing orbital view/zoom controls. Hanoi retains its completed frame when the playback clock leads React and reserves actual mobile space for transport and station records. Rain and geometric numeric labels use the observatory's contrasting ink. Bubble's Manrope numerals remain local to Bubble.

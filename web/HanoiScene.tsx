@@ -5,7 +5,7 @@ import type { Step, Language } from './algorithms';
 import { useSpaceLesson } from './SpaceLesson';
 import { useSceneVisibility } from './use-scene-visibility';
 import { SceneBoundary } from './BubbleScene';
-import { BUBBLE_SWAP_MS } from './bubble-playback';
+import { traceTransitionTime } from './bubble-motion';
 
 type RingPosition = { disc: number; pole: number; level: number };
 export const hanoiPositions = (poles: number[][]): RingPosition[] => poles.flatMap((pole, station) => [...pole].reverse().map((disc, level) => ({ disc, pole: station, level })));
@@ -58,7 +58,9 @@ function Ring({ item, prior, n, active, visible, label }: { item: RingPosition; 
   useEffect(() => () => material.dispose(), [material]);
   useFrame((_, delta) => {
     if (!mesh.current) return;
-    const progress = scene.clock.current.animate ? Math.min(1, scene.clock.current.elapsed / BUBBLE_SWAP_MS) : 1;
+    const state = scene.clock.current;
+    const progress = traceTransitionTime(state, scene.index ?? state.index, Boolean(state.animate && prior && (item.pole !== prior.pole || item.level !== prior.level)));
+    if (progress === undefined) return;
     mesh.current.position.set(...hanoiPosition(item, prior, progress));
     if (visible) spin.current += Math.min(delta, .1) * Math.PI * 2 / (8 + item.disc / n * 4);
     mesh.current.rotation.set(-Math.PI / 2, 0, spin.current);
@@ -67,7 +69,7 @@ function Ring({ item, prior, n, active, visible, label }: { item: RingPosition; 
     const node = label.current.get(item.disc);
     if (node) node.style.transform = `translate(${(anchor.x + 1) * size.width / 2}px,${(1 - anchor.y) * size.height / 2}px) translate(-50%,-50%)`;
   });
-  return <mesh ref={mesh} material={material} position={hanoiPosition(item, prior, 1)} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[radius, .065, 12, 80]} /></mesh>;
+  return <mesh ref={mesh} material={material}><torusGeometry args={[radius, .065, 12, 80]} /></mesh>;
 }
 
 export default function HanoiScene({ step, language }: { step: Step; language: Language }) {

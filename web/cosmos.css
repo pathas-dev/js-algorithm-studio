@@ -76,3 +76,11 @@
   .space-studio.idle-studio :is(.learning-view, .puzzle-view, .seam-view) svg { max-height: 220px; }
   .space-studio.idle-studio .chess-board { width: 220px; height: 220px; }
 }
+
+/* Station records and transport reserve their real height; the rings take the rest. */
+.space-studio.idle-studio .bubble-expanded:has(.hanoi-scene) { height: 100dvh; overflow: hidden; }
+.space-studio.idle-studio .bubble-expanded:has(.hanoi-scene) :is(.lesson-heading, .playback-card, .frontier, .legend, .hanoi-stations) { flex-shrink: 0; }
+.space-studio.idle-studio .bubble-expanded:has(.hanoi-scene) .canvas-card { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.space-studio.idle-studio .bubble-expanded:has(.hanoi-scene) :is(.space-lesson, .space-lesson-content, .lesson-visual, .puzzle-view, .hanoi-scene) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.space-studio.idle-studio .bubble-expanded .hanoi-scene .hanoi-canvas { flex: 1; min-height: 0; height: auto; }
+.space-studio.idle-studio .bubble-expanded .hanoi-scene .hanoi-labels { height: 100%; overflow: hidden; }
