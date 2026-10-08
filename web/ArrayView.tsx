@@ -11,7 +11,7 @@ export default function ArrayView({ step, language, orbital = true, planetary = 
   const reducedMotion = useReducedMotion();
   const scene = useSpaceLesson();
   if (orbital && scene && !scene.reduced) return <Suspense fallback={<div className="bubble-art"><div className="bubble-canvas bubble-loading">
-    <SpaceSky />
+    <SpaceSky variant="lesson" />
     <div className="bubble-loading-preview" aria-hidden="true"><ArrayView step={step} language={language} orbital={false} planetary /></div>
     <p role="status">{language === 'ko' ? '행성을 불러오는 중' : 'Loading planets'}</p>
   </div></div>}><BubbleScene step={step} language={language} {...scene} world="space" /></Suspense>;

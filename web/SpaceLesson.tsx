@@ -25,7 +25,7 @@ export default function SpaceLesson({ children, sky, onZoom, ...scene }: Scene &
     return () => element.removeEventListener('wheel', wheel);
   }, [onZoom, scene.reduced, sceneRef]);
   return <Context.Provider value={scene}><div ref={sceneRef} className="space-lesson" data-spinning={visible}>
-    {sky && <SpaceSky active={visible} />}
+    {sky && <SpaceSky active={visible} variant="lesson" />}
     <div className="space-lesson-content">{children}</div>
   </div></Context.Provider>;
 }

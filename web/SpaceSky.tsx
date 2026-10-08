@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
-import { spaceFragment, spaceVertex } from './space-shader';
+import { lessonFragment, spaceFragment, spaceVertex } from './space-shader';
 
-export default function SpaceSky({ active = true }: { active?: boolean }) {
+export default function SpaceSky({ active = true, variant = 'ambient' }: { active?: boolean; variant?: 'ambient' | 'lesson' }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [lost, setLost] = useState(false);
   const reduced = Boolean(useReducedMotion());
@@ -28,7 +28,7 @@ export default function SpaceSky({ active = true }: { active?: boolean }) {
     const release = () => { cancelAnimationFrame(frame); shaders.forEach((shader) => gl.deleteShader(shader)); gl.deleteBuffer(buffer); gl.deleteProgram(program); };
     try {
       compile(gl.VERTEX_SHADER, spaceVertex);
-      compile(gl.FRAGMENT_SHADER, spaceFragment);
+      compile(gl.FRAGMENT_SHADER, variant === 'lesson' ? lessonFragment : spaceFragment);
       gl.linkProgram(program);
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Sky shader unavailable');
     } catch { release(); setLost(true); return; }
@@ -71,6 +71,6 @@ export default function SpaceSky({ active = true }: { active?: boolean }) {
     resize();
     visibility();
     return () => { observer.disconnect(); element.removeEventListener('webglcontextlost', contextLost); document.removeEventListener('visibilitychange', visibility); release(); };
-  }, [reduced, lost, active]);
-  return lost ? <div className="space-sky space-sky-still" aria-hidden="true" /> : <canvas ref={canvas} className="space-sky" aria-hidden="true" />;
+  }, [reduced, lost, active, variant]);
+  return lost ? <div className="space-sky space-sky-still" data-sky={variant} aria-hidden="true" /> : <canvas ref={canvas} className="space-sky" data-sky={variant} aria-hidden="true" />;
 }

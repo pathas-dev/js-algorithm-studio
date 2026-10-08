@@ -30,7 +30,7 @@ try {
     const initial = bubble.run([8, 3])[0];
     const markup = renderToString(React.createElement(SpaceLesson, { previous: initial, clock: { current: initialBubblePlayback(3) }, reduced: false, view: '3d', sky: false }, React.createElement(ArrayView, { step: initial, language })));
     assert(markup.includes('bubble-loading'), 'A cold scene reserves the canvas while its Three.js chunk loads');
-    assert(markup.includes('space-sky') && markup.includes('planet-mark'), 'Cold loading keeps a shader sky and planet preview');
+    assert(markup.includes('space-sky') && markup.includes('data-sky="lesson"') && markup.includes('planet-mark'), 'Cold loading keeps the lesson sky and planet preview');
     assert(markup.includes('role="status"') && markup.includes(language === 'ko' ? '행성을 불러오는 중' : 'Loading planets'), 'Loading has a bilingual accessible status');
     assert(!markup.includes('array-chart') && !markup.includes('class="bar"'), 'The old bar chart never flashes during planetary scene loading');
   }
