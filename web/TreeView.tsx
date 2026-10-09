@@ -1,6 +1,7 @@
 import PlanetMark from './PlanetMark';
 import { motion } from 'motion/react';
 import type { Step, Language } from './algorithms';
+import TreeSpaceView from './TreeSpaceView';
 
 type Node = { id: number; value: number; depth: number; left: number; right: number; balance?: number; height?: number; color?: string };
 
@@ -21,7 +22,7 @@ export default function TreeView({ step, language }: { step: Step; language: Lan
   const rb = step.variables.structure === 'red-black-tree';
   const nodes = tree.map((node) => ({ ...node, x: 30 + (ordered.findIndex((item) => item.id === node.id) + .5) / Math.max(1, tree.length) * (width - 60), y: 35 + node.depth * (avl || rb ? 75 : 55) }));
   const height = Math.max(110, ...nodes.map((node) => node.y + (avl || rb ? 50 : 35)));
-  return <div className="structure-view">
+  return <div className="structure-view"><TreeSpaceView step={step} language={language}>
     <p>{traversal ? language === 'ko' ? '레벨 순서 이진 트리 · 주황: 현재 · 초록: 방문한 노드' : 'Level-order binary tree · orange: current · green: visited' : rb ? language === 'ko' ? 'R = 빨강 · B = 검정 · ? = 색 배정 전 · 주황 테두리는 현재 노드 · 빈 자식은 검정' : 'R = red · B = black · ? = uncolored · orange outline marks current node · null children are black' : avl ? language === 'ko' ? 'AVL · b = 왼쪽 높이 − 오른쪽 높이 · 균형 복구 후 |b| ≤ 1' : 'AVL · b = left height − right height · |b| ≤ 1 after repair' : language === 'ko' ? '왼쪽 < 현재 값 < 오른쪽 · ROOT부터 탐색' : 'Left < current value < right · search from ROOT'}</p>
     <div className="tree-scroll">
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={traversal ? language === 'ko' ? '순회 중인 이진 트리' : 'Binary tree traversal' : rb ? language === 'ko' ? '현재 레드–블랙 트리' : 'Current red–black tree' : avl ? language === 'ko' ? '현재 AVL 트리' : 'Current AVL tree' : language === 'ko' ? '현재 이진 검색 트리' : 'Current binary search tree'}>
@@ -40,6 +41,7 @@ export default function TreeView({ step, language }: { step: Step; language: Lan
         {!nodes.length && <text x={width / 2} y={55} textAnchor="middle" fill="#a3b0a7">ROOT = ∅</text>}
       </svg>
     </div>
+    </TreeSpaceView>
     {traversal && <div className="frontier">{step.variables.mode === 'tree-bfs' ? language === 'ko' ? '대기 큐 · FRONT → REAR' : 'Queue · FRONT → REAR' : language === 'ko' ? '호출 스택 · 루트 → 현재' : 'Call stack · root → current'} <strong>{step.variables.mode === 'tree-bfs' ? (JSON.parse(String(step.variables.queue)) as number[]).join(' → ') || '∅' : String(step.variables.stack) || '∅'}</strong></div>}
     {'result' in step.variables && <div className="frontier">{traversal ? language === 'ko' ? '방문 순서' : 'Visit order' : language === 'ko' ? '반환 값' : 'Returned value'} <output data-testid="operation-result">{String(traversal ? step.variables.order : step.variables.result) || '∅'}</output></div>}
   </div>;

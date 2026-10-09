@@ -5,6 +5,7 @@ import { advanceBubblePlayback, bubblePlaybackReducer, initialBubblePlayback, ty
 import { graphTravel } from './graph-scene';
 import { sequenceMotion } from './sequence-scene';
 import { storageMotion } from './storage-scene';
+import { treeMotion } from './tree-scene';
 import { linkedMotion } from './linked-scene';
 
 export default function useBubblePlayback(steps: Step[], active: boolean, autoplay = false, loop = true) {
@@ -19,7 +20,7 @@ export default function useBubblePlayback(steps: Step[], active: boolean, autopl
     const previous = steps[Math.max(0, clock.current.index - 1)];
     const graphMotion = Boolean(step.edges?.length && (graphTravel(step, previous) || typeof step.variables.via === 'number'));
     clock.current = bubblePlaybackReducer(clock.current, action.type === 'toggle'
-      ? { ...action, swap: graphMotion || sequenceMotion(step, previous) || linkedMotion(step, previous) || storageMotion(step, previous) || ['swap', 'move'].includes(step.type) || step.array.some((item, index) => previous.array[index]?.id !== item.id) }
+      ? { ...action, swap: graphMotion || sequenceMotion(step, previous) || linkedMotion(step, previous) || storageMotion(step, previous) || treeMotion(step, previous) || ['swap', 'move'].includes(step.type) || step.array.some((item, index) => previous.array[index]?.id !== item.id) }
       : action);
     setPlayback(clock.current);
   };

@@ -165,3 +165,8 @@
 .storage-observatory .graph-scene-footer { flex-wrap: wrap; }
 
 .storage-labels .storage-slot { font-size: 10px; line-height: 1.4; color: #c9d2c6; }
+
+.tree-labels { position: absolute; inset: 0; pointer-events: none; }
+.tree-labels > span { position: absolute; left: 0; top: 0; visibility: hidden; white-space: pre; text-align: center; font-size: 14px; line-height: 1.4; font-variant-numeric: tabular-nums; color: #e2e7d9; background: #14201ef2; padding: 2px 5px; }
+.tree-labels > span[data-active="true"], .tree-labels > span[data-unbalanced="true"] { color: #eed1a3; }
+.tree-observatory .graph-scene-footer { flex-wrap: wrap; }
