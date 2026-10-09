@@ -170,3 +170,20 @@
 .tree-labels > span { position: absolute; left: 0; top: 0; visibility: hidden; white-space: pre; text-align: center; font-size: 14px; line-height: 1.4; font-variant-numeric: tabular-nums; color: #e2e7d9; background: #14201ef2; padding: 2px 5px; }
 .tree-labels > span[data-active="true"], .tree-labels > span[data-unbalanced="true"] { color: #eed1a3; }
 .tree-observatory .graph-scene-footer { flex-wrap: wrap; }
+.tree-mission { margin: 12px 0 20px; max-width: 75ch; color: #e0ddcf; }
+.tree-mission > strong { display: block; font-size: 20px; font-weight: 500; }
+.tree-mission p { margin: 8px 0; line-height: 1.65; text-wrap: pretty; }
+.tree-route { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin: 8px 0; font-variant-numeric: tabular-nums; }
+.tree-route > span:first-child { min-width: 4.5em; color: #c9d2c6; }
+.tree-route ol { display: flex; flex-wrap: wrap; gap: 4px; padding: 0; margin: 0; list-style: none; }
+.tree-route li { color: #e0ddcf; }
+.tree-route li + li::before { content: '→'; padding: 0 8px; color: #9bb7a5; }
+.tree-route > span:last-child { color: #d7b578; }
+.tree-route-comparison { margin-top: 12px; }
+.tree-route-comparison .tree-route:first-child > span:last-child { color: #c9b7d2; }
+.tree-route-comparison output { color: #c9d2c6; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tree-candidates { color: #b9c9b5; }
+.tree-labels span[data-sector]:not([data-sector=''])::after { content: attr(data-sector); display: block; color: #c9d2c6; font-size: 11px; }
+.tree-probe-label { position: absolute; inset: 0; pointer-events: none; }
+.tree-probe-label span { position: absolute; top: 0; left: 0; white-space: nowrap; color: #edce98; background: #0b1012; padding: 2px 5px; font-size: 12px; font-variant-numeric: tabular-nums; visibility: hidden; }
+.tree-arrival-label span { color: #c9d2c6; }

@@ -17,7 +17,8 @@ export function treeModel(step: Step, capacity = step.array.length) {
 }
 
 export function treeMotion(step: Step, previous: Step) {
-  return treeSceneSupported(step) && step.variables.tree !== previous.variables.tree;
+  return treeSceneSupported(step) && (step.variables.tree !== previous.variables.tree
+    || step.type !== 'done' && (step.variables.value !== previous.variables.value || step.indices.join() !== previous.indices.join()));
 }
 
 // Detach changed arms before moving nodes, then grow only the recorded replacements.

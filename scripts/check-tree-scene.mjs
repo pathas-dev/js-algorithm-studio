@@ -6,6 +6,7 @@ import { createServer } from 'vite';
 const server = await createServer({ configFile: 'web/vite.config.mts', server: { middlewareMode: true, watch: null } });
 try {
   const { treeModel, treeMotion, treePosition, treeArmProgress, treeLabel, treeTransferText, treeSceneSupported } = await server.ssrLoadModule('/tree-scene.ts');
+  const { treeJourney, treeJourneyText, treeProbePosition, treeRoute, treeJourneyBounds } = await server.ssrLoadModule('/tree-journey.ts');
   const { algorithms } = await server.ssrLoadModule('/algorithms.ts');
   const { default: SpaceLesson } = await server.ssrLoadModule('/SpaceLesson.tsx');
   const { default: LessonView } = await server.ssrLoadModule('/LessonView.tsx');
@@ -30,6 +31,32 @@ try {
         const prior = steps[Math.max(0, index - 1)];
         const model = treeModel(step, capacity);
         const before = treeModel(prior, capacity);
+        const journey = treeJourney(step, prior);
+        const bounds = treeJourneyBounds(journey, model, before);
+        if (journey.vacancy) {
+          assert(bounds.height / 2 >= Math.abs(journey.vacancy[1]) + 1, 'Vacancy, craft and label fit the scene');
+          assert(bounds.width / 2 >= Math.abs(journey.vacancy[0]) + 1.35);
+        }
+        for (const path of [journey.path, ...(journey.rotation ? [journey.rotation.before, journey.rotation.after] : [])]) {
+          if (path.length) assert.equal(path[0].depth, 0);
+          path.slice(1).forEach((gate, i) => assert([path[i].left, path[i].right].includes(gate.id), 'Routes use recorded children only'));
+        }
+        assert(journey.candidates.every((id) => !journey.excluded.includes(id)));
+        if (journey.inspecting && journey.active && journey.side) {
+          journey.candidates.forEach((id) => {
+            const candidate = model.units.find((unit) => unit.id === id);
+            assert(journey.side === 'left' ? candidate.value < journey.active.value : candidate.value > journey.active.value);
+          });
+          assert(journey.vacancy ? journey.candidates.length === 0 : journey.candidates.length > 0);
+        }
+        for (const t of [0,.22,.5,.65,.78,1]) assert(treeProbePosition(journey,t).every(Number.isFinite));
+        if (journey.rotation) {
+          assert.equal(journey.rotation.before.at(-1).value, journey.rotation.value);
+          assert.equal(journey.rotation.after.at(-1).value, journey.rotation.value);
+          assert(journey.rotation.before.length > journey.rotation.after.length);
+          assert.deepEqual(journey.rotation.inorder, [...model.units].sort((a,b) => a.value-b.value).map((unit) => unit.value));
+        }
+        for (const language of ['ko','en']) assert.equal(typeof treeJourneyText(step,journey,language), 'string');
         const raw = JSON.parse(step.variables.tree);
         assert(treeSceneSupported(step));
         assert.equal(new Set(model.units.map((unit) => unit.id)).size, model.units.length);
@@ -84,6 +111,7 @@ try {
           }
           const scene = renderToStaticMarkup(React.createElement(SpaceLesson, { ...props, reduced: false }, React.createElement(TreeScene, { step, language, fallback })));
           assert(scene.includes('Inspect exact tree state') || scene.includes('정확한 트리 상태 보기'));
+          assert(scene.includes('data-testid="tree-mission"'));
         }
         checked++;
       }
@@ -99,9 +127,22 @@ try {
   assert.equal(treeArmProgress(false,true,1), 0);
   assert.equal(treeArmProgress(true,false,0), 0);
   assert.equal(treeArmProgress(true,false,1), 1);
+  const avl = algorithms.find((entry) => entry.id === 'avl-tree');
+  const ll = avl.run([30,20,10], undefined, undefined, undefined, '');
+  const turn = ll.findIndex((step) => step.type === 'rotation');
+  const proof = treeJourney(ll[turn], ll[turn-1]).rotation;
+  assert.equal(proof.value, 10);
+  assert.deepEqual(proof.before.map((gate) => gate.value), [30,20,10]);
+  assert.deepEqual(proof.after.map((gate) => gate.value), [20,10]);
+  const bst = algorithms.find((entry) => entry.id === 'binary-search-tree');
+  const missing = bst.run([30,20,10],undefined,undefined,undefined,'find 15');
+  const absent = missing.findIndex((step) => step.type === 'find');
+  const expedition = treeJourney(missing[absent],missing[absent-1]);
+  assert(expedition.vacancy && expedition.target === 15);
+  assert.deepEqual(treeRoute(treeModel(missing[absent]),15).map((gate) => gate.value), [30,20,10]);
   for (const id of ['red-black-tree','tree-bfs','tree-dfs','min-heap','trie']) {
     const algorithm = algorithms.find((entry) => entry.id === id);
     if (algorithm) assert(algorithm.run(algorithm.example, algorithm.target, algorithm.edges, algorithm.directed).every((step) => !treeSceneSupported(step)));
   }
-  console.log(`Checked ${checked} tree snapshots: stable IDs, exact L/R arms, all four AVL cases (${rotations} single rotations), middle-branch transfers, deletion value copies, 12-node/empty/duplicate/signed inputs, pause/resume/seek and bilingual fallback.`);
+  console.log(`Checked ${checked} tree snapshots: exact routes/candidate sectors, same-destination rotation proof, vacancy/probe bounds, stable IDs/L/R arms, all four AVL cases (${rotations} single rotations), deletion copies, empty/12-node/duplicate/signed inputs, pause/resume/seek and bilingual fallback.`);
 } finally { await server.close(); }
